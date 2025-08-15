@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fortiview Holdings – Services</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --dark: #02050af3;
+      --mid:  #1e1f21;
+      --gold: #5c8c45;
+      --light: #ffffffc1;
+      --shadow: rgba(159, 249, 81, 0.6);
+      --radius: 10px;
+      --gap:    1.5rem;
+    }
+
+    * { box-sizing: border-box; margin:0; padding:0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--dark);
+      color: var(--light);
+      padding: 2rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    header h1 {
+      color: var(--gold);
+      font-size: 2.5rem;
+      margin-bottom: .3rem;
+    }
+
+    header p {
+      opacity: .8;
+      font-size: 1rem;
+    }
+
+    /* GRID CONTAINER */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: var(--gap);
+    }
+
+    /* CARD BASE */
+    .card {
+      background: var(--mid);
+      border-radius: var(--radius);
+      box-shadow: 0 6px 18px var(--shadow);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: transform .3s ease, box-shadow .3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 24px var(--shadow);
+    }
+
+    .card h3 {
+      color: var(--gold);
+      font-size: 1.2rem;
+      margin-bottom: .5rem;
+    }
+
+    .card p {
+      font-size: .9rem;
+      line-height: 1.4;
+      opacity: .85;
+    }
+
+    /* FEATURED CARD (Youth Education) */
+    .card.featured {
+      grid-column: span 2;
+      background: linear-gradient(018deg, #484c09, #04034aea);
+    }
+    .card.featured::before {
+      content: '★';
+      position: absolute;
+      top: .75rem;
+      right: .75rem;
+      font-size: 1.5rem;
+      color: var(--gold);
+      opacity: .6;
+    }
+
+    @media (max-width: 600px) {
+      .card.featured {
+        grid-column: span 1;
+      }
+    }
+  </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.card').forEach(card => {
+        const path = card.dataset.path;
+        if (path) {
+          card.addEventListener('click', () => window.location.href = path);
+        }
+      });
+    });
+  </script>
+</head>
+
+<body>
+  <header>
+    <h1>Fortiview Holdings™</h1>
+  </header>
+
+  <div class="grid">
+    <div class="card" data-path="PATH_TO_LEADERSHIP_AND_STRATEGY">
+      <h3>Leadership & Business Strategy</h3>
+      <p>Team building, organizational development, and growth planning</p>
+    </div>
+
+    <div class="card" data-path="PATH_TO_OPERATIONS_MANAGEMENT">
+      <h3>Project & Operations Management</h3>
+      <p>Asset management, logistics, and workflow optimization</p>
+    </div>
+
+    <div class="card" data-path="PATH_TO_FINANCIAL_COORDINATION">
+      <h3>Financial Coordination</h3>
+      <p>Budgeting strategies, cost analysis, and funding pathways</p>
+    </div>
+
+    <div class="card" data-path="PATH_TO_MARKETING_SALES">
+      <h3>Marketing, Sales & Client Relations</h3>
+      <p>Brand development, engagement, and prospecting</p>
+    </div>
+
+    <div class="card" data-path="PATH_TO_GOVERNANCE_CONTRACTS">
+      <h3>Governance & Regulatory Support</h3>
+      <p>Business structuring, compliance strategies, and audit trails</p>
+    </div>
+
+    <div class="card" data-path="PATH_TO_CX_OPTIMIZATION">
+      <h3>Customer Experience Optimization</h3>
+      <p>Quality assurance, service strategy, and user engagement</p>
+    </div>
+
+    <div class="card" data-path="PATH_TO_NETWORKING_PARTNERSHIPS">
+      <h3>Networking & Partnerships</h3>
+      <p>Strategic alliances, vendor management, and bulk discounts</p>
+    </div>
+
+    <div class="card" data-path="PATH_TO_ADDITIONAL_SERVICES">
+      <h3>Additional Services</h3>
+      <p>Manufacturing, instrumentation, drafting, and compliance</p>
+    </div>
+
+    <div class="card" data-path="PATH_TO_PRAGOPTICS_SERVICES">
+      <h3>PragOptics™ System Integration</h3>
+      <p>Software architecture, automation, and dashboards</p>
+    </div>
+
+    <!-- New Featured Card -->
+    <div class="card featured" data-path="PATH_TO_YOUTH_EDUCATION">
+      <h3>Youth Entrepreneur Education</h3>
+      <p>Modular legal, financial & UX training tracks—empowering minors with guardian-backed business licenses.</p>
+    </div>
+  </div>
+</body>
+</html>
