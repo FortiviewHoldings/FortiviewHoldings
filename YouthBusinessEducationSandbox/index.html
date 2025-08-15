@@ -17,11 +17,11 @@
       --text-dark: #0b1c3d;
     }
 
+    * { box-sizing: border-box; margin:0; padding:0; }
+
     body {
       font-family: 'Segoe UI', sans-serif;
       background-color: var(--primary-bg);
-      margin: 0;
-      padding: 0;
       color: var(--text-light);
     }
 
@@ -34,7 +34,6 @@
       box-shadow: 0 4px 12px var(--shadow-gold);
     }
 
-    /* Top‐left controls */
     .top-left {
       position: absolute;
       top: 1rem;
@@ -45,7 +44,6 @@
     .top-left button,
     .top-left a {
       font-size: 0.9rem;
-      line-height: 1;
       padding: 0.5rem 1rem;
       border-radius: 5px;
       border: none;
@@ -54,11 +52,11 @@
       transition: background 0.25s ease;
     }
     .top-left button {
-      background-color: var(--accent-gold);
+      background: var(--accent-gold);
       color: var(--text-dark);
     }
     .top-left button:hover {
-      background-color: var(--shadow-gold);
+      background: var(--shadow-gold);
     }
     .top-left a {
       background: transparent;
@@ -66,141 +64,107 @@
       border: 1px solid var(--accent-gold);
     }
     .top-left a:hover {
-      background-color: var(--accent-gold);
+      background: var(--accent-gold);
       color: var(--text-dark);
     }
 
     .vision {
       max-width: 800px;
       margin: 2rem auto;
-      text-align: center;
-      font-size: 1.1rem;
-      background-color: var(--card-bg);
       padding: 1.5rem;
+      background: var(--card-bg);
       border-radius: 10px;
+      text-align: center;
       box-shadow: 0 4px 12px var(--shadow-green);
-      transition: transform 0.3s ease;
+      transition: transform .3s ease;
     }
-    .vision:hover {
-      transform: scale(1.02);
-    }
+    .vision:hover { transform: scale(1.02); }
 
     .card-container {
       display: flex;
+      flex-wrap: wrap;
       justify-content: center;
       gap: 1.5rem;
-      flex-wrap: wrap;
       margin: 2rem;
     }
 
-    .card {
-      background-color: var(--card-bg);
-      color: var(--text-light);
+    .card, .add-ons-card {
+      background: var(--card-bg);
       border-radius: 10px;
-      width: 250px;
-      padding: 1.5rem;
       box-shadow: 0 4px 12px var(--shadow-gold);
-      transition: transform 0.3s ease;
-      position: relative;
       overflow: hidden;
+      position: relative;
       cursor: pointer;
+      transition: transform .3s ease;
     }
-    .card:hover {
+    .card:hover, .add-ons-card:hover {
       transform: scale(1.05);
     }
 
-    .card h3 {
-      color: var(--accent-gold);
-      margin-bottom: 0.5rem;
+    .card {
+      width: 250px;
+      padding: 1.5rem;
     }
-    .card p {
-      font-size: 0.95rem;
+
+    .card h3, .add-ons-card h3 {
+      color: var(--accent-gold);
+      margin-bottom: .5rem;
+    }
+    .card p, .add-ons-card p {
+      font-size: .95rem;
       margin-bottom: 1rem;
     }
-    .card button {
-      background-color: var(--accent-gold);
+    .card button, .add-ons-card button {
+      background: var(--accent-gold);
       color: var(--text-dark);
       border: none;
-      padding: 0.5rem 1rem;
+      padding: .5rem 1rem;
       border-radius: 5px;
       cursor: pointer;
     }
 
     .add-ons-card {
-      background-color: var(--card-bg);
-      color: var(--text-light);
-      border-radius: 10px;
-      width: 100%;
       max-width: 600px;
       margin: 2rem auto;
-      padding: 1.5rem;
-      box-shadow: 0 4px 12px var(--shadow-alt);
       text-align: center;
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-      transition: transform 0.3s ease;
-    }
-    .add-ons-card:hover {
-      transform: scale(1.05);
-    }
-    .add-ons-card h3 {
-      color: var(--accent-gold);
-    }
-    .add-ons-card button {
-      margin-top: 1rem;
-      background-color: var(--accent-gold);
-      color: var(--text-dark);
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 5px;
-      cursor: pointer;
+      box-shadow: 0 4px 12px var(--shadow-alt);
     }
 
     .details {
       max-width: 900px;
       margin: 3rem auto;
-      background-color: var(--card-bg);
-      border-radius: 10px;
       padding: 2rem;
+      background: var(--card-bg);
+      border-radius: 10px;
       box-shadow: 0 4px 12px var(--shadow-orange);
-      transition: transform 0.3s ease;
+      transition: transform .3s ease;
     }
-    .details:hover {
-      transform: scale(1.02);
-    }
+    .details:hover { transform: scale(1.02); }
     .details h2 {
       color: var(--accent-gold);
       border-bottom: 2px solid var(--accent-gold);
-      padding-bottom: 0.5rem;
+      padding-bottom: .5rem;
+      margin-bottom: 1rem;
     }
     .details ul li {
-      margin-bottom: 0.5rem;
+      margin-bottom: .5rem;
     }
 
-    /* Canvas overlay for hover effects */
+    /* Canvas overlay must not block clicks */
     canvas.effect {
       position: absolute;
-      top: 0;
-      left: 0;
+      top:0; left:0;
+      width:100%; height:100%;
       pointer-events: none;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
+      z-index:1;
     }
   </style>
-
-  <script>
-    function handleSupport() {
-      window.location.href =
-      'mailto:support@fortiviewholdings.com';
-    }
-  </script>
 </head>
 <body>
+
   <header>
     <div class="top-left">
-      <button onclick="handleSupport()">Support</button>
+      <button id="btn-support">Support</button>
       <a href="submit_request.html">Submit a Request</a>
     </div>
     <h1>Youth Business Education Sandbox</h1>
@@ -208,266 +172,259 @@
   </header>
 
   <div class="vision">
-    <h2 style="color: var(--accent-gold);
-               text-align: center;
-               margin-bottom: 1rem;
-               text-decoration: underline;">
+    <h2 style="color: var(--accent-gold); text-decoration: underline;">
       Purpose and Vision
     </h2>
-    <p><strong style="color: var(--accent-gold);">
-        Parent Perspective:
-      </strong>
-      Fortiview empowers families to co-create safe, compliant business pathways for their
-      children—blending legal scaffolding, brand clarity, and mentorship into a
-      legacy-building experience. Parents remain in control, while youth gain real-world
-      tools to explore entrepreneurship responsibly.
-    </p>
-    <p><strong style="color: var(--accent-gold);">
-        Youth Perspective:
-      </strong>
-      This is your launchpad. Whether you're designing a brand, selling a product, or
-      building something entirely new—Fortiview gives you the power to create, grow, and
-      own your ideas. With your guardian by your side, you get the freedom to build
-      something real, with tools that scale as you do.
-    </p>
+    <p><strong style="color: var(--accent-gold);">Parent Perspective:</strong>
+      Fortiview empowers families to co-create safe, compliant business pathways for their children—blending legal scaffolding,
+      brand clarity, and mentorship into a legacy-building experience.</p>
+    <p><strong style="color: var(--accent-gold);">Youth Perspective:</strong>
+      Your launchpad for real-world entrepreneurship. With guardian-backed licenses, you get the freedom to build, scale, and own your ideas.</p>
   </div>
 
-<div class="card-container">
+  <div class="card-container">
     <div class="card" data-effect="launch">
       <h3>🚀 LaunchPad</h3>
       <p>$45/month<br>Custom branding, 1 business type, co-learning dashboard</p>
-      <button onclick="scrollToSection('launchpad')">Learn More</button>
+      <button class="cta-btn" data-target="launchpad">Learn More</button>
     </div>
     <div class="card" data-effect="orbit">
       <h3>🪐 Orbit</h3>
       <p>$75/month<br>2 business types, budgeting tools, mentorship access</p>
-      <button onclick="scrollToSection('orbit')">Learn More</button>
+      <button class="cta-btn" data-target="orbit">Learn More</button>
     </div>
     <div class="card" data-effect="galaxy">
       <h3>🌌 Galaxy</h3>
       <p>$125/month<br>LLC support, legal templates, branded email</p>
-      <button onclick="scrollToSection('galaxy')">Learn More</button>
+      <button class="cta-btn" data-target="galaxy">Learn More</button>
     </div>
     <div class="card" data-effect="nova">
       <h3>🌠 Nova</h3>
       <p>Custom Pricing<br>Full-stack system, nonprofit support, legacy planning</p>
-      <button onclick="scrollToSection('nova')">Learn More</button>
+      <button class="cta-btn" data-target="nova">Learn More</button>
     </div>
   </div>
 
   <div class="add-ons-card" data-effect="addons">
     <h3>🧾 Add-Ons</h3>
     <p>LLC Formation ($150–$300), Domain Setup ($25–$50), Legal Filings, Mentorship Expansion</p>
-    <button onclick= <a href="addons" style="color: var(--text-light); text-decoration: none;">View Details</a></button>
+    <button class="cta-btn" data-target="addons">View Details</button>
   </div>
 
-  <!-- Detailed Sections -->
   <div class="details" id="launchpad">
     <h2>🚀 LaunchPad Tier</h2>
     <ul>
       <li>Age Range: 13–14</li>
       <li>Guardian-backed micro-license</li>
-      <li>Custom branding kit (logo, tone engine, templates)</li>
-      <li>1 business type</li>
-      <li>Entry-level curriculum: branding, budgeting, safety</li>
-      <li>Parent-child co-learning dashboard</li>
-      <li>Legal Path: Guardian-backed Sole Proprietorship</li>
+      <li>Custom branding kit</li>
+      <li>Parent-child dashboard</li>
+      <li>Legal Path: Sole Proprietorship</li>
     </ul>
   </div>
 
   <div class="details" id="orbit">
     <h2>🪐 Orbit Tier</h2>
     <ul>
-      <li>Age Range: 14–15</li>
       <li>Everything in LaunchPad</li>
       <li>2 business types</li>
-      <li>Budgeting dashboard (Power Apps or Excel)</li>
+      <li>Budgeting dashboard</li>
       <li>Mentorship access</li>
-      <li>Intermediate curriculum: contracts, pricing, tone building</li>
-      <li>Legal Path: Guardian-backed Sole Proprietorship or optional LLC</li>
+      <li>Legal Path: Optional LLC</li>
     </ul>
   </div>
 
   <div class="details" id="galaxy">
     <h2>🌌 Galaxy Tier</h2>
     <ul>
-      <li>Age Range: 15–17</li>
       <li>Everything in Orbit</li>
-      <li>LLC formation support (optional)</li>
-      <li>Legal templates: contracts, waivers, disclaimers</li>
-      <li>Engineering resource access</li>
-      <li>Advanced curriculum: entity types, email security, filings</li>
-      <li>Branded email + DMARC/DKIM/SPF configuration</li>
-      <li>Legal Path: Optional LLC filed by Fortiview or parent</li>
+      <li>LLC formation support</li>
+      <li>Legal templates & branded email</li>
+      <li>Legal Path: LLC or parent-filed</li>
     </ul>
   </div>
 
   <div class="details" id="nova">
     <h2>🌠 Nova Tier</h2>
     <ul>
-      <li>Age Range: 16–17+</li>
       <li>Everything in Galaxy</li>
-      <li>Full-stack business system</li>
-      <li>Nonprofit formation support (optional)</li>
-      <li>Strategic consulting</li>
-      <li>Pitch deck builder</li>
+      <li>Nonprofit support</li>
       <li>Legacy planning modules</li>
-      <li>Expanded mentorship network</li>
-      <li>Legal Path: LLC or Nonprofit Formation</li>
+      <li>Legal Path: LLC or Nonprofit</li>
     </ul>
   </div>
 
   <div class="details" id="addons">
     <h2>🧾 Add-Ons Detailed</h2>
     <ul>
-      <li><strong>LLC Formation:</strong> Filed by Fortiview on behalf of parent ($150–$300)</li>
-      <li><strong>Domain Registration:</strong> Custom domain + DNS setup ($25–$50/year)</li>
-      <li><strong>Legal Filing Support:</strong> EIN, DBA, nonprofit setup (Varies)</li>
-      <li><strong>Mentorship Expansion:</strong> Additional mentor hours or specialty tracks (Tier-based)</li>
+      <li>LLC Formation: $150–$300</li>
+      <li>Domain Setup: $25–$50/yr</li>
+      <li>Legal Filing Support: EIN, DBA, Nonprofit</li>
+      <li>Mentorship Expansion: Tier-based</li>
     </ul>
   </div>
 
   <script>
-    // canvas-based hover effects
-    const effects = {
-      launch(ctx, w, h) {
-        const lines = [];
-        for (let i = 0; i < 20; i++) {
-          const angle = (Math.PI * 2 * i) / 20;
-          lines.push({
-            x: w/2, y: h/2,
-            dx: Math.cos(angle)*2, dy: Math.sin(angle)*2,
-            alpha: 1
-          });
-        }
-        let frame = 0;
-        function animate() {
-          ctx.clearRect(0,0,w,h);
-          lines.forEach(l => {
-            ctx.beginPath();
-            ctx.strokeStyle = `rgba(255,200,100,${l.alpha})`;
-            ctx.moveTo(w/2,h/2);
-            ctx.lineTo(l.x,l.y);
-            ctx.stroke();
-            l.x += l.dx;
-            l.y += l.dy;
-            l.alpha -= 0.03;
-          });
-          frame++;
-          if (frame < 40) requestAnimationFrame(animate);
-        }
-        animate();
-      },
+  // 1. Smooth scroll helper
+  function scrollToSection(id) {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  }
 
-      orbit(ctx, w, h) {
-        let angle = 0;
-        function animate() {
-          ctx.clearRect(0,0,w,h);
-          ctx.beginPath();
-          ctx.strokeStyle = 'rgba(100,200,255,0.6)';
-          ctx.arc(w/2,h/2,40,0,Math.PI*2);
-          ctx.stroke();
-          ctx.beginPath();
-          ctx.fillStyle = 'rgba(255,255,255,0.8)';
-          ctx.arc(
-            w/2 + Math.cos(angle)*40,
-            h/2 + Math.sin(angle)*40,
-            5,0,Math.PI*2
-          );
-          ctx.fill();
-          angle += 0.1;
-          if (angle < Math.PI*4) requestAnimationFrame(animate);
-        }
-        animate();
-      },
+  // 2. Support button → mailto:
+  document.getElementById('btn-support')
+    .addEventListener('click', () => {
+      window.location.href =
+        'mailto:support@fortiviewholdings.com' +
+        '?subject=Fortiview%20Support%20Request';
+    });
 
-      galaxy(ctx, w, h) {
-        const stars = Array.from({length:50}, () => ({
-          x: Math.random()*w,
-          y: Math.random()*h,
-          alpha: Math.random()
-        }));
-        let frame = 0;
-        function animate() {
-          ctx.clearRect(0,0,w,h);
-          stars.forEach(s => {
-            ctx.beginPath();
-            ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
-            ctx.arc(s.x, s.y, 2,0,Math.PI*2);
-            ctx.fill();
-            s.alpha += Math.sin(frame/10)*0.02;
-          });
-          frame++;
-          if (frame < 60) requestAnimationFrame(animate);
-        }
-        animate();
-      },
-
-      nova(ctx, w, h) {
-        let radius = 0;
-        function animate() {
-          ctx.clearRect(0,0,w,h);
-          ctx.beginPath();
-          ctx.strokeStyle = `rgba(255,255,100,${1 - radius/80})`;
-          ctx.arc(w/2,h/2,radius,0,Math.PI*2);
-          ctx.stroke();
-          radius += 2;
-          if (radius < 80) requestAnimationFrame(animate);
-        }
-        animate();
-      },
-
-      addons(ctx, w, h) {
-        const sparks = Array.from({length:15}, () => ({
+  // 3. Canvas hover effects—full implementations restored
+  const effects = {
+    launch(ctx, w, h) {
+      const lines = [];
+      for (let i = 0; i < 20; i++) {
+        const angle = (Math.PI * 2 * i) / 20;
+        lines.push({
           x: w/2, y: h/2,
-          dx: (Math.random()-0.5)*4,
-          dy: (Math.random()-0.5)*4,
+          dx: Math.cos(angle)*2, dy: Math.sin(angle)*2,
           alpha: 1
-        }));
-        let frame = 0;
-        function animate() {
-          ctx.clearRect(0,0,w,h);
-          sparks.forEach(s => {
-            ctx.beginPath();
-            ctx.fillStyle = `rgba(200,255,200,${s.alpha})`;
-            ctx.arc(s.x,s.y,3,0,Math.PI*2);
-            ctx.fill();
-            s.x += s.dx;
-            s.y += s.dy;
-            s.alpha -= 0.03;
-          });
-          frame++;
-          if (frame < 40) requestAnimationFrame(animate);
-        }
-        animate();
+        });
       }
-    };
+      let frame = 0;
+      function animate() {
+        ctx.clearRect(0,0,w,h);
+        lines.forEach(l => {
+          ctx.beginPath();
+          ctx.strokeStyle = `rgba(255,200,100,${l.alpha})`;
+          ctx.moveTo(w/2,h/2);
+          ctx.lineTo(l.x,l.y);
+          ctx.stroke();
+          l.x += l.dx;
+          l.y += l.dy;
+          l.alpha -= 0.03;
+        });
+        frame++;
+        if (frame < 40) requestAnimationFrame(animate);
+      }
+      animate();
+    },
 
-    document
-      .querySelectorAll('.card, .add-ons-card')
-      .forEach(card => {
-        let canvasEl;
-        card.addEventListener('mouseenter', () => {
-          if (canvasEl) return;
-          canvasEl = document.createElement('canvas');
-          canvasEl.className = 'effect';
-          canvasEl.width  = card.offsetWidth;
-          canvasEl.height = card.offsetHeight;
-          card.appendChild(canvasEl);
-          const ctx = canvasEl.getContext('2d');
-          const effect = card.dataset.effect;
-          if (effects[effect]) effects[effect](ctx, canvasEl.width, canvasEl.height);
+    orbit(ctx, w, h) {
+      let angle = 0;
+      function animate() {
+        ctx.clearRect(0,0,w,h);
+        ctx.beginPath();
+        ctx.strokeStyle = 'rgba(100,200,255,0.6)';
+        ctx.arc(w/2,h/2,40,0,Math.PI*2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.fillStyle = 'rgba(255,255,255,0.8)';
+        ctx.arc(
+          w/2 + Math.cos(angle)*40,
+          h/2 + Math.sin(angle)*40,
+          5,0,Math.PI*2
+        );
+        ctx.fill();
+        angle += 0.1;
+        if (angle < Math.PI*4) requestAnimationFrame(animate);
+      }
+      animate();
+    },
+
+    galaxy(ctx, w, h) {
+      const stars = Array.from({ length: 50 }, () => ({
+        x: Math.random()*w,
+        y: Math.random()*h,
+        alpha: Math.random()
+      }));
+      let frame = 0;
+      function animate() {
+        ctx.clearRect(0,0,w,h);
+        stars.forEach(s => {
+          ctx.beginPath();
+          ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
+          ctx.arc(s.x, s.y, 2,0,Math.PI*2);
+          ctx.fill();
+          s.alpha += Math.sin(frame/10)*0.02;
         });
-        card.addEventListener('mouseleave', () => {
-          if (!canvasEl) return;
-          canvasEl.style.transition = 'opacity 0.5s ease';
-          canvasEl.style.opacity = '0';
-          setTimeout(() => {
-            canvasEl.remove();
-            canvasEl = null;
-          }, 500);
+        frame++;
+        if (frame < 60) requestAnimationFrame(animate);
+      }
+      animate();
+    },
+
+    nova(ctx, w, h) {
+      let radius = 0;
+      function animate() {
+        ctx.clearRect(0,0,w,h);
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(255,255,100,${1 - radius/80})`;
+        ctx.arc(w/2,h/2,radius,0,Math.PI*2);
+        ctx.stroke();
+        radius += 2;
+        if (radius < 80) requestAnimationFrame(animate);
+      }
+      animate();
+    },
+
+    addons(ctx, w, h) {
+      const sparks = Array.from({ length: 15 }, () => ({
+        x: w/2, y: h/2,
+        dx: (Math.random() - .5)*4,
+        dy: (Math.random() - .5)*4,
+        alpha: 1
+      }));
+      let frame = 0;
+      function animate() {
+        ctx.clearRect(0,0,w,h);
+        sparks.forEach(s => {
+          ctx.beginPath();
+          ctx.fillStyle = `rgba(200,255,200,${s.alpha})`;
+          ctx.arc(s.x,s.y,3,0,Math.PI*2);
+          ctx.fill();
+          s.x += s.dx;
+          s.y += s.dy;
+          s.alpha -= 0.03;
         });
-      });
-  </script>
+        frame++;
+        if (frame < 40) requestAnimationFrame(animate);
+      }
+      animate();
+    }
+  };
+
+  // 4. Wire up canvas on hover + CTA scrolling
+  document.querySelectorAll('.card, .add-ons-card').forEach(card => {
+    let canvasEl;
+    const effectName = card.dataset.effect;
+    card.addEventListener('mouseenter', () => {
+      if (canvasEl) return;
+      canvasEl = document.createElement('canvas');
+      canvasEl.className = 'effect';
+      canvasEl.width  = card.offsetWidth;
+      canvasEl.height = card.offsetHeight;
+      card.appendChild(canvasEl);
+      const ctx = canvasEl.getContext('2d');
+      effects[effectName]?.(ctx, canvasEl.width, canvasEl.height);
+    });
+    card.addEventListener('mouseleave', () => {
+      if (!canvasEl) return;
+      canvasEl.style.transition = 'opacity .5s ease';
+      canvasEl.style.opacity = '0';
+      setTimeout(() => {
+        canvasEl.remove();
+        canvasEl = null;
+      }, 500);
+    });
+  });
+
+  document.querySelectorAll('.cta-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      scrollToSection(btn.dataset.target);
+    });
+  });
+</script>
+
 </body>
 </html>
