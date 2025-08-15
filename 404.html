@@ -2,84 +2,64 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Fortiview Holdings — Coming Soon</title>
+  <title>Coming Soon</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root {
       --dark:   #02050af3;
-      --mid:    #1e1f21;
       --gold:   #5c8c45;
-      --light:  #ffffffc1;
-      --shadow: rgba(159, 249, 81, 0.6);
       --radius: 10px;
-      --gap:    1.5rem;
+      --shadow: rgba(159,249,81,0.6);
     }
 
-    /* Reset & body */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin:0; padding:0; box-sizing:border-box; }
     html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
+      width:100%; height:100%;
+      overflow:hidden;
       background: var(--dark);
       font-family: 'Segoe UI', sans-serif;
-      color: var(--light);
+      color: #fff;
     }
 
-    /* BACKGROUND ANIMATION CONTAINER */
     .animation-container {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      perspective: 800px;
-      z-index: 1;
-      overflow: hidden;
+      position:absolute; top:0; left:0;
+      width:100%; height:100%;
+      perspective:800px;
+      z-index:1;
     }
 
     .ring {
-      position: absolute;
-      top: 50%; left: 50%;
+      position:absolute;
+      top:50%; left:50%;
       transform-style: preserve-3d;
       transform-origin: center center;
-      border-radius: 50%;
+      border-radius:50%;
+      border:4px solid var(--gold);
+      opacity:.5;
     }
-    /* outer ring */
+
     .ring.outer {
-      width: 400px;
-      height: 400px;
-      margin: -200px 0 0 -200px;
-      border: 4px solid var(--gold);
-      opacity: 0.5;
-      animation: spinOuter 12s linear infinite;
+      width:400px; height:400px;
+      margin:-200px 0 0 -200px;
+      animation:spinOuter 12s linear infinite;
     }
-    /* inner ring */
     .ring.inner {
-      width: 300px;
-      height: 300px;
-      margin: -150px 0 0 -150px;
-      border: 4px solid var(--gold);
-      animation: spinInner 8s linear infinite;
+      width:300px; height:300px;
+      margin:-150px 0 0 -150px;
+      animation:spinInner 8s linear infinite;
     }
-        .ring.outer2 {
-      width: 150px;
-      height: 150px;
-      margin: -200px 0 0 -200px;
-      border: 4px solid var(--gold);
-      opacity: 0.5;
-      animation: spinOuter2 4s linear infinite;
+
+    /* NEW RINGS */
+    .ring.outer2 {
+      width:150px; height:150px;
+      margin:-75px 0 0 -75px;
+      animation:spinOuter2 6s linear infinite;
     }
-    /* inner ring */
     .ring.inner2 {
-      width: 600px;
-      height: 600px;
-      margin: -5px 0 0 -5px;
-      border: 4px solid var(--gold);
-      animation: spinInner2 16s linear infinite;
+      width:600px; height:600px;
+      margin:-300px 0 0 -300px;
+      opacity:.3;
+      animation:spinInner2 20s linear infinite;
     }
 
     @keyframes spinOuter {
@@ -92,62 +72,59 @@
       50%  { transform: rotateX(180deg) rotateZ(-180deg); }
       100% { transform: rotateX(360deg) rotateZ(-360deg); }
     }
+
     @keyframes spinOuter2 {
-      0%   { transform: rotateX(-5eg)   rotateY(5deg); }
-      50%  { transform: rotateX(-180deg) rotateY(-180deg); }
-      100% { transform: rotateX(-360deg) rotateY(-360deg); }
+      0%   { transform: rotateX(0deg)    rotateY(180deg); }
+      50%  { transform: rotateX(180deg)  rotateY(0deg);   }
+      100% { transform: rotateX(360deg)  rotateY(180deg); }
     }
     @keyframes spinInner2 {
-      0%   { transform: rotateX(-5deg)   rotateZ(5deg); }
-      50%  { transform: rotateX(-180deg) rotateZ(180deg); }
-      100% { transform: rotateX(-360deg) rotateZ(360deg); }
+      0%   { transform: rotateX(0deg)    rotateZ(180deg); }
+      50%  { transform: rotateX(180deg)  rotateZ(0deg);   }
+      100% { transform: rotateX(360deg)  rotateZ(180deg); }
     }
 
-    /* TABLE LAYOUT for centering the card */
     table.layout {
-      position: relative;
-      z-index: 2;
-      width: 100%;
-      height: 100%;
-      border-collapse: collapse;
+      position:relative; z-index:2;
+      width:100%; height:100%;
+      border-collapse:collapse;
     }
     table.layout td {
-      text-align: center;
-      vertical-align: middle;
+      text-align:center;
+      vertical-align:middle;
     }
 
-    /* CARD STYLES */
     .card {
-      display: inline-block;
-      padding: 2rem 3rem;
-      background: var(--mid);
-      border-radius: var(--radius);
-      box-shadow: 0 0 30px var(--shadow);
-      font-size: 2.5rem;
-      font-weight: bold;
-      letter-spacing: 0.05em;
-      color: var(--light);
-      user-select: none;
-      transition: transform 0.3s ease;
+      display:inline-block;
+      padding:2rem 3rem;
+      background:#1e1f21;
+      border-radius:var(--radius);
+      box-shadow:0 0 30px var(--shadow);
+      font-size:2.5rem;
+      font-weight:bold;
+      letter-spacing:.05em;
+      transition:transform .3s ease, box-shadow .3s ease;
     }
     .card:hover {
-      transform: translateY(-5px) scale(1.02);
-      box-shadow: 0 0 40px var(--shadow);
+      transform:translateY(-5px) scale(1.02);
+      box-shadow:0 0 40px var(--shadow);
     }
   </style>
 </head>
 <body>
-  <!-- Rotating Helical Rings -->
   <div class="animation-container">
     <div class="ring outer"></div>
     <div class="ring inner"></div>
+
+    <!-- these two get added so their keyframes run -->
+    <div class="ring outer2"></div>
+    <div class="ring inner2"></div>
   </div>
 
-  <!-- Centering Table -->
   <table class="layout">
     <tr>
       <td>
-        <div class="card">COMING SOON...</div>
+        <div class="card">COMING SOON…</div>
       </td>
     </tr>
   </table>
