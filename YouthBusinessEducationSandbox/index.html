@@ -17,14 +17,7 @@
       --text-dark: #0b1c3d;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html {
-      font-size: 16px;
-    }
-    @media (max-width: 768px) {
-      html { font-size: 14px; }
-    }
+    * { box-sizing: border-box; margin:0; padding:0; }
 
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -112,6 +105,7 @@
       width: 250px;
       padding: 1.5rem;
     }
+
     .card h3, .add-ons-card h3 {
       color: var(--accent-gold);
       margin-bottom: .5rem;
@@ -159,64 +153,10 @@
     /* Canvas overlay must not block clicks */
     canvas.effect {
       position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+      top:0; left:0;
+      width:100%; height:100%;
       pointer-events: none;
-      z-index: 1;
-    }
-
-    /* Portrait on <=768px: stack, scale down text */
-    @media only screen and (orientation: portrait) and (max-width: 768px) {
-      body { padding: 0 .5rem; }
-      header { padding: 1rem; }
-      header h1 { font-size: 1.5rem; }
-      header p { font-size: .9rem; }
-
-      .vision {
-        margin: 1.5rem auto;
-        padding: 1rem;
-        font-size: 1rem;
-      }
-
-      .card-container {
-        flex-direction: column;
-        gap: 1rem;
-        margin: 1rem 0;
-      }
-      .card, .add-ons-card {
-        width: 100%;
-        max-width: none;
-        padding: 1rem;
-      }
-      .card h3, .add-ons-card h3 { font-size: 1.2rem; }
-      .card p, .add-ons-card p { font-size: .9rem; }
-      .card button, .add-ons-card button {
-        width: 100%;
-        margin-top: .5rem;
-        font-size: .9rem;
-      }
-
-      .details {
-        margin: 1.5rem auto;
-        padding: 1rem;
-      }
-      .details h2 { font-size: 1.2rem; }
-      .details ul li { font-size: .9rem; }
-    }
-
-    /* Landscape <=600px: center & constrain width */
-    @media only screen and (max-width: 600px) and (orientation: landscape) {
-      body {
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-      }
-      .card-container,
-      .add-ons-card,
-      .vision,
-      .details {
-        max-width: 600px;
-      }
+      z-index:1;
     }
   </style>
 </head>
@@ -226,7 +166,7 @@
     <div class="top-left">
       <button id="btn-support">Support</button>
       <a href="submit_request.html">Submit a Request</a>
-    </div>
+    </div><br>
     <h1>Youth Business Education Sandbox</h1>
     <p>Launch their legacy. Build it together.</p>
   </header>
@@ -236,12 +176,10 @@
       Purpose and Vision
     </h2>
     <p><strong style="color: var(--accent-gold);">Parent Perspective:</strong>
-      Fortiview empowers families to co-create safe, compliant business pathways for their
-      children—blending legal scaffolding, brand clarity, and mentorship into a
-      legacy-building experience.</p>
+      Fortiview empowers families to co-create safe, compliant business pathways for their children—blending legal scaffolding,
+      brand clarity, and mentorship into a legacy-building experience.</p>
     <p><strong style="color: var(--accent-gold);">Youth Perspective:</strong>
-      Your launchpad for real-world entrepreneurship. With guardian-backed licenses, you get the
-      freedom to build, scale, and own your ideas.</p>
+      Your launchpad for real-world entrepreneurship. With guardian-backed licenses, you get the freedom to build, scale, and own your ideas.</p>
   </div>
 
   <div class="card-container">
@@ -326,171 +264,167 @@
   </div>
 
   <script>
-    // 1. Smooth scroll helper
-    function scrollToSection(id) {
-      const el = document.getElementById(id);
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    }
+  // 1. Smooth scroll helper
+  function scrollToSection(id) {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  }
 
-    // 2. Support button → mailto:
-    document.getElementById('btn-support')
-      .addEventListener('click', () => {
-        window.location.href =
-          'mailto:support@fortiviewholdings.com' +
-          '?subject=Fortiview%20Support%20Request';
-      });
+  // 2. Support button → mailto:
+  document.getElementById('btn-support')
+    .addEventListener('click', () => {
+      window.location.href =
+        'mailto:support@fortiviewholdings.com' +
+        '?subject=Fortiview%20Support%20Request';
+    });
 
-    // 3. Canvas hover effects
-    const effects = {
-      launch(ctx, w, h) {
-        const lines = [];
-        for (let i = 0; i < 20; i++) {
-          const angle = (Math.PI * 2 * i) / 20;
-          lines.push({
-            x: w/2, y: h/2,
-            dx: Math.cos(angle)*2,
-            dy: Math.sin(angle)*2,
-            alpha: 1
-          });
-        }
-        let frame = 0;
-        function animate() {
-          ctx.clearRect(0,0,w,h);
-          lines.forEach(l => {
-            ctx.beginPath();
-            ctx.strokeStyle = `rgba(255,200,100,${l.alpha})`;
-            ctx.moveTo(w/2,h/2);
-            ctx.lineTo(l.x,l.y);
-            ctx.stroke();
-            l.x += l.dx;
-            l.y += l.dy;
-            l.alpha -= 0.03;
-          });
-          frame++;
-          if (frame < 40) requestAnimationFrame(animate);
-        }
-        animate();
-      },
-
-      orbit(ctx, w, h) {
-        let angle = 0;
-        function animate() {
-          ctx.clearRect(0,0,w,h);
-          ctx.beginPath();
-          ctx.strokeStyle = 'rgba(100,200,255,0.6)';
-          ctx.arc(w/2,h/2,40,0,Math.PI*2);
-          ctx.stroke();
-          ctx.beginPath();
-          ctx.fillStyle = 'rgba(255,255,255,0.8)';
-          ctx.arc(
-            w/2 + Math.cos(angle)*40,
-            h/2 + Math.sin(angle)*40,
-            5,0,Math.PI*2
-          );
-          ctx.fill();
-          angle += 0.1;
-          if (angle < Math.PI*4) requestAnimationFrame(animate);
-        }
-        animate();
-      },
-
-      galaxy(ctx, w, h) {
-        const stars = Array.from({length:50}, () => ({
-          x: Math.random()*w,
-          y: Math.random()*h,
-          alpha: Math.random()
-        }));
-        let frame = 0;
-        function animate() {
-          ctx.clearRect(0,0,w,h);
-          stars.forEach(s => {
-            ctx.beginPath();
-            ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
-            ctx.arc(s.x, s.y, 2,0,Math.PI*2);
-            ctx.fill();
-            s.alpha += Math.sin(frame/10)*0.02;
-          });
-          frame++;
-          if (frame < 60) requestAnimationFrame(animate);
-        }
-        animate();
-      },
-
-      nova(ctx, w, h) {
-        let radius = 0;
-        function animate() {
-          ctx.clearRect(0,0,w,h);
-          ctx.beginPath();
-          ctx.strokeStyle = `rgba(255,255,100,${1 - radius/80})`;
-          ctx.arc(w/2,h/2,radius,0,Math.PI*2);
-          ctx.stroke();
-          radius += 2;
-          if (radius < 80) requestAnimationFrame(animate);
-        }
-        animate();
-      },
-
-      addons(ctx, w, h) {
-        const sparks = Array.from({length:15}, () => ({
+  // 3. Canvas hover effects—full implementations restored
+  const effects = {
+    launch(ctx, w, h) {
+      const lines = [];
+      for (let i = 0; i < 20; i++) {
+        const angle = (Math.PI * 2 * i) / 20;
+        lines.push({
           x: w/2, y: h/2,
-          dx: (Math.random()-0.5)*4,
-          dy: (Math.random()-0.5)*4,
+          dx: Math.cos(angle)*2, dy: Math.sin(angle)*2,
           alpha: 1
-        }));
-        let frame = 0;
-        function animate() {
-          ctx.clearRect(0,0,w,h);
-          sparks.forEach(s => {
-            ctx.beginPath();
-            ctx.fillStyle = `rgba(200,255,200,${s.alpha})`;
-            ctx.arc(s.x,s.y,3,0,Math.PI*2);
-            ctx.fill();
-            s.x += s.dx;
-            s.y += s.dy;
-            s.alpha -= 0.03;
-          });
-          frame++;
-          if (frame < 40) requestAnimationFrame(animate);
-        }
-        animate();
+        });
       }
-    };
+      let frame = 0;
+      function animate() {
+        ctx.clearRect(0,0,w,h);
+        lines.forEach(l => {
+          ctx.beginPath();
+          ctx.strokeStyle = `rgba(255,200,100,${l.alpha})`;
+          ctx.moveTo(w/2,h/2);
+          ctx.lineTo(l.x,l.y);
+          ctx.stroke();
+          l.x += l.dx;
+          l.y += l.dy;
+          l.alpha -= 0.03;
+        });
+        frame++;
+        if (frame < 40) requestAnimationFrame(animate);
+      }
+      animate();
+    },
 
-    // 4. Wire up hover canvases with safe removal + CTA scrolling
-    document.querySelectorAll('.card, .add-ons-card').forEach(card => {
-      let canvasEl;
-      const effectName = card.dataset.effect;
+    orbit(ctx, w, h) {
+      let angle = 0;
+      function animate() {
+        ctx.clearRect(0,0,w,h);
+        ctx.beginPath();
+        ctx.strokeStyle = 'rgba(100,200,255,0.6)';
+        ctx.arc(w/2,h/2,40,0,Math.PI*2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.fillStyle = 'rgba(255,255,255,0.8)';
+        ctx.arc(
+          w/2 + Math.cos(angle)*40,
+          h/2 + Math.sin(angle)*40,
+          5,0,Math.PI*2
+        );
+        ctx.fill();
+        angle += 0.1;
+        if (angle < Math.PI*4) requestAnimationFrame(animate);
+      }
+      animate();
+    },
 
-      card.addEventListener('mouseenter', () => {
-        if (canvasEl) return;
-        canvasEl = document.createElement('canvas');
-        canvasEl.className = 'effect';
-        canvasEl.width  = card.offsetWidth;
-        canvasEl.height = card.offsetHeight;
-        card.appendChild(canvasEl);
-        effects[effectName]?.(canvasEl.getContext('2d'), canvasEl.width, canvasEl.height);
-      });
+    galaxy(ctx, w, h) {
+      const stars = Array.from({ length: 50 }, () => ({
+        x: Math.random()*w,
+        y: Math.random()*h,
+        alpha: Math.random()
+      }));
+      let frame = 0;
+      function animate() {
+        ctx.clearRect(0,0,w,h);
+        stars.forEach(s => {
+          ctx.beginPath();
+          ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
+          ctx.arc(s.x, s.y, 2,0,Math.PI*2);
+          ctx.fill();
+          s.alpha += Math.sin(frame/10)*0.02;
+        });
+        frame++;
+        if (frame < 60) requestAnimationFrame(animate);
+      }
+      animate();
+    },
 
-      card.addEventListener('mouseleave', () => {
-        if (!canvasEl) return;
-        canvasEl.style.transition = 'opacity .5s ease';
-        canvasEl.style.opacity    = '0';
-        setTimeout(() => {
-          if (canvasEl && canvasEl.parentNode) {
-            canvasEl.remove();
-            canvasEl = null;
-          }
-        }, 500);
-      });
+    nova(ctx, w, h) {
+      let radius = 0;
+      function animate() {
+        ctx.clearRect(0,0,w,h);
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(255,255,100,${1 - radius/80})`;
+        ctx.arc(w/2,h/2,radius,0,Math.PI*2);
+        ctx.stroke();
+        radius += 2;
+        if (radius < 80) requestAnimationFrame(animate);
+      }
+      animate();
+    },
+
+    addons(ctx, w, h) {
+      const sparks = Array.from({ length: 15 }, () => ({
+        x: w/2, y: h/2,
+        dx: (Math.random() - .5)*4,
+        dy: (Math.random() - .5)*4,
+        alpha: 1
+      }));
+      let frame = 0;
+      function animate() {
+        ctx.clearRect(0,0,w,h);
+        sparks.forEach(s => {
+          ctx.beginPath();
+          ctx.fillStyle = `rgba(200,255,200,${s.alpha})`;
+          ctx.arc(s.x,s.y,3,0,Math.PI*2);
+          ctx.fill();
+          s.x += s.dx;
+          s.y += s.dy;
+          s.alpha -= 0.03;
+        });
+        frame++;
+        if (frame < 40) requestAnimationFrame(animate);
+      }
+      animate();
+    }
+  };
+
+  // 4. Wire up canvas on hover + CTA scrolling
+  document.querySelectorAll('.card, .add-ons-card').forEach(card => {
+    let canvasEl;
+    const effectName = card.dataset.effect;
+    card.addEventListener('mouseenter', () => {
+      if (canvasEl) return;
+      canvasEl = document.createElement('canvas');
+      canvasEl.className = 'effect';
+      canvasEl.width  = card.offsetWidth;
+      canvasEl.height = card.offsetHeight;
+      card.appendChild(canvasEl);
+      const ctx = canvasEl.getContext('2d');
+      effects[effectName]?.(ctx, canvasEl.width, canvasEl.height);
     });
-
-    document.querySelectorAll('.cta-btn').forEach(btn => {
-      btn.addEventListener('click', e => {
-        e.stopPropagation();
-        scrollToSection(btn.dataset.target);
-      });
+    card.addEventListener('mouseleave', () => {
+      if (!canvasEl) return;
+      canvasEl.style.transition = 'opacity .5s ease';
+      canvasEl.style.opacity = '0';
+      setTimeout(() => {
+        canvasEl.remove();
+        canvasEl = null;
+      }, 500);
     });
-  </script>
+  });
+
+  document.querySelectorAll('.cta-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      scrollToSection(btn.dataset.target);
+    });
+  });
+</script>
 
 </body>
 </html>
