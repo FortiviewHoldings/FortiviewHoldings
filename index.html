@@ -2,39 +2,49 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Fortiview Holdings – Services</title>
+  <title>Fortiview Holdings</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     :root {
-      --dark: #02050af3;
-      --mid:  #1e1f21;
-      --gold: #5c8c45;
-      --light: #ffffffc1;
-      --shadow: rgba(159, 249, 81, 0.6);
-      --radius: 10px;
-      --gap:    1.5rem;
+      --dark:    #02050af3;
+      --mid:     #1e1f21;
+      --gold:    #5c8c45;
+      --light:   #ffffffc1;
+      --shadow:  rgba(159, 249, 81, 0.6);
+      --radius:  10px;
+      --gap:     1.5rem;
     }
 
-    * { box-sizing: border-box; margin:0; padding:0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Segoe UI', sans-serif;
       background: var(--dark);
       color: var(--light);
       padding: 2rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Fullscreen star-field canvas behind content */
+    #bg-stars {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: -1;
     }
 
     header {
       text-align: center;
       margin-bottom: 2rem;
     }
-
     header h1 {
       color: var(--gold);
       font-size: 2.5rem;
       margin-bottom: .3rem;
     }
-
     header p {
       opacity: .8;
       font-size: 1rem;
@@ -65,55 +75,44 @@
       transform: translateY(-5px);
       box-shadow: 0 10px 24px var(--shadow);
     }
-
     .card h3 {
       color: var(--gold);
       font-size: 1.2rem;
       margin-bottom: .5rem;
     }
-
     .card p {
       font-size: .9rem;
       line-height: 1.4;
       opacity: .85;
     }
 
-    /* FEATURED CARD (Youth Education) */
+    /* FEATURED CARD */
     .card.featured {
       grid-column: span 2;
-      background: linear-gradient(018deg, #484c09, #04034aea);
+      background: linear-gradient(18deg, #484c09, #04034aea);
     }
     .card.featured::before {
       content: '★';
       position: absolute;
-      top: .75rem;
-      right: .75rem;
+      top: .75rem; right: .75rem;
       font-size: 1.5rem;
       color: var(--gold);
       opacity: .6;
     }
 
     @media (max-width: 600px) {
-      .card.featured {
-        grid-column: span 1;
-      }
+      .card.featured { grid-column: span 1; }
     }
   </style>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('.card').forEach(card => {
-        const path = card.dataset.path;
-        if (path) {
-          card.addEventListener('click', () => window.location.href = path);
-        }
-      });
-    });
-  </script>
 </head>
 
 <body>
+  <!-- Full-screen background canvas -->
+  <canvas id="bg-stars"></canvas>
+
   <header>
     <h1>Fortiview Holdings™</h1>
+    <p>Our suite of strategic services</p>
   </header>
 
   <div class="grid">
@@ -162,11 +161,62 @@
       <p>Software architecture, automation, and dashboards</p>
     </div>
 
-    <!-- New Featured Card -->
+    <!-- Featured Card -->
     <div class="card featured" data-path="/YouthBusinessEducationSandbox">
       <h3>Youth Entrepreneur Education</h3>
       <p>Modular legal, financial & UX training tracks—empowering minors with guardian-backed business licenses.</p>
     </div>
   </div>
+
+  <script>
+    // 1) Card click navigation
+    document.querySelectorAll('.card').forEach(card => {
+      const path = card.dataset.path;
+      if (!path) return;
+      card.addEventListener('click', () => {
+        window.location.href = path;
+      });
+    });
+
+    // 2) Fullscreen star-field background
+    function initStarField() {
+      const canvas = document.getElementById('bg-stars');
+      const ctx = canvas.getContext('2d');
+
+      // size to viewport
+      function resize() {
+        canvas.width  = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      // generate 100 stars
+      const stars = Array.from({ length: 100 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        alpha: Math.random()
+      }));
+      let frame = 0;
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        stars.forEach(s => {
+          ctx.beginPath();
+          ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
+          ctx.arc(s.x, s.y, 2, 0, Math.PI * 2);
+          ctx.fill();
+          // flicker
+          s.alpha = 0.3 + Math.abs(Math.sin(frame/50)) * 0.7;
+        });
+        frame++;
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+    }
+
+    window.addEventListener('load', initStarField);
+  </script>
 </body>
 </html>
