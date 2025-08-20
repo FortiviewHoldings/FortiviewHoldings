@@ -84,6 +84,16 @@ a:hover {
   color: #fff176;
   text-shadow: 0 0 3px #f9c851;
 }
+    .table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 12px;
+}
+
+.table-wrapper table {
+  min-width: 600px; /* ensures table doesn't collapse too tightly */
+}
   </style>
 </head>
 <body>
@@ -178,7 +188,8 @@ a:hover {
 
 <section class="legal">
   <h2>Comparative Legal Structure Snapshot</h2>
-  <table>
+  <div class="table-wrapper">
+   <table>
     <thead>
       <tr>
         <th>Tier</th>
@@ -230,6 +241,7 @@ a:hover {
       </tr>
     </tbody>
   </table>
+  </div>
 </section>
 
 </body>
