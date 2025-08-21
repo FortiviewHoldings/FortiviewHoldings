@@ -1,248 +1,488 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Youth Business Education Sandbox</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <title>Fortiview — Youth Business Education Sandbox</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #0b1c3d;
-      color: #ffffffcc;
-      margin: 0;
-      padding: 0;
+    :root{
+      --bg-deep:#0b1022;            /* flattered navy base */
+      --bg-accent:#0b1c3d;          /* primary, used subtly */
+      --card:#101a33cc;             /* glass card */
+      --card-border:#ffffff1a;
+      --gold:#f9c851;               /* accent gold */
+      --gold-600:#d6a538;
+      --ink:#e7ecff;
+      --muted:#c6d0f0a6;
+      --success:#51f9e8;
+      --warning:#f9aa51;
+      --shadow:0 10px 30px #00000066;
+      --radius:16px;
+      --radius-sm:12px;
+      --maxw:1200px;
+      --grad:linear-gradient(135deg,#182a52 0%,#0b1c3d 40%,#1d3557 100%);
+      --gold-glow:0 0 0 2px #f9c85133, 0 10px 20px #f9c85122;
     }
-    header {
-      background-color: #0b1c3d;
-      padding: 2rem;
-      text-align: center;
-      color: #f9c851;
-      box-shadow: 0 4px 12px #f9c651b7;
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;padding:0;
+      font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      background:var(--bg-deep);color:var(--ink);scroll-behavior:smooth
     }
-    section {
-      max-width: 1000px;
-      margin: 2rem auto;
-      padding: 1.5rem;
-      background-color: #132a4f;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px #51f9e8b7;
-    }
-    h2, h3 {
-      color: #f9c851;
-      border-bottom: 1px solid #f9c851;
-      padding-bottom: 0.5rem;
-    }
-    ul {
-      margin-left: 1rem;
-    }
-    li {
-      margin-bottom: 0.5rem;
-    }
-    .tier {
-      margin-top: 2rem;
-      padding: 1rem;
-      background-color: #132a4f;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px #f9aa51b7;
-    }
-    .legal {
-      background-color: #132a4f;
-      margin-top: 2rem;
-      padding: 1rem;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px #f9a551b7;
-    }
-table {
-  width: 100%;
-  border-collapse: separate; /* allows border-radius to work */
-  border-spacing: 0;         /* removes gaps between cells */
-  margin-top: 1rem;
-  border: 2px solid #ccc;    /* visible border */
-  border-radius: 12px;       /* rounded corners */
-  overflow: hidden;          /* clips inner borders if needed */
-}
-td, th {
-  padding: 0.75rem;
-  border-bottom: 1px solid #eee;
-}
-tr:last-child td {
-  border-bottom: none;
-}
+    a{color:inherit;text-decoration:none}
+    section a{color:var(--gold)}
+    section a:hover{color:#fff176;text-shadow:0 0 3px var(--gold)}
+    img{display:block;max-width:100%}
 
-thead {
-  background-image: linear-gradient(to right, #f9c651c3, #f9c651a2);
-}
+    /* Background image layer */
+    .bg{
+      position:fixed; inset:0; z-index:-2;
+      background:
+        radial-gradient(1200px 800px at 10% -10%, #5ac8fa22, transparent 60%),
+        radial-gradient(900px 600px at 110% 10%, #f9c8511c, transparent 55%),
+        url('assets/bg.jpg') center/cover no-repeat,
+        var(--grad);
+      filter: blur(6px) saturate(1.05) brightness(.85);
+      transform: scale(1.03);
+    }
+    /* Subtle vignette overlay */
+    .bg::after{
+      content:""; position:absolute; inset:0;
+      background: radial-gradient(1000px 600px at 50% -10%, transparent, #000814aa 70%),
+                  linear-gradient(to bottom, #00000055, transparent 30%, #00000066 100%);
+    }
 
-thead th {
-  background: none; /* Prevent overriding the thead gradient */
-  color: #fff;
-  font-weight: 600;
-  text-align: left;
-}
+    /* Sticky glass header */
+    header{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter:saturate(140%) blur(10px);
+      background:#0b1224cc;
+      border-bottom:1px solid var(--card-border);
+    }
+    .nav{
+      max-width:var(--maxw); margin:0 auto; padding:14px 20px;
+      display:flex; align-items:center; gap:16px; justify-content:space-between;
+    }
+    .brand{display:flex; align-items:center; gap:10px; letter-spacing:.5px}
+    .logo{
+      width:34px; height:34px; border-radius:10px;
+      background: conic-gradient(from 220deg, #f9c851, #51f9e8, #f9aa51, #f9c851);
+      box-shadow: var(--gold-glow);
+    }
+    .brand strong{font-weight:700}
+    nav ul{display:flex; gap:14px; list-style:none; align-items:center; margin:0;padding:0}
+    .link{
+      padding:9px 14px; border-radius:999px; color:var(--muted);
+      border:1px solid transparent; transition:.2s ease;
+    }
+    .link:hover{color:var(--ink); border-color:#ffffff22; background:#ffffff10}
+    .cta{
+      background: linear-gradient(180deg, var(--gold), var(--gold-600));
+      color:#1a1405; font-weight:700;
+      padding:10px 16px; border-radius:999px; box-shadow: var(--gold-glow);
+    }
+    .cta:hover{filter:brightness(.95)}
 
-a:hover {
-  color: #fff176;
-  text-shadow: 0 0 3px #f9c851;
-}
-    .table-wrapper {
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  border-radius: 12px;
-}
+    /* Sections */
+    .section{max-width:var(--maxw); margin:36px auto; padding:0 20px}
 
-.table-wrapper table {
-  min-width: 600px; /* ensures table doesn't collapse too tightly */
-}
+    /* Hero */
+    .hero{
+      max-width:var(--maxw); margin:40px auto; padding:24px 20px;
+      display:grid; grid-template-columns:1.2fr .8fr; gap:28px;
+    }
+    .hero-card{
+      background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius);
+      padding:32px; box-shadow:var(--shadow);
+    }
+    .kicker{color:var(--success); font-weight:700; letter-spacing:.12em; text-transform:uppercase; font-size:.8rem}
+    h1{font-size:clamp(2rem, 3.2vw, 3rem); line-height:1.1; margin:.4rem 0 1rem 0}
+    .sub{color:var(--muted); font-size:1.05rem}
+    .hero-side{
+      display:grid; gap:16px;
+    }
+    .stat{
+      padding:20px; border-radius:var(--radius-sm);
+      background:#0f1933cc; border:1px solid var(--card-border);
+      display:flex; align-items:flex-start; gap:14px;
+    }
+    .pill{padding:6px 10px; border-radius:999px; font-weight:700; font-size:.8rem;
+      color:#071018; background:linear-gradient(180deg,#51f9e8,#22d3ee)}
+    .pill.gold{background:linear-gradient(180deg,#f9c851,#f39c12)}
+
+    /* Showcase gallery */
+    .gallery-wrap{
+      position:relative; overflow:hidden; border-radius:var(--radius); border:1px solid var(--card-border);
+      background:#0e1730cc; box-shadow:var(--shadow);
+    }
+    .rail{
+      display:flex; gap:14px; padding:16px; overflow-x:auto; scroll-snap-type:x mandatory;
+      scrollbar-width:none; -ms-overflow-style:none;
+    }
+    .rail::-webkit-scrollbar{display:none}
+    .tile{
+      flex:0 0 auto; width:320px; height:200px; position:relative; border-radius:12px;
+      overflow:hidden; scroll-snap-align:center; border:1px solid #ffffff1a; background:#0c1530;
+    }
+    .tile img{width:100%; height:100%; object-fit:cover; opacity:.95; transition:.25s}
+    .tile:hover img{transform:scale(1.03); opacity:1}
+    .tile .label{
+      position:absolute; left:10px; bottom:10px; padding:6px 10px; border-radius:999px;
+      background:#0b1224cc; border:1px solid #ffffff22; color:#fff; font-size:.8rem
+    }
+    .gallery-controls{
+      position:absolute; inset:auto 10px 10px auto; display:flex; gap:8px; z-index:2;
+    }
+    .ctrl{
+      width:36px; height:36px; display:grid; place-items:center; border-radius:10px;
+      background:#0b1224cc; border:1px solid #ffffff2a; color:#fff; cursor:pointer
+    }
+    .ctrl:hover{background:#0b1224e0}
+
+    /* Purpose + Legal sections */
+    .card{
+      background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius);
+      padding:24px; box-shadow:var(--shadow);
+    }
+    .card h2{font-size:1.6rem; margin:0 0 12px 0; color:var(--gold)}
+    .card h3{color:var(--gold); margin:18px 0 8px 0}
+    .card ul{margin:8px 0 0 18px}
+    .card li{margin:.4rem 0}
+
+    /* Tiers */
+    .tiers{display:grid; grid-template-columns:repeat(4,1fr); gap:16px}
+    .tier{
+      background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius-sm);
+      padding:18px; box-shadow:var(--shadow); transform-style:preserve-3d; transition:transform .2s ease, box-shadow .2s ease;
+    }
+    .tier:hover{transform:translateY(-4px); box-shadow:0 16px 40px #00000088}
+    .tier h3{display:flex; align-items:center; gap:8px; margin:4px 0 8px 0; color:var(--gold)}
+    .tier ul{margin:0; padding-left:18px; color:var(--ink)}
+    .tier li{margin:.35rem 0}
+
+    /* Table */
+    .table-wrapper{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--card-border); background:#0e1730cc; box-shadow:var(--shadow)}
+    table{min-width:700px;width:100%;border-collapse:collapse;overflow:hidden;border-radius:var(--radius)}
+    thead{background:linear-gradient(to right,var(--gold),var(--gold-600))}
+    th,td{padding:12px 14px;border-bottom:1px solid #ffffff1a;text-align:left;color:#e9eefc}
+    thead th{color:#1a1405;font-weight:700}
+    tr:last-child td{border-bottom:none}
+    tbody a{color:var(--gold)}
+
+    /* Footer */
+    footer{margin:50px 0 30px 0; color:var(--muted); text-align:center; font-size:.9rem}
+
+    /* Responsive */
+    @media (max-width: 1000px){
+      .hero{grid-template-columns:1fr}
+      .tiers{grid-template-columns:repeat(2,1fr)}
+    }
+    @media (max-width: 640px){
+      .tiers{grid-template-columns:1fr}
+      .tile{width:84vw; height:52vw}
+      .nav{gap:10px}
+      nav ul{gap:8px}
+      .link{padding:8px 10px}
+      .hero-card{padding:22px}
+    }
+
+    /* Motion preferences */
+    @media (prefers-reduced-motion: reduce){
+      *{animation:none!important; transition:none!important}
+    }
   </style>
 </head>
 <body>
+  <div class="bg" aria-hidden="true"></div>
 
-<header>
-  <h1>Youth Business Education Sandbox</h1>
-  <p>From sandbox to entity. Guardian-Powered, legacy-secured.
-</p>
-</header>
-<section class="legal-intro">
-  <h2>Hey Parents—You’ve Got the Power. We’ve Got the Framework.</h2>
+  <header>
+    <div class="nav">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <strong>Fortiview</strong>
+        <span style="color:var(--muted)">Youth Business Sandbox</span>
+      </div>
+      <nav aria-label="Primary">
+        <ul>
+          <li><a class="link" href="#intro">Intro</a></li>
+          <li><a class="link" href="#purpose">Purpose</a></li>
+          <li><a class="link" href="#gallery">Showcase</a></li>
+          <li><a class="link" href="#tiers">Tiers</a></li>
+          <li><a class="link" href="#compare">Snapshot</a></li>
+          <li><a class="cta" href="submit_request.html">Submit a Request</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
 
-  <p>
-    If your child thinks like a builder—whether it’s business automation, infrastructure design, or just dreaming up systems that work—they’re not just playing. They’re prototyping a future. This guide is here to help you understand your rights, your role, and the legal frameworks we’ve built to keep everything safe, compliant, and scalable.
-  </p>
+  <main>
+    <!-- HERO -->
+    <section id="intro" class="hero">
+      <div class="hero-card">
+        <div class="kicker">From sandbox to entity. Guardian‑powered, legacy‑secured.</div>
+        <h1>Hey Parents—You’ve Got the Power. We’ve Got the Framework.</h1>
+        <p class="sub">
+          If your child thinks like a builder—whether it’s business automation, infrastructure design, or just dreaming up systems that work—they’re not just playing. They’re prototyping a future. This guide is here to help you understand your rights, your role, and the legal frameworks we’ve built to keep everything safe, compliant, and scalable.
+        </p>
+        <p class="sub">
+          You’re in control. Every tier is optional. Every agreement is parent‑signed. And when your child’s ready to take the next step—whether it’s a napkin sketch or a full‑blown business—we’re here as a resource to co‑develop, reality‑check, and support their growth at every level.
+        </p>
+        <p class="sub">
+          This isn’t a contract—it’s an open door. A chance to explore what’s possible, with your guidance and our support. We’ve built this framework to protect your family, honor your values, and help your child build something real—something they can own, grow, and be proud of.
+        </p>
+      </div>
+      <div class="hero-side">
+        <div class="stat">
+          <span class="pill">Safe by design</span>
+          <div>
+            <strong>Parent‑controlled access</strong>
+            <div style="color:var(--muted)">Credentials, dashboards, and audits are mirrored to guardians.</div>
+          </div>
+        </div>
+        <div class="stat">
+          <span class="pill gold">Own the IP</span>
+          <div>
+            <strong>Youth keeps the rights</strong>
+            <div style="color:var(--muted)">Build, learn, and launch without giving up ownership.</div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  <p>
-    You’re in control. Every tier is optional. Every agreement is parent-signed. And when your child’s ready to take the next step—whether it’s a napkin sketch or a full-blown business—we’re here as a resource to co-develop, reality-check, and support their growth at every level.
-  </p>
+    <!-- PURPOSE -->
+    <section id="purpose" class="section">
+      <div class="card">
+        <h2>This Isn’t Business as Usual—It’s Legacy in Motion</h2>
+        <p>
+          This service is unlike our standard business offerings. It’s a deeply reduced‑rate initiative designed to engage young minds in the real‑world development of business operations, infrastructure, and automation. It’s cancellable at any time. All data remains secure and transferable to another cloud stack if desired. We’re not here to own your child’s idea—we’re here to help them build it, protect it, and understand how to stay the main stakeholder for as long as possible.
+        </p>
+        <p>
+          Each tier represents a proposed curriculum, paced by your child’s energy and your comfort level. We won’t engage in anything we believe could compromise a youth’s financial future, a parent’s financial stability, or anyone’s mental or physical health. These are the youth—the future of business. We offer a safe, empowering space to explore what they’re capable of.
+        </p>
+        <p>
+          We hope to scale this into a community‑driven system, where local business owners and schools collaborate to mentor, guide, and uplift young entrepreneurs. Whether your child wants to cut hair, build apps, or design systems that run Corporate Giants, this framework is here to support them—and you—every step of the way.
+        </p>
+      </div>
+    </section>
 
-  <p>
-    This isn’t a contract—it’s an open door. A chance to explore what’s possible, with your guidance and our support. We’ve built this framework to protect your family, honor your values, and help your child build something real—something they can own, grow, and be proud of.
-  </p>
-</section>
+    <!-- SHOWCASE -->
+    <section id="gallery" class="section">
+      <h2 style="color:var(--gold); margin:0 0 12px 0">Showcase</h2>
+      <div class="gallery-wrap">
+        <div class="gallery-controls" aria-hidden="true">
+          <button class="ctrl" id="prev" title="Previous">◀</button>
+          <button class="ctrl" id="next" title="Next">▶</button>
+        </div>
+        <div class="rail" id="rail" aria-label="Auto-scrolling gallery"></div>
+      </div>
+      <div style="margin-top:8px; color:var(--muted); font-size:.9rem">
+        Tip: Drop a gallery.json in /assets to auto-populate from Power Automate.
+      </div>
+    </section>
 
+    <!-- TIERS -->
+    <section id="tiers" class="section">
+      <h2 style="color:var(--gold); margin:0 0 12px 0">Legal Blueprint by Tier</h2>
+      <div class="tiers">
+        <article class="tier">
+          <h3>🚀 LaunchPad Tier</h3>
+          <ul>
+            <li>Non‑commercial sandbox; no formal entity required</li>
+            <li>Educational license signed by parent/guardian</li>
+            <li>All contracts executed by parent only</li>
+            <li>Revenue capped below reporting thresholds</li>
+            <li><strong>Legal Basis:</strong> <a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.151.htm" target="_blank" rel="noopener">Texas Family Code §151.001</a></li>
+          </ul>
+        </article>
 
-<section class="legal-purpose">
-  <h2>This Isn’t Business as Usual—It’s Legacy in Motion</h2>
+        <article class="tier">
+          <h3>🪐 Orbit Tier</h3>
+          <ul>
+            <li>UTMA Custodial LLC formation</li>
+            <li>Operating agreement with spending thresholds</li>
+            <li>Custodian signs contracts; minor signs internal resolutions</li>
+            <li><strong>Legal Basis:</strong>
+              <a href="https://statutes.capitol.texas.gov/Docs/PR/htm/PR.141.htm" target="_blank" rel="noopener">Texas Property Code §141.001</a>;
+              <a href="https://statutes.capitol.texas.gov/Docs/BO/htm/BO.3.htm" target="_blank" rel="noopener">Texas Business Organizations Code §3.101</a>
+            </li>
+          </ul>
+        </article>
 
-  <p>
-    This service is unlike our standard business offerings. It’s a deeply reduced-rate initiative designed to engage young minds in the real-world development of business operations, infrastructure, and automation. It’s cancellable at any time. All data remains secure and transferable to another cloud stack if desired. We’re not here to own your child’s idea—we’re here to help them build it, protect it, and understand how to stay the main stakeholder for as long as possible.
-  </p>
+        <article class="tier">
+          <h3>🌌 Galaxy Tier</h3>
+          <ul>
+            <li>Trust overlay for staggered distributions</li>
+            <li>Advisory board charter and governance templates</li>
+            <li>Insurance and compliance automation</li>
+            <li><strong>Legal Basis:</strong>
+              <a href="https://statutes.capitol.texas.gov/Docs/PR/htm/PR.141.htm#141.007" target="_blank" rel="noopener">Texas Property Code §141.007</a>;
+              <a href="https://statutes.capitol.texas.gov/Docs/PR/htm/PR.111.htm" target="_blank" rel="noopener">Texas Trust Code §111.001</a>
+            </li>
+          </ul>
+        </article>
 
-  <p>
-    Each tier represents a proposed curriculum, paced by your child’s energy and your comfort level. We won’t engage in anything we believe could compromise a youth’s financial future, a parent’s financial stability, or anyone’s mental or physical health. These are the youth—the future of business. We offer a safe, empowering space to explore what they’re capable of.
-  </p>
+        <article class="tier">
+          <h3>🌠 Nova Tier</h3>
+          <ul>
+            <li>LLC or Texas nonprofit formation</li>
+            <li>501(c)(3) application and Form 990 filing</li>
+            <li>Legacy planning via trust and board succession</li>
+            <li><strong>Legal Basis:</strong>
+              <a href="https://statutes.capitol.texas.gov/Docs/BO/htm/BO.22.htm" target="_blank" rel="noopener">Texas Business Organizations Code §22.001</a>;
+              <a href="https://www.irs.gov/forms-pubs/about-form-1023" target="_blank" rel="noopener">IRS Form 1023</a>
+            </li>
+          </ul>
+        </article>
+      </div>
+    </section>
 
-  <p>
-    We hope to scale this into a community-driven system, where local business owners and schools collaborate to mentor, guide, and uplift young entrepreneurs. Whether your child wants to cut hair, build apps, or design systems that run Corporate Giants, this framework is here to support them—and you—every step of the way.
-  </p>
-</section>
+    <!-- COMPARATIVE TABLE -->
+    <section id="compare" class="section">
+      <h2 style="color:var(--gold); margin:0 0 12px 0">Comparative Legal Structure Snapshot</h2>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Tier</th>
+              <th>Entity Type</th>
+              <th>Contract Authority</th>
+              <th>Liability Protection</th>
+              <th>Legal Basis</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>LaunchPad</td>
+              <td>None</td>
+              <td>Parent/Guardian</td>
+              <td>None</td>
+              <td>
+                <a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.151.htm" target="_blank" rel="noopener">Texas Family Code §151.001</a>
+              </td>
+            </tr>
+            <tr>
+              <td>Orbit</td>
+              <td>UTMA Custodial LLC</td>
+              <td>Custodian</td>
+              <td>Limited</td>
+              <td>
+                <a href="https://statutes.capitol.texas.gov/Docs/PR/htm/PR.141.htm" target="_blank" rel="noopener">Property Code §141.001</a>;
+                <a href="https://statutes.capitol.texas.gov/Docs/BO/htm/BO.3.htm" target="_blank" rel="noopener">BOC §3.101</a>
+              </td>
+            </tr>
+            <tr>
+              <td>Galaxy</td>
+              <td>UTMA LLC + Trust</td>
+              <td>Custodian &amp; Board</td>
+              <td>Limited + Trust</td>
+              <td>
+                <a href="https://statutes.capitol.texas.gov/Docs/PR/htm/PR.141.htm#141.007" target="_blank" rel="noopener">Property Code §141.007</a>;
+                <a href="https://statutes.capitol.texas.gov/Docs/PR/htm/PR.111.htm" target="_blank" rel="noopener">Trust Code §111.001</a>
+              </td>
+            </tr>
+            <tr>
+              <td>Nova</td>
+              <td>LLC or Nonprofit</td>
+              <td>Custodian/Board</td>
+              <td>High</td>
+              <td>
+                <a href="https://statutes.capitol.texas.gov/Docs/BO/htm/BO.22.htm" target="_blank" rel="noopener">BOC §22.001</a>;
+                <a href="https://www.irs.gov/forms-pubs/about-form-1023" target="_blank" rel="noopener">IRS Form 1023</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
 
+  <footer>
+    © <span id="y"></span> Fortiview. All rights reserved.
+  </footer>
 
+  <script>
+    // Year
+    document.getElementById('y').textContent = new Date().getFullYear();
 
-<section class="legal">
-  <h2>Legal Blueprint by Tier</h2>
+    // Gallery data: defaults, then optional assets/gallery.json override
+    const defaults = [
+      {src:'https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1200&auto=format&fit=crop', label:'Ideas to Ops'},
+      {src:'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1200&auto=format&fit=crop', label:'Mentorship'},
+      {src:'https://images.unsplash.com/photo-1556157382-97eda2d62296?q=80&w=1200&auto=format&fit=crop', label:'Automation'},
+      {src:'https://images.unsplash.com/photo-1520974692291-2208d157c9e2?q=80&w=1200&auto=format&fit=crop', label:'Branding'},
+      {src:'https://images.unsplash.com/photo-1516245834210-c4c142787335?q=80&w=1200&auto=format&fit=crop', label:'Dashboards'}
+    ];
 
-  <h3>🚀 LaunchPad Tier</h3>
-  <ul>
-    <li>Non-commercial sandbox; no formal entity required</li>
-    <li>Educational license signed by parent/guardian</li>
-    <li>All contracts executed by parent only</li>
-    <li>Revenue capped below reporting thresholds</li>
-    <li><strong>Legal Basis:</strong> 
-      <a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.151.htm" style="color: #f9c851;" target="_blank">Texas Family Code §151.001</a> 
-    </li>
-  </ul>
+    async function loadGallery() {
+      try {
+        const r = await fetch('assets/gallery.json', {cache:'no-store'});
+        if (!r.ok) throw new Error('no json');
+        const items = await r.json();
+        if (!Array.isArray(items) || !items.length) throw new Error('empty');
+        return items;
+      } catch { return defaults; }
+    }
 
-  <h3>🪐 Orbit Tier</h3>
-  <ul>
-    <li>UTMA Custodial LLC formation</li>
-    <li>Operating agreement with spending thresholds</li>
-    <li>Custodian signs contracts; minor signs internal resolutions</li>
-    <li><strong>Legal Basis:</strong> 
-      <a href="https://statutes.capitol.texas.gov/Docs/PR/htm/PR.141.htm" style="color: #f9c851;" target="_blank">Texas Property Code §141.001</a>; 
-      <a href="https://statutes.capitol.texas.gov/Docs/BO/htm/BO.3.htm" style="color: #f9c851;" target="_blank">Texas Business Organizations Code §3.101</a>
-    </li>
-  </ul>
+    const rail = document.getElementById('rail');
+    function render(items){
+      rail.innerHTML = '';
+      const loop = [...items, ...items.slice(0, 3)];
+      loop.forEach((it)=>{
+        const tile = document.createElement('div');
+        tile.className = 'tile';
+        tile.innerHTML = `
+          <img src="${it.src}" alt="${it.alt || it.label || 'Gallery item'}" loading="lazy">
+          <span class="label">${it.label || ''}</span>
+        `;
+        rail.appendChild(tile);
+      });
+    }
 
-  <h3>🌌 Galaxy Tier</h3>
-  <ul>
-    <li>Trust overlay for staggered distributions</li>
-    <li>Advisory board charter and governance templates</li>
-    <li>Insurance and compliance automation</li>
-    <li><strong>Legal Basis:</strong> 
-      <a href="https://statutes.capitol.texas.gov/Docs/PR/htm/PR.141.htm#141.007" style="color: #f9c851;" target="_blank">Texas Property Code §141.007</a>; 
-      <a href="https://statutes.capitol.texas.gov/Docs/PR/htm/PR.111.htm" style="color: #f9c851;" target="_blank">Texas Trust Code §111.001</a>
-    </li>
-  </ul>
+    let idx = 0, timer;
+    const allowMotion = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function step(dir=1){
+      const tiles = rail.children;
+      if (!tiles.length) return;
+      idx = (idx + dir + tiles.length) % tiles.length;
+      tiles[idx].scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
+    }
+    function play(){ if (allowMotion){ timer = setInterval(()=>step(1), 2800); } }
+    function pause(){ clearInterval(timer); }
 
-  <h3>🌠 Nova Tier</h3>
-  <ul>
-    <li>LLC or Texas nonprofit formation</li>
-    <li>501(c)(3) application and Form 990 filing</li>
-    <li>Legacy planning via trust and board succession</li>
-    <li><strong>Legal Basis:</strong> 
-      <a href="https://statutes.capitol.texas.gov/Docs/BO/htm/BO.22.htm" style="color: #f9c851;" target="_blank">Texas Business Organizations Code §22.001</a>; 
-      <a href="https://www.irs.gov/forms-pubs/about-form-1023" style="color: #f9c851;" target="_blank">IRS Form 1023</a>
-    </li>
-  </ul>
-</section>
+    loadGallery().then(items=>{ render(items); play(); });
+    rail.addEventListener('mouseenter', pause);
+    rail.addEventListener('mouseleave', play);
+    document.getElementById('prev').addEventListener('click', ()=>{ pause(); step(-1); });
+    document.getElementById('next').addEventListener('click', ()=>{ pause(); step(1); });
 
-<section class="legal">
-  <h2>Comparative Legal Structure Snapshot</h2>
-  <div class="table-wrapper">
-   <table>
-    <thead>
-      <tr>
-        <th>Tier</th>
-        <th>Entity Type</th>
-        <th>Contract Authority</th>
-        <th>Liability Protection</th>
-        <th>Legal Basis</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>LaunchPad</td>
-        <td>None</td>
-        <td>Parent/Guardian</td>
-        <td>None</td>
-        <td>
-          <a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.151.htm" style="color: #f9c851;" target="_blank">Texas Family Code §151.001</a>
-        </td>
-      </tr>
-      <tr>
-        <td>Orbit</td>
-        <td>UTMA Custodial LLC</td>
-        <td>Custodian</td>
-        <td>Limited</td>
-        <td>
-          <a href="https://statutes.capitol.texas.gov/Docs/PR/htm/PR.141.htm" style="color: #f9c851;" target="_blank">Property Code §141.001</a>; 
-          <a href="https://statutes.capitol.texas.gov/Docs/BO/htm/BO.3.htm" style="color: #f9c851;" target="_blank">BOC §3.101</a>
-        </td>
-      </tr>
-      <tr>
-        <td>Galaxy</td>
-        <td>UTMA LLC + Trust</td>
-        <td>Custodian & Board</td>
-        <td>Limited + Trust</td>
-        <td>
-          <a href="https://statutes.capitol.texas.gov/Docs/PR/htm/PR.141.htm#141.007" style="color: #f9c851;" target="_blank">Property Code §141.007</a>; 
-          <a href="https://statutes.capitol.texas.gov/Docs/PR/htm/PR.111.htm" style="color: #f9c851;" target="_blank">Trust Code §111.001</a>
-        </td>
-      </tr>
-      <tr>
-        <td>Nova</td>
-        <td>LLC or Nonprofit</td>
-        <td>Custodian/Board</td>
-        <td>High</td>
-        <td>
-          <a href="https://statutes.capitol.texas.gov/Docs/BO/htm/BO.22.htm" style="color: #f9c851;" target="_blank">BOC §22.001</a>; 
-          <a href="https://www.irs.gov/forms-pubs/about-form-1023" style="color: #f9c851;" target="_blank">IRS Form 1023</a>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-  </div>
-</section>
+    // 3D hover tilt for tier cards
+    document.querySelectorAll('.tier').forEach(card=>{
+      let rAF;
+      function onMove(e){
+        const rect = card.getBoundingClientRect();
+        const x = (e.clientX - rect.left)/rect.width - .5;
+        const y = (e.clientY - rect.top)/rect.height - .5;
+        cancelAnimationFrame(rAF);
+        rAF = requestAnimationFrame(()=>{
+          card.style.transform = `rotateX(${(-y*6).toFixed(2)}deg) rotateY(${(x*6).toFixed(2)}deg) translateY(-4px)`;
+        });
+      }
+      function reset(){ card.style.transform = '' }
+      card.addEventListener('mousemove', onMove);
+      card.addEventListener('mouseleave', reset);
+    });
+  </script>
 
+  <!--
+    Optional: assets/gallery.json (Power Automate can overwrite this)
+    [
+      {"src":"assets/gallery/1.jpg","label":"Prototype"},
+      {"src":"assets/gallery/2.jpg","label":"KPIs"},
+      {"src":"assets/gallery/3.jpg","label":"Parent View"}
+    ]
+
+    Place a background image at assets/bg.jpg (abstract, high-res).
+  -->
 </body>
 </html>
