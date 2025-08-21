@@ -1,221 +1,339 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Fortiview Holdings</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>Fortiview Holdings — Strategic Services</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
   <style>
-    :root {
-      --dark:    #02050af3;
-      --mid:     #1e1f21;
-      --gold:    #5c8c45;
-      --light:   #ffffffc1;
-      --shadow:  rgba(159, 249, 81, 0.6);
-      --radius:  10px;
-      --gap:     1.5rem;
+    :root{
+      --bg-deep:#0b1022;
+      --bg-accent:#0b1c3d;
+      --glass:#101a33cc;
+      --glass-2:#0f1933cc;
+      --border:#ffffff1a;
+      --ink:#e7ecff;
+      --muted:#c6d0f0a6;
+      --brand:#5c8c45;       /* your green-gold */
+      --brand-600:#4d7a39;
+      --aura:0 10px 24px rgba(92,140,69,.35);
+      --radius:16px;
+      --radius-sm:12px;
+      --maxw:1200px;
+      --grad:linear-gradient(135deg,#182a52 0%,#0b1c3d 40%,#1d3557 100%);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg-deep);color:var(--ink);scroll-behavior:smooth}
+    a{color:inherit;text-decoration:none}
+    img{display:block;max-width:100%}
+
+    /* Background: gradient + optional image + starfield canvas behind */
+    .bg{
+      position:fixed; inset:0; z-index:-2;
+      background:
+        radial-gradient(1100px 700px at 12% -10%, #5ac8fa22, transparent 60%),
+        radial-gradient(900px 600px at 110% 10%, rgba(92,140,69,.20), transparent 55%),
+        var(--grad);
+      filter:blur(6px) brightness(.9) saturate(1.05);
+      transform:scale(1.03);
+    }
+    .bg::after{
+      content:""; position:absolute; inset:0;
+      background:
+        radial-gradient(900px 500px at 50% -10%, transparent, #000814bb 70%),
+        linear-gradient(to bottom, #00000066, transparent 35%, #00000077 100%);
+    }
+    #bg-stars{
+      position:fixed; inset:0; width:100vw; height:100vh; z-index:-1; pointer-events:none;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    /* Sticky glass header */
+    header{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter:saturate(140%) blur(10px);
+      background:#0b1224cc;
+      border-bottom:1px solid var(--border);
+    }
+    .nav{
+      max-width:var(--maxw); margin:0 auto; padding:14px 20px;
+      display:flex; align-items:center; justify-content:space-between; gap:16px;
+    }
+    .brand{display:flex; align-items:center; gap:10px; letter-spacing:.4px}
+    .logo{
+      width:34px; height:34px; border-radius:10px;
+      background: conic-gradient(from 220deg, var(--brand), #51f9e8, #f9aa51, var(--brand));
+      box-shadow: 0 0 0 2px rgba(92,140,69,.25), 0 10px 20px rgba(92,140,69,.18);
+    }
+    .brand strong{font-weight:800}
+    nav ul{display:flex; gap:14px; list-style:none; align-items:center; margin:0; padding:0}
+    .link{
+      padding:9px 14px; border-radius:999px; color:var(--muted);
+      border:1px solid transparent; transition:.2s ease;
+    }
+    .link:hover{color:#fff; border-color:#ffffff22; background:#ffffff12}
+    .cta{
+      background: linear-gradient(180deg, var(--brand), var(--brand-600));
+      color:#0c120a; font-weight:800; letter-spacing:.2px;
+      padding:10px 16px; border-radius:999px; box-shadow: var(--aura);
+    }
+    .cta:hover{filter:brightness(.95)}
 
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: var(--dark);
-      color: var(--light);
-      padding: 2rem;
-      position: relative;
-      overflow-x: hidden;
-    }
-
-    /* Fullscreen star-field canvas behind content */
-    #bg-stars {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      z-index: -1;
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-    header h1 {
-      color: var(--gold);
-      font-size: 2.5rem;
-      margin-bottom: .3rem;
-    }
-    header p {
-      opacity: .8;
-      font-size: 1rem;
-    }
-
-    /* GRID CONTAINER */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: var(--gap);
+    /* Sections */
+    .section{max-width:var(--maxw); margin:36px auto; padding:0 20px}
+    .glass{
+      background:var(--glass); border:1px solid var(--border); border-radius:var(--radius);
+      box-shadow:var(--aura);
     }
 
-    /* CARD BASE */
-    .card {
-      background: var(--mid);
-      border-radius: var(--radius);
-      box-shadow: 0 6px 18px var(--shadow);
-      padding: 1.25rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      cursor: pointer;
-      transition: transform .3s ease, box-shadow .3s ease;
-      position: relative;
-      overflow: hidden;
+    /* Hero */
+    .hero{
+      display:grid; grid-template-columns:1.2fr .8fr; gap:28px;
+      max-width:var(--maxw); margin:40px auto; padding:24px 20px;
     }
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 24px var(--shadow);
+    .hero-card{padding:32px}
+    .kicker{color:#9ff951; font-weight:800; letter-spacing:.12em; text-transform:uppercase; font-size:.8rem}
+    h1{font-size:clamp(2rem, 3.2vw, 3rem); line-height:1.08; margin:.45rem 0 .8rem 0}
+    .sub{color:var(--muted); font-size:1.05rem}
+    .hero-side{display:grid; gap:16px}
+    .stat{
+      display:flex; gap:14px; align-items:flex-start;
+      padding:18px 20px; background:var(--glass-2); border-top:1px solid rgba(255,255,255,.06);
+      border-radius:var(--radius); border:1px solid var(--border);
     }
-    .card h3 {
-      color: var(--gold);
-      font-size: 1.2rem;
-      margin-bottom: .5rem;
+    .pill{padding:6px 10px; border-radius:999px; font-weight:800; font-size:.78rem; color:#071008;
+      background:linear-gradient(180deg,#9ff951,#6be654); border:1px solid rgba(159,249,81,.35)}
+
+    /* Services grid */
+    .grid{
+      display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
+      gap:18px;
     }
-    .card p {
-      font-size: .9rem;
-      line-height: 1.4;
-      opacity: .85;
+    .card{
+      position:relative; overflow:hidden;
+      padding:18px; border-radius:var(--radius);
+      background:var(--glass); border:1px solid var(--border);
+      box-shadow:var(--aura);
+      cursor:pointer;
+      transform-style:preserve-3d;
+      transition:transform .18s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
+    }
+    .card:hover{transform:translateY(-4px); box-shadow:0 16px 40px rgba(0,0,0,.45)}
+    .card h3{color:var(--brand); font-size:1.1rem; margin:2px 0 6px 0}
+    .card p{color:#e7ecff; opacity:.85; font-size:.94rem; line-height:1.4}
+    .card::after{
+      content:""; position:absolute; inset:auto -20% -20% auto; width:180px; height:180px;
+      background: radial-gradient(closest-side, rgba(92,140,69,.18), transparent 70%);
+      transform:rotate(25deg);
+    }
+    .card.featured{
+      grid-column: span 2; background:linear-gradient(18deg, rgba(72,76,9,.65), rgba(4,3,74,.7));
+      border-color:rgba(159,249,81,.35);
+    }
+    .badge{
+      position:absolute; top:10px; right:10px; font-size:.8rem; padding:6px 10px; border-radius:999px;
+      background:linear-gradient(180deg,#9ff951,#6be654); color:#0a1205; font-weight:800; border:1px solid rgba(159,249,81,.35)
     }
 
-    /* FEATURED CARD */
-    .card.featured {
-      grid-column: span 2;
-      background: linear-gradient(18deg, #484c09, #04034aea);
+    /* Footer */
+    footer{margin:50px 0 30px 0; color:var(--muted); text-align:center; font-size:.9rem}
+
+    /* Responsive */
+    @media (max-width: 1000px){
+      .hero{grid-template-columns:1fr}
+      .card.featured{grid-column:span 1}
     }
-    .card.featured::before {
-      content: '★';
-      position: absolute;
-      top: .75rem; right: .75rem;
-      font-size: 1.5rem;
-      color: var(--gold);
-      opacity: .6;
+    @media (max-width:640px){
+      .nav{gap:10px}
+      nav ul{gap:8px; flex-wrap:wrap}
+      .link{padding:8px 10px}
+      .hero-card{padding:22px}
     }
 
-    @media (max-width: 600px) {
-      .card.featured { grid-column: span 1; }
+    /* Motion preferences */
+    @media (prefers-reduced-motion: reduce){
+      *{animation:none!important; transition:none!important}
     }
   </style>
 </head>
-
 <body>
-  <!-- Full-screen background canvas -->
-  <canvas id="bg-stars"></canvas>
+  <div class="bg" aria-hidden="true"></div>
+  <canvas id="bg-stars" aria-hidden="true"></canvas>
 
   <header>
-    <h1>Fortiview Holdings™</h1>
-    <p>Our suite of strategic services</p>
+    <div class="nav">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <strong>Fortiview</strong>
+        <span style="color:var(--muted)">Holdings</span>
+      </div>
+      <nav aria-label="Primary">
+        <ul>
+          <li><a class="link" href="#services">Services</a></li>
+          <li><a class="link" href="/YouthBusinessEducationSandbox">Youth Sandbox</a></li>
+          <li><a class="link" href="#about">About</a></li>
+          <li><a class="cta" href="mailto:contact@fortiviewholdings.com?subject=Fortiview%20Inquiry">Work with us</a></li>
+        </ul>
+      </nav>
+    </div>
   </header>
 
-  <div class="grid">
-    <div class="card" data-path="PATH_TO_LEADERSHIP_AND_STRATEGY">
-      <h3>Leadership & Business Strategy</h3>
-      <p>Team building, organizational development, and growth planning</p>
-    </div>
+  <main>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="glass hero-card">
+        <div class="kicker">Focused. Practical. Accountable.</div>
+        <h1>Strategic services that build durable businesses</h1>
+        <p class="sub">From leadership architecture and governance to automation and CX — we help you design systems that scale, with audit‑ready trails and real outcomes.</p>
+      </div>
+      <div class="hero-side">
+        <div class="stat">
+          <span class="pill">Governance‑ready</span>
+          <div>
+            <strong>Controls, audits, compliance</strong>
+            <div style="color:var(--muted)">Every engagement ships with clear decision rights and traceability.</div>
+          </div>
+        </div>
+        <div class="stat">
+          <span class="pill">Operator‑proven</span>
+          <div>
+            <strong>From plan to playbook</strong>
+            <div style="color:var(--muted)">We turn strategy into procedures, dashboards, and accountable routines.</div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <div class="card" data-path="PATH_TO_OPERATIONS_MANAGEMENT">
-      <h3>Project & Operations Management</h3>
-      <p>Asset management, logistics, and workflow optimization</p>
-    </div>
+    <!-- SERVICES GRID -->
+    <section id="services" class="section">
+      <div class="grid">
+        <article class="card" data-path="PATH_TO_LEADERSHIP_AND_STRATEGY" tabindex="0" role="button" aria-label="Leadership & Business Strategy">
+          <h3>Leadership & Business Strategy</h3>
+          <p>Team building, organizational development, and growth planning</p>
+        </article>
 
-    <div class="card" data-path="PATH_TO_FINANCIAL_COORDINATION">
-      <h3>Financial Coordination</h3>
-      <p>Budgeting strategies, cost analysis, and funding pathways</p>
-    </div>
+        <article class="card" data-path="PATH_TO_OPERATIONS_MANAGEMENT" tabindex="0" role="button" aria-label="Project & Operations Management">
+          <h3>Project & Operations Management</h3>
+          <p>Asset management, logistics, and workflow optimization</p>
+        </article>
 
-    <div class="card" data-path="PATH_TO_MARKETING_SALES">
-      <h3>Marketing, Sales & Client Relations</h3>
-      <p>Brand development, engagement, and prospecting</p>
-    </div>
+        <article class="card" data-path="PATH_TO_FINANCIAL_COORDINATION" tabindex="0" role="button" aria-label="Financial Coordination">
+          <h3>Financial Coordination</h3>
+          <p>Budgeting strategies, cost analysis, and funding pathways</p>
+        </article>
 
-    <div class="card" data-path="PATH_TO_GOVERNANCE_CONTRACTS">
-      <h3>Governance & Regulatory Support</h3>
-      <p>Business structuring, compliance strategies, and audit trails</p>
-    </div>
+        <article class="card" data-path="PATH_TO_MARKETING_SALES" tabindex="0" role="button" aria-label="Marketing, Sales & Client Relations">
+          <h3>Marketing, Sales & Client Relations</h3>
+          <p>Brand development, engagement, and prospecting</p>
+        </article>
 
-    <div class="card" data-path="PATH_TO_CX_OPTIMIZATION">
-      <h3>Customer Experience Optimization</h3>
-      <p>Quality assurance, service strategy, and user engagement</p>
-    </div>
+        <article class="card" data-path="PATH_TO_GOVERNANCE_CONTRACTS" tabindex="0" role="button" aria-label="Governance & Regulatory Support">
+          <h3>Governance & Regulatory Support</h3>
+          <p>Business structuring, compliance strategies, and audit trails</p>
+        </article>
 
-    <div class="card" data-path="PATH_TO_NETWORKING_PARTNERSHIPS">
-      <h3>Networking & Partnerships</h3>
-      <p>Strategic alliances, vendor management, and bulk discounts</p>
-    </div>
+        <article class="card" data-path="PATH_TO_CX_OPTIMIZATION" tabindex="0" role="button" aria-label="Customer Experience Optimization">
+          <h3>Customer Experience Optimization</h3>
+          <p>Quality assurance, service strategy, and user engagement</p>
+        </article>
 
-    <div class="card" data-path="PATH_TO_ADDITIONAL_SERVICES">
-      <h3>Additional Services</h3>
-      <p>Manufacturing, instrumentation, drafting, and compliance</p>
-    </div>
+        <article class="card" data-path="PATH_TO_NETWORKING_PARTNERSHIPS" tabindex="0" role="button" aria-label="Networking & Partnerships">
+          <h3>Networking & Partnerships</h3>
+          <p>Strategic alliances, vendor management, and bulk discounts</p>
+        </article>
 
-    <div class="card" data-path="PATH_TO_PRAGOPTICS_SERVICES">
-      <h3>PragOptics™ System Integration</h3>
-      <p>Software architecture, automation, and dashboards</p>
-    </div>
+        <article class="card" data-path="PATH_TO_ADDITIONAL_SERVICES" tabindex="0" role="button" aria-label="Additional Services">
+          <h3>Additional Services</h3>
+          <p>Manufacturing, instrumentation, drafting, and compliance</p>
+        </article>
 
-    <!-- Featured Card -->
-    <div class="card featured" data-path="/YouthBusinessEducationSandbox">
-      <h3>Youth Entrepreneur Education</h3>
-      <p>Modular legal, financial & UX training tracks—empowering minors with guardian-backed business licenses.</p>
-    </div>
-  </div>
+        <article class="card" data-path="PATH_TO_PRAGOPTICS_SERVICES" tabindex="0" role="button" aria-label="PragOptics™ System Integration">
+          <h3>PragOptics™ System Integration</h3>
+          <p>Software architecture, automation, and dashboards</p>
+        </article>
+
+        <article class="card featured" data-path="/YouthBusinessEducationSandbox" tabindex="0" role="button" aria-label="Youth Entrepreneur Education">
+          <span class="badge">Featured</span>
+          <h3>Youth Entrepreneur Education</h3>
+          <p>Modular legal, financial & UX training tracks — empowering minors with guardian‑backed business licenses.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ABOUT (optional light content holder to anchor nav) -->
+    <section id="about" class="section glass" style="padding:22px">
+      <h2 style="margin:0 0 8px 0; color:var(--brand); font-size:1.2rem">About Fortiview</h2>
+      <p style="margin:0; color:var(--muted)">We build systems that honor strategy, protect people, and produce measurable outcomes. Clear governance. Practical operations. Durable growth.</p>
+    </section>
+  </main>
+
+  <footer>
+    © <span id="y"></span> Fortiview. All rights reserved.
+  </footer>
 
   <script>
-    // 1) Card click navigation
-    document.querySelectorAll('.card').forEach(card => {
+    // Year
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    // Card click navigation + keyboard activation
+    function go(path){ if(path) window.location.href = path; }
+    document.querySelectorAll('.card').forEach(card=>{
       const path = card.dataset.path;
-      if (!path) return;
-      card.addEventListener('click', () => {
-        window.location.href = path;
+      if(!path) return;
+      card.addEventListener('click', ()=>go(path));
+      card.addEventListener('keydown', (e)=>{
+        if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(path); }
       });
     });
 
-    // 2) Fullscreen star-field background
+    // 3D hover tilt for cards
+    document.querySelectorAll('.card').forEach(card=>{
+      let rAF;
+      function onMove(e){
+        const rect = card.getBoundingClientRect();
+        const x = (e.clientX - rect.left)/rect.width - .5;
+        const y = (e.clientY - rect.top)/rect.height - .5;
+        cancelAnimationFrame(rAF);
+        rAF = requestAnimationFrame(()=>{
+          card.style.transform = `rotateX(${(-y*6).toFixed(2)}deg) rotateY(${(x*6).toFixed(2)}deg) translateY(-4px)`;
+        });
+      }
+      function reset(){ card.style.transform = ''; }
+      card.addEventListener('mousemove', onMove);
+      card.addEventListener('mouseleave', reset);
+      card.addEventListener('blur', reset);
+    });
+
+    // Fullscreen star-field background
     function initStarField() {
       const canvas = document.getElementById('bg-stars');
       const ctx = canvas.getContext('2d');
+      function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+      resize(); window.addEventListener('resize', resize);
 
-      // size to viewport
-      function resize() {
-        canvas.width  = window.innerWidth;
-        canvas.height = window.innerHeight;
-      }
-      resize();
-      window.addEventListener('resize', resize);
-
-      // generate 100 stars
-      const stars = Array.from({ length: 100 }, () => ({
+      const stars = Array.from({ length: 120 }, () => ({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        alpha: Math.random()
+        r: Math.random() * 1.6 + 0.4,
+        a: Math.random()
       }));
-      let frame = 0;
+      let frame = 0, reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        stars.forEach(s => {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        for (const s of stars) {
           ctx.beginPath();
-          ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
-          ctx.arc(s.x, s.y, 2, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255,255,255,${s.a})`;
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
           ctx.fill();
-          // flicker
-          s.alpha = 0.3 + Math.abs(Math.sin(frame/50)) * 0.7;
-        });
+          if(!reduce){
+            s.a = 0.25 + Math.abs(Math.sin((frame/60) + s.x*0.001 + s.y*0.001)) * 0.75;
+          }
+        }
         frame++;
         requestAnimationFrame(animate);
       }
-
       animate();
     }
-
     window.addEventListener('load', initStarField);
   </script>
 </body>
