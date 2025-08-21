@@ -2,131 +2,260 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Coming Soon</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fortiview — Coming Soon</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
   <style>
-    :root {
-      --dark:   #02050af3;
-      --gold:   #5c8c45;
-      --radius: 10px;
-      --shadow: rgba(159,249,81,0.6);
+    :root{
+      --dark:#02050af3;           /* deep space navy */
+      --glass:#0f1424cc;          /* glass card */
+      --glass-2:#10182fcc;        /* secondary glass */
+      --border:#ffffff1a;
+      --ink:#eef3ff;
+      --muted:#c9d2f3a8;
+      --gold:#5c8c45;             /* your green-gold */
+      --gold-600:#4a7238;
+      --accent:#51f9e8;
+      --shadow:0 18px 50px rgba(0,0,0,.55);
+      --aura:0 8px 26px rgba(92,140,69,.35);
+      --radius:16px;
+      --radius-sm:12px;
+      --maxw:1100px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--dark);color:var(--ink)}
+    a{color:inherit;text-decoration:none}
+
+    /* Layered background */
+    .bg{
+      position:fixed; inset:0; z-index:-3;
+      background:
+        radial-gradient(1100px 700px at 15% -10%, #5ac8fa22, transparent 60%),
+        radial-gradient(900px 600px at 115% 10%, rgba(92,140,69,.2), transparent 55%),
+        linear-gradient(135deg, #0a0f1f 0%, #0b1022 40%, #0d1530 100%);
+      filter:brightness(.92) saturate(1.06);
+    }
+    .vignette{
+      position:fixed; inset:0; z-index:-2; pointer-events:none;
+      background:
+        radial-gradient(900px 500px at 50% -10%, transparent, #000814bb 70%),
+        linear-gradient(to bottom, #00000066, transparent 35%, #00000088 100%);
     }
 
-    * { margin:0; padding:0; box-sizing:border-box; }
-    html, body {
-      width:100%; height:100%;
-      overflow:hidden;
-      background: var(--dark);
-      font-family: 'Segoe UI', sans-serif;
-      color: #fff;
+    /* Subtle 3D rings (CSS only, motion-aware) */
+    .rings{
+      position:fixed; inset:0; z-index:-1; perspective:900px; pointer-events:none;
+    }
+    .ring{
+      position:absolute; top:50%; left:50%;
+      transform-style:preserve-3d; transform-origin:center center;
+      border-radius:50%; border:3px solid var(--gold); opacity:.45; filter:drop-shadow(0 0 12px rgba(92,140,69,.25));
+    }
+    .r1{ width:560px;height:560px;margin:-280px 0 0 -280px; animation:spin1 18s linear infinite; }
+    .r2{ width:380px;height:380px;margin:-190px 0 0 -190px; animation:spin2 12s linear infinite; }
+    .r3{ width:220px;height:220px;margin:-110px 0 0 -110px; animation:spin3 8s linear infinite; opacity:.35; }
+    @keyframes spin1{0%{transform:rotateX(0) rotateY(0)}50%{transform:rotateX(180deg) rotateY(180deg)}100%{transform:rotateX(360deg) rotateY(360deg)}}
+    @keyframes spin2{0%{transform:rotateX(0) rotateZ(0)}50%{transform:rotateX(180deg) rotateZ(-180deg)}100%{transform:rotateX(360deg) rotateZ(-360deg)}}
+    @keyframes spin3{0%{transform:rotateX(0) rotateY(180deg)}50%{transform:rotateX(180deg) rotateY(0)}100%{transform:rotateX(360deg) rotateY(180deg)}}
+
+    /* Sticky glass header (minimal) */
+    header{
+      position:sticky; top:0; z-index:10;
+      backdrop-filter:saturate(140%) blur(10px);
+      background:#0b1224cc; border-bottom:1px solid var(--border);
+    }
+    .nav{
+      max-width:var(--maxw); margin:0 auto; padding:12px 20px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+    }
+    .brand{display:flex; align-items:center; gap:10px}
+    .logo{width:32px;height:32px;border-radius:10px;background:conic-gradient(from 220deg,var(--gold),#9ff951,#51f9e8,var(--gold)); box-shadow:0 0 0 2px rgba(92,140,69,.25), 0 10px 20px rgba(92,140,69,.18)}
+    .brand strong{font-weight:800; letter-spacing:.2px}
+    .chip{
+      padding:8px 12px;border-radius:999px;color:#dfe8ffb8;border:1px solid #ffffff1f
     }
 
-    .animation-container {
-      position:absolute; top:0; left:0;
-      width:100%; height:100%;
-      perspective:800px;
-      z-index:1;
+    /* Center stage */
+    .stage{
+      min-height:calc(100vh - 64px);
+      display:grid; place-items:center;
+      padding:40px 20px;
     }
-
-    .ring {
-      position:absolute;
-      top:50%; left:50%;
-      transform-style: preserve-3d;
-      transform-origin: center center;
-      border-radius:50%;
-      border:4px solid var(--gold);
-      opacity:.5;
-    }
-
-    .ring.outer {
-      width:400px; height:400px;
-      margin:-200px 0 0 -200px;
-      animation:spinOuter 12s linear infinite;
-    }
-    .ring.inner {
-      width:300px; height:300px;
-      margin:-150px 0 0 -150px;
-      animation:spinInner 8s linear infinite;
-    }
-
-    /* NEW RINGS */
-    .ring.outer2 {
-      width:150px; height:150px;
-      margin:-75px 0 0 -75px;
-      animation:spinOuter2 6s linear infinite;
-    }
-    .ring.inner2 {
-      width:600px; height:600px;
-      margin:-300px 0 0 -300px;
-      opacity:.3;
-      animation:spinInner2 20s linear infinite;
-    }
-
-    @keyframes spinOuter {
-      0%   { transform: rotateX(0deg)   rotateY(0deg); }
-      50%  { transform: rotateX(180deg) rotateY(180deg); }
-      100% { transform: rotateX(360deg) rotateY(360deg); }
-    }
-    @keyframes spinInner {
-      0%   { transform: rotateX(0deg)   rotateZ(0deg); }
-      50%  { transform: rotateX(180deg) rotateZ(-180deg); }
-      100% { transform: rotateX(360deg) rotateZ(-360deg); }
-    }
-
-    @keyframes spinOuter2 {
-      0%   { transform: rotateX(0deg)    rotateY(180deg); }
-      50%  { transform: rotateX(180deg)  rotateY(0deg);   }
-      100% { transform: rotateX(360deg)  rotateY(180deg); }
-    }
-    @keyframes spinInner2 {
-      0%   { transform: rotateX(0deg)    rotateZ(180deg); }
-      50%  { transform: rotateX(180deg)  rotateZ(0deg);   }
-      100% { transform: rotateX(360deg)  rotateZ(180deg); }
-    }
-
-    table.layout {
-      position:relative; z-index:2;
-      width:100%; height:100%;
-      border-collapse:collapse;
-    }
-    table.layout td {
-      text-align:center;
-      vertical-align:middle;
-    }
-
-    .card {
-      display:inline-block;
-      padding:2rem 3rem;
-      background:#1e1f21;
+    .card{
+      width:min(680px, 92vw);
+      background:var(--glass);
+      border:1px solid var(--border);
       border-radius:var(--radius);
-      box-shadow:0 0 30px var(--shadow);
-      font-size:2.5rem;
-      font-weight:bold;
-      letter-spacing:.05em;
-      transition:transform .3s ease, box-shadow .3s ease;
+      box-shadow:var(--shadow);
+      padding:28px;
+      text-align:center;
+      transform-style:preserve-3d;
+      transition:transform .16s ease, box-shadow .2s ease;
     }
-    .card:hover {
-      transform:translateY(-5px) scale(1.02);
-      box-shadow:0 0 40px var(--shadow);
+    .card:hover{ transform:translateY(-2px); box-shadow:0 24px 60px rgba(0,0,0,.55) }
+    .kicker{
+      display:inline-block; font-size:.8rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase;
+      padding:6px 10px; border-radius:999px; color:#06210c;
+      background:linear-gradient(180deg,#9ff951,#6be654); border:1px solid rgba(159,249,81,.35);
+    }
+    h1{font-size:clamp(1.8rem, 4vw, 2.6rem); margin:12px 0 6px 0; color:#fff}
+    .sub{color:var(--muted); margin:0 0 18px 0}
+
+    /* Countdown */
+    .countdown{
+      display:grid; grid-template-columns:repeat(4, minmax(70px, 1fr)); gap:12px;
+      margin:16px 0 10px 0;
+    }
+    .unit{
+      background:var(--glass-2); border:1px solid var(--border);
+      border-radius:var(--radius-sm); padding:12px 10px;
+    }
+    .num{font-size:1.6rem; font-weight:800; color:#fff}
+    .lbl{font-size:.78rem; color:var(--muted); letter-spacing:.08em; text-transform:uppercase}
+
+    /* Notify form */
+    form{margin-top:16px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap}
+    input[type="email"]{
+      width:min(360px, 80vw);
+      background:#0c1224; color:#fff; border:1px solid #2a355b; outline:none;
+      padding:12px 14px; border-radius:10px; font-size:.98rem;
+      box-shadow: inset 0 0 0 1px #0003;
+    }
+    input[type="email"]::placeholder{color:#a8b3dacc}
+    button{
+      background:linear-gradient(180deg,var(--gold),var(--gold-600));
+      color:#0d1209; border:none; padding:12px 16px; font-weight:800; border-radius:10px;
+      box-shadow:var(--aura); cursor:pointer;
+    }
+    button:hover{filter:brightness(.95)}
+    .note{margin-top:10px; color:#a9b5db; font-size:.9rem}
+
+    /* Footer */
+    footer{color:#8ea0d8; text-align:center; font-size:.9rem; margin:24px 0 26px 0}
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      .ring{animation:none}
+      .card:hover{transform:none; box-shadow:var(--shadow)}
+    }
+
+    /* Responsive */
+    @media (max-width:520px){
+      .countdown{grid-template-columns:repeat(2, minmax(90px, 1fr))}
     }
   </style>
 </head>
-<body>
-  <div class="animation-container">
-    <div class="ring outer"></div>
-    <div class="ring inner"></div>
-
-    <!-- these two get added so their keyframes run -->
-    <div class="ring outer2"></div>
-    <div class="ring inner2"></div>
+<body data-target="2026-03-01T17:00:00Z">
+  <!-- Background layers -->
+  <div class="bg" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="rings" aria-hidden="true">
+    <div class="ring r1"></div>
+    <div class="ring r2"></div>
+    <div class="ring r3"></div>
   </div>
 
-  <table class="layout">
-    <tr>
-      <td>
-        <div class="card">COMING SOON…</div>
-      </td>
-    </tr>
-  </table>
+  <!-- Minimal glass header -->
+  <header>
+    <div class="nav">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <strong>Fortiview</strong>
+        <span class="chip" aria-hidden="true">Coming soon</span>
+      </div>
+      <div class="chip" title="Contact">
+        <a href="mailto:support@fortiviewholdings.com?subject=Coming%20Soon%20Updates">support@fortiviewholdings.com</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Center stage -->
+  <main class="stage">
+    <section class="card" aria-labelledby="title">
+      <span class="kicker">In progress</span>
+      <h1 id="title">We’re building something durable</h1>
+      <p class="sub">Systems-first. Governance-ready. Sign up to be notified when we launch.</p>
+
+      <!-- Countdown -->
+      <div class="countdown" role="timer" aria-live="polite">
+        <div class="unit"><div class="num" id="d">—</div><div class="lbl">Days</div></div>
+        <div class="unit"><div class="num" id="h">—</div><div class="lbl">Hours</div></div>
+        <div class="unit"><div class="num" id="m">—</div><div class="lbl">Minutes</div></div>
+        <div class="unit"><div class="num" id="s">—</div><div class="lbl">Seconds</div></div>
+      </div>
+
+      <!-- Notify form -->
+      <form id="notify" aria-label="Notify me form">
+        <label for="email" class="sr-only" style="position:absolute;left:-9999px">Email address</label>
+        <input id="email" name="email" type="email" placeholder="you@domain.com" autocomplete="email" required />
+        <button type="submit">Notify me</button>
+      </form>
+      <div class="note" id="note">We’ll only use your email for this launch.</div>
+    </section>
+  </main>
+
+  <footer>
+    © <span id="y"></span> Fortiview. All rights reserved.
+  </footer>
+
+  <script>
+    // Year
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    // Countdown (reads target from body[data-target])
+    (function(){
+      const elD = document.getElementById('d');
+      const elH = document.getElementById('h');
+      const elM = document.getElementById('m');
+      const elS = document.getElementById('s');
+      const targetAttr = document.body.getAttribute('data-target');
+      const target = targetAttr ? new Date(targetAttr) : null;
+
+      if(!target || isNaN(target.getTime())){
+        document.querySelector('.countdown').style.display = 'none';
+        return;
+      }
+      function pad(n){ return n.toString().padStart(2,'0'); }
+      function tick(){
+        const now = new Date();
+        let diff = Math.max(0, target - now);
+        const days = Math.floor(diff / (1000*60*60*24)); diff -= days*(1000*60*60*24);
+        const hours = Math.floor(diff / (1000*60*60));   diff -= hours*(1000*60*60);
+        const mins  = Math.floor(diff / (1000*60));      diff -= mins*(1000*60);
+        const secs  = Math.floor(diff / 1000);
+
+        elD.textContent = days;
+        elH.textContent = pad(hours);
+        elM.textContent = pad(mins);
+        elS.textContent = pad(secs);
+        if(target - now <= 0){
+          clearInterval(timer);
+          elD.textContent = '00';
+          elH.textContent = '00';
+          elM.textContent = '00';
+          elS.textContent = '00';
+          document.getElementById('note').textContent = 'We’re live. Refresh to check availability.';
+        }
+      }
+      const timer = setInterval(tick, 1000);
+      tick();
+    })();
+
+    // Notify form (mailto fallback)
+    (function(){
+      const form = document.getElementById('notify');
+      const note = document.getElementById('note');
+      form.addEventListener('submit', (e)=>{
+        e.preventDefault();
+        const email = (document.getElementById('email').value || '').trim();
+        if(!email) return;
+        // Use a mailto fallback so there’s no backend dependency
+        const subject = encodeURIComponent('Notify me about the launch');
+        const body = encodeURIComponent('Please notify me at ' + email + ' when you launch.');
+        window.location.href = `mailto:support@fortiviewholdings.com?subject=${subject}&body=${body}`;
+        note.textContent = 'Thanks — your mail client will open. If it didn’t, email us directly.';
+      });
+    })();
+  </script>
 </body>
 </html>
