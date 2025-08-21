@@ -1,432 +1,393 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Youth Business Education Sandbox</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <title>Fortiview — Youth Business Education Sandbox</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
   <style>
-    :root {
-      --primary-bg: #0b1c3d;
-      --card-bg: #132a4f;
-      --accent-gold: #f9c851;
-      --shadow-gold: #f9c651b7;
-      --shadow-green: #51f9e8b7;
-      --shadow-orange: #f9aa51b7;
-      --shadow-alt: #f9a551b7;
-      --text-light: #ffffff91;
-      --text-dark: #0b1c3d;
+    :root{
+      --bg-deep:#0b1022;            /* flattered navy base */
+      --bg-accent:#0b1c3d;          /* your primary, used subtly */
+      --card:#101a33cc;             /* glass card */
+      --card-border:#ffffff1a;
+      --gold:#f9c851;               /* your accent gold */
+      --gold-600:#d6a538;
+      --ink:#e7ecff;
+      --muted:#c6d0f0a6;
+      --success:#51f9e8;
+      --warning:#f9aa51;
+      --shadow:0 10px 30px #00000066;
+      --radius:16px;
+      --radius-sm:12px;
+      --maxw:1200px;
+      --grad:linear-gradient(135deg,#182a52 0%,#0b1c3d 40%,#1d3557 100%);
+      --gold-glow:0 0 0 2px #f9c85133, 0 10px 20px #f9c85122;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg-deep);color:var(--ink);scroll-behavior:smooth}
+    a{color:inherit;text-decoration:none}
+    img{display:block;max-width:100%}
+    /* Background image layer */
+    .bg{
+      position:fixed; inset:0; z-index:-2;
+      background:
+        radial-gradient(1200px 800px at 10% -10%, #5ac8fa22, transparent 60%),
+        radial-gradient(900px 600px at 110% 10%, #f9c8511c, transparent 55%),
+        url('assets/bg.jpg') center/cover no-repeat,
+        var(--grad);
+      filter: blur(6px) saturate(1.05) brightness(.85);
+      transform: scale(1.03);
+    }
+    /* Subtle vignette overlay */
+    .bg::after{
+      content:""; position:absolute; inset:0;
+      background: radial-gradient(1000px 600px at 50% -10%, transparent, #000814aa 70%),
+                  linear-gradient(to bottom, #00000055, transparent 30%, #00000066 100%);
     }
 
-    * { box-sizing: border-box; margin:0; padding:0; }
+    /* Sticky glass header */
+    header{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter:saturate(140%) blur(10px);
+      background:#0b1224cc;
+      border-bottom:1px solid var(--card-border);
+    }
+    .nav{
+      max-width:var(--maxw); margin:0 auto; padding:14px 20px;
+      display:flex; align-items:center; gap:16px; justify-content:space-between;
+    }
+    .brand{display:flex; align-items:center; gap:10px; letter-spacing:.5px}
+    .logo{
+      width:34px; height:34px; border-radius:10px;
+      background: conic-gradient(from 220deg, #f9c851, #51f9e8, #f9aa51, #f9c851);
+      box-shadow: var(--gold-glow);
+    }
+    .brand strong{font-weight:700}
+    nav ul{display:flex; gap:14px; list-style:none; align-items:center}
+    .link{
+      padding:9px 14px; border-radius:999px; color:var(--muted);
+      border:1px solid transparent; transition:.2s ease;
+    }
+    .link:hover{color:var(--ink); border-color:#ffffff22; background:#ffffff10}
+    .cta{
+      background: linear-gradient(180deg, var(--gold), var(--gold-600));
+      color:#1a1405; font-weight:700;
+      padding:10px 16px; border-radius:999px; box-shadow: var(--gold-glow);
+    }
+    .cta:hover{filter:brightness(.95)}
 
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: var(--primary-bg);
-      color: var(--text-light);
+    /* Hero */
+    .hero{
+      max-width:var(--maxw); margin:40px auto; padding:24px 20px;
+      display:grid; grid-template-columns:1.2fr .8fr; gap:28px;
     }
+    .hero-card{
+      background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius);
+      padding:32px; box-shadow:var(--shadow);
+    }
+    .kicker{color:var(--success); font-weight:700; letter-spacing:.12em; text-transform:uppercase; font-size:.8rem}
+    h1{font-size:clamp(2rem, 3.2vw, 3rem); line-height:1.1; margin:.4rem 0 1rem 0}
+    .sub{color:var(--muted); font-size:1.05rem}
+    .hero-actions{margin-top:18px; display:flex; gap:12px; flex-wrap:wrap}
+    .btn{
+      padding:12px 16px; border-radius:12px; border:1px solid #ffffff1f;
+      background:#ffffff0f; color:#fff; backdrop-filter: blur(6px);
+      transition: transform .15s ease, background .2s ease;
+    }
+    .btn:hover{transform: translateY(-1px); background:#ffffff1a}
+    .btn.gold{background: linear-gradient(180deg, var(--gold), var(--gold-600)); color:#1a1405; border:none}
 
-    header {
-      position: relative;
-      background-color: var(--primary-bg);
-      color: var(--accent-gold);
-      padding: 2rem;
-      text-align: center;
-      box-shadow: 0 4px 12px var(--shadow-gold);
+    .hero-side{
+      display:grid; gap:16px;
     }
+    .stat{
+      padding:20px; border-radius:var(--radius-sm);
+      background:#0f1933cc; border:1px solid var(--card-border);
+      display:flex; align-items:center; gap:14px;
+    }
+    .pill{padding:6px 10px; border-radius:999px; font-weight:700; font-size:.8rem;
+      color:#071018; background:linear-gradient(180deg,#51f9e8,#22d3ee)}
+    .pill.gold{background:linear-gradient(180deg,#f9c851,#f39c12)}
 
-    .top-left {
-      position: absolute;
-      top: 1rem;
-      left: 1rem;
-      display: flex;
-      gap: 0.75rem;
+    /* Gallery */
+    .section{max-width:var(--maxw); margin:36px auto; padding:0 20px}
+    .section h2{font-size:1.6rem; margin-bottom:12px}
+    .gallery-wrap{
+      position:relative; overflow:hidden; border-radius:var(--radius); border:1px solid var(--card-border);
+      background:#0e1730cc; box-shadow:var(--shadow);
     }
-    .top-left button,
-    .top-left a {
-      font-size: 0.9rem;
-      padding: 0.5rem 1rem;
-      border-radius: 5px;
-      border: none;
-      cursor: pointer;
-      text-decoration: none;
-      transition: background 0.25s ease;
+    .rail{
+      display:flex; gap:14px; padding:16px; overflow-x:auto; scroll-snap-type:x mandatory;
+      scrollbar-width:none; -ms-overflow-style:none;
     }
-    .top-left button {
-      background: var(--accent-gold);
-      color: var(--text-dark);
+    .rail::-webkit-scrollbar{display:none}
+    .tile{
+      flex:0 0 auto; width:320px; height:200px; position:relative; border-radius:12px;
+      overflow:hidden; scroll-snap-align:center; border:1px solid #ffffff1a; background:#0c1530;
     }
-    .top-left button:hover {
-      background: var(--shadow-gold);
+    .tile img{width:100%; height:100%; object-fit:cover; opacity:.95; transition:.25s}
+    .tile:hover img{transform:scale(1.03); opacity:1}
+    .tile .label{
+      position:absolute; left:10px; bottom:10px; padding:6px 10px; border-radius:999px;
+      background:#0b1224cc; border:1px solid #ffffff22; color:#fff; font-size:.8rem
     }
-    .top-left a {
-      background: transparent;
-      color: var(--accent-gold);
-      border: 1px solid var(--accent-gold);
+    .gallery-controls{
+      position:absolute; inset:auto 10px 10px auto; display:flex; gap:8px; z-index:2;
     }
-    .top-left a:hover {
-      background: var(--accent-gold);
-      color: var(--text-dark);
+    .ctrl{
+      width:36px; height:36px; display:grid; place-items:center; border-radius:10px;
+      background:#0b1224cc; border:1px solid #ffffff2a; color:#fff; cursor:pointer
     }
+    .ctrl:hover{background:#0b1224e0}
 
-    .vision {
-      max-width: 800px;
-      margin: 2rem auto;
-      padding: 1.5rem;
-      background: var(--card-bg);
-      border-radius: 10px;
-      text-align: center;
-      box-shadow: 0 4px 12px var(--shadow-green);
-      transition: transform .3s ease;
+    /* Tiers */
+    .tiers{display:grid; grid-template-columns:repeat(4,1fr); gap:16px}
+    .tier{
+      background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius-sm);
+      padding:18px; box-shadow:var(--shadow); transform-style:preserve-3d; transition:transform .2s ease, box-shadow .2s ease;
     }
-    .vision:hover { transform: scale(1.02); }
+    .tier:hover{transform:translateY(-4px); box-shadow:0 16px 40px #00000088}
+    .tier h3{display:flex; align-items:center; gap:8px; margin:4px 0 8px 0; color:var(--gold)}
+    .price{color:var(--muted); font-size:.95rem; margin-bottom:8px}
+    .tier ul{margin:0; padding-left:18px; color:var(--ink)}
+    .tier li{margin:.35rem 0}
+    .tier .go{margin-top:10px; display:inline-block; font-weight:700}
 
-    .card-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1.5rem;
-      margin: 2rem;
-    }
+    /* Footer */
+    footer{margin:50px 0 30px 0; color:var(--muted); text-align:center; font-size:.9rem}
 
-    .card, .add-ons-card {
-      background: var(--card-bg);
-      border-radius: 10px;
-      box-shadow: 0 4px 12px var(--shadow-gold);
-      overflow: hidden;
-      position: relative;
-      cursor: pointer;
-      transition: transform .3s ease;
+    /* Responsive */
+    @media (max-width: 1000px){
+      .hero{grid-template-columns:1fr}
+      .tiers{grid-template-columns:repeat(2,1fr)}
     }
-    .card:hover, .add-ons-card:hover {
-      transform: scale(1.05);
-    }
-
-    .card {
-      width: 250px;
-      padding: 1.5rem;
-    }
-
-    .card h3, .add-ons-card h3 {
-      color: var(--accent-gold);
-      margin-bottom: .5rem;
-    }
-    .card p, .add-ons-card p {
-      font-size: .95rem;
-      margin-bottom: 1rem;
-    }
-    .card button, .add-ons-card button {
-      background: var(--accent-gold);
-      color: var(--text-dark);
-      border: none;
-      padding: .5rem 1rem;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .add-ons-card {
-      max-width: 600px;
-      margin: 2rem auto;
-      text-align: center;
-      box-shadow: 0 4px 12px var(--shadow-alt);
-    }
-
-    .details {
-      max-width: 900px;
-      margin: 3rem auto;
-      padding: 2rem;
-      background: var(--card-bg);
-      border-radius: 10px;
-      box-shadow: 0 4px 12px var(--shadow-orange);
-      transition: transform .3s ease;
-    }
-    .details:hover { transform: scale(1.02); }
-    .details h2 {
-      color: var(--accent-gold);
-      border-bottom: 2px solid var(--accent-gold);
-      padding-bottom: .5rem;
-      margin-bottom: 1rem;
-    }
-    .details ul li {
-      margin-bottom: .5rem;
+    @media (max-width: 640px){
+      .tiers{grid-template-columns:1fr}
+      .tile{width:84vw; height:52vw}
+      .nav{gap:10px}
+      nav ul{gap:8px}
+      .link{padding:8px 10px}
+      .hero-card{padding:22px}
     }
 
-    /* Canvas overlay must not block clicks */
-    canvas.effect {
-      position: absolute;
-      top:0; left:0;
-      width:100%; height:100%;
-      pointer-events: none;
-      z-index:1;
+    /* Motion preferences */
+    @media (prefers-reduced-motion: reduce){
+      *{animation:none!important; transition:none!important}
     }
   </style>
 </head>
 <body>
+  <div class="bg" aria-hidden="true"></div>
 
   <header>
-    <div class="top-left">
-      <button id="btn-support">Support</button>
-      <a href="submit_request.html">Submit a Request</a>
-      <a href="/ParentLegalGuide/">For The Parents</a>
-    </div><br><br>
-    <h1>Youth Business Education Sandbox</h1>
-    <p>Launch their legacy. Build it together.</p>
+    <div class="nav">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <strong>Fortiview</strong>
+        <span style="color:var(--muted)">Youth Business Sandbox</span>
+      </div>
+      <nav aria-label="Primary">
+        <ul>
+          <li><a class="link" href="#gallery">Showcase</a></li>
+          <li><a class="link" href="#tiers">Tiers</a></li>
+          <li><a class="link" href="/ParentLegalGuide/">For the Parents</a></li>
+          <li><a class="cta" href="submit_request.html">Submit a Request</a></li>
+        </ul>
+      </nav>
+    </div>
   </header>
 
-  <div class="vision">
-    <h2 style="color: var(--accent-gold); text-decoration: underline;">
-      Purpose and Vision
-    </h2><br>
-    <p><strong style="color: var(--accent-gold);">Parent Perspective:</strong>
-      Fortiview empowers families to co-create safe, compliant business pathways for their children—blending legal scaffolding,
-      brand clarity, and mentorship into a legacy-building experience.</p><br>
-    <p><strong style="color: var(--accent-gold);">Youth Perspective:</strong>
-      Your launchpad for real-world entrepreneurship. With guardian-backed licenses, you get the freedom to build, scale, and own your ideas.</p>
-  </div>
+  <main>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-card">
+        <div class="kicker">Launch their legacy. Build it together.</div>
+        <h1>Modern, safe, parent‑backed entrepreneurship for youth</h1>
+        <p class="sub">A glass‑smooth workspace with governance baked in. Real tools. Real guidance. Their ideas, their IP — your oversight.</p>
+        <div class="hero-actions">
+          <a class="btn gold" href="#tiers">Explore tiers</a>
+          <a class="btn" id="btn-support" href="mailto:support@fortiviewholdings.com?subject=Fortiview%20Support">Contact support</a>
+        </div>
+      </div>
+      <div class="hero-side">
+        <div class="stat">
+          <span class="pill">Safe by design</span>
+          <div>
+            <strong>Parent‑controlled access</strong>
+            <div style="color:var(--muted)">Credentials, dashboards, and audits are mirrored to guardians.</div>
+          </div>
+        </div>
+        <div class="stat">
+          <span class="pill gold">Own the IP</span>
+          <div>
+            <strong>Youth keeps the rights</strong>
+            <div style="color:var(--muted)">Build, learn, and launch without giving up ownership.</div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-<div class="card-container">
-  <div class="card" data-effect="launch">
-    <h3>🚀 LaunchPad</h3>
-    <p>$45/month<br>Custom branding kit, Idea Lab access, Parent-child dashboard</p>
-    <button class="cta-btn" data-target="launchpad">Learn More</button>
-  </div>
-  <div class="card" data-effect="orbit">
-    <h3>🪐 Orbit</h3>
-    <p>$75/month<br>business types, budgeting tools, mentorship access</p>
-    <button class="cta-btn" data-target="orbit">Learn More</button>
-  </div>
-  <div class="card" data-effect="galaxy">
-    <h3>🌌 Galaxy</h3>
-    <p>$125/month<br>Liability Protection, legal templates, branded email</p>
-    <button class="cta-btn" data-target="galaxy">Learn More</button>
-  </div>
-  <div class="card" data-effect="nova">
-    <h3>🌠 Nova</h3>
-    <p>Custom Pricing<br>Full-stack governance, LLC or nonprofit formation, legacy planning</p>
-    <button class="cta-btn" data-target="nova">Learn More</button>
-  </div>
-</div>
+    <!-- GALLERY -->
+    <section id="gallery" class="section">
+      <h2>Showcase</h2>
+      <div class="gallery-wrap">
+        <div class="gallery-controls" aria-hidden="true">
+          <button class="ctrl" id="prev" title="Previous">◀</button>
+          <button class="ctrl" id="next" title="Next">▶</button>
+        </div>
+        <div class="rail" id="rail" aria-label="Auto-scrolling gallery"></div>
+      </div>
+      <div style="margin-top:8px; color:var(--muted); font-size:.9rem">
+      </div>
+    </section>
 
-<div class="add-ons-card" data-effect="addons">
-  <h3>🧾 Add-Ons: We cover these charges</h3>
-  <p>LLC Formation ($150–$300), Domain Setup ($25–$50), EIN/LLC/Nonprofit Filings, Mentorship Expansion</p>
-  <button class="cta-btn" data-target="addons">View Details</button>
-</div>
+    <!-- TIERS -->
+    <section id="tiers" class="section">
+      <h2>Choose your tier</h2>
+      <div class="tiers">
+        <article class="tier">
+          <h3>🚀 LaunchPad</h3>
+          <div class="price">$45/month</div>
+          <ul>
+            <li>Custom branding kit</li>
+            <li>Idea Lab access</li>
+            <li>Parent‑child dashboard</li>
+            <li>Non‑commercial sandbox</li>
+          </ul>
+          <a class="go link" href="#contact">Learn more →</a>
+        </article>
+        <article class="tier">
+          <h3>🪐 Orbit</h3>
+          <div class="price">$75/month</div>
+          <ul>
+            <li>Everything in LaunchPad</li>
+            <li>Business types (UTMA LLC option)</li>
+            <li>Budgeting dashboard</li>
+            <li>Mentorship access</li>
+          </ul>
+          <a class="go link" href="#contact">Learn more →</a>
+        </article>
+        <article class="tier">
+          <h3>🌌 Galaxy</h3>
+          <div class="price">$125/month</div>
+          <ul>
+            <li>Everything in Orbit</li>
+            <li>Trust overlay (TX & federal aligned)</li>
+            <li>Legal templates (OA, EIN, etc.)</li>
+            <li>Branded email domain</li>
+          </ul>
+          <a class="go link" href="#contact">Learn more →</a>
+        </article>
+        <article class="tier">
+          <h3>🌠 Nova</h3>
+          <div class="price">Custom pricing</div>
+          <ul>
+            <li>Everything in Galaxy</li>
+            <li>LLC or nonprofit formation</li>
+            <li>Legacy governance plan</li>
+            <li>Market launch readiness</li>
+          </ul>
+          <a class="go link" href="#contact">Learn more →</a>
+        </article>
+      </div>
+    </section>
+  </main>
 
-<div class="details" id="launchpad">
-  <h2>🚀 LaunchPad Tier</h2>
-  <ul>
-    <li>Age Range: 13–14</li>
-    <li>Guardian-backed micro-license</li>
-    <li>Custom branding kit</li>
-    <li>Parent-child dashboard</li>
-    <li>Legal Path: Non-commercial sandbox</li>
-  </ul>
-</div>
-
-<div class="details" id="orbit">
-  <h2>🪐 Orbit Tier</h2>
-  <ul>
-    <li>Everything in LaunchPad</li>
-    <li>business types (e.g., UTMA LLC Formation)</li>
-    <li>Budgeting dashboard</li>
-    <li>Mentorship access</li>
-    <li>Legal Path: Optional UTMA LLC (guardian-filed)</li>
-  </ul>
-</div>
-
-<div class="details" id="galaxy">
-  <h2>🌌 Galaxy Tier</h2>
-  <ul>
-    <li>Everything in Orbit</li>
-    <li>Trust Overlay (Texas & federal compliant)</li>
-    <li>Legal templates (Operating Agreement, EIN, etc)</li>
-    <li>Branded email domain</li>
-    <li>Legal Path: Texas Trust Code §111.001</li>
-  </ul>
-</div>
-
-<div class="details" id="nova">
-  <h2>🌠 Nova Tier</h2>
-  <ul>
-    <li>Everything in Galaxy</li>
-    <li>LLC or Nonprofit formation support (501(c)(3) and Form 990 filing)</li>
-    <li>Legacy planning modules (succession, governance)</li>
-    <li>Legal Path: Youth LLC or Nonprofit (guardian-backed)</li>
-  </ul>
-</div>
-
-<div class="details" id="addons">
-  <h2>🧾 Add-Ons Detailed (We've Got These Covered)</h2>
-  <ul>
-    <li>LLC Formation: $150–$300 (state + federal filing)</li>
-    <li>Domain Setup: $25–$50/yr (includes branded email)</li>
-    <li>Legal Filing Support: EIN, LLC, Nonprofit 1023EZ</li>
-    <li>Mentorship Expansion: Tier-based access</li>
-  </ul>
-</div>
+  <footer>
+    © <span id="y"></span> Fortiview. All rights reserved.
+  </footer>
 
   <script>
-  // 1. Smooth scroll helper
-  function scrollToSection(id) {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-  }
+    // Year
+    document.getElementById('y').textContent = new Date().getFullYear();
 
-  // 2. Support button → mailto:
-  document.getElementById('btn-support')
-    .addEventListener('click', () => {
-      window.location.href =
-        'mailto:support@fortiviewholdings.com' +
-        '?subject=Fortiview%20Support%20Request';
-    });
+    // Gallery data: defaults, then optional assets/gallery.json override
+    const defaults = [
+      {src:'https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1200&auto=format&fit=crop', label:'Ideas to Ops'},
+      {src:'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1200&auto=format&fit=crop', label:'Mentorship'},
+      {src:'https://images.unsplash.com/photo-1556157382-97eda2d62296?q=80&w=1200&auto=format&fit=crop', label:'Automation'},
+      {src:'https://images.unsplash.com/photo-1520974692291-2208d157c9e2?q=80&w=1200&auto=format&fit=crop', label:'Branding'},
+      {src:'https://images.unsplash.com/photo-1516245834210-c4c142787335?q=80&w=1200&auto=format&fit=crop', label:'Dashboards'}
+    ];
 
-  // 3. Canvas hover effects—full implementations restored
-  const effects = {
-    launch(ctx, w, h) {
-      const lines = [];
-      for (let i = 0; i < 20; i++) {
-        const angle = (Math.PI * 2 * i) / 20;
-        lines.push({
-          x: w/2, y: h/2,
-          dx: Math.cos(angle)*2, dy: Math.sin(angle)*2,
-          alpha: 1
-        });
-      }
-      let frame = 0;
-      function animate() {
-        ctx.clearRect(0,0,w,h);
-        lines.forEach(l => {
-          ctx.beginPath();
-          ctx.strokeStyle = `rgba(255,200,100,${l.alpha})`;
-          ctx.moveTo(w/2,h/2);
-          ctx.lineTo(l.x,l.y);
-          ctx.stroke();
-          l.x += l.dx;
-          l.y += l.dy;
-          l.alpha -= 0.03;
-        });
-        frame++;
-        if (frame < 40) requestAnimationFrame(animate);
-      }
-      animate();
-    },
-
-    orbit(ctx, w, h) {
-      let angle = 0;
-      function animate() {
-        ctx.clearRect(0,0,w,h);
-        ctx.beginPath();
-        ctx.strokeStyle = 'rgba(100,200,255,0.6)';
-        ctx.arc(w/2,h/2,40,0,Math.PI*2);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.fillStyle = 'rgba(255,255,255,0.8)';
-        ctx.arc(
-          w/2 + Math.cos(angle)*40,
-          h/2 + Math.sin(angle)*40,
-          5,0,Math.PI*2
-        );
-        ctx.fill();
-        angle += 0.1;
-        if (angle < Math.PI*4) requestAnimationFrame(animate);
-      }
-      animate();
-    },
-
-    galaxy(ctx, w, h) {
-      const stars = Array.from({ length: 50 }, () => ({
-        x: Math.random()*w,
-        y: Math.random()*h,
-        alpha: Math.random()
-      }));
-      let frame = 0;
-      function animate() {
-        ctx.clearRect(0,0,w,h);
-        stars.forEach(s => {
-          ctx.beginPath();
-          ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
-          ctx.arc(s.x, s.y, 2,0,Math.PI*2);
-          ctx.fill();
-          s.alpha += Math.sin(frame/10)*0.02;
-        });
-        frame++;
-        if (frame < 60) requestAnimationFrame(animate);
-      }
-      animate();
-    },
-
-    nova(ctx, w, h) {
-      let radius = 0;
-      function animate() {
-        ctx.clearRect(0,0,w,h);
-        ctx.beginPath();
-        ctx.strokeStyle = `rgba(255,255,100,${1 - radius/80})`;
-        ctx.arc(w/2,h/2,radius,0,Math.PI*2);
-        ctx.stroke();
-        radius += 2;
-        if (radius < 80) requestAnimationFrame(animate);
-      }
-      animate();
-    },
-
-    addons(ctx, w, h) {
-      const sparks = Array.from({ length: 15 }, () => ({
-        x: w/2, y: h/2,
-        dx: (Math.random() - .5)*4,
-        dy: (Math.random() - .5)*4,
-        alpha: 1
-      }));
-      let frame = 0;
-      function animate() {
-        ctx.clearRect(0,0,w,h);
-        sparks.forEach(s => {
-          ctx.beginPath();
-          ctx.fillStyle = `rgba(200,255,200,${s.alpha})`;
-          ctx.arc(s.x,s.y,3,0,Math.PI*2);
-          ctx.fill();
-          s.x += s.dx;
-          s.y += s.dy;
-          s.alpha -= 0.03;
-        });
-        frame++;
-        if (frame < 40) requestAnimationFrame(animate);
-      }
-      animate();
+    async function loadGallery() {
+      try {
+        const r = await fetch('assets/gallery.json', {cache:'no-store'});
+        if (!r.ok) throw new Error('no json');
+        const items = await r.json();
+        if (!Array.isArray(items) || !items.length) throw new Error('empty');
+        return items;
+      } catch { return defaults; }
     }
-  };
 
-  // 4. Wire up canvas on hover + CTA scrolling
-  document.querySelectorAll('.card, .add-ons-card').forEach(card => {
-    let canvasEl;
-    const effectName = card.dataset.effect;
-    card.addEventListener('mouseenter', () => {
-      if (canvasEl) return;
-      canvasEl = document.createElement('canvas');
-      canvasEl.className = 'effect';
-      canvasEl.width  = card.offsetWidth;
-      canvasEl.height = card.offsetHeight;
-      card.appendChild(canvasEl);
-      const ctx = canvasEl.getContext('2d');
-      effects[effectName]?.(ctx, canvasEl.width, canvasEl.height);
-    });
-    card.addEventListener('mouseleave', () => {
-      if (!canvasEl) return;
-      canvasEl.style.transition = 'opacity .5s ease';
-      canvasEl.style.opacity = '0';
-      setTimeout(() => {
-        canvasEl.remove();
-        canvasEl = null;
-      }, 500);
-    });
-  });
+    const rail = document.getElementById('rail');
+    function render(items){
+      rail.innerHTML = '';
+      // Duplicate items on each end for seamless loop
+      const loop = [...items, ...items.slice(0, 3)];
+      loop.forEach((it,i)=>{
+        const tile = document.createElement('div');
+        tile.className = 'tile';
+        tile.innerHTML = `
+          <img src="${it.src}" alt="${it.alt || it.label || 'Gallery item'}" loading="lazy">
+          <span class="label">${it.label || ''}</span>
+        `;
+        rail.appendChild(tile);
+      });
+    }
 
-  document.querySelectorAll('.cta-btn').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      scrollToSection(btn.dataset.target);
-    });
-  });
-</script>
+    let idx = 0, timer, allowMotion = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function step(dir=1){
+      const tiles = rail.children;
+      if (!tiles.length) return;
+      idx = (idx + dir + tiles.length) % tiles.length;
+      const el = tiles[idx];
+      el.scrollIntoView({behavior: 'smooth', inline:'center', block:'nearest'});
+    }
+    function play(){ if (allowMotion){ timer = setInterval(()=>step(1), 2800); } }
+    function pause(){ clearInterval(timer); }
 
+    loadGallery().then(items=>{
+      render(items);
+      play();
+    });
+
+    rail.addEventListener('mouseenter', pause);
+    rail.addEventListener('mouseleave', play);
+    document.getElementById('prev').addEventListener('click', ()=>{ pause(); step(-1); });
+    document.getElementById('next').addEventListener('click', ()=>{ pause(); step(1); });
+
+    // 3D hover tilt for tier cards
+    document.querySelectorAll('.tier').forEach(card=>{
+      let rAF;
+      function onMove(e){
+        const rect = card.getBoundingClientRect();
+        const x = (e.clientX - rect.left)/rect.width - .5;
+        const y = (e.clientY - rect.top)/rect.height - .5;
+        cancelAnimationFrame(rAF);
+        rAF = requestAnimationFrame(()=>{
+          card.style.transform = `rotateX(${(-y*6).toFixed(2)}deg) rotateY(${(x*6).toFixed(2)}deg) translateY(-4px)`;
+        });
+      }
+      function reset(){ card.style.transform = '' }
+      card.addEventListener('mousemove', onMove);
+      card.addEventListener('mouseleave', reset);
+    });
+
+    // Anchor smooth scroll fix for sticky header offset (if needed)
+    // Not required due to scroll-behavior CSS and section spacing.
+  </script>
+
+  <!--
+    Optional: assets/gallery.json (Power Automate can overwrite this)
+    [
+      {"src":"assets/gallery/1.jpg","label":"Prototype"},
+      {"src":"assets/gallery/2.jpg","label":"KPIs"},
+      {"src":"assets/gallery/3.jpg","label":"Parent View"}
+    ]
+
+    Place a background image at assets/bg.jpg (abstract, high-res).
+  -->
 </body>
 </html>
