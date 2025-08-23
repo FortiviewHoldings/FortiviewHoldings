@@ -162,14 +162,35 @@
       .hero{grid-template-columns:1fr}
       .tiers{grid-template-columns:repeat(2,1fr)}
     }
-    @media (max-width: 640px){
-      .tiers{grid-template-columns:1fr}
-      .tile{width:84vw; height:52vw}
-      .nav{gap:10px}
-      nav ul{gap:8px}
-      .link{padding:8px 10px}
-      .hero-card{padding:22px}
-    }
+@media (max-width: 640px) {
+  .nav {
+    flex-direction: column;
+    align-items: stretch; /* full width */
+    text-align: center;
+  }
+  .brand {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  nav ul {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    padding: 0;
+    margin: 0;
+  }
+  nav ul li {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: center;
+  }
+  nav ul a {
+    width: 100%;
+    text-align: center;
+  }
+}
 
     /* Motion preferences */
     @media (prefers-reduced-motion: reduce){
