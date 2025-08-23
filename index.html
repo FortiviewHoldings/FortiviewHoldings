@@ -142,12 +142,30 @@
       .hero{grid-template-columns:1fr}
       .card.featured{grid-column:span 1}
     }
-    @media (max-width:640px){
-      .nav{gap:10px}
-      nav ul{gap:8px; flex-wrap:wrap}
-      .link{padding:8px 10px}
-      .hero-card{padding:22px}
-    }
+@media (max-width: 640px) {
+  .nav {
+    flex-direction: column;
+    align-items: stretch; /* full width */
+  }
+  .brand {
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+  nav ul {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+  nav ul li {
+    flex: 1 1 auto; /* let buttons grow/shrink evenly */
+    display: flex;
+    justify-content: center;
+  }
+  nav ul a {
+    width: 100%; /* make each button fill its li */
+    text-align: center;
+  }
+}
 
     /* Motion preferences */
     @media (prefers-reduced-motion: reduce){
