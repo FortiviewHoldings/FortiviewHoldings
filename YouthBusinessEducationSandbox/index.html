@@ -189,8 +189,6 @@
       </div>
       <nav aria-label="Primary">
         <ul>
-          <li><a class="link" href="#gallery">Showcase</a></li>
-          <li><a class="link" href="#tiers">Tiers</a></li>
           <li><a class="link" href="/ParentLegalGuide/">For the Parents</a></li>
           <li><a class="cta" href="submit_request.html">Submit a Request</a></li>
         </ul>
@@ -204,7 +202,7 @@
       <div class="hero-card">
         <div class="kicker">Launch their legacy. Build it together.</div>
         <h1>Modern, safe, parent‑backed entrepreneurship for youth</h1>
-        <p class="sub">A glass‑smooth workspace with governance baked in. Real tools. Real guidance. Their ideas, their IP — your oversight.</p>
+        <p class="sub">A glass‑smooth workspace with governance baked in. Real tools. Real guidance. Their ideas, their IP (Intellectual Property) — your oversight.</p>
         <div class="hero-actions">
           <a class="btn gold" href="#tiers">Explore tiers</a>
           <a class="btn" id="btn-support" href="mailto:support@fortiviewholdings.com?subject=Fortiview%20Support">Contact support</a>
@@ -230,7 +228,7 @@
 
     <!-- GALLERY -->
     <section id="gallery" class="section">
-      <h2>Showcase</h2>
+      <h2>Features</h2>
       <div class="gallery-wrap">
         <div class="gallery-controls" aria-hidden="true">
           <button class="ctrl" id="prev" title="Previous">◀</button>
@@ -345,7 +343,7 @@
       const el = tiles[idx];
       el.scrollIntoView({behavior: 'smooth', inline:'center', block:'nearest'});
     }
-    function play(){ if (allowMotion){ timer = setInterval(()=>step(1), 2800); } }
+    function play(){ if (allowMotion){ timer = setInterval(()=>step(1), 3600); } }
     function pause(){ clearInterval(timer); }
 
     loadGallery().then(items=>{
