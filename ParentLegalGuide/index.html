@@ -28,12 +28,13 @@
     html,body{
       margin:0;padding:0;
       font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-      background:var(--bg-deep);color:var(--ink);scroll-behavior:smooth
+      background:var(--bg-deep);color:var(--ink);scroll-behavior:smooth;
+      line-height:1.6;
     }
     a{color:inherit;text-decoration:none}
     section a{color:var(--gold)}
     section a:hover{color:#fff176;text-shadow:0 0 3px var(--gold)}
-    img{display:block;max-width:100%}
+    img{display:block;max-width:100%;height:auto}
 
     /* Background image layer */
     .bg{
@@ -63,15 +64,16 @@
     .nav{
       max-width:var(--maxw); margin:0 auto; padding:14px 20px;
       display:flex; align-items:center; gap:16px; justify-content:space-between;
+      flex-wrap:wrap;
     }
-    .brand{display:flex; align-items:center; gap:10px; letter-spacing:.5px}
+    .brand{display:flex; align-items:center; gap:10px; letter-spacing:.5px; flex-wrap:wrap}
     .logo{
       width:34px; height:34px; border-radius:10px;
       background: conic-gradient(from 220deg, #f9c851, #51f9e8, #f9aa51, #f9c851);
       box-shadow: var(--gold-glow);
     }
     .brand strong{font-weight:700}
-    nav ul{display:flex; gap:14px; list-style:none; align-items:center; margin:0;padding:0}
+    nav ul{display:flex; gap:14px; list-style:none; align-items:center; margin:0;padding:0; flex-wrap:wrap}
     .link{
       padding:9px 14px; border-radius:999px; color:var(--muted);
       border:1px solid transparent; transition:.2s ease;
@@ -90,7 +92,7 @@
     /* Hero */
     .hero{
       max-width:var(--maxw); margin:40px auto; padding:24px 20px;
-      display:grid; grid-template-columns:1.2fr .8fr; gap:28px;
+      display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:28px;
     }
     .hero-card{
       background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius);
@@ -145,13 +147,13 @@
       background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius);
       padding:24px; box-shadow:var(--shadow);
     }
-    .card h2{font-size:1.6rem; margin:0 0 12px 0; color:var(--gold)}
+    .card h2{font-size:clamp(1.5rem, 2.5vw, 2.5rem); margin:0 0 12px 0; color:var(--gold)}
     .card h3{color:var(--gold); margin:18px 0 8px 0}
     .card ul{margin:8px 0 0 18px}
     .card li{margin:.4rem 0}
 
     /* Tiers */
-    .tiers{display:grid; grid-template-columns:repeat(4,1fr); gap:16px}
+    .tiers{display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:16px}
     .tier{
       background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius-sm);
       padding:18px; box-shadow:var(--shadow); transform-style:preserve-3d; transition:transform .2s ease, box-shadow .2s ease;
@@ -177,14 +179,16 @@
     @media (max-width: 1000px){
       .hero{grid-template-columns:1fr}
       .tiers{grid-template-columns:repeat(2,1fr)}
+      .nav{gap:10px}
+      nav ul{gap:10px; justify-content:center}
     }
     @media (max-width: 640px){
       .tiers{grid-template-columns:1fr}
       .tile{width:84vw; height:52vw}
-      .nav{gap:10px}
-      nav ul{gap:8px}
       .link{padding:8px 10px}
       .hero-card{padding:22px}
+      h1{font-size:clamp(1.6rem, 7vw, 2.2rem)}
+      .cta{padding:9px 14px; font-size:.95rem}
     }
 
     /* Motion preferences */
@@ -217,7 +221,7 @@
     <section id="intro" class="hero">
       <div class="hero-card">
         <div class="kicker">From sandbox to entity. Guardian‑powered, legacy‑secured.</div>
-        <h1>Hey Parents—You’ve Got the Power. We’ve Got the Framework.</h1>
+        <h1>Hey Parents-You’ve Got the Power. We’ve Got the Framework.</h1>
         <p class="sub">
           If your child thinks like a builder; whether it’s business automation, infrastructure design, or just dreaming up systems that work, they’re not just playing. They’re prototyping a future. This guide is here to help you understand your rights, your role, and the legal frameworks we’ve built to keep everything safe, compliant, and scalable.
         </p>
@@ -228,84 +232,82 @@
           This isn’t a contract, it’s an open door. A chance to explore what’s possible, with your guidance and our support. We’ve built this framework to protect your family, honor your values, and help your child build something real that they can own, grow, and be proud of.
         </p>
       </div>
-  
-    <!-- PURPOSE -->
-   <div class="hero">
-    <section id="purpose" class="section">
-      <div class="card">
-        <h2>This Isn’t Business as Usual—It’s Legacy in Motion</h2>
-        <p>
-          This service is unlike our standard business offerings. It’s a deeply reduced‑rate initiative designed to engage young minds in the real‑world development of business operations, infrastructure, and automation. It’s cancellable at any time. All data remains secure and transferable to another cloud stack if desired. We’re not here to own your child’s idea—we’re here to help them build it, protect it, and understand how to stay the main stakeholder for as long as possible.
-        </p>
-        <p>
-          Each tier represents a proposed curriculum, paced by your child’s energy and your comfort level. We won’t engage in anything we believe could compromise a youth’s financial future, a parent’s financial stability, or anyone’s mental or physical health. These are the youth—the future of business. We offer a safe, empowering space to explore what they’re capable of.
-        </p>
-        <p>
-          We hope to scale this into a community‑driven system, where local business owners and schools collaborate to mentor, guide, and uplift young entrepreneurs. Whether your child wants to cut hair, build apps, or design systems that run Corporate Giants, this framework is here to support them—and you—every step of the way.
-        </p>
-      </div>
+
+      <section id="purpose" class="hero-side">
+        <div class="card">
+          <h2>This Isn’t Business as Usual-It’s Legacy in Motion</h2>
+          <p class="sub">
+            This service is unlike our standard business offerings. It’s a deeply reduced‑rate initiative designed to engage young minds in the real‑world development of business operations, infrastructure, and automation. It’s cancellable at any time. All data remains secure and transferable to another cloud stack if desired. We’re not here to own your child’s idea—we’re here to help them build it, protect it, and understand how to stay the main stakeholder for as long as possible.
+          </p>
+          <p class="sub">
+            Each tier represents a proposed curriculum, paced by your child’s energy and your comfort level. We won’t engage in anything we believe could compromise a youth’s financial future, a parent’s financial stability, or anyone’s mental or physical health. These are the youth—the future of business. We offer a safe, empowering space to explore what they’re capable of.
+          </p>
+          <p class="sub">
+            We hope to scale this into a community‑driven system, where local business owners and schools collaborate to mentor, guide, and uplift young entrepreneurs. Whether your child wants to cut hair, build apps, or design systems that run Corporate Giants, this framework is here to support them—and you—every step of the way.
+          </p>
+        </div>
+      </section>
     </section>
-  </div>
-  
+    
     <!-- TIERS -->
-  <div class="hero">
     <section id="tiers" class="section">
       <h2 style="color:var(--gold); margin:0 0 12px 0">Legal Blueprint by Tier</h2>
-      <div class="tiers">
-        <article class="tier">
-          <h3>🚀 LaunchPad Tier</h3>
-          <ul>
-            <li>Non‑commercial sandbox; no formal entity required</li>
-            <li>Educational license signed by parent/guardian</li>
-            <li>All contracts executed by parent only</li>
-            <li>Revenue capped below reporting thresholds</li>
-            <li><strong>Legal Basis:</strong> <a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.151.htm" target="_blank" rel="noopener">Texas Family Code §151.001</a></li>
-          </ul>
-        </article>
+      <div class="gallery-wrap">
+        <div class="tiers">
+          <article class="tier">
+            <h3>🚀 LaunchPad Tier</h3>
+            <ul>
+              <li>Non‑commercial sandbox; no formal entity required</li>
+              <li>Educational license signed by parent/guardian</li>
+              <li>All contracts executed by parent only</li>
+              <li>Revenue capped below reporting thresholds</li>
+              <li><strong>Legal Basis:</strong> <a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.151.htm" target="_blank" rel="noopener">Texas Family Code §151.001</a></li>
+            </ul>
+          </article>
 
-        <article class="tier">
-          <h3>🪐 Orbit Tier</h3>
-          <ul>
-            <li>UTMA Custodial LLC formation</li>
-            <li>Operating agreement with spending thresholds</li>
-            <li>Custodian signs contracts; minor signs internal resolutions</li>
-            <li><strong>Legal Basis:</strong>
-              <a href="https://statutes.capitol.texas.gov/Docs/PR/htm/PR.141.htm" target="_blank" rel="noopener">Texas Property Code §141.001</a>;
-              <a href="https://statutes.capitol.texas.gov/Docs/BO/htm/BO.3.htm" target="_blank" rel="noopener">Texas Business Organizations Code §3.101</a>
-            </li>
-          </ul>
-        </article>
+          <article class="tier">
+            <h3>🪐 Orbit Tier</h3>
+            <ul>
+              <li>UTMA Custodial LLC formation</li>
+              <li>Operating agreement with spending thresholds</li>
+              <li>Custodian signs contracts; minor signs internal resolutions</li>
+              <li><strong>Legal Basis:</strong>
+                <a href="https://statutes.capitol.texas.gov/Docs/PR/htm/PR.141.htm" target="_blank" rel="noopener">Texas Property Code §141.001</a>;
+                <a href="https://statutes.capitol.texas.gov/Docs/BO/htm/BO.3.htm" target="_blank" rel="noopener">Texas Business Organizations Code §3.101</a>
+              </li>
+            </ul>
+          </article>
 
-        <article class="tier">
-          <h3>🌌 Galaxy Tier</h3>
-          <ul>
-            <li>Trust overlay for staggered distributions</li>
-            <li>Advisory board charter and governance templates</li>
-            <li>Insurance and compliance automation</li>
-            <li><strong>Legal Basis:</strong>
-              <a href="https://statutes.capitol.texas.gov/Docs/PR/htm/PR.141.htm#141.007" target="_blank" rel="noopener">Texas Property Code §141.007</a>;
-              <a href="https://statutes.capitol.texas.gov/Docs/PR/htm/PR.111.htm" target="_blank" rel="noopener">Texas Trust Code §111.001</a>
-            </li>
-          </ul>
-        </article>
+          <article class="tier">
+            <h3>🌌 Galaxy Tier</h3>
+            <ul>
+              <li>Trust overlay for staggered distributions</li>
+              <li>Advisory board charter and governance templates</li>
+              <li>Insurance and compliance automation</li>
+              <li><strong>Legal Basis:</strong>
+                <a href="https://statutes.capitol.texas.gov/Docs/PR/htm/PR.141.htm#141.007" target="_blank" rel="noopener">Texas Property Code §141.007</a>;
+                <a href="https://statutes.capitol.texas.gov/Docs/PR/htm/PR.111.htm" target="_blank" rel="noopener">Texas Trust Code §111.001</a>
+              </li>
+            </ul>
+          </article>
 
-        <article class="tier">
-          <h3>🌠 Nova Tier</h3>
-          <ul>
-            <li>LLC or Texas nonprofit formation</li>
-            <li>501(c)(3) application and Form 990 filing</li>
-            <li>Legacy planning via trust and board succession</li>
-            <li><strong>Legal Basis:</strong>
-              <a href="https://statutes.capitol.texas.gov/Docs/BO/htm/BO.22.htm" target="_blank" rel="noopener">Texas Business Organizations Code §22.001</a>;
-              <a href="https://www.irs.gov/forms-pubs/about-form-1023" target="_blank" rel="noopener">IRS Form 1023</a>
-            </li>
-          </ul>
-        </article>
+          <article class="tier">
+            <h3>🌠 Nova Tier</h3>
+            <ul>
+              <li>LLC or Texas nonprofit formation</li>
+              <li>501(c)(3) application and Form 990 filing</li>
+              <li>Legacy planning via trust and board succession</li>
+              <li><strong>Legal Basis:</strong>
+                <a href="https://statutes.capitol.texas.gov/Docs/BO/htm/BO.22.htm" target="_blank" rel="noopener">Texas Business Organizations Code §22.001</a>;
+                <a href="https://www.irs.gov/forms-pubs/about-form-1023" target="_blank" rel="noopener">IRS Form 1023</a>
+              </li>
+            </ul>
+          </article>
+        </div>
       </div>
     </section>
-  </div>
+ 
     <!-- COMPARATIVE TABLE -->
-  <div class="hero">
     <section id="compare" class="section">
       <h2 style="color:var(--muted); margin:0 0 12px 0">Comparative Legal Structure Snapshot</h2>
       <div class="table-wrapper">
@@ -363,12 +365,15 @@
         </table>
       </div>
     </section>
-  </div>
   </main>
 
   <footer>
     © <span id="y"></span> Fortiview Holdings. All rights reserved.
   </footer>
-  
+
+  <script>
+    // Set dynamic year without changing your content
+    (function(){ var y=document.getElementById('y'); if(y) y.textContent=new Date().getFullYear(); })();
+  </script>
 </body>
 </html>
