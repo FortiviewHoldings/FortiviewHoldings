@@ -357,14 +357,21 @@
       });
     }
 
-    let idx = 0, timer, allowMotion = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    function step(dir=1){
-      const tiles = rail.children;
-      if (!tiles.length) return;
-      idx = (idx + dir + tiles.length) % tiles.length;
-      const el = tiles[idx];
-      el.scrollIntoView({behavior: 'smooth', inline:'center', block:'nearest'});
-    }
+let idx = 0, timer, allowMotion = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function step(dir = 1) {
+  const tiles = rail.children;
+  if (!tiles.length) return;
+
+  idx = (idx + dir + tiles.length) % tiles.length;
+  const el = tiles[idx];
+
+  // Scroll only the gallery rail, not the whole page
+  rail.scrollTo({
+    left: el.offsetLeft - rail.offsetLeft,
+    behavior: 'smooth'
+  });
+}
     function play(){ if (allowMotion){ timer = setInterval(()=>step(1), 3600); } }
     function pause(){ clearInterval(timer); }
 
