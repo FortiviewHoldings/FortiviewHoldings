@@ -64,6 +64,45 @@
     .detail-card p{margin:.5rem 0 1rem;}
     .detail-card .cta-link{display:inline-block; margin-top:1rem; padding:10px 16px; border-radius:999px; background: linear-gradient(180deg, var(--gold), var(--gold-600)); color:#1a1405; font-weight:700; text-decoration:none; box-shadow:var(--gold-glow);}
     .detail-card .cta-link:hover{filter:brightness(.95)}
+    
+    @media (max-width: 1000px){
+      .hero{grid-template-columns:1fr}
+      .tiers{grid-template-columns:repeat(2,1fr)}
+    }
+@media (max-width: 640px) {
+  .nav {
+    flex-direction: column;
+    align-items: stretch; /* full width */
+    text-align: center;
+  }
+  .brand {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  nav ul {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    padding: 0;
+    margin: 0;
+  }
+  nav ul li {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: center;
+  }
+  nav ul a {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+    /* Motion preferences */
+    @media (prefers-reduced-motion: reduce){
+      *{animation:none!important; transition:none!important}
+    }
   </style>
 </head>
 <body>
