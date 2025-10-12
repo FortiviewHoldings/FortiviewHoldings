@@ -493,7 +493,7 @@ function selectTier(el, tier) {
 function selectPlan(el, plan) {
   document.querySelectorAll('#planOptions .option-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
-  selectedPlan = plan;
+  selectedPlan = plan.toLowerCase();
   updateSummary();
 }
 
