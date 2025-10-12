@@ -1,125 +1,98 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<title>Fortiview Holdings — Terms, Privacy & Communications</title>
-<meta name="description" content="Terms of Service, Privacy Policy, and Communications Policy for Fortiview Holdings (PragOptics™ System Integration).">
+  <meta charset="UTF-8" />
+  <title>Fortiview Holdings — Terms, Privacy & Communications</title>
   <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="dark light" />
   <meta property="og:image" content="https://fortiviewholdings.com/images/social-preview.png">
   <style>
-:root{
-  --bg-deep:#0b1022;
-  --bg-accent:#0b1c3d;
-  --glass:#101a33cc;
-  --glass-2:#0f1933cc;
-  --border:#ffffff1a;
-  --ink:#e7ecff;
-  --muted:#c6d0f0a6;
-  --brand:#5c8c45;
-  --brand-600:#4d7a39;
-  --aura:0 10px 24px rgba(92,140,69,.35);
-  --radius:16px;
-  --radius-sm:12px;
-  --maxw:1200px;
-  --grad:linear-gradient(135deg,#182a52 0%,#0b1c3d 40%,#1d3557 100%);
-}
-*{box-sizing:border-box}
-html,body{
-  margin:0;padding:0;
-  font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-  background:var(--bg-deep); color:var(--ink);
-  scroll-behavior:smooth; -webkit-text-size-adjust:100%;
-}
-a{color:inherit;text-decoration:none}
-img{display:block;max-width:100%}
+    :root{
+      --bg-deep:#0b1022;
+      --bg-accent:#0b1c3d;
+      --glass:#101a33cc;
+      --glass-2:#0f1933cc;
+      --border:#ffffff1a;
+      --ink:#e7ecff;
+      --muted:#c6d0f0a6;
+      --brand:#5c8c45;
+      --brand-600:#4d7a39;
+      --aura:0 10px 24px rgba(92,140,69,.35);
+      --radius:16px;
+      --radius-sm:12px;
+      --maxw:1200px;
+      --grad:linear-gradient(135deg,#182a52 0%,#0b1c3d 40%,#1d3557 100%);
+    }
+    *{box-sizing:border-box}
+    html,body{
+      margin:0; padding:0;
+      font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      background:var(--bg-deep); color:var(--ink);
+      scroll-behavior:smooth; -webkit-text-size-adjust:100%;
+    }
+    a{color:inherit;text-decoration:none}
+    img{display:block;max-width:100%}
 
-/* Background */
-.bg{
-  position:fixed; inset:0; z-index:-2;
-  background:
-    radial-gradient(1100px 700px at 12% -10%, #5ac8fa22, transparent 60%),
-    radial-gradient(900px 600px at 110% 10%, rgba(92,140,69,.20), transparent 55%),
-    var(--grad);
-  filter:blur(6px) brightness(.9) saturate(1.05);
-  transform:scale(1.03);
-}
-.bg::after{
-  content:""; position:absolute; inset:0;
-  background:
-    radial-gradient(900px 500px at 50% -10%, transparent, #000814bb 70%),
-    linear-gradient(to bottom, #00000066, transparent 35%, #00000077 100%);
-}
-#bg-stars{position:fixed; inset:0; width:100vw; height:100vh; z-index:-1; pointer-events:none;}
+    /* Background */
+    .bg{
+      position:fixed; inset:0; z-index:-2;
+      background:
+        radial-gradient(1100px 700px at 12% -10%, #5ac8fa22, transparent 60%),
+        radial-gradient(900px 600px at 110% 10%, rgba(92,140,69,.20), transparent 55%),
+        var(--grad);
+      filter:blur(6px) brightness(.9) saturate(1.05);
+      transform:scale(1.03);
+    }
+    .bg::after{
+      content:""; position:absolute; inset:0;
+      background:
+        radial-gradient(900px 500px at 50% -10%, transparent, #000814bb 70%),
+        linear-gradient(to bottom, #00000066, transparent 35%, #00000077 100%);
+    }
+    #bg-stars{position:fixed; inset:0; width:100vw; height:100vh; z-index:-1; pointer-events:none;}
 
-/* Header */
-header{
-  position:sticky; top:0; z-index:50;
-  backdrop-filter:saturate(140%) blur(10px);
-  background:#0b1224cc;
-  border-bottom:1px solid var(--border);
-}
-.nav{
-  max-width:var(--maxw); margin:0 auto; padding:14px 20px;
-  display:flex; align-items:center; justify-content:space-between; gap:16px;
-}
-.brand{display:flex; align-items:center; gap:10px; letter-spacing:.4px}
-.logo{
-  width:34px; height:34px; border-radius:10px;
-  background-image:url('https://fortiviewholdings.com/images/Logo.png');
-  background-size:cover; background-position:center;
-  box-shadow:0 0 0 2px rgba(92,140,69,.25), 0 10px 20px rgba(92,140,69,.18);
-}
-.brand strong{font-weight:800;}
-nav ul{display:flex; gap:14px; list-style:none; align-items:center; margin:0; padding:0}
-.link{
-  padding:9px 14px; border-radius:999px; color:var(--muted);
-  border:1px solid transparent; transition:.2s ease;
-}
-.link:hover{color:#fff; border-color:#ffffff22; background:#ffffff12}
+    /* Header */
+    header{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter:saturate(140%) blur(10px);
+      background:#0b1224cc;
+      border-bottom:1px solid var(--border);
+    }
+    .nav{
+      max-width:var(--maxw); margin:0 auto; padding:14px 20px;
+      display:flex; align-items:center; justify-content:space-between; gap:16px;
+    }
+    .brand{display:flex; align-items:center; gap:10px; letter-spacing:.4px}
+    .logo{
+      width:34px; height:34px; border-radius:10px;
+      background-image:url('https://fortiviewholdings.com/images/Logo.png');
+      background-size:cover; background-position:center;
+      box-shadow:0 0 0 2px rgba(92,140,69,.25), 0 10px 20px rgba(92,140,69,.18);
+    }
+    .brand strong{font-weight:800;}
 
-/* Content */
-.section{max-width:var(--maxw); margin:36px auto; padding:0 20px}
-.glass{
-  background:var(--glass); border:1px solid var(--border); border-radius:var(--radius);
-  box-shadow:var(--aura); padding:28px;
-}
-.kicker{color:var(--muted); font-size:.95rem; margin:0 0 6px 0}
-h1{margin:8px 0 10px 0; font-size:clamp(1.6rem,2.2vw,2.2rem)}
-h2{margin:26px 0 8px 0; color:var(--brand)}
-h3{margin:18px 0 6px 0; color:#cfe3c3}
-p{line-height:1.7; color:#e9eeff}
-ul,ol{line-height:1.7}
-small,.muted{color:var(--muted)}
+    /* Content */
+    .section{max-width:var(--maxw); margin:36px auto; padding:0 20px}
+    .glass{
+      background:var(--glass); border:1px solid var(--border); border-radius:var(--radius);
+      box-shadow:var(--aura); padding:28px;
+    }
+    .kicker{color:var(--muted); font-size:.95rem; margin:0 0 6px 0}
+    h1{margin:8px 0 10px 0; font-size:clamp(1.6rem,2.2vw,2.2rem)}
+    h2{margin:26px 0 8px 0; color:var(--brand)}
+    p{line-height:1.7; color:#e9eeff}
+    small,.muted{color:var(--muted)}
 
-.note{
-  background:var(--glass-2); border:1px solid var(--border);
-  border-radius:12px; padding:14px 16px; color:var(--muted)
-}
+    footer{margin:40px 0 30px 0; color:var(--muted); text-align:center; font-size:.9rem}
 
-/* TOC */
-.toc{
-  display:flex; gap:10px; flex-wrap:wrap; margin:16px 0 10px 0
-}
-.toc a{
-  padding:8px 12px; border:1px solid var(--border);
-  border-radius:999px; color:var(--muted);
-}
-.toc a:hover{background:#ffffff12; color:#fff}
-
-footer{margin:40px 0 30px 0; color:var(--muted); text-align:center; font-size:.9rem}
-
-@media (max-width: 640px){
-  .nav{flex-direction:column; align-items:stretch}
-  .brand{justify-content:center; margin-bottom:8px}
-  nav ul{flex-wrap:wrap; justify-content:center; gap:8px}
-  nav ul li{flex:1 1 auto; display:flex; justify-content:center}
-  nav ul a{width:100%; text-align:center}
-}
-</style>
+    @media (max-width: 640px){
+      .nav{flex-direction:column; align-items:stretch}
+      .brand{justify-content:center; margin-bottom:8px}
+    }
+  </style>
 </head>
-<body id="top">
+<body>
   <!-- Background -->
   <div class="bg" aria-hidden="true"></div>
   <canvas id="bg-stars" aria-hidden="true"></canvas>
@@ -127,17 +100,11 @@ footer{margin:40px 0 30px 0; color:var(--muted); text-align:center; font-size:.9
   <!-- Header -->
   <header>
     <div class="nav">
-      <a class="brand" href="https://       <div class="logo" aria-hidden="true"></div>
+      <a class="brand" href="https://fortiviewholdings.com">
+        <div class="logo" aria-hidden="true"></div>
         <strong>Fortiview</strong>
         <span style="color:var(--muted)">Holdings</span>
       </a>
-      <nav aria-label="Primary">
-        <ul>
-          <li>/integration</a></li>
-          <li>/Home</a></li>
-          <li>#contactContact</a></li>
-        </ul>
-      </nav>
     </div>
   </header>
 
@@ -148,37 +115,11 @@ footer{margin:40px 0 30px 0; color:var(--muted); text-align:center; font-size:.9
       <h1>Terms of Service, Privacy Policy & Communications</h1>
       <p class="muted">Effective date: October 12, 2025</p>
 
-      <div class="note" role="note">
-        <strong>Summary:</strong> This page explains our terms of service, privacy practices, and how we use email, SMS, and other communications to support your services. It is intended to be concise and readable; some customers may also have a signed MSA/SOW that governs over any conflicting language here.
-      </div>
-
-      <!-- Table of Contents -->
-      <nav class="toc" aria-label="Contents">
-        #termsTerms of Service</a>
-        #privacyPrivacy Policy</a>
-        #communicationsCommunications Policy</a>
-        #cookiesCookies & Tracking</a>
-        #securitySecurity</a>
-        <a href="#rightsts</a>
-        #contactContact</a>
-      </nav>
-
-      <!-- Insert your corrected content here -->
-      <!-- Example: -->
-      <section id="terms">
-        <h2>1) Terms of Service</h2>
-        <h3>1.1 Scope</h3>
-        <p>We provide PragOptics™ system integration and related services as described on our site and/or in your order...</p>
-        <!-- Continue with your content -->
-      </section>
-
-      <!-- Repeat for Privacy, Communications, etc. -->
-
-      <hr style="border-color:var(--border); margin:24px 0"/>
-      <div style="display:flex; gap:12px; flex-wrap:wrap">
-        #topBack to top</a>
-        /integration/Return to Integration</a>
-      </div>
+      <p>
+        This page explains our terms of service, privacy practices, and how we use communications
+        to support your services. Some customers may also have a signed MSA/SOW that governs over
+        any conflicting language here.
+      </p>
     </div>
   </main>
 
