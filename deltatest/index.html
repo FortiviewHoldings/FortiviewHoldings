@@ -183,6 +183,28 @@ table th:nth-child(3),
 table th:nth-child(4) {
   text-align: center;
 }
+
+    /* Overlay */
+#loadingOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  z-index: 200;
+  display: none;
+}
+.spinner {
+  border: 4px solid #ffffff33;
+  border-top: 4px solid var(--brand);
+  border-radius: 50%;
+  width: 40px; height: 40px;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { 100% { transform: rotate(360deg); } }
+    
     footer{margin:50px 0 30px 0; color:var(--muted); text-align:center; font-size:.9rem}
 
     @media (max-width: 640px) {
@@ -251,6 +273,11 @@ table th:nth-child(4) {
 
 <!-- Hidden Container -->
 <div id="ctaBox" class="glass" style="display:none; margin-top:20px; padding:20px;">
+    
+  <div id="loadingOverlay">
+    <div class="spinner"></div>
+  </div>
+
   <h3 style="margin-top:0; color:var(--brand)">Choose Your Tier</h3>
   <div id="tierOptions" style="display:flex; gap:16px; flex-wrap:wrap;">
     <div class="option-card" onclick="selectTier(this,'Email Essentials')">
@@ -590,7 +617,7 @@ async function handleFormSubmit(e) {
   const perUserPrice = PRICING_MATRIX[selectedTier]?.[selectedPlan] || 0;
 
   const customerData = {
-    jobId, // include the generated jobId
+    jobId,
     name: document.getElementById('custName').value,
     business: document.getElementById('businessName').value,
     email: document.getElementById('custEmail').value,
@@ -603,13 +630,16 @@ async function handleFormSubmit(e) {
     perUserPrice: Number(perUserPrice)
   };
 
+  // lock UI + show overlay
+  btn.disabled = true;
+  document.querySelectorAll('#ctaBox input, #ctaBox select, #ctaBox button')
+    .forEach(el => el.disabled = true);
+  document.getElementById('loadingOverlay').style.display = 'flex';
+
   try {
     // Phase 1: Omnitok preflight
     const omni = await getOmniTok(act);
-
-    if (!omni.endpoint) {
-      throw new Error("Omnitok preflight did not return an endpoint");
-    }
+    if (!omni.endpoint) throw new Error("Omnitok preflight did not return an endpoint");
 
     // Phase 2: Call the returned endpoint with customerData
     const response = await fetch(omni.endpoint, {
@@ -629,19 +659,35 @@ async function handleFormSubmit(e) {
 
     console.log("Final flow result:", result);
 
-    // Friendly confirmation popup
+    // success: collapse the form and mark the main button green
+    document.getElementById('ctaBox').style.display = 'none';
+    const selectBtn = document.querySelector('.cta-btn');
+    selectBtn.textContent = '✓ Package Selected';
+    selectBtn.style.background = 'linear-gradient(180deg, #4CAF50, #388E3C)';
+    selectBtn.style.color = '#fff';
+    selectBtn.disabled = true;
+
     alert(
       `✅ Your request has been sent!\n\n` +
       `We've emailed a confirmation to: ${result.email}\n` +
       `If you don't see it, please check your spam folder and mark us as a trusted sender.\n\n` +
       `Tracking ID: ${jobId}`
     );
+
   } catch (err) {
     console.error("Submission error:", err);
+    // unlock inputs so they can try again
+    btn.disabled = false;
+    document.querySelectorAll('#ctaBox input, #ctaBox select, #ctaBox button')
+      .forEach(el => el.disabled = false);
+
     alert(
       "❌ Your request did not go through.\n\n" +
       "Please try again in a moment. If the problem persists, contact support."
     );
+  } finally {
+    // always hide overlay
+    document.getElementById('loadingOverlay').style.display = 'none';
   }
 }
 </script>
