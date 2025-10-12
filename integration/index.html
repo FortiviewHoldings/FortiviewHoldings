@@ -79,19 +79,19 @@
     }
     .cta:hover{filter:brightness(.95)}
 
-    .cta-btn {
+.cta-btn {
   display:inline-block;
-  background: linear-gradient(180deg, var(--brand), var(--brand-600));
-  color:#0c120a;
-  font-weight:800;
-  letter-spacing:.2px;
-  padding:14px 24px;
+  background: #2a354d; /* toned-down dark button */
+  color:#e7ecff;
+  font-weight:600;
+  padding:10px 18px;
   border-radius:999px;
-  box-shadow: var(--aura);
+  border:1px solid var(--border);
   transition: all .2s ease;
+  cursor:pointer;
 }
 .cta-btn:hover {
-  filter:brightness(.95);
+  background:#3a4661;
   transform:translateY(-2px);
 }
 
@@ -125,6 +125,32 @@
     }
     .dropdown-menu li a:hover { background:#ffffff12; color:#fff; }
 
+.option-card {
+  flex:1 1 200px;
+  background:var(--glass-2);
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  padding:16px;
+  cursor:pointer;
+  transition:all .2s ease;
+}
+.option-card:hover {
+  background:#ffffff12;
+  border-color:var(--brand);
+}
+.option-card.selected {
+  background: #1a233a; /* subtle dark highlight */
+  border-color: var(--brand); /* thin green border */
+  box-shadow: 0 0 0 2px rgba(92,140,69,.35);
+}
+table td:nth-child(2),
+table td:nth-child(3),
+table td:nth-child(4),
+table th:nth-child(2),
+table th:nth-child(3),
+table th:nth-child(4) {
+  text-align: center;
+}
     footer{margin:50px 0 30px 0; color:var(--muted); text-align:center; font-size:.9rem}
 
     @media (max-width: 640px) {
@@ -186,12 +212,141 @@
         <li>🔒 Identity-aware access control and compliance-ready logging</li>
         <li>🌐 Scalable architecture designed for growth and partnerships</li>
       </ul>
-          <div style="margin-top:28px;">
-      <a href="mailto:support@fortiviewholdings.com?subject=PragOptics%20Consultation"
-         class="cta-btn">Request a Consultation</a>
-    </div>
+<!-- CTA Button -->
+<div style="margin-top:28px;">
+  <button class="cta-btn" onclick="openCtaBox()">Select Your Package</button>
+</div>
 
+<!-- Hidden Container -->
+<div id="ctaBox" class="glass" style="display:none; margin-top:20px; padding:20px;">
+  <h3 style="margin-top:0; color:var(--brand)">Choose Your Tier</h3>
+  <div id="tierOptions" style="display:flex; gap:16px; flex-wrap:wrap;">
+    <div class="option-card" onclick="selectTier(this,'Email Essentials')">
+      <strong>Email Essentials</strong>
+      <p style="color:var(--muted); font-size:.9rem;">Branded email, SharePoint, backend support</p>
     </div>
+    <div class="option-card" onclick="selectTier(this,'Productivity Suite')">
+      <strong>Productivity Suite</strong>
+      <p style="color:var(--muted); font-size:.9rem;">Everything in Essentials + Office apps, Teams, automation</p>
+    </div>
+  </div>
+
+  <!-- Payment Terms -->
+  <div id="planBox" style="display:none; margin-top:24px;">
+    <h3 style="margin-top:0; color:var(--brand)">Choose Payment Plan</h3>
+    <div id="planOptions" style="display:flex; gap:16px; flex-wrap:wrap;">
+      <div class="option-card" onclick="selectPlan(this,'Monthly')"><strong>Monthly</strong></div>
+      <div class="option-card" onclick="selectPlan(this,'Quarterly')"><strong>Quarterly</strong></div>
+      <div class="option-card" onclick="selectPlan(this,'Annual')"><strong>Annual</strong></div>
+    </div>
+  </div>
+
+  <!-- Confirmation -->
+  <div id="summaryBox" style="display:none; margin-top:24px; color:var(--ink);">
+    <h3 style="margin-top:0; color:var(--brand)">Your Selection</h3>
+    <p id="summaryText"></p>
+    <button id="submitBtn" class="cta-btn" style="margin-top:16px; display:none;" onclick="showContactForm()">
+      Submit Request
+    </button>
+  </div>
+
+<!-- Contact Form -->
+<div id="contactForm" style="display:none; margin-top:24px;">
+  <h3 style="margin-top:0; color:var(--brand)">Enter Your Contact Information</h3>
+  <form onsubmit="handleFormSubmit(event)" autocomplete="on">
+    <label>
+      Name:<br>
+      <input type="text" id="custName" name="name" autocomplete="name"
+             required style="width:100%; padding:8px; margin:6px 0;">
+    </label><br>
+
+    <label>
+      Business Name:<br>
+      <input type="text" id="businessName" name="organization" autocomplete="organization"
+             required style="width:100%; padding:8px; margin:6px 0;">
+    </label><br>
+
+    <label>
+      Email:<br>
+      <input type="email" id="custEmail" name="email" autocomplete="email"
+             required style="width:100%; padding:8px; margin:6px 0;">
+    </label><br>
+
+    <label>
+      Phone:<br>
+      <input type="tel" id="custPhone" name="tel" autocomplete="tel"
+             inputmode="numeric" maxlength="10"
+             placeholder="Enter 10 digits"
+             style="width:100%; padding:8px; margin:6px 0;"
+             onblur="formatPhone(this)">
+    </label><br>
+
+    <label>
+      State:<br>
+      <select id="custState" name="address-level1" autocomplete="address-level1"
+              required style="width:100%; padding:8px; margin:6px 0;">
+        <option value="">Select a state</option>
+        <option value="AL">Alabama</option>
+        <option value="AK">Alaska</option>
+        <option value="AZ">Arizona</option>
+        <option value="AR">Arkansas</option>
+        <option value="CA">California</option>
+        <option value="CO">Colorado</option>
+        <option value="CT">Connecticut</option>
+        <option value="DE">Delaware</option>
+        <option value="FL">Florida</option>
+        <option value="GA">Georgia</option>
+        <option value="HI">Hawaii</option>
+        <option value="ID">Idaho</option>
+        <option value="IL">Illinois</option>
+        <option value="IN">Indiana</option>
+        <option value="IA">Iowa</option>
+        <option value="KS">Kansas</option>
+        <option value="KY">Kentucky</option>
+        <option value="LA">Louisiana</option>
+        <option value="ME">Maine</option>
+        <option value="MD">Maryland</option>
+        <option value="MA">Massachusetts</option>
+        <option value="MI">Michigan</option>
+        <option value="MN">Minnesota</option>
+        <option value="MS">Mississippi</option>
+        <option value="MO">Missouri</option>
+        <option value="MT">Montana</option>
+        <option value="NE">Nebraska</option>
+        <option value="NV">Nevada</option>
+        <option value="NH">New Hampshire</option>
+        <option value="NJ">New Jersey</option>
+        <option value="NM">New Mexico</option>
+        <option value="NY">New York</option>
+        <option value="NC">North Carolina</option>
+        <option value="ND">North Dakota</option>
+        <option value="OH">Ohio</option>
+        <option value="OK">Oklahoma</option>
+        <option value="OR">Oregon</option>
+        <option value="PA">Pennsylvania</option>
+        <option value="RI">Rhode Island</option>
+        <option value="SC">South Carolina</option>
+        <option value="SD">South Dakota</option>
+        <option value="TN">Tennessee</option>
+        <option value="TX">Texas</option>
+        <option value="UT">Utah</option>
+        <option value="VT">Vermont</option>
+        <option value="VA">Virginia</option>
+        <option value="WA">Washington</option>
+        <option value="WV">West Virginia</option>
+        <option value="WI">Wisconsin</option>
+        <option value="WY">Wyoming</option>
+      </select>
+    </label><br>
+
+    <button type="submit" class="cta-btn" style="margin-top:12px;">Finalize Request</button>
+  </form>
+</div>
+
+<script>
+
+</script>
+</div>
   </section>
 
   <!-- Pricing Section -->
@@ -283,6 +438,69 @@
         if(menu) menu.style.display = 'none';
       }
     });
-  </script>
+    
+let selectedTier = null;
+let selectedPlan = null;
+let customerData = {};
+
+function openCtaBox() {
+  document.getElementById('ctaBox').style.display = 'block';
+}
+
+function selectTier(el, tier) {
+  document.querySelectorAll('#tierOptions .option-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedTier = tier;
+  document.getElementById('planBox').style.display = 'block';
+  updateSummary();
+}
+
+function selectPlan(el, plan) {
+  document.querySelectorAll('#planOptions .option-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedPlan = plan;
+  updateSummary();
+}
+
+function updateSummary() {
+  if (selectedTier && selectedPlan) {
+    document.getElementById('summaryBox').style.display = 'block';
+    document.getElementById('summaryText').textContent =
+      `You selected: ${selectedTier} with ${selectedPlan} billing.`;
+    document.getElementById('submitBtn').style.display = 'inline-block';
+  }
+}
+
+function showContactForm() {
+  document.getElementById('contactForm').style.display = 'block';
+}
+function formatPhone(input) {
+  let digits = input.value.replace(/\D/g, '').substring(0, 10);
+  if (digits.length === 10) {
+    const area = digits.substring(0,3);
+    const mid = digits.substring(3,6);
+    const last = digits.substring(6);
+    input.value = `+1 (${area}) ${mid}-${last}`;
+    input.dataset.raw = digits;
+  } else {
+    input.value = digits;
+    input.dataset.raw = digits;
+  }
+}
+
+function handleFormSubmit(e) {
+  e.preventDefault();
+  const customerData = {
+    name: document.getElementById('custName').value,
+    business: document.getElementById('businessName').value,
+    email: document.getElementById('custEmail').value,
+    phoneRaw: document.getElementById('custPhone').dataset.raw || "",
+    phoneFormatted: document.getElementById('custPhone').value,
+    state: document.getElementById('custState').value
+  };
+  console.log("Collected Data:", customerData);
+  alert("Your request has been captured. Ready to send to endpoint.");
+}
+</script>
 </body>
 </html>
