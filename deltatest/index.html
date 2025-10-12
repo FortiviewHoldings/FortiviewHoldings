@@ -618,7 +618,7 @@ async function handleFormSubmit(e) {
         'Content-Type': 'application/json',
         'x-auth-token': omni.authToken,
         'x-omnitok': omni.OmniTok,
-        'x-session-id': omni.sid,
+        'x-sid': omni.sid,
         'x-act': omni.act
       },
       body: JSON.stringify(customerData)
