@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Fortiview Holdings — Strategic Services</title>
+  <title>Fortiview Holdings — PragOptics™ System Integration</title>
   <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="dark light" />
@@ -85,24 +85,32 @@
       box-shadow:var(--aura); padding:32px;
     }
 
-    table {
-      width:100%; border-collapse:collapse; margin-top:1rem; font-size:.95rem;
-    }
-    th, td {
-      padding:12px; border-bottom:1px solid var(--border);
-    }
-    th {
-      background:var(--bg-accent); color:#fff; text-align:center;
-    }
+    table {width:100%; border-collapse:collapse; margin-top:1rem; font-size:.95rem;}
+    th, td {padding:12px; border-bottom:1px solid var(--border);}
+    th {background:var(--bg-accent); color:#fff; text-align:center;}
     td:first-child { text-align:left; }
     .check { color: var(--brand); font-weight:700; text-align:center; }
     .cross { color: #f44336; font-weight:700; text-align:center; }
 
+    .dropdown { position: relative; }
+    .dropdown-toggle {
+      background: none; border: none; cursor: pointer; font: inherit;
+      color: var(--muted); padding: 9px 14px; border-radius: 999px;
+    }
+    .dropdown-toggle:hover { color:#fff; background:#ffffff12; border:1px solid #ffffff22; }
+    .dropdown-menu {
+      display: none; position: absolute; top: 110%; left: 0;
+      background: var(--glass); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); box-shadow: var(--aura);
+      list-style: none; margin: 0; padding: 8px 0; min-width: 240px; z-index: 100;
+    }
+    .dropdown-menu li a {
+      display: block; padding: 10px 16px; color: var(--ink);
+    }
+    .dropdown-menu li a:hover { background:#ffffff12; color:#fff; }
+
     footer{margin:50px 0 30px 0; color:var(--muted); text-align:center; font-size:.9rem}
 
-    @media (max-width: 1000px){
-      .hero{grid-template-columns:1fr}
-    }
     @media (max-width: 640px) {
       .nav {flex-direction: column; align-items: stretch;}
       .brand {justify-content: center; margin-bottom: 8px;}
@@ -125,8 +133,20 @@
       </div>
       <nav aria-label="Primary">
         <ul>
-          <li><a class="link" href="#services">Services</a></li>
-          <li><a class="link" href="/YouthBusinessEducationSandbox">Youth Sandbox</a></li>
+          <li class="dropdown">
+            <button class="link dropdown-toggle" onclick="toggleDropdown()">Services ▾</button>
+            <ul id="servicesDropdown" class="dropdown-menu">
+              <li><a href="/leadership">Leadership & Business Strategy</a></li>
+              <li><a href="/operations">Project & Operations Management</a></li>
+              <li><a href="/finance">Financial Coordination</a></li>
+              <li><a href="/marketing">Marketing, Sales & Client Relations</a></li>
+              <li><a href="/governance">Governance & Regulatory Support</a></li>
+              <li><a href="/cx">Customer Experience Optimization</a></li>
+              <li><a href="/partnerships">Networking & Partnerships</a></li>
+              <li><a href="/integration">PragOptics™ System Integration</a></li>
+              <li><a href="/youth">Youth Entrepreneur Education</a></li>
+            </ul>
+          </li>
           <li><a class="link" href="#about">About</a></li>
           <li><a class="cta" href="mailto:support@fortiviewholdings.com?subject=Fortiview%20Inquiry">Work with us</a></li>
         </ul>
@@ -134,12 +154,32 @@
     </div>
   </header>
 
+  <!-- PragOptics Section -->
+  <section id="integration" class="section">
+    <div class="glass">
+      <h2 style="margin-top:0; color:var(--brand)">PragOptics™ System Integration</h2>
+            <p style="color:var(--muted); font-size:1.05rem; line-height:1.6;">
+        PragOptics™ is our framework for unifying your business systems into a single,
+        transparent architecture. We connect your data, workflows, and customer touchpoints
+        into dashboards that drive clarity and accountability.
+      </p>
+      <ul style="margin-top:16px; color:var(--ink); line-height:1.6;">
+        <li>🔗 Seamless integration of Microsoft 365, CRM, and POS systems</li>
+        <li>📊 Unified dashboards for finance, operations, and customer experience</li>
+        <li>⚡ Automation pipelines (Power Automate, PowerShell, Python)</li>
+        <li>🔒 Identity-aware access control and compliance-ready logging</li>
+        <li>🌐 Scalable architecture designed for growth and partnerships</li>
+      </ul>
+    </div>
+  </section>
+
   <!-- Pricing Section -->
   <section id="pricing" class="section">
     <div class="glass">
       <h2 style="margin-top:0; color:var(--brand)">Strategic Service Packages</h2>
       <p style="color:var(--muted); margin-bottom:24px;">
-        Transparent pricing with scalable options. Every package includes a dedicated tenant, domain integration, and Fortiview-managed security.
+        Transparent pricing with scalable options. Every package includes a dedicated tenant,
+        domain integration, and Fortiview-managed security.
       </p>
 
       <h3>One-Time Setup Fee — $1,500</h3>
@@ -168,7 +208,7 @@
             <tr><td>Microsoft 365 license</td><td>Basic</td><td>Standard (Office apps)</td></tr>
             <tr><td>SharePoint access for document storage</td><td class="check">✔</td><td class="check">✔</td></tr>
             <tr><td>DNS management (SPF, DKIM, DMARC)</td><td class="check">✔</td><td class="check">✔</td></tr>
-                        <tr><td>Fortiview-managed updates & security</td><td class="check">✔</td><td class="check">✔</td></tr>
+            <tr><td>Fortiview-managed updates & security</td><td class="check">✔</td><td class="check">✔</td></tr>
             <tr><td>Ongoing backend support</td><td class="check">✔</td><td class="check">✔</td></tr>
             <tr><td>Microsoft Teams collaboration</td><td class="cross">✘</td><td class="check">✔</td></tr>
             <tr><td>Microsoft Office apps (Word, Excel, Outlook, PowerPoint)</td><td class="cross">✘</td><td class="check">✔</td></tr>
@@ -209,5 +249,19 @@
   <footer>
     <p>© 2025 Fortiview Holdings LLC — Secure, scalable, and fully managed.</p>
   </footer>
+
+  <script>
+    function toggleDropdown() {
+      const menu = document.getElementById('servicesDropdown');
+      menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+    }
+    document.addEventListener('click', function(e) {
+      const dropdown = document.querySelector('.dropdown');
+      if (dropdown && !dropdown.contains(e.target)) {
+        const menu = document.getElementById('servicesDropdown');
+        if(menu) menu.style.display = 'none';
+      }
+    });
+  </script>
 </body>
 </html>
