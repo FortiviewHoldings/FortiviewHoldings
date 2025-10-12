@@ -101,13 +101,6 @@
       box-shadow:var(--aura); padding:32px;
     }
 
-    table {width:100%; border-collapse:collapse; margin-top:1rem; font-size:.95rem;}
-    th, td {padding:12px; border-bottom:1px solid var(--border);}
-    th {background:var(--bg-accent); color:#fff; text-align:center;}
-    td:first-child { text-align:left; }
-    .check { color: var(--brand); font-weight:700; text-align:center; }
-    .cross { color: #f44336; font-weight:700; text-align:center; }
-
     .dropdown { position: relative; }
     .dropdown-toggle {
       background: none; border: none; cursor: pointer; font: inherit;
@@ -143,6 +136,44 @@
   border-color: var(--brand); /* thin green border */
   box-shadow: 0 0 0 2px rgba(92,140,69,.35);
 }
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;   /* allows horizontal scroll if needed */
+  -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
+}
+
+.table-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 500px;
+  margin-top: 1rem;       /* from your old block */
+  font-size: .95rem;      /* from your old block */
+}
+
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  background: var(--bg-accent);
+  color: #fff;
+}
+
+td:first-child {
+  text-align: left;
+}
+    .check { 
+  color: var(--brand); 
+  font-weight:700; 
+  text-align:center; 
+}
+.cross { 
+  color: #f44336; 
+  font-weight:700; 
+  text-align:center; 
+}
+
 table td:nth-child(2),
 table td:nth-child(3),
 table td:nth-child(4),
@@ -168,7 +199,7 @@ table th:nth-child(4) {
 
   <header>
     <div class="nav">
-      <div class="brand">
+      <div class="brand" href="https://fortiviewholdings.com">
         <div class="logo" aria-hidden="true"></div>
         <strong>Fortiview</strong>
         <span style="color:var(--muted)">Holdings</span>
@@ -393,33 +424,35 @@ table th:nth-child(4) {
           </tbody>
         </table>
       </div>
+      
+<h3 style="margin-top:32px; color:var(--brand)">Pricing (Per User)</h3>
 
-      <h3 style="margin-top:32px; color:var(--brand)">Pricing (Per User)</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Tier</th>
-            <th>Monthly</th>
-            <th>Quarterly (5% off)</th>
-            <th>Annual (10% off)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Email Essentials</td>
-            <td>$10</td>
-            <td>$28.50</td>
-            <td>$108</td>
-          </tr>
-          <tr>
-            <td>Productivity Suite</td>
-            <td>$20</td>
-            <td>$57</td>
-            <td>$216</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+<div class="table-wrapper">
+  <table>
+    <thead>
+      <tr>
+        <th>Tier</th>
+        <th>Monthly</th>
+        <th>Quarterly (5% off)</th>
+        <th>Annual (10% off)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Email Essentials</td>
+        <td>$10</td>
+        <td>$28.50</td>
+        <td>$108</td>
+      </tr>
+      <tr>
+        <td>Productivity Suite</td>
+        <td>$20</td>
+        <td>$57</td>
+        <td>$216</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
   </section>
 
   <footer>
