@@ -184,17 +184,19 @@ table th:nth-child(4) {
   text-align: center;
 }
 
+#ctaBox {
+  position: relative;
+}
     /* Overlay */
 #loadingOverlay {
   position: absolute;
   inset: 0;
   background: rgba(0,0,0,0.6);
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius);
-  z-index: 200;
-  display: none;
+  border-radius: inherit;
+  z-index: 100;
 }
 .spinner {
   border: 4px solid #ffffff33;
