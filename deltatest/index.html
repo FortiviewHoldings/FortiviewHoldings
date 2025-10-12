@@ -599,8 +599,8 @@ async function handleFormSubmit(e) {
     state: document.getElementById('custState').value,
     tier: selectedTier,
     plan: selectedPlan,
-    setupFee: INITIAL_SETUP_FEE,
-    perUserPrice: perUserPrice
+    setupFee: Number(INITIAL_SETUP_FEE),
+    perUserPrice: Number(perUserPrice)
   };
 
   try {
