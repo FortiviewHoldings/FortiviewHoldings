@@ -137,6 +137,59 @@
       background:linear-gradient(180deg,#9ff951,#6be654); color:#0a1205; font-weight:800; border:1px solid rgba(159,249,81,.35)
     }
 
+    .dropdown {
+  position: relative;
+}
+
+.dropdown-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  color: var(--muted);
+  padding: 9px 14px;
+  border-radius: 999px;
+  transition: .2s ease;
+}
+
+.dropdown-toggle:hover {
+  color: #fff;
+  background: #ffffff12;
+  border: 1px solid #ffffff22;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 110%;
+  left: 0;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--aura);
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+  min-width: 240px;
+  z-index: 100;
+}
+
+.dropdown-menu li {
+  padding: 0;
+}
+
+.dropdown-menu a {
+  display: block;
+  padding: 10px 16px;
+  color: var(--ink);
+  transition: background .2s ease;
+}
+
+.dropdown-menu a:hover {
+  background: #ffffff12;
+  color: #fff;
+}
+
     /* Footer */
     footer{margin:50px 0 30px 0; color:var(--muted); text-align:center; font-size:.9rem}
 
@@ -189,7 +242,20 @@
       </div>
       <nav aria-label="Primary">
         <ul>
-          <li><a class="link" href="#services">Services</a></li>
+          <li class="dropdown">
+  <button class="link dropdown-toggle" onclick="toggleDropdown()">Services ▾</button>
+  <ul id="servicesDropdown" class="dropdown-menu">
+    <li><a href="#leadership">Leadership & Business Strategy</a></li>
+    <li><a href="#operations">Project & Operations Management</a></li>
+    <li><a href="#finance">Financial Coordination</a></li>
+    <li><a href="#marketing">Marketing, Sales & Client Relations</a></li>
+    <li><a href="#governance">Governance & Regulatory Support</a></li>
+    <li><a href="#cx">Customer Experience Optimization</a></li>
+    <li><a href="#partnerships">Networking & Partnerships</a></li>
+    <li><a href="#integration">PragOptics™ System Integration</a></li>
+    <li><a href="#youth">Youth Entrepreneur Education</a></li>
+  </ul>
+</li>
           <li><a class="link" href="/YouthBusinessEducationSandbox">Youth Sandbox</a></li>
           <li><a class="link" href="#about">About</a></li>
           <li><a class="cta" href="mailto:support@fortiviewholdings.com?subject=Fortiview%20Inquiry">Work with us</a></li>
@@ -295,6 +361,18 @@
     // Year
     document.getElementById('y').textContent = new Date().getFullYear();
 
+    function toggleDropdown() {
+  const menu = document.getElementById('servicesDropdown');
+  menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+}
+
+// Optional: close dropdown if clicking outside
+document.addEventListener('click', function(e) {
+  const dropdown = document.querySelector('.dropdown');
+  if (!dropdown.contains(e.target)) {
+    document.getElementById('servicesDropdown').style.display = 'none';
+  }
+});
     // Card click navigation + keyboard activation
     function go(path){ if(path) window.location.href = path; }
     document.querySelectorAll('.card').forEach(card=>{
