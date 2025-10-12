@@ -371,7 +371,7 @@ table th:nth-child(4) {
       </select>
     </label><br>
 
-    <button type="submit" class="cta-btn" style="margin-top:12px;">Finalize Request</button>
+    <button type="submit" class="cta-btn" style="margin-top:12px;" data-act="integration">Finalize Request</button>
   </form>
 </div>
 </div>
@@ -526,12 +526,32 @@ function formatPhone(input) {
     input.dataset.raw = digits;
   }
 }
+  
+// ===========================
+// Pricing configuration
+// ===========================
+const INITIAL_SETUP_FEE = 1500;
+
+// Pricing matrix: per-user cost by tier and plan
+const PRICING_MATRIX = {
+  "Email Essentials": {
+    monthly: 10,
+    quarterly: 28.50,
+    annual: 108
+  },
+  "Productivity Suite": {
+    monthly: 20,
+    quarterly: 57,
+    annual: 216
+  }
+};
+
 
 // ===========================
 // Omnitok integration
 // ===========================
 const API = {
-  issueOmniTok: 'https://your-omnitok-endpoint' // replace with your real endpoint
+  issueOmniTok: 'https://default6eda43f3fbf04e2b9978b543d9dd31.e3.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/4be2293ea9ca4e418ac17059d7209cf1/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=vGhxzQ1mnf06FenEffQzPjo1iP_OLyKLH-yzAkPGUjo' // replace with endpoint
 };
 
 async function getOmniTok(act) {
@@ -560,7 +580,17 @@ async function getOmniTok(act) {
 async function handleFormSubmit(e) {
   e.preventDefault();
 
+  const btn = e.submitter;
+  const act = btn?.dataset.act || 'integration';
+
+  // Generate a jobId for this request
+  const jobId = `IntReq-${crypto.randomUUID()}`;
+
+  // Look up per-user price from the matrix
+  const perUserPrice = PRICING_MATRIX[selectedTier]?.[selectedPlan] || 0;
+
   const customerData = {
+    jobId, // include the generated jobId
     name: document.getElementById('custName').value,
     business: document.getElementById('businessName').value,
     email: document.getElementById('custEmail').value,
@@ -568,20 +598,28 @@ async function handleFormSubmit(e) {
     phoneFormatted: document.getElementById('custPhone').value,
     state: document.getElementById('custState').value,
     tier: selectedTier,
-    plan: selectedPlan
+    plan: selectedPlan,
+    setupFee: INITIAL_SETUP_FEE,
+    perUserPrice: perUserPrice
   };
 
   try {
-    // Step 1: Get Omnitok token
-    const omni = await getOmniTok("checkout");
+    // Phase 1: Omnitok preflight
+    const omni = await getOmniTok(act);
 
-    // Step 2: Send customer data to your backend with Omnitok headers
-    const response = await fetch('/api/submit-request', {
+    if (!omni.endpoint) {
+      throw new Error("Omnitok preflight did not return an endpoint");
+    }
+
+    // Phase 2: Call the returned endpoint with customerData
+    const response = await fetch(omni.endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-omnitok': omni.authToken,   // token from Omnitok
-        'x-session-id': omni.sid
+        'x-auth-token': omni.authToken,
+        'x-omnitok': omni.OmniTok,
+        'x-session-id': omni.sid,
+        'x-act': omni.act
       },
       body: JSON.stringify(customerData)
     });
@@ -589,11 +627,21 @@ async function handleFormSubmit(e) {
     if (!response.ok) throw new Error("Backend rejected request");
     const result = await response.json();
 
-    console.log("Submission result:", result);
-    alert("Your request has been securely submitted.");
+    console.log("Final flow result:", result);
+
+    // Friendly confirmation popup
+    alert(
+      `✅ Your request has been sent!\n\n` +
+      `We've emailed a confirmation to: ${result.email}\n` +
+      `If you don't see it, please check your spam folder and mark us as a trusted sender.\n\n` +
+      `Tracking ID: ${jobId}`
+    );
   } catch (err) {
     console.error("Submission error:", err);
-    alert("There was a problem submitting your request. Please try again.");
+    alert(
+      "❌ Your request did not go through.\n\n" +
+      "Please try again in a moment. If the problem persists, contact support."
+    );
   }
 }
 </script>
