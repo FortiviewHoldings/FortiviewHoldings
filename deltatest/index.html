@@ -187,25 +187,55 @@ table th:nth-child(4) {
 #ctaBox {
   position: relative;
 }
-    /* Overlay */
-#loadingOverlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  display: none;
+/* Shimmer effect */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #f6f7f8;
+  display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: inherit;
-  z-index: 100;
+  z-index: 9999;
+  animation: zoomOut 0.5s ease-out forwards;
 }
-.spinner {
-  border: 4px solid #ffffff33;
-  border-top: 4px solid var(--brand);
-  border-radius: 50%;
-  width: 40px; height: 40px;
-  animation: spin 1s linear infinite;
+
+.shimmer {
+  width: 80%;
+  height: 20px;
+  background: linear-gradient(
+    to right,
+    #eeeeee 0%,
+    #dddddd 20%,
+    #eeeeee 40%,
+    #eeeeee 100%
+  );
+  background-size: 800px 104px;
+  animation: shimmer 2s infinite linear;
+  border-radius: 4px;
 }
-@keyframes spin { 100% { transform: rotate(360deg); } }
+
+/* Shimmer animation */
+@keyframes shimmer {
+  0% {
+    background-position: -800px 0;
+  }
+  100% {
+    background-position: 800px 0;
+  }
+}
+
+/* Zoom-out animation */
+@keyframes zoomOut {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0.95);
+  }
+
     
     footer{margin:50px 0 30px 0; color:var(--muted); text-align:center; font-size:.9rem}
 
@@ -277,7 +307,7 @@ table th:nth-child(4) {
 <div id="ctaBox" class="glass" style="display:none; margin-top:20px; padding:20px;">
     
   <div id="loadingOverlay">
-    <div class="spinner"></div>
+    <div class="shimmer"></div>
   </div>
 
   <h3 style="margin-top:0; color:var(--brand)">Choose Your Tier</h3>
