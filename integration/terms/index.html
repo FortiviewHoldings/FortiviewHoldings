@@ -2,28 +2,30 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Fortiview Holdings — Terms, Privacy & Communications</title>
+  <title>Fortiview Holdings - Terms, Privacy & Communications</title>
   <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="dark light" />
   <meta property="og:image" content="https://fortiviewholdings.com/images/social-preview.png">
   <style>
     :root{
-      --bg-deep:#0b1022;
-      --bg-accent:#0b1c3d;
-      --glass:#101a33cc;
-      --glass-2:#0f1933cc;
+      --bg-deep:#000000cc;
+      --bg-accent:#101625cc;
+      --glass:#d9d9d912;
+      --glass-2:#00000012;
+      --glass-blur:#272727c6;
       --border:#ffffff1a;
       --ink:#e7ecff;
       --muted:#c6d0f0a6;
-      --brand:#5c8c45;
-      --brand-600:#4d7a39;
-      --aura:0 10px 24px rgba(92,140,69,.35);
+      --brand:#1ca490da;       /* your green-gold */
+      --brand-600:#21bca5;
+      --aura:0 4px 8px rgba(17, 76, 67, 0.678);
       --radius:16px;
       --radius-sm:12px;
       --maxw:1200px;
-      --grad:linear-gradient(135deg,#182a52 0%,#0b1c3d 40%,#1d3557 100%);
+      --grad:linear-gradient(135deg,#121b2d 0%,#060e1e 40%,#0f1824 100%);
     }
+
     *{box-sizing:border-box}
     html,body{
       margin:0; padding:0;
@@ -37,39 +39,35 @@
     /* Background */
     .bg{
       position:fixed; inset:0; z-index:-2;
-      background:
-        radial-gradient(1100px 700px at 12% -10%, #5ac8fa22, transparent 60%),
-        radial-gradient(900px 600px at 110% 10%, rgba(92,140,69,.20), transparent 55%),
-        var(--grad);
+      background: var(--glass);
       filter:blur(6px) brightness(.9) saturate(1.05);
       transform:scale(1.03);
     }
     .bg::after{
       content:""; position:absolute; inset:0;
-      background:
-        radial-gradient(900px 500px at 50% -10%, transparent, #000814bb 70%),
-        linear-gradient(to bottom, #00000066, transparent 35%, #00000077 100%);
+      background: var(--glass);
     }
-    #bg-stars{position:fixed; inset:0; width:100vw; height:100vh; z-index:-1; pointer-events:none;}
-
+  #bg-stars{
+    position:fixed; inset:0; width:100vw; height:100vh; z-index:-1; pointer-events:none;
+  }
     /* Header */
     header{
       position:sticky; top:0; z-index:50;
       backdrop-filter:saturate(140%) blur(10px);
-      background:#0b1224cc;
+      background:var(--glass);
       border-bottom:1px solid var(--border);
     }
-    .nav{
-      max-width:var(--maxw); margin:0 auto; padding:14px 20px;
-      display:flex; align-items:center; justify-content:space-between; gap:16px;
-    }
-    .brand{display:flex; align-items:center; gap:10px; letter-spacing:.4px}
-    .logo{
-      width:34px; height:34px; border-radius:10px;
-      background-image:url('https://fortiviewholdings.com/images/Logo.png');
-      background-size:cover; background-position:center;
-      box-shadow:0 0 0 2px rgba(92,140,69,.25), 0 10px 20px rgba(92,140,69,.18);
-    }
+  .nav{
+    max-width:var(--maxw); margin:0 auto; padding:14px 20px;
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+  }
+  .brand{display:flex; align-items:center; gap:10px; letter-spacing:.4px}
+  .logo{
+    width:34px; height:34px; border-radius:10px;
+    background-image:url('https://fortiviewholdings.com/images/Logo.png');
+    background-size:cover; background-position:center;
+    box-shadow:0 0 0 2px rgba(92,140,69,.25), 0 10px 20px rgba(92,140,69,.18);
+  }
     .brand strong{font-weight:800;}
 
     /* Content */
@@ -81,7 +79,7 @@
     .kicker{color:var(--muted); font-size:.95rem; margin:0 0 6px 0}
     h1{margin:8px 0 10px 0; font-size:clamp(1.6rem,2.2vw,2.2rem)}
     h2{margin:26px 0 8px 0; color:var(--brand)}
-    p{line-height:1.7; color:#e9eeff}
+    p{line-height:1.7; color:var(--ink); margin:12px 0}
     small,.muted{color:var(--muted)}
 
     footer{margin:40px 0 30px 0; color:var(--muted); text-align:center; font-size:.9rem}
@@ -102,87 +100,158 @@
     <div class="nav">
       <a class="brand" href="https://fortiviewholdings.com/integration">
         <div class="logo" aria-hidden="true"></div>
-        <strong>Fortiview</strong>
-        <span style="color:var(--muted)">Holdings</span>
+        <strong style="color: var(--muted)">Fortiview</strong>
+        <span style="color:var(--brand-600)">Holdings</span>
       </a>
     </div>
   </header>
 
   <!-- Main -->
-  <main class="section">
-    <div class="glass">
-      <p class="kicker">Fortiview Holdings LLC</p>
-      <h1>Terms of Service, Privacy Policy & Communications</h1>
+<main class="section">
+  <div class="glass">
+    <h1>Terms of Service, Privacy & Pricing</h1>
 
-      <section id="terms">
-        <h2>1) Terms of Service</h2>
-        <h3>1.1 Scope</h3>
-        <p>These Terms govern your use of Fortiview Holdings’ services, including PragOptics™ system integration and related offerings. By accessing or using our services, you agree to these Terms.</p>
-        <h3>1.2 Eligibility</h3>
-        <p>You must be at least 18 years old and legally able to enter into contracts to use our services.</p>
-        <h3>1.3 Service Agreement</h3>
-        <p>We will provide services with reasonable skill, care, and in good faith. You agree to provide accurate information, maintain necessary access, and use our services only for lawful purposes.</p>
-        <h3>1.4 Acceptable Use</h3>
-        <p>You may not misuse our systems, attempt unauthorized access, or interfere with service integrity.</p>
-        <h3>1.5 Termination</h3>
-        <p>Either party may terminate services with written notice if the other materially breaches these Terms and fails to cure within 30 days. We may suspend or terminate immediately for unlawful use or security risks.</p>
-        <h3>1.6 Liability</h3>
-        <p>We are not liable for indirect, incidental, or consequential damages. Our total liability is limited to the fees paid for the services in the 12 months preceding the claim.</p>
-        <h3>1.7 Governing Law</h3>
-        <p>These Terms are governed by the laws of the State of Texas, without regard to conflict of law principles.</p>
-      </section>
+    <section id="terms">
+      <h2><span style="color:var(--muted)">Terms of</span> <span style="color:var(--brand-600)">Service</span></h2>
+      <h3 style="color:var(--muted)">Scope</h3>
+      <p>These Terms govern your use of Fortiview Holdings’ services, including PragOptics™ system integration and related offerings. By accessing or using our services, you agree to these Terms.</p>
 
-      <section id="privacy">
-        <h2>2) Privacy Policy</h2>
-        <h3>2.1 Information We Collect</h3>
-        <p>Contact details, account and billing information, and technical data such as IP address and usage logs.</p>
-        <h3>2.2 How We Use Information</h3>
-        <p>To provide and improve services, communicate with you, and comply with legal obligations.</p>
-        <h3>2.3 Sharing</h3>
-        <p>We do not sell your data. We may share with trusted service providers under confidentiality agreements.</p>
-        <h3>2.4 Retention</h3>
-        <p>We retain data only as long as necessary for service delivery, legal compliance, or legitimate business purposes.</p>
-        <h3>2.5 Your Rights</h3>
-        <p>You may request access, correction, or deletion of your personal data, subject to applicable law.</p>
-      </section>
+      <h3 style="color:var(--muted)">Eligibility</h3>
+      <p>You must be at least 18 years old and legally able to enter into contracts to use our services.</p>
 
-      <section id="communications">
-        <h2>3) Communications Policy</h2>
-        <p>We may contact you via email, SMS, or phone for service updates, billing, and support. Marketing communications require your opt‑in consent and include an unsubscribe option. You are responsible for keeping your contact information current.</p>
-      </section>
-      
-      <section id="cookies">
-        <h2>4) Cookies & Tracking</h2>
-        <p>We use cookies and similar technologies to manage sessions, analyze site usage, and improve user experience. You may disable cookies in your browser, but some features may not function properly.</p>
-      </section>
+      <h3 style="color:var(--muted)">Service Agreement</h3>
+      <p>We will provide services with reasonable skill, care, and in good faith. You agree to provide accurate information, maintain necessary access, and use our services only for lawful purposes.</p>
 
-      <section id="security">
-        <h2>5) Security</h2>
-        <p>We implement administrative, technical, and physical safeguards to protect your data. While no system is 100% secure, we take reasonable measures to prevent unauthorized access, disclosure, or loss. You are responsible for maintaining the confidentiality of your account credentials. We will notify you of any data breach as required by law.</p>
-      </section>
+      <h3 style="color:var(--muted)">Acceptable Use</h3>
+      <p>You may not misuse our systems, attempt unauthorized access, or interfere with service integrity.</p>
 
-      <section id="rights">
-        <h2>6) Rights & Responsibilities</h2>
-        <p><strong>Your rights:</strong> Access to services as agreed, data protection rights, and the ability to terminate under these Terms.</p>
-        <p><strong>Our rights:</strong> To update services, enforce policies, and protect system integrity.</p>
-        <p><strong>Mutual good faith:</strong> Both parties agree to act honestly, fairly, and in good faith in all dealings.</p>
-      </section>
+      <h3 style="color:var(--muted)">Termination</h3>
+      <p>Either party may terminate services with written notice if the other materially breaches these Terms and fails to cure within 30 days. We may suspend or terminate immediately for unlawful use or security risks.</p>
 
-      <section id="contact">
-        <h2>7) Contact</h2>
-        <p>If you have questions or concerns about these Terms or our Privacy Policy, please contact us:</p>
-        <p>
-          <strong>Fortiview Holdings LLC</strong><br>
-          Email: <a href="mailto:support@fortiviewholdings.com">support@fortiviewholdings.com</a><br>
-          Phone: (832) 425-0421
-        </p>
-      </section>
-    </div>
-  </main>
+      <h3 style="color:var(--muted)">Liability</h3>
+      <p>We are not liable for indirect, incidental, or consequential damages. Our total liability is limited to the fees paid for the services in the 12 months preceding the claim.</p>
+
+      <h3 style="color:var(--muted)">Governing Law</h3>
+      <p>These Terms are governed by the laws of the State of Texas, without regard to conflict of law principles.</p>
+    </section>
+
+    <section id="privacy">
+      <h2><span style="color:var(--muted)">Privacy</span> <span style="color:var(--brand-600)">Policy</span></h2>
+      <h3 style="color:var(--muted)">Information We Collect</h3>
+      <p>Contact details, account and billing information, and technical data such as IP address and usage logs.</p>
+
+      <h3 style="color:var(--muted)">How We Use Information</h3>
+      <p>To provide and improve services, communicate with you, and comply with legal obligations.</p>
+
+      <h3 style="color:var(--muted)">Sharing</h3>
+      <p>We do not sell your data. We may share with trusted service providers under confidentiality agreements.</p>
+
+      <h3 style="color:var(--muted)">Retention</h3>
+      <p>We retain data only as long as necessary for service delivery, legal compliance, or legitimate business purposes.</p>
+
+      <h3 style="color:var(--muted)">Your Rights</h3>
+      <p>You may request access, correction, or deletion of your personal data, subject to applicable law.</p>
+    </section>
+
+    <section id="communications">
+      <h2><span style="color:var(--muted)">Client</span> <span style="color:var(--brand-600)">Communications</span></h2>
+      <p>We may contact you via email, SMS, or phone for service updates, billing, and support. Marketing communications require your opt‑in consent and include an unsubscribe option. You are responsible for keeping your contact information current.</p>
+    </section>
+
+    <section id="cookies">
+      <h2><span style="color:var(--muted)">Cookies &</span> <span style="color:var(--brand-600)">Tracking</span></h2>
+      <p>We use cookies and similar technologies to manage sessions, analyze site usage, and improve user experience. You may disable cookies in your browser, but some features may not function properly.</p>
+    </section>
+
+    <section id="security">
+      <h2><span style="color:var(--muted)">Data</span> <span style="color:var(--brand-600)">Security</span></h2>
+      <p>We implement administrative, technical, and physical safeguards to protect your data. While no system is 100% secure, we take reasonable measures to prevent unauthorized access, disclosure, or loss. You are responsible for maintaining the confidentiality of your account credentials. We will notify you of any data breach as required by law.</p>
+    </section>
+
+    <section id="rights">
+      <h2><span style="color:var(--muted)">Rights &</span> <span style="color:var(--brand-600)">Responsibilities</span></h2>
+      <p><strong>Your rights:</strong> Access to services as agreed, data protection rights, and the ability to terminate under these Terms.</p>
+      <p><strong>Our rights:</strong> To update services, enforce policies, and protect system integrity.</p>
+      <p><strong>Mutual good faith:</strong> Both parties agree to act honestly, fairly, and in good faith in all dealings.</p>
+    </section>
+
+    <section id="pricing-policy">
+      <h2><span style="color:var(--muted)">Pricing</span> <span style="color:var(--brand-600)">Philosophy</span></h2>
+
+      <h3 style="color:var(--muted)">One-Time Setup Fee</h3>
+      <p>Our advertised setup fee includes foundational infrastructure and is delivered regardless of usage. This covers:</p>
+      <ul>
+        <li>✅ One full webpage with a singular automation aligned to the selected service tier</li>
+        <li>✅ Additional infrastructure and backend setup not billed ad-hoc</li>
+        <li>✅ No surprise billing - setup is inclusive and transparent</li>
+      </ul>
+
+      <h3 style="color:var(--muted)">Additional Web Pages</h3>
+      <p>Clients may request additional functional pages beyond the included setup. Pricing:</p>
+      <ul>
+        <li>💬 Informational-only pages: <strong>$250 minimum</strong> per page</li>
+        <li>⚙️ Pages requiring automation (e.g. eCommerce, dynamic forms): priced based on integration complexity</li>
+      </ul>
+      <p>Integration development is billed at <strong>$125.00/hour</strong>, only after initial setup completion and only for requested services.</p>
+
+      <h3 style="color:var(--muted)">Tiered Service Model</h3>
+      <p>Our two-tier system is designed for accessibility and modular growth:</p>
+      <ul>
+        <li><strong>Email Essentials</strong> - a value-added, hassle-free entry point</li>
+        <li><strong>Productivity Suite</strong> - includes Office apps, Teams, and advanced automation</li>
+      </ul>
+      <p>Both tiers are priced per user at minimal cost and can be upgraded at any time. We believe in modularity, transparency, and empowering clients with scalable options.</p>
+    </section>
+
+    <section id="contact">
+      <h2><span style="color:var(--muted)">Contact</span> <span style="color:var(--brand-600)">Fortiview</span></h2>
+      <p>If you have questions or concerns about these Terms or our Pricing Policy, please contact us:</p>
+      <p>
+        <strong>Fortiview Holdings LLC</strong><br>
+        Email: <a href="mailto:support@fortiviewholdings.com">support@fortiviewholdings.com</a><br>
+        Phone: (832) 425-0421
+      </p>
+    </section>
+  </div>
+</main>
 
   <!-- Footer -->
   <footer>
-    © 2025 Fortiview Holdings LLC — Secure, scalable, and fully managed.
+    © 2025 Fortiview Holdings LLC - Secure, scalable, and fully managed.
   </footer>
+<script>
+   // Fullscreen star-field background
+    function initStarField() {
+      const canvas = document.getElementById('bg-stars');
+      const ctx = canvas.getContext('2d');
+      function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+      resize(); window.addEventListener('resize', resize);
+
+      const stars = Array.from({ length: 120 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.6 + 0.4,
+        a: Math.random()
+      }));
+      let frame = 0, reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function animate() {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        for (const s of stars) {
+          ctx.beginPath();
+          ctx.fillStyle = `rgba(255,255,255,${s.a})`;
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+          ctx.fill();
+          if(!reduce){
+            s.a = 0.25 + Math.abs(Math.sin((frame/60) + s.x*0.001 + s.y*0.001)) * 0.75;
+          }
+        }
+        frame++;
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
+    window.addEventListener('load', initStarField);
+</script>
 </body>
 </html>
