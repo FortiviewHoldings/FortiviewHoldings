@@ -8,23 +8,23 @@
   <meta name="color-scheme" content="dark light" />
   <style>
     :root{
-      --bg-deep:#0b1022;            /* flattered navy base */
-      --bg-accent:#0b1c3d;          /* your primary, used subtly */
-      --card:#101a33cc;             /* glass card */
-      --card-border:#ffffff1a;
-      --gold:#f9c851;               /* your accent gold */
-      --gold-600:#d6a538;
+      --bg-deep:#000000cc;
+      --bg-accent:#101625cc;
+      --glass:#d9d9d912;
+      --glass-2:#1d1c1c7a;
+      --glass-blur:#000000d0;
+      --border:#ffffff1a;
       --ink:#e7ecff;
       --muted:#c6d0f0a6;
-      --success:#51f9e8;
-      --warning:#f9aa51;
-      --shadow:0 10px 30px #00000066;
+      --brand:#1ca490da;     
+      --brand-600:#21bca5;
+      --aura:0 4px 8px rgba(17, 76, 67, 0.678);
       --radius:16px;
       --radius-sm:12px;
       --maxw:1200px;
-      --grad:linear-gradient(135deg,#182a52 0%,#0b1c3d 40%,#1d3557 100%);
-      --gold-glow:0 0 0 2px #f9c85133, 0 10px 20px #f9c85122;
+      --grad:linear-gradient(135deg,#121b2d 0%,#060e1e 40%,#0f1824 100%);
     }
+
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg-deep);color:var(--ink);scroll-behavior:smooth}
     a{color:inherit;text-decoration:none}
@@ -32,93 +32,194 @@
     /* Background image layer */
     .bg{
       position:fixed; inset:0; z-index:-2;
-      background:
-        radial-gradient(1200px 800px at 10% -10%, #5ac8fa22, transparent 60%),
-        radial-gradient(900px 600px at 110% 10%, #f9c8511c, transparent 55%),
-        url('assets/bg.jpg') center/cover no-repeat,
-        var(--grad);
-      filter: blur(6px) saturate(1.05) brightness(.85);
-      transform: scale(1.03);
+      background: var(--glass);
+      filter:blur(6px) brightness(.9) saturate(1.05);
+      transform:scale(1.03);
     }
-    /* Subtle vignette overlay */
     .bg::after{
       content:""; position:absolute; inset:0;
-      background: radial-gradient(1000px 600px at 50% -10%, transparent, #000814aa 70%),
-                  linear-gradient(to bottom, #00000055, transparent 30%, #00000066 100%);
+      background: var(--glass);
     }
-
+  #bg-stars{
+    position:fixed; inset:0; width:100vw; height:100vh; z-index:-1; pointer-events:none;
+  }
     /* Sticky glass header */
     header{
       position:sticky; top:0; z-index:50;
       backdrop-filter:saturate(140%) blur(10px);
-      background:#0b1224cc;
-      border-bottom:1px solid var(--card-border);
+      background:var(--glass);
+      border-bottom:1px solid var(--border);
     }
-    .nav{
-      max-width:var(--maxw); margin:0 auto; padding:14px 20px;
-      display:flex; align-items:center; gap:16px; justify-content:space-between;
-    }
-    .brand{display:flex; align-items:center; gap:10px; letter-spacing:.5px}
-    .logo{
-      width:34px; height:34px; border-radius:10px;
-      background-image: url("https://fortiviewholdings.com/images/Logo.png");
-      background-size: cover;
-      background-position: center;
-      box-shadow: var(--gold-glow);
-    }
-    .brand strong{font-weight:700}
+  .nav{
+    max-width:var(--maxw); margin:0 auto; padding:14px 20px;
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+  }
+  .brand{display:flex; align-items:center; gap:10px; letter-spacing:.4px}
+  .logo{
+    width:34px; height:34px; border-radius:10px;
+    background-image:url('https://fortiviewholdings.com/images/Logo.png');
+    background-size:cover; background-position:center;
+    box-shadow:0 0 0 2px rgba(92,140,69,.25), 0 10px 20px rgba(92,140,69,.18);
+  }
+  .brand strong{font-weight:800}
     nav ul{display:flex; gap:14px; list-style:none; align-items:center}
     .link{
       padding:9px 14px; border-radius:999px; color:var(--muted);
       border:1px solid transparent; transition:.2s ease;
     }
     .link:hover{color:var(--ink); border-color:#ffffff22; background:#ffffff10}
-    .cta{
-      background: linear-gradient(180deg, var(--gold), var(--gold-600));
-      color:#1a1405; font-weight:700;
-      padding:10px 16px; border-radius:999px; box-shadow: var(--gold-glow);
-    }
-    .cta:hover{filter:brightness(.95)}
+  .cta{
+    background:linear-gradient(180deg, var(--brand), var(--brand-600));
+    color:var(--bg-deep); font-weight:800; letter-spacing:.2px;
+    padding:10px 16px; border-radius:999px; box-shadow:var(--aura);
+  }
+  .cta:hover{filter:brightness(.65); transform:translateY(-2px);}
+
+  .cta-btn{
+    display:inline-block;
+    background:var(--glass); 
+    color:var(--brand); font-weight:600;
+    padding:10px 18px; border-radius:999px;
+    border:1px solid var(--brand-600);
+    transition:all .2s ease; cursor:pointer;
+  }
+  .cta-btn:hover{ background:#3a4661; transform:translateY(-2px); }
+
+  /* Success lock state for the CTA button */
+  .cta-btn.is-selected{
+    background:linear-gradient(180deg, var(--brand), var(--brand-600));
+    color:#0c120a;
+    border-color:var(--brand-600);
+    box-shadow:0 0 0 3px rgba(92,140,69,.28);
+    cursor:default;
+  }
+  .cta-btn.is-selected:disabled{ opacity:1; }
+  .cta-btn.is-selected::after{
+    content:" ✓";
+    font-weight:700;
+  }
 
     /* Hero */
     .hero{
-      max-width:var(--maxw); margin:40px auto; padding:24px 20px;
       display:grid; grid-template-columns:1.2fr .8fr; gap:28px;
+      max-width:var(--maxw); margin:40px auto; padding:24px 20px;
     }
-    .hero-card{
-      background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius);
-      padding:32px; box-shadow:var(--shadow);
-    }
-    .kicker{color:var(--success); font-weight:700; letter-spacing:.12em; text-transform:uppercase; font-size:.8rem}
-    h1{font-size:clamp(2rem, 3.2vw, 3rem); line-height:1.1; margin:.4rem 0 1rem 0}
+    .hero-card{display: grid; padding:32px;background:var(--glass-2); border-top:1px solid rgba(255,255,255,.06);
+      border-radius:var(--radius); border:1px solid var(--border);
+      box-shadow:var(--aura); gap:16px;}
+
+    .kicker{color: var(--brand); font-weight:800; letter-spacing:.12em; text-transform:uppercase; font-size:.8rem}
+    h1{color: var(--ink);font-size:clamp(2rem, 3.2vw, 3rem); line-height:1.08; margin:.45rem 0 .8rem 0}
     .sub{color:var(--muted); font-size:1.05rem}
-    .hero-actions{margin-top:18px; display:flex; gap:12px; flex-wrap:wrap}
-    .btn{
-      padding:12px 16px; border-radius:12px; border:1px solid #ffffff1f;
-      background:#ffffff0f; color:#fff; backdrop-filter: blur(6px);
-      transition: transform .15s ease, background .2s ease;
-    }
-    .btn:hover{transform: translateY(-1px); background:#ffffff1a}
-    .btn.gold{background: linear-gradient(180deg, var(--gold), var(--gold-600)); color:#1a1405; border:none}
-
-    .hero-side{
-      display:grid; gap:16px;
-    }
+    .hero-side{display:grid; gap:16px}
     .stat{
-      padding:20px; border-radius:var(--radius-sm);
-      background:#0f1933cc; border:1px solid var(--card-border);
-      display:flex; align-items:center; gap:14px;
+      display:flex; gap:14px; align-items:flex-start;
+      padding:18px 20px; background:var(--glass-2); border-top:1px solid rgba(255,255,255,.06);
+      border-radius:var(--radius); border:1px solid var(--border);
     }
-    .pill{padding:6px 10px; border-radius:999px; font-weight:700; font-size:.8rem;
-      color:#071018; background:linear-gradient(180deg,#51f9e8,#22d3ee)}
-    .pill.gold{background:linear-gradient(180deg,#f9c851,#f39c12)}
+    .pill{
+        padding:6px 10px; 
+        border-radius:999px; 
+        font-weight:800; 
+        font-size:.78rem; 
+        color:#071008;
+        background:linear-gradient(180deg, var(--brand), var(--brand-600)); border:1px solid rgb(33, 188, 165); 
+        white-space: nowrap;
+        overflow: visible;
+        text-overflow: ellipsis;
+    }
 
+    .grid{
+      display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
+      gap:18px;
+    }
+
+        .card{
+      position:relative; overflow:hidden;
+      padding:18px; border-radius:var(--radius);
+      background:var(--glass); border:1px solid var(--border);
+      box-shadow: none;
+      cursor:pointer;
+      transform-style:preserve-3d;
+      transition:transform .18s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
+    }
+    .card:hover{transform:translateY(-4px); box-shadow: var(--aura)}
+    .card h3{color:var(--brand); font-size:1.1rem; margin:2px 0 6px 0}
+    .card p{color:var(--ink); opacity:.85; font-size:.94rem; line-height:1.4}
+    .card::after{
+      content:""; position:absolute; inset:auto -20% -20% auto; width:180px; height:180px;
+    }
+    .card.featured{
+      grid-column: span 2; background:linear-gradient(18deg, rgba(72,76,9,.65), rgba(4,3,74,.7));
+      border-color:rgba(159,249,81,.35);
+    }
+    .badge{
+      position:absolute; top:10px; right:10px; font-size:.8rem; padding:6px 10px; border-radius:999px;
+      background:linear-gradient(180deg,var(--brand), var(--brand-600)); color:#0a1205; font-weight:800; border:1px solid rgba(159,249,81,.35)
+    }
     /* Gallery */
-    .section{max-width:var(--maxw); margin:36px auto; padding:0 20px}
+      .section{max-width:var(--maxw); margin:36px auto; padding:0 20px}
+  .glass{
+    background:var(--glass); border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:var(--aura); padding:32px;
+  }
+
+    .dropdown {
+  position: relative;
+}
+
+.dropdown-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  color: var(--muted);
+  padding: 9px 14px;
+  border-radius: 999px;
+  transition: .2s ease;
+}
+
+.dropdown-toggle:hover {
+  color: var(--muted);
+  background: #ffffff12;
+  border: 1px solid #ffffff22;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 110%;
+  left: 0;
+  background: var(--glass-blur);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--aura);
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+  min-width: 240px;
+  z-index: 100;
+}
+
+.dropdown-menu li {
+  padding: 0;
+}
+
+.dropdown-menu a {
+  display: block;
+  padding: 10px 16px;
+  color: var(--muted);
+  transition: background .2s ease;
+}
+
+.dropdown-menu a:hover {
+  background: #ffffff12;
+  color: var(--ink);
+}
     .section h2{font-size:1.6rem; margin-bottom:12px}
     .gallery-wrap{
       position:relative; overflow:hidden; border-radius:var(--radius); border:1px solid var(--card-border);
-      background:#0e1730cc; box-shadow:var(--shadow);
+      background:var(--glass-2); box-shadow:var(--shadow);
     }
     .rail{
       display:flex; gap:14px; padding:16px; overflow-x:auto; scroll-snap-type:x mandatory;
@@ -147,8 +248,8 @@
     /* Tiers */
     .tiers{display:grid; grid-template-columns:repeat(4,1fr); gap:16px}
     .tier{
-      background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius-sm);
-      padding:18px; box-shadow:var(--shadow); transform-style:preserve-3d; transition:transform .2s ease, box-shadow .2s ease;
+      background:var(--glass-2); border:1px solid var(--border); border-radius:var(--radius-sm);
+      padding:18px; box-shadow:var(--aura); transform-style:preserve-3d; transition:transform .2s ease, box-shadow .2s ease;
     }
     .tier:hover{transform:translateY(-4px); box-shadow:0 16px 40px #00000088}
     .tier h3{display:flex; align-items:center; gap:8px; margin:4px 0 8px 0; color:var(--gold)}
@@ -202,14 +303,16 @@
   </style>
 </head>
 <body>
+
   <div class="bg" aria-hidden="true"></div>
+  <canvas id="bg-stars" aria-hidden="true"></canvas>
 
   <header>
     <div class="nav">
       <a class="brand" href="https://fortiviewholdings.com">
         <div class="logo" aria-hidden="true"></div>
-        <strong>Fortiview</strong>
-        <span style="color:var(--muted)">Holdings</span>
+        <strong style="color: var(--ink);">Fortiview</strong>
+        <span style="color:var(--brand-600)">Holdings</span>
         <span style="color:var(--muted)">Youth Business Education Sandbox</span>
       </a>
       <nav aria-label="Primary">
@@ -227,10 +330,10 @@
       <div class="hero-card">
         <div class="kicker">Launch their legacy. Build it together.</div>
         <h1>Modern, safe, parent‑backed entrepreneurship for youth</h1>
-        <p class="sub">A glass‑smooth workspace with governance baked in. Real tools. Real guidance. Their ideas, their IP (Intellectual Property) — your oversight.</p>
+        <p class="sub">A glass‑smooth workspace with governance baked in. Real tools. Real guidance. Their ideas, their IP (Intellectual Property) - your oversight.</p>
         <div class="hero-actions">
-          <a class="btn gold" href="#tiers">Explore tiers</a>
-          <a class="btn" id="btn-support" href="mailto:support@fortiviewholdings.com?subject=Fortiview%20Support">Contact support</a>
+          <a class="cta" href="#tiers">Explore tiers</a>
+          <a class="cta-btn" id="btn-support" href="mailto:support@fortiviewholdings.com?subject=Fortiview%20Support">Contact support</a>
         </div>
       </div>
       <div class="hero-side">
@@ -242,7 +345,7 @@
           </div>
         </div>
         <div class="stat">
-          <span class="pill gold">Own the IP</span>
+          <span class="pill">Own the IP</span>
           <div>
             <strong>Youth keeps the rights</strong>
             <div style="color:var(--muted)">Build, learn, and launch without giving up ownership.</div>
@@ -404,6 +507,39 @@ function step(dir = 1) {
       card.addEventListener('mousemove', onMove);
       card.addEventListener('mouseleave', reset);
     });
+
+     // Fullscreen star-field background
+    function initStarField() {
+      const canvas = document.getElementById('bg-stars');
+      const ctx = canvas.getContext('2d');
+      function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+      resize(); window.addEventListener('resize', resize);
+
+      const stars = Array.from({ length: 120 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.6 + 0.4,
+        a: Math.random()
+      }));
+      let frame = 0, reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function animate() {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        for (const s of stars) {
+          ctx.beginPath();
+          ctx.fillStyle = `rgba(255,255,255,${s.a})`;
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+          ctx.fill();
+          if(!reduce){
+            s.a = 0.25 + Math.abs(Math.sin((frame/60) + s.x*0.001 + s.y*0.001)) * 0.75;
+          }
+        }
+        frame++;
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
+    window.addEventListener('load', initStarField);
 
     // Anchor smooth scroll fix for sticky header offset (if needed)
     // Not required due to scroll-behavior CSS and section spacing.
