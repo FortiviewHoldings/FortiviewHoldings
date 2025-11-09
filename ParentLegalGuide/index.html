@@ -144,7 +144,7 @@
     /* Tiers */
     .tiers{display:grid; background: var(--bg-deep); border:1px solid var(--bg-deep); grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:16px}
     .tier{
-      background:var(--glass-2); border:1px solid var(--border); border-radius:var(--radius-sm);
+      display:absolute; background:var(--glass-2); border:1px solid var(--border); border-radius:var(--radius-sm);
       padding:18px; box-shadow:var(--bg-deep); transform-style:preserve-3d; transition:transform .2s ease, box-shadow .2s ease;
     }
     .tier:hover{transform:translateY(-4px); box-shadow:var(--aura)}
@@ -267,7 +267,7 @@
       <div class="gallery-wrap">
         <div class="tiers">
           <article class="tier">
-            <h3 style="color: var(--brand-600)">🚀 LaunchPad <span style="color: var(--muted)">Tier</span></h3>
+            <h3 style="color: var(--brand-600)">🚀 Launch <span style="color: var(--muted)">Tier</span></h3>
             <ul>
               <li>Non‑commercial sandbox; no formal entity required</li>
               <li>Educational license signed by parent/guardian</li>
