@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Fortiview Holdings — Business Services</title>
+  <title>Fortiview Holdings — Strategic Services</title>
   <meta name="description" content="Fortiview Holdings LLC delivers secure, branded backend-as-a-service solutions for small businesses. Scalable infrastructure, transparent pricing, and trusted support.">
   <meta name="color-scheme" content="dark light" />
 
@@ -33,6 +33,7 @@
       --bg-accent:#101625cc;
       --glass:#ffffff12;
       --glass-2:#dcffbb12;
+      --glass-blur:#272727c6;
       --border:#ffffff1a;
       --ink:#e7ecff;
       --muted:#c6d0f0a6;
@@ -176,7 +177,7 @@
 }
 
 .dropdown-toggle:hover {
-  color: #fff;
+  color: var(--muted);
   background: #ffffff12;
   border: 1px solid #ffffff22;
 }
@@ -186,7 +187,7 @@
   position: absolute;
   top: 110%;
   left: 0;
-  background: var(--glass);
+  background: var(--glass-blur);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   box-shadow: var(--aura);
@@ -204,13 +205,13 @@
 .dropdown-menu a {
   display: block;
   padding: 10px 16px;
-  color: var(--ink);
+  color: var(--muted);
   transition: background .2s ease;
 }
 
 .dropdown-menu a:hover {
   background: #ffffff12;
-  color: #fff;
+  color: var(--ink);
 }
 
     /* Footer */
