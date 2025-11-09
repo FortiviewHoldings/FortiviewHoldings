@@ -29,20 +29,20 @@
 
   <style>
     :root{
-      --bg-deep:#0b1022;
-      --bg-accent:#0b1c3d;
-      --glass:#101a33cc;
-      --glass-2:#0f1933cc;
+      --bg-deep:#000000cc;
+      --bg-accent:#101625cc;
+      --glass:#ffffff12;
+      --glass-2:#dcffbb12;
       --border:#ffffff1a;
       --ink:#e7ecff;
       --muted:#c6d0f0a6;
-      --brand:#5c8c45;       /* your green-gold */
-      --brand-600:#4d7a39;
-      --aura:0 4px 8px rgba(92,140,69,.35);
+      --brand:#1ca490da;       /* your green-gold */
+      --brand-600:#21bca5;
+      --aura:0 4px 8px rgba(17, 76, 67, 0.678);
       --radius:16px;
       --radius-sm:12px;
       --maxw:1200px;
-      --grad:linear-gradient(135deg,#182a52 0%,#0b1c3d 40%,#1d3557 100%);
+      --grad:linear-gradient(135deg,#121b2d 0%,#060e1e 40%,#0f1824 100%);
     }
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg-deep);color:var(--ink);scroll-behavior:smooth}
@@ -52,18 +52,13 @@
     /* Background: gradient + optional image + starfield canvas behind */
     .bg{
       position:fixed; inset:0; z-index:-2;
-      background:
-        radial-gradient(1100px 700px at 12% -10%, #5ac8fa22, transparent 60%),
-        radial-gradient(900px 600px at 110% 10%, rgba(92,140,69,.20), transparent 55%),
-        var(--grad);
+      background: var(--glass);
       filter:blur(6px) brightness(.9) saturate(1.05);
       transform:scale(1.03);
     }
     .bg::after{
       content:""; position:absolute; inset:0;
-      background:
-        radial-gradient(900px 500px at 50% -10%, transparent, #000814bb 70%),
-        linear-gradient(to bottom, #00000066, transparent 35%, #00000077 100%);
+      background: var(--glass);
     }
     #bg-stars{
       position:fixed; inset:0; width:100vw; height:100vh; z-index:-1; pointer-events:none;
@@ -73,7 +68,7 @@
     header{
       position:sticky; top:0; z-index:50;
       backdrop-filter:saturate(140%) blur(10px);
-      background:#0b1224cc;
+      background:var(--glass);
       border-bottom:1px solid var(--border);
     }
     .nav{
@@ -115,8 +110,8 @@
       max-width:var(--maxw); margin:40px auto; padding:24px 20px;
     }
     .hero-card{padding:32px}
-    .kicker{color:#9ff951; font-weight:800; letter-spacing:.12em; text-transform:uppercase; font-size:.8rem}
-    h1{font-size:clamp(2rem, 3.2vw, 3rem); line-height:1.08; margin:.45rem 0 .8rem 0}
+    .kicker{color: var(--brand); font-weight:800; letter-spacing:.12em; text-transform:uppercase; font-size:.8rem}
+    h1{color: var(--ink);font-size:clamp(2rem, 3.2vw, 3rem); line-height:1.08; margin:.45rem 0 .8rem 0}
     .sub{color:var(--muted); font-size:1.05rem}
     .hero-side{display:grid; gap:16px}
     .stat{
@@ -124,8 +119,17 @@
       padding:18px 20px; background:var(--glass-2); border-top:1px solid rgba(255,255,255,.06);
       border-radius:var(--radius); border:1px solid var(--border);
     }
-    .pill{padding:6px 10px; border-radius:999px; font-weight:800; font-size:.78rem; color:#071008;
-      background:linear-gradient(180deg,#9ff951,#6be654); border:1px solid rgba(159,249,81,.35)}
+    .pill{
+        padding:6px 10px; 
+        border-radius:999px; 
+        font-weight:800; 
+        font-size:.78rem; 
+        color:#071008;
+        background:linear-gradient(180deg, var(--brand), var(--brand-600)); border:1px solid rgb(33, 188, 165); 
+        white-space: nowrap;
+        overflow: visible;
+        text-overflow: ellipsis;
+    }
 
     /* Services grid */
     .grid{
@@ -136,18 +140,16 @@
       position:relative; overflow:hidden;
       padding:18px; border-radius:var(--radius);
       background:var(--glass); border:1px solid var(--border);
-      box-shadow:var(--aura);
+      box-shadow: none;
       cursor:pointer;
       transform-style:preserve-3d;
       transition:transform .18s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
     }
-    .card:hover{transform:translateY(-4px); box-shadow:0 16px 40px rgba(0,0,0,.45)}
+    .card:hover{transform:translateY(-4px); box-shadow: var(--aura)}
     .card h3{color:var(--brand); font-size:1.1rem; margin:2px 0 6px 0}
-    .card p{color:#e7ecff; opacity:.85; font-size:.94rem; line-height:1.4}
+    .card p{color:var(--ink); opacity:.85; font-size:.94rem; line-height:1.4}
     .card::after{
       content:""; position:absolute; inset:auto -20% -20% auto; width:180px; height:180px;
-      background: radial-gradient(closest-side, rgba(92,140,69,.18), transparent 70%);
-      transform:rotate(25deg);
     }
     .card.featured{
       grid-column: span 2; background:linear-gradient(18deg, rgba(72,76,9,.65), rgba(4,3,74,.7));
@@ -155,7 +157,7 @@
     }
     .badge{
       position:absolute; top:10px; right:10px; font-size:.8rem; padding:6px 10px; border-radius:999px;
-      background:linear-gradient(180deg,#9ff951,#6be654); color:#0a1205; font-weight:800; border:1px solid rgba(159,249,81,.35)
+      background:linear-gradient(180deg,var(--brand), var(--brand-600)); color:#0a1205; font-weight:800; border:1px solid rgba(159,249,81,.35)
     }
 
     .dropdown {
@@ -258,8 +260,8 @@
     <div class="nav">
       <div class="brand">
         <div class="logo" aria-hidden="true"></div>
-        <strong>Fortiview</strong>
-        <span style="color:var(--muted)">Holdings</span>
+        <strong style="color: var(--ink);">Fortiview</strong>
+        <span style="color:var(--brand-600)">Holdings</span>
       </div>
       <nav aria-label="Primary">
         <ul>
@@ -289,29 +291,42 @@
     <section class="hero">
       <div class="glass hero-card">
         <div class="kicker">Focused. Practical. Accountable.</div>
-        <h1>Strategic services that build durable businesses</h1>
-        <p class="sub">From leadership architecture and governance to automation and CX — we help you design systems that scale, with audit‑ready trails and real outcomes.</p>
+        <h1>Business Strategy, Engineered for Clarity</h1>
+        <p class="sub">We build more than systems - We Build Resilience. Every solution is designed to withstand change, eliminate waste, and deliver clarity where it matters most. 
+            From leadership architecture to automation and customer experience, we engineer pathways that scale with strength and foresight. 
+            Our approach integrates seamlessly with your existing tools or stands alone as a tailored framework, ensuring accountability at every step. 
+            The outcome is simple: durable businesses, smarter processes, and measurable results.</p>
       </div>
       <div class="hero-side">
         <div class="stat">
-          <span class="pill">Governance‑ready</span>
+          <span class="pill">Smart Systems</span>
           <div>
-            <strong>Controls, audits, compliance</strong>
-            <div style="color:var(--muted)">Every engagement ships with clear decision rights and traceability.</div>
+            <strong style="color: var(--ink)">Microsoft Agents & Intelligent Workflows</strong>
+            <div style="color:var(--muted)">Harness AI to streamline processes, enhance customer experience and connect your existing tools without costly overhead.
+            </div>
           </div>
         </div>
         <div class="stat">
-          <span class="pill">Operator‑proven</span>
+          <span class="pill">Operator Proven</span>
           <div>
-            <strong>From plan to playbook</strong>
-            <div style="color:var(--muted)">We turn strategy into procedures, dashboards, and accountable routines.</div>
+            <strong style="color: var(--ink)">From plan to playbook</strong>
+            <div style="color:var(--muted)">We turn strategy into dashboards, procedures, and accountable routines - at the lowest cost to your business</div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- SERVICES GRID -->
-    <section id="services" class="section">
+    <section id="about" class="section">
+              <div class="glass hero-card">
+        <div class="kicker">Affordable. Scalable. Real-World Solutions.</div>
+        <h1>Bridging Pathways For Success...</h1>
+        <p class="sub">At Fortiview, we don’t believe in one‑size‑fits‑all solutions or hidden costs. 
+            We deliver foresight and discipline by engineering systems that remove waste, control expenses, and adapt to the way your business truly operates. 
+            Whether it’s streamlining digital workflows, optimizing operations on the ground, or modernizing data and automation, our approach is built on strength and vision. 
+            We integrate seamlessly with your existing tools or design stand‑alone solutions that scale with accountability. The result is simple: durable businesses, smarter processes, and measurable outcomes - Never shortcuts that cost you more.
+        </p>
+      </div><br>
       <div class="grid">
         <article class="card" data-path="PATH_TO_LEADERSHIP_AND_STRATEGY" tabindex="0" role="button" aria-label="Leadership & Business Strategy">
           <h3>Leadership & Business Strategy</h3>
@@ -355,22 +370,16 @@
 
         <article class="card" data-path="/integration" tabindex="0" role="button" aria-label="PragOptics™ System Integration">
           <h3>PragOptics™ System Integration</h3>
-          <p>Software architecture, automation, and dashboards</p>
+          <p>Business Automation, eCommerce Development, Point-of-Sale Integration, Software architecture, and Visual Dashboards (UX Development)</p>
         </article>
 
         <article class="card" data-path="/YouthBusinessEducationSandbox" tabindex="0" role="button" aria-label="Youth Entrepreneur Education">
           <h3>Youth Entrepreneur Education</h3>
-          <p>Modular legal, financial & UX training tracks — empowering minors with guardian‑backed business licenses.</p>
+          <p>Modular legal, financial & UX training tracks - empowering minors with guardian‑backed business licenses.</p>
         </article>
       </div>
     </section>
-
-    <!-- ABOUT (optional light content holder to anchor nav) -->
-    <section id="about" class="section glass" style="padding:22px">
-      <h2 style="margin:0 0 8px 0; color:var(--brand); font-size:1.2rem">About Fortiview</h2>
-      <p style="margin:0; color:var(--muted)">We build systems that honor strategy, protect people, and produce measurable outcomes. Clear governance. Practical operations. Durable growth.</p>
-    </section>
-  </main>
+ </main>
 
   <footer>
     © <span id="y"></span> Fortiview Holdings. All rights reserved.
