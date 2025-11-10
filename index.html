@@ -77,7 +77,7 @@
       display:flex; align-items:center; text-align: center; justify-content:space-between; gap:16px;
     }
     .brand{display:flex; align-items:center; gap:10px; letter-spacing:.4px; flex-wrap: wrap;}
-    .site-label { flex-basis: 100%; text-align: center; margin-top: 4px;}
+    .site-label { color; var(--muted); font-size: .85rem; white-space: nowrap;}
     .logo{
       width:34px; height:34px; border-radius:10px;
       background-image: url('https://fortiviewholdings.com/images/Logo.png');
@@ -235,6 +235,11 @@
     gap: 6px;
     margin-bottom: 8px;
   }
+  .site-label {
+  flex-basis: 100%;
+  text-align: center;
+  margin-top: 2px;
+}
   nav ul {
     flex-wrap: wrap;
     justify-content: center;
@@ -269,7 +274,7 @@
         <div class="logo" aria-hidden="true"></div>
         <strong style="color: var(--ink);">Fortiview</strong>
         <span style="color:var(--brand-600)">Holdings</span>
-        <div class="site-label"><span style="color:var(--muted)">Business Services</span></div>
+        <span class="site-label">Business Services</span>
       </a>
       <nav aria-label="Primary">
         <ul>
