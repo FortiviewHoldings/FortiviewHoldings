@@ -226,23 +226,28 @@
   .nav {
     flex-direction: column;
     align-items: stretch; /* full width */
+    text-align: center;
   }
   .brand {
+    flex-wrap: wrap;
     justify-content: center;
+    gap: 6px;
     margin-bottom: 8px;
   }
   nav ul {
     flex-wrap: wrap;
     justify-content: center;
     gap: 8px;
+    padding: 0;
+    margin: 0;
   }
   nav ul li {
-    flex: 1 1 auto; /* let buttons grow/shrink evenly */
+    flex: 1 1 auto;
     display: flex;
     justify-content: center;
   }
   nav ul a {
-    width: 100%; /* make each button fill its li */
+    width: 100%;
     text-align: center;
   }
 }
