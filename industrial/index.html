@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fortiview Holdings - Industrial Automation</title>
+  <meta name="description" content="Fortiview Holdings LLC delivers secure, branded backend-as-a-service solutions for small businesses. Scalable infrastructure, transparent pricing, and trusted support.">
+  <meta name="color-scheme" content="dark light" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Fortiview Holdings">
+  <meta property="og:title" content="Fortiview Holdings - Industrial Automation">
+  <meta property="og:description" content="Secure, branded backend solutions that empower small businesses with clarity, trust, and scalability.">
+  <meta property="og:image" content="https://fortiviewholdings.com/images/social-preview.png">
+  <meta property="og:url" content="https://fortiviewholdings.com">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Icons -->
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" href="/images/favicon.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+
+  <!-- Preload brand background -->
+  <link rel="preload" as="image" href="https://fortiviewholdings.com/images/bg.png">
+
+  <style>
+    :root{
+      --bg-deep:#000000cc;
+      --bg-accent:#101625cc;
+      --glass:#ffffff12;
+      --glass-2:#dcffbb12;
+      --glass-blur:#000000d0;
+      --border:#ffffff1a;
+      --ink:#e7ecff;
+      --muted:#c6d0f0a6;
+      --brand:#1ca490da;
+      --brand-600:#21bca5;
+      --aura:0 4px 8px rgba(17, 76, 67, 0.678);
+      --radius:16px;
+      --radius-sm:12px;
+      --maxw:1200px;
+      --grad:linear-gradient(135deg,#121b2d 0%,#060e1e 40%,#0f1824 100%);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg-deep);color:var(--ink);scroll-behavior:smooth}
+    a{color:inherit;text-decoration:none}
+    img{display:block;max-width:100%}
+
+    /* Background: gradient + optional image + starfield canvas behind */
+    .bg{
+      position:fixed; inset:0; z-index:-2;
+      background: var(--glass);
+      filter:blur(6px) brightness(.9) saturate(1.05);
+      transform:scale(1.03);
+    }
+    .bg::after{
+      content:""; position:absolute; inset:0;
+      background: var(--glass);
+    }
+    #bg-stars{
+      position:fixed; inset:0; width:100vw; height:100vh; z-index:-1; pointer-events:none;
+    }
+
+    /* Sticky glass header */
+    header{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter:saturate(140%) blur(10px);
+      background:var(--glass);
+      border-bottom:1px solid var(--border);
+    }
+    .nav{
+      max-width:var(--maxw); margin:0 auto; padding:14px 20px;
+      display:flex; align-items:center; justify-content:space-between; gap:16px;
+    }
+    .brand{display:flex; align-items:center; gap:10px; letter-spacing:.4px}
+    .logo{
+      width:34px; height:34px; border-radius:10px;
+      background-image: url('https://fortiviewholdings.com/images/Logo.png');
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 0 0 2px rgba(92,140,69,.25), 0 10px 20px rgba(92,140,69,.18);
+    }
+    .brand strong{font-weight:800}
+    nav ul{display:flex; gap:14px; list-style:none; align-items:center; margin:0; padding:0}
+    .link{
+      padding:9px 14px; border-radius:999px; color:var(--muted);
+      border:1px solid transparent; transition:.2s ease;
+    }
+    .link:hover{color:#fff; border-color:#ffffff22; background:#ffffff12}
+    .cta{
+      background: var(--glass-2);
+      color:var(ink); font-weight:800; letter-spacing:.2px;
+      padding:10px 16px; border:1px solid var(--brand-600); border-radius: 999px; box-shadow: var(--bg-deep);
+    }
+    .cta:hover{background: linear-gradient(180deg, var(--brand), var(--brand-600));
+      color:#0c120a; font-weight:800; letter-spacing:.2px;
+      padding:10px 16px; border-radius:999px; box-shadow: var(--aura);}
+
+    /* Sections */
+    .section{max-width:var(--maxw); margin:36px auto; padding:0 20px}
+    .glass{
+      background:var(--glass); border:1px solid var(--border); border-radius:var(--radius);
+      box-shadow:var(--aura);
+    }
+
+    /* Hero */
+    .hero{
+      display:grid; grid-template-columns:1.2fr .8fr; gap:28px;
+      max-width:var(--maxw); margin:40px auto; padding:24px 20px;
+    }
+    .hero-card{padding:32px}
+    .kicker{color: var(--brand); font-weight:800; letter-spacing:.12em; text-transform:uppercase; font-size:.8rem}
+    h1{color: var(--ink);font-size:clamp(2rem, 3.2vw, 3rem); line-height:1.08; margin:.45rem 0 .8rem 0}
+    .sub{color:var(--muted); font-size:1.05rem}
+    .hero-side{display:grid; gap:16px}
+    .stat{
+      display:flex; gap:14px; align-items:flex-start;
+      padding:18px 20px; background:var(--glass-2); border-top:1px solid rgba(255,255,255,.06);
+      border-radius:var(--radius); border:1px solid var(--border);
+    }
+    .pill{
+        padding:6px 10px; 
+        border-radius:999px; 
+        font-weight:800; 
+        font-size:.78rem; 
+        color:#071008;
+        background:linear-gradient(180deg, var(--brand), var(--brand-600)); border:1px solid rgb(33, 188, 165); 
+        white-space: nowrap;
+        overflow: visible;
+        text-overflow: ellipsis;
+    }
+
+    /* Services grid */
+    .grid{
+      display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
+      gap:18px;
+    }
+    .card{
+      position:relative; overflow:hidden;
+      padding:18px; border-radius:var(--radius);
+      background:var(--glass); border:1px solid var(--border);
+      box-shadow: none;
+      cursor:pointer;
+      transform-style:preserve-3d;
+      transition:transform .18s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
+    }
+    .card:hover{transform:translateY(-4px); box-shadow: var(--aura)}
+    .card h3{color:var(--brand); font-size:1.1rem; margin:2px 0 6px 0}
+    .card p{color:var(--ink); opacity:.85; font-size:.94rem; line-height:1.4}
+    .card::after{
+      content:""; position:absolute; inset:auto -20% -20% auto; width:180px; height:180px;
+    }
+    .card.featured{
+      grid-column: span 2; background:linear-gradient(18deg, rgba(72,76,9,.65), rgba(4,3,74,.7));
+      border-color:rgba(159,249,81,.35);
+    }
+    .badge{
+      position:absolute; top:10px; right:10px; font-size:.8rem; padding:6px 10px; border-radius:999px;
+      background:linear-gradient(180deg,var(--brand), var(--brand-600)); color:#0a1205; font-weight:800; border:1px solid rgba(159,249,81,.35)
+    }
+
+    .dropdown {
+  position: relative;
+}
+
+.dropdown-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  color: var(--muted);
+  padding: 9px 14px;
+  border-radius: 999px;
+  transition: .2s ease;
+}
+
+.dropdown-toggle:hover {
+  color: var(--muted);
+  background: #ffffff12;
+  border: 1px solid #ffffff22;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 110%;
+  left: 0;
+  background: var(--glass-blur);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--aura);
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+  min-width: 240px;
+  z-index: 100;
+}
+
+.dropdown-menu li {
+  padding: 0;
+}
+
+.dropdown-menu a {
+  display: block;
+  padding: 10px 16px;
+  color: var(--muted);
+  transition: background .2s ease;
+}
+
+.dropdown-menu a:hover {
+  background: #ffffff12;
+  color: var(--ink);
+}
+
+    /* Footer */
+    footer{margin:50px 0 30px 0; color:var(--muted); text-align:center; font-size:.9rem}
+
+    /* Responsive */
+    @media (max-width: 1000px){
+      .hero{grid-template-columns:1fr}
+      .card.featured{grid-column:span 1}
+    }
+@media (max-width: 640px) {
+  .nav {
+    flex-direction: column;
+    align-items: stretch; /* full width */
+  }
+  .brand {
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+  nav ul {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+  nav ul li {
+    flex: 1 1 auto; /* let buttons grow/shrink evenly */
+    display: flex;
+    justify-content: center;
+  }
+  nav ul a {
+    width: 100%; /* make each button fill its li */
+    text-align: center;
+  }
+}
+
+    /* Motion preferences */
+    @media (prefers-reduced-motion: reduce){
+      *{animation:none!important; transition:none!important}
+    }
+  </style>
+</head>
+<body>
+  <div class="bg" aria-hidden="true"></div>
+  <canvas id="bg-stars" aria-hidden="true"></canvas>
+
+  <header>
+    <div class="nav">
+      <a class="brand" href="https://fortiviewholdings.com">
+        <div class="logo" aria-hidden="true"></div>
+        <strong style="color: var(--ink);">Fortiview</strong>
+        <span style="color:var(--brand-600)">Holdings</span>
+        <span style="color:var(--muted)">Industrial Automation</span>
+      </a>
+      <nav aria-label="Primary">
+        <ul>
+          <li class="dropdown">
+  <button class="link dropdown-toggle" onclick="toggleDropdown()">Services ▾</button>
+  <ul id="servicesDropdown" class="dropdown-menu">
+    <li><a href="/leadership">Leadership & Business Strategy</a></li>
+    <li><a href="/operations">Project & Operations Management</a></li>
+    <li><a href="/finance">Financial Coordination</a></li>
+    <li><a href="/marketing">Marketing, Sales & Client Relations</a></li>
+    <li><a href="/governance">Governance & Regulatory Support</a></li>
+    <li><a href="/cx">Customer Experience Optimization</a></li>
+    <li><a href="/partnerships">Networking & Partnerships</a></li>
+    <li><a href="/industrial">Industrial Automation</a></li>
+    <li><a href="/integration">PragOptics™ System Integration</a></li>
+    <li><a href="/YouthBusinessEducationSandbox">Youth Entrepreneur Education</a></li>
+  </ul>
+</li>
+          <li><a class="link" href="#about">About</a></li>
+          <li><a class="cta" href="mailto:support@fortiviewholdings.com?subject=Fortiview%20Inquiry">Work with us</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+<section class="hero">
+  <div class="glass hero-card">
+    <div class="kicker">Instrumentation. Integration. Industrial Intelligence.</div>
+    <h1>Industrial Automation & Instrumentation Education</h1>
+    <p class="sub">
+      Fortiview brings 15 years of hands-on industrial automation experience - from pneumatic systems and assembly lines to burner management, relay logic, and PLC/DCS architecture. We don’t just build systems - we educate teams, audit workflows in person, and design modular, mobile-friendly solutions that meet IT/OT compliance standards. Operational Technology may be an old name with a new shine, but in today’s cyber-aware world, it’s more critical than ever.
+    </p>
+    <br><br>
+    <div><a class="cta" id="btn-support" href="mailto:support@fortiviewholdings.com?subject=Industrial%20Automation">Contact Our Team!</a></div>
+  </div>
+  <div class="hero-side">
+    <div class="stat">
+      <span class="pill">Instrumentation & Controls</span>
+      <div>
+        <strong style="color: var(--ink)">Precision from the field up</strong>
+        <div style="color:var(--muted)">We design and teach systems that include sensors, transmitters, control loops, and field-ready diagnostics.</div>
+      </div>
+    </div>
+    <div class="stat">
+      <span class="pill">Motor & Relay Logic</span>
+      <div>
+        <strong style="color: var(--ink)">Legacy meets logic</strong>
+        <div style="color:var(--muted)">We support motor control circuits, relay logic, and burner management systems with modern visibility and safeguards.</div>
+      </div>
+    </div>
+    <div class="stat">
+      <span class="pill">PLC / DCS Systems</span>
+      <div>
+        <strong style="color: var(--ink)">Modular and scalable</strong>
+        <div style="color:var(--muted)">We network & program logic controllers and distributed control systems that integrate seamlessly with your operations.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="glass hero-card">
+    <div class="kicker">Audit-Ready. Field-Tested. Cyber-Aware.</div>
+    <h1>What We Deliver</h1>
+    <p class="sub">
+      Our automation and instrumentation services are built through direct engagement, hands-on training, and operational audits. We blend education with execution. Deliverables include:
+    </p>
+    <ul style="color:var(--muted); font-size:1rem; line-height:1.6">
+      <p>✅ Pneumatic and assembly line system design and training</p>
+      <p>✅ Instrumentation schematics, loop diagrams, and calibration routines</p>
+      <p>✅ Advanced Instrumentation, PID Control, and Safety Instrumented Functions (SIF's)</p>
+      <p>✅ Advanced Motor control, relay logic, and burner management workflows</p>
+      <p>✅ PLC/DCS programming, integration, and modular deployment</p>
+      <p>✅ IT/OT compliance mapping and mobile-friendly data acquisition flows</p>
+      <p>✅ Cyber-aware architecture with audit trail infrastructure</p>
+    </ul>
+    <p class="sub">We help you modernize without compromise - blending legacy systems with modern standards to deliver clarity, control, and compliance at every level.</p>
+  </div>
+</section>
+ </main>
+
+  <footer>
+    © <span id="y"></span> Fortiview Holdings. All rights reserved.
+  </footer>
+
+  <script>
+    // Year
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    function toggleDropdown() {
+  const menu = document.getElementById('servicesDropdown');
+  menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+}
+
+// Optional: close dropdown if clicking outside
+document.addEventListener('click', function(e) {
+  const dropdown = document.querySelector('.dropdown');
+  if (!dropdown.contains(e.target)) {
+    document.getElementById('servicesDropdown').style.display = 'none';
+  }
+});
+    // Card click navigation + keyboard activation
+    function go(path){ if(path) window.location.href = path; }
+    document.querySelectorAll('.card').forEach(card=>{
+      const path = card.dataset.path;
+      if(!path) return;
+      card.addEventListener('click', ()=>go(path));
+      card.addEventListener('keydown', (e)=>{
+        if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(path); }
+      });
+    });
+
+    // 3D hover tilt for cards
+    document.querySelectorAll('.card').forEach(card=>{
+      let rAF;
+      function onMove(e){
+        const rect = card.getBoundingClientRect();
+        const x = (e.clientX - rect.left)/rect.width - .5;
+        const y = (e.clientY - rect.top)/rect.height - .5;
+        cancelAnimationFrame(rAF);
+        rAF = requestAnimationFrame(()=>{
+          card.style.transform = `rotateX(${(-y*6).toFixed(2)}deg) rotateY(${(x*6).toFixed(2)}deg) translateY(-4px)`;
+        });
+      }
+      function reset(){ card.style.transform = ''; }
+      card.addEventListener('mousemove', onMove);
+      card.addEventListener('mouseleave', reset);
+      card.addEventListener('blur', reset);
+    });
+
+    // Fullscreen star-field background
+    function initStarField() {
+      const canvas = document.getElementById('bg-stars');
+      const ctx = canvas.getContext('2d');
+      function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+      resize(); window.addEventListener('resize', resize);
+
+      const stars = Array.from({ length: 120 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.6 + 0.4,
+        a: Math.random()
+      }));
+      let frame = 0, reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function animate() {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        for (const s of stars) {
+          ctx.beginPath();
+          ctx.fillStyle = `rgba(255,255,255,${s.a})`;
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+          ctx.fill();
+          if(!reduce){
+            s.a = 0.25 + Math.abs(Math.sin((frame/60) + s.x*0.001 + s.y*0.001)) * 0.75;
+          }
+        }
+        frame++;
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
+    window.addEventListener('load', initStarField);
+  </script>
+</body>
+</html>
