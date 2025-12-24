@@ -270,6 +270,19 @@
 
   #ctaBox{ position:relative; }
 
+  .sms-consent {
+  display: flex;
+  align-items: flex-start;
+  margin: 8px 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.sms-consent input[type="checkbox"] {
+  margin-right: 8px;
+  accent-color: var(--brand-600); /* modern browsers */
+}
+
   /* Hide the old local overlay if it still exists in markup */
   #loadingOverlay{ display:none !important; }
 
@@ -478,6 +491,11 @@
         <option value="WI">Wisconsin</option>
         <option value="WY">Wyoming</option>
       </select>
+    </label><br>
+    
+    <label class="sms-consent">
+      <input type="checkbox" id="smsConsent" name="smsConsent">
+        I consent to receive transactional SMS messages & Phone Calls from Fortiview Holdings. (optional)
     </label><br>
 
     <button type="submit" class="cta-btn" style="margin-top:12px;" data-act="integration">Finalize Request</button>
@@ -786,7 +804,8 @@ async function handleFormSubmit(e) {
     tier: selectedTier,
     plan: selectedPlan,
     setupFee: Number(INITIAL_SETUP_FEE),
-    perUserPrice: Number(perUserPrice)
+    perUserPrice: Number(perUserPrice),
+    smsConsent: document.getElementById('smsConsent').checked // true/false
   };
 
   // Lock UI
