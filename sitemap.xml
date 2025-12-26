@@ -8,89 +8,17 @@
     <priority>1.0</priority>
   </url>
 
-  <url>
-    <loc>https://fortiviewholdings.com/cx/</loc>
-    <lastmod>2025-11-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fortiviewholdings.com/finance/</loc>
-    <lastmod>2025-11-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fortiviewholdings.com/governance/</loc>
-    <lastmod>2025-11-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fortiviewholdings.com/industrial/</loc>
-    <lastmod>2025-11-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fortiviewholdings.com/integration/</loc>
-    <lastmod>2025-11-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fortiviewholdings.com/leadership/</loc>
-    <lastmod>2025-11-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fortiviewholdings.com/marketing/</loc>
-    <lastmod>2025-11-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fortiviewholdings.com/operations/</loc>
-    <lastmod>2025-11-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fortiviewholdings.com/partnerships/</loc>
-    <lastmod>2025-11-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fortiviewholdings.com/YouthBusinessEducationSandbox/</loc>
-    <lastmod>2025-12-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-      <url>
-    <loc>https://fortiviewholdings.com/ParentLegalGuide/</loc>
-    <lastmod>2025-12-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://fortiviewholdings.com/TierBreakdown/</loc>
-    <lastmod>2025-12-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-
+  <url><loc>https://fortiviewholdings.com/cx/</loc></url>
+  <url><loc>https://fortiviewholdings.com/finance/</loc></url>
+  <url><loc>https://fortiviewholdings.com/governance/</loc></url>
+  <url><loc>https://fortiviewholdings.com/industrial/</loc></url>
+  <url><loc>https://fortiviewholdings.com/integration/</loc></url>
+  <url><loc>https://fortiviewholdings.com/leadership/</loc></url>
+  <url><loc>https://fortiviewholdings.com/marketing/</loc></url>
+  <url><loc>https://fortiviewholdings.com/operations/</loc></url>
+  <url><loc>https://fortiviewholdings.com/partnerships/</loc></url>
+  <url><loc>https://fortiviewholdings.com/YouthBusinessEducationSandbox/</loc></url>
+  <url><loc>https://fortiviewholdings.com/ParentLegalGuide/</loc></url>
+  <url><loc>https://fortiviewholdings.com/TierBreakdown/</loc></url>
 
 </urlset>
