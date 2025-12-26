@@ -92,11 +92,5 @@
     <priority>0.6</priority>
   </url>
 
-  <url>
-    <loc>https://fortiviewholdings.com/404.html</loc>
-    <lastmod>2025-11-07</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.1</priority>
-  </url>
 
 </urlset>
