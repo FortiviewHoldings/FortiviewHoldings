@@ -340,6 +340,16 @@
     nav ul li{ flex:1 1 auto; display:flex; justify-content:center; }
     nav ul a{ width:100%; text-align:center; }
   }
+
+  .sms-consent .privacy-link {
+  color: #4ecdc4; /* your mint accent */
+  text-decoration: underline; /* optional */
+  font-weight: 500; /* optional */
+}
+
+.sms-consent .privacy-link:hover {
+  color: #38a89d; /* darker mint on hover */
+}
 </style>
 </head>
 <body>
@@ -537,8 +547,10 @@
     
     <label class="sms-consent">
   <input type="checkbox" id="smsConsent" name="smsConsent">
-  I consent to receive informational/transactional SMS messages & Phone Calls from Fortiview Holdings in regards to account notifications and one-time passcodes. Message frequency varies. Message and data rates may apply. Reply STOP to opt-out. 
-  <a href="/integration/terms" target="_self">See our Privacy Policy</a>.
+  <span class="sms-text">
+    I consent to receive informational/transactional SMS messages & Phone Calls from Fortiview Holdings in regards to account notifications and one-time passcodes. Message frequency varies. Message and data rates may apply. Reply STOP to opt-out. 
+    <a href="/integration/terms" class="privacy-link" target="_self">See our Privacy Policy</a>.
+  </span>
 </label><br>
 
     <button type="submit" class="cta-btn" style="margin-top:12px;" data-act="integration">Finalize Request</button>
