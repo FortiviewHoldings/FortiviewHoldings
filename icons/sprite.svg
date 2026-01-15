@@ -71,6 +71,11 @@
   <path d="M28,2H4A2.002,2.002,0,0,0,2,4V16H4V13H28.001l.001,15H16v2H28a2.0027,2.0027,0,0,0,2-2V4A2.0023,2.0023,0,0,0,28,2ZM12,11H4V4h8Zm2,0V4H28l.0007,7Z"/>
 </symbol>
 
+	  <!-- LIGHTNING ICON -->
+  <symbol id="icon-lightning" viewBox="0 0 24 24">
+    <path d="M18,11.74a1,1,0,0,0-.52-.63L14.09,9.43,15,3.14a1,1,0,0,0-1.78-.75l-7,9a1,1,0,0,0-.18.87,1.05,1.05,0,0,0,.6.67l4.27,1.71L10,20.86a1,1,0,0,0,.63,1.07A.92.92,0,0,0,11,22a1,1,0,0,0,.83-.45l6-9A1,1,0,0,0,18,11.74Z"/>
+  </symbol>
+
   <!-- OTHER ICONS (empty placeholders for now) -->
   <symbol id="icon-link" viewBox="0 0 24 24"></symbol>
   <symbol id="icon-dashboard" viewBox="0 0 24 24"></symbol>
