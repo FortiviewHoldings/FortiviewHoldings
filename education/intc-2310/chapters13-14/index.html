@@ -107,8 +107,8 @@
   </button>
 
   <!-- Collapsible Content -->
+  <!-- BEGIN INSERTED CONTENT -->
   <div id="chap1314" class="collapsible">
-    <!-- BEGIN INSERTED CONTENT -->
   <h1>Chapter's 13 – 14 Overview</h1>
   <div class="meta">
     <div><span class="label">Instructor:</span> Cameron Bridges</div>
@@ -246,14 +246,165 @@
   Power is only restored after the combustion cycle is proven and the burner has passed flame stabilization and RFM (release for modulation).  
   This prevents energizing a heated probe in the presence of unburned or flammable vapors that could ignite.
 </div>
-        <!-- END INSERTED CONTENT -->
  </div>
+       <!-- END INSERTED CONTENT -->
 </div>
 
     <div class="session">
       <span class="time">7:15 p.m. – 7:45 p.m.</span>
       <span>Lab Review + Quiz (due before midnight)</span>
-    </div>
+
+  <button class="toggle-btn" onclick="toggleSection('assessmentSummary')">
+    Lab Summary
+  </button>
+
+  <div id="assessmentSummary" class="collapsible">
+
+    <h2>Mechanical Understanding</h2>
+    <ul>
+      <li>Depressing the forcebar increases output because the flapper moves closer to the nozzle, restricting bleed air.</li>
+      <li>Pulling the forcebar decreases output because the flapper moves away, increasing bleed and lowering backpressure.</li>
+      <li>Students should connect mechanical motion → flapper/nozzle gap → relay output pressure.</li>
+    </ul>
+
+    <h2>As‑Found Setup</h2>
+    <ul>
+      <li>Connect reference gauge to output and process pressure source to high side.</li>
+      <li>Vent low side to atmosphere.</li>
+      <li>Record output before and after connecting process pressure.</li>
+      <li>LRV = expected 3 psig output; URV = expected 15 psig output.</li>
+    </ul>
+
+    <h2>Locating Current Calibration Points</h2>
+    <ul>
+      <li>If LRV output ≠ 3 psig, adjust process pressure until output = 3 psig → this is the instrument’s true zero.</li>
+      <li>Increase process pressure until output = 15 psig → this is the true span/URV point.</li>
+      <li>Students record:
+        <ul>
+          <li>As‑Found @ LRV</li>
+          <li>As‑Found @ URV</li>
+          <li>Current zero & span positions</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h2>As‑Left Calibration</h2>
+    <ul>
+      <li>Adjust zero screw for LRV alignment.</li>
+      <li>Adjust range wheel for URV alignment.</li>
+      <li>Zero affects span; span affects zero — students should observe interaction.</li>
+      <li>Always re‑verify after each adjustment.</li>
+    </ul>
+
+    <h2>Terminology & Tolerance</h2>
+    <ul>
+      <li><strong>Accuracy:</strong> closeness to expected value.</li>
+      <li><strong>Repeatability:</strong> consistency of readings.</li>
+      <li><strong>Linearity:</strong> proportionality of input/output.</li>
+      <li><strong>Tolerance:</strong> maximum allowed deviation.</li>
+      <li><strong>Turndown:</strong> max span ÷ min span.</li>
+      <li><strong>Percent Error:</strong> \((Observed - Expected) / Span × 100\)</li>
+      <li>Observed value = instrument output; expected value = what output should be at that input.</li>
+      <li>Standardized outputs (3–15 psig, 4–20 mA) are best for percent error calculations.</li>
+    </ul>
+
+    <h2>Troubleshooting Scenario (T‑100)</h2>
+    <ul>
+      <li>Symptoms: jumping to full scale, incorrect level, >100% reading.</li>
+      <li>Possible causes: plugged impulse line, mechanical binding, diaphragm damage, wet leg issues, power/signal issues.</li>
+      <li>First step: verify process conditions, isolation, and safe access.</li>
+      <li>Bring: P&ID, loop sheet, spec sheet, calibration range, recent history.</li>
+      <li>Tools: hand pump, reference gauge, communicator (if applicable), wrenches, multimeter, tubing tools.</li>
+    </ul>
+
+    <h2>Post‑Troubleshooting Reflection</h2>
+    <ul>
+      <li>Students summarize symptoms, root cause, and repair.</li>
+      <li>Common real‑world causes: plugged taps, stuck floats, failed diaphragms, incorrect range, water in lines.</li>
+    </ul>
+  </div>
+
+      
+     <div class="session">
+  <span class="time">Quiz Overview</span>
+  <span>Ch. 13–14 Quiz Concepts</span>
+
+  <button class="toggle-btn" onclick="toggleSection('kcSummary')">
+    Quiz Summary
+  </button>
+
+  <div id="kcSummary" class="collapsible">
+
+    <h2>Mechanical & Point-Level Devices</h2>
+    <ul>
+      <li><strong>Point level switches</strong> trip only when material physically reaches the switch location.</li>
+      <li><strong>Tape floats</strong> can behave erratically if guide wires are loose or obstructed.</li>
+      <li><strong>Paddle switches</strong> rely on motor stall torque; failure to trip often means the paddle cannot stall.</li>
+      <li><strong>Magnetic gauges</strong> use a float magnet to flip external indicators.</li>
+      <li><strong>Tape float systems</strong> use a float, tape, and counterweight to indicate level.</li>
+    </ul>
+
+    <h2>Direct Visual Indicators</h2>
+    <ul>
+      <li><strong>Sight glasses</strong> showing no level despite a full tank usually indicate:
+        <ul>
+          <li>Stuck float</li>
+          <li>Debris or buildup</li>
+          <li>Plugged connection</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h2>Pressure & DP-Based Level Measurement</h2>
+    <ul>
+      <li><strong>DP transmitters</strong> must be scaled to the liquid’s specific gravity.</li>
+      <li>A DP transmitter reading low on an open tank often means:
+        <ul>
+          <li>Transmitter installed too low (elevation error)</li>
+        </ul>
+      </li>
+      <li><strong>Bubbler systems</strong> reading full when tank is empty usually indicate:
+        <ul>
+          <li>Tank vented (no backpressure)</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h2>Electrical & Electronic Level Devices</h2>
+    <ul>
+      <li><strong>Capacitance probes</strong> measure changes in dielectric constant.</li>
+      <li>Single‑point capacitance probes act as <strong>switches</strong>.</li>
+      <li><strong>Conductivity probes</strong> require a conductive fluid to complete the circuit.</li>
+      <li><strong>Photometric sensors</strong> detect level using returned <strong>infrared</strong> light.</li>
+      <li><strong>Thermal dispersion sensors</strong> detect level using heat removal differences between heated and reference elements.</li>
+    </ul>
+
+    <h2>Advanced Technologies</h2>
+    <ul>
+      <li><strong>Nuclear gauges</strong> are chosen because they measure level without contacting the process.</li>
+      <li><strong>Radar</strong> is preferred over ultrasonic when:
+        <ul>
+          <li>Vapor space contains steam or dust</li>
+        </ul>
+      </li>
+      <li><strong>Guided‑wave radar</strong> gives erratic readings when:
+        <ul>
+          <li>The probe is coated or bridged with material</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h2>Matching Principles (Summary)</h2>
+    <ul>
+      <li><strong>Bubbler:</strong> regulated air overcomes hydrostatic head.</li>
+      <li><strong>Paddle switch:</strong> motor stalls when material stops rotation.</li>
+      <li><strong>Magnetic gauge:</strong> float magnet flips external indicators.</li>
+      <li><strong>Tape float:</strong> float connected to tape and counterweight.</li>
+    </ul>
+
+  </div>
+</div>
+
 
     <p class="note">
       Times are approximate and may be adjusted based on class needs and discussion.
