@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>INTC 2310 - Third Day Overview</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fff;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 6px;
+      padding: 20px 24px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 0.25rem;
+    }
+    h2 {
+      font-size: 1.2rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .session {
+      margin: 10px 0;
+      padding: 8px 10px;
+      border-left: 3px solid #333;
+      background-color: #fafafa;
+    }
+    .time {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 3px;
+    }
+    .note {
+      background: #fef3c7;
+      border: 1px solid #facc15;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    
+   .related {
+  background: #dbeafe;
+  border: 1px solid #60a5fa;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin: 1.5rem 0;
+  font-size: 0.95rem;
+  color: #1e3a8a;
+    }
+
+    .toggle-btn {
+  margin-top: 8px;
+  padding: 6px 10px;
+  background: #1ca490da;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.toggle-btn:hover {
+  background: #c6d0f0a6;
+  color: #000;
+}
+
+.collapsible {
+  display: none;
+  margin-top: 12px;
+  padding: 12px;
+  background: #dcffbb12;
+  border: 1px solid #c7d2fe;
+  border-radius: 6px;
+}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>INTC 2310 – Principles of Industrial Measurement II</h1>
+    <h2>Jan 29 2026 - Third Day Overview</h2>
+
+    <div class="session">
+      <span class="time">6:00 p.m. – 6:15 p.m.</span>
+      <span>Safety Moment</span><br>
+      <span><iframe width="640" height="320" src="https://www.youtube.com/embed/PZHpeBubb_M" 
+  title="Iron in the Fire" frameborder="0" 
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+  referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></span>
+    </div>
+
+<div class="session">
+  <span class="time">6:15 p.m. – 7:15 p.m.</span>
+  <span>Chapter 13-14 Lecture + Handbook</span>
+
+  <!-- Toggle Button -->
+  <button class="toggle-btn" onclick="toggleSection('chap1314')">
+    View Overview
+  </button>
+
+  <!-- Collapsible Content -->
+  <div id="chap1314" class="collapsible">
+    <!-- BEGIN INSERTED CONTENT -->
+  <h1>Chapter's 13 – 14 Overview</h1>
+  <div class="meta">
+    <div><span class="label">Instructor:</span> Cameron Bridges</div>
+    <div><span class="label">Topic:</span> Mechanical, Pressure, and Electrical Level Measurement</div>
+    <div><span class="label">Chapters Covered:</span> 13–14</div>
+    <div><span class="label">Extra Credit:</span> skim through 15-16</div>
+  </div>
+
+  <div class="note">
+    <strong>Note:</strong> This handout is written from my point of view and connects the book material to how these instruments actually behave in the field.  
+    Quiz questions will be based on the assigned textbook chapters, but this guide is meant to help you bridge theory and practice.
+  </div>
+
+  <section>
+    <h2>Chapter 13 – Mechanical & Pressure-Based Level Measurement</h2>
+
+    <h3>Point vs Continuous Level</h3>
+    <p>
+      <strong>Point level</strong> devices answer a yes/no question: “Is the material at this level?”  
+      They are usually discrete I/O (on/off) and used for high/low alarms, pump protection, and overfill/empty protection. These can be older mechanical switches or modern smart devices with onboard diagnostics.
+    </p>
+    <p>
+      <strong>Continuous level</strong> devices track the level across the entire span of the vessel and output a proportional signal.  
+      These are used for inventory, control, and trending, not just simple alarms.
+    </p>
+
+    <h3>Gauge Glasses / Sight Glasses</h3>
+    <p>
+      In the field, these are usually called <strong>sight glasses</strong>. They are direct visual level indicators:
+    </p>
+    <ul>
+      <li>Simple glass tubes tied into the vessel above and below the liquid level.</li>
+      <li>Flat glass plates in a bolted metal housing (armored) for higher pressure or more hazardous service.</li>
+      <li>Reflex glass with a prismatic surface to improve visibility of clear liquids.</li>
+      <li>In some cases, clear poly tubing is used (not ideal, but you will see it).</li>
+    </ul>
+    <p>
+      There are also <strong>magnetically coupled level gauges</strong> where a float with an internal magnet rides in a chamber. As it moves, it flips external indicator tiles or interacts with a sensor array that can provide an analog output.
+    </p>
+    <p>
+      Common real‑world issues: glass breaks, floats crack, floats stick due to debris or poor installation, and “clean” processes still carry trash that finds every trap. If a sight glass or magnetic gauge is not working, the float and process cleanliness are the first things to suspect.
+    </p>
+
+    <h3>Pressure as an Indirect Level Measurement</h3>
+    <p>
+      Pressure can be used to infer level when:
+    </p>
+    <ul>
+      <li>The pressure tap is at or near the bottom of the vessel.</li>
+      <li>The specific gravity (density) of the product is known or controlled.</li>
+      <li>The gauge or transmitter has enough resolution to see the change.</li>
+    </ul>
+    <p>
+      At the simplest level, a single pressure gauge at the bottom of an open tank can be used to estimate level. Two gauges (top and bottom) could be used to manually calculate differential pressure, but that is not practical in real operations.
+    </p>
+    <p>
+      The proper method is to use a <strong>differential pressure (DP) gauge or transmitter</strong>. This works for both open and pressurized vessels. The product specific gravity is still needed to scale the reading into level. Pneumatic DP transmitters use a diaphragm, beam, flapper/nozzle, and a relay to generate a 3–15 psi output. Zero and span adjustments set the range.
+    </p>
+    <p>
+      <strong>Calibration:</strong> The standard approach is to step the input up in 25% increments (0%, 25%, 50%, 75%, 100%) and then back down, checking each point. That is the traditional method and what you should default to, especially when documentation or site procedures require it.  
+      If a device does not appear to be linear, this traditional step method is how you verify and troubleshoot it.
+    </p>
+    <p>
+      Mechanical wear eventually limits pneumatic accuracy. Some instruments, like the Foxboro 13A, are extremely robust and can last a very long time when maintained properly. Suppression and elevation hardware is used when taps are not at the true zero level, shifting the range so the transmitter still reads correctly.
+    </p>
+
+    <h3>Bubblers</h3>
+    <p>
+      A <strong>bubbler</strong> uses regulated air down a dip tube to measure level. The air pressure required to just start bubbling out of the tube equals the hydrostatic head of the liquid. As level changes, the required pressure changes. As a rule of thumb, you should set your regulated air supply to match the total hydrostatic head expected at full URV. This will keep your instrument reading realiably through it's range, if ranged properly.
+    </p>
+    <p>
+      If the process pressure exceeds the regulated air pressure, the instrument will saturate high or behave incorrectly. Bubblers need clean tubing and correct pressure settings, and they are sensitive to plugging, freezing, and changes in liquid density.
+    </p>
+
+    <h3>Tape Floats & Cable/Weight Systems</h3>
+    <p>
+      A <strong>tape float</strong> uses a float connected to a tape or chain that runs over pulleys to a counterweight or indicator. As the float rises, the indicator moves in the opposite direction. Guide wires keep the float centered.
+    </p>
+    <p>
+      More modern servo‑type systems drop a weight into the process, detect when it hits the material, measure the distance, and retract. The travel distance is calibrated to level. These systems are older technology but still found in tanks and silos.
+    </p>
+
+    <h3>Paddle Wheel Switches</h3>
+    <p>
+      Classic paddle switches use a small motor to spin a paddle in the vessel. When material reaches the paddle and stops it from turning, the motor stalls and trips a mechanical linkage that actuates a switch. Modern versions may use different sensing methods, but the basic idea is the same: if the paddle cannot turn, the level (or flow of solids) has reached that point.
+    </p>
+  </section>
+
+  <section>
+    <h2>Chapter 14 – Electrical, Optical & Thermal Level Measurement</h2>
+
+    <h3>Capacitance Probes</h3>
+    <p>
+      Capacitance probes measure the change in capacitance between the probe and the vessel wall (or a reference rod). The process material acts as the dielectric. As the level changes, the dielectric changes, and so does the capacitance. The electronics interpret that change as level.
+    </p>
+
+    <h3>Single-Point vs Continuous Capacitance</h3>
+    <p>
+      <strong>Single-point capacitance probes</strong> act like switches. When material reaches the probe and the capacitance crosses a set threshold, the device trips. These are used for high/low level alarms.
+    </p>
+    <p>
+      <strong>Continuous capacitance probes</strong> measure capacitance along the length of the probe and output a proportional signal. They behave like a continuous level transmitter, not just an on/off switch.
+    </p>
+
+    <h3>Conductivity vs Inductive Probes</h3>
+    <p>
+      <strong>Conductivity probes</strong> require a conductive fluid. When the fluid touches the probe, it completes a circuit between the probe and ground (or between two probes). This drives an amplifier relay and changes the output state. These can often be tested by bridging the terminals to simulate a conductive path.
+    </p>
+    <p>
+      <strong>Inductive probes</strong> require a conductive fluid. They use electromagnetic fields to detect the presence of material without direct electrical contact. These are better for corrosive or non‑conductive materials and for applications where you do not want the sensing element directly exposed electrically to the process.
+    </p>
+
+    <h3>Photometric Sensors</h3>
+    <p>
+      Photometric level sensors use infrared (IR) light and a reflective surface or prism. The electronics are tuned to the IR spectrum. When the prism is in air, the IR reflection is strong. When liquid covers the prism or changes the refractive index, the returned IR signal drops. When that signal falls below a threshold, the sensor switches.
+    </p>
+    <p>
+      These work well in clean services but can struggle with coating, fouling, or dirty processes where the optical path is compromised.
+    </p>
+
+    <h3>Thermal Dispersion Sensors</h3>
+    <p>
+      Thermal dispersion sensors are based on the thermal mass principle. They typically have two elements: one heated and one reference. Air or vapor removes heat slowly; liquid removes heat much faster. The electronics monitor the temperature difference between the two elements.
+    </p>
+    <p>
+      When liquid reaches the sensor, the heated element cools more quickly, the temperature difference changes, and the device switches at a setpoint. These are essentially thermal mass flow concepts applied to level or presence detection. They can be sensitive to buildup and are not true “level transmitters” — they are more like thermal switches.   
+    </p>
+  </section>
+  
+  <div class="related">
+     <strong>Adjacent Safety Consideration:</strong>  
+  Any process containing flammable vapors must be evaluated before installing an in‑situ instrument that includes a heated element.  
+  For example, Zirconia (“Zirc”) oxygen analyzers used in flue gas applications operate at elevated temperatures.  
+  In some boiler systems, the Burner Management System removes power to the analyzer through an interposing relay during startup.  
+  Power is only restored after the combustion cycle is proven and the burner has passed flame stabilization and RFM (release for modulation).  
+  This prevents energizing a heated probe in the presence of unburned or flammable vapors that could ignite.
+</div>
+        <!-- END INSERTED CONTENT -->
+ </div>
+</div>
+
+    <div class="session">
+      <span class="time">7:15 p.m. – 7:45 p.m.</span>
+      <span>Lab Review + Quiz (due before midnight)</span>
+    </div>
+
+    <p class="note">
+      Times are approximate and may be adjusted based on class needs and discussion.
+    </p>
+  </div>
+  <script>
+  function toggleSection(id) {
+    const el = document.getElementById(id);
+    el.style.display = (el.style.display === "block") ? "none" : "block";
+  }
+</script>
+</body>
+</html>
