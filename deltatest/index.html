@@ -362,6 +362,22 @@
 .grid .card:hover {
   transform: translateY(-6px);
 }
+
+@media (max-width: 640px) {
+  .grid {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: auto;
+    overflow-y: visible;        /* ensures nothing gets clipped vertically */
+    flex-wrap: nowrap;          /* prevents wrapping on small screens */
+    padding-left: 1rem;
+    scroll-padding-left: 1rem;  /* centers first card */
+  }
+
+  .grid .card {
+    max-width: 85vw;            /* keeps each card inside the viewport */
+  }
+}
     .card{
       position:relative; overflow:hidden;
       padding:18px; border-radius:var(--radius);
