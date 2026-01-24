@@ -1455,22 +1455,21 @@
   // Fullscreen grid autoscroll
   const grid = document.querySelector('.grid');
 
-  function autoScroll() {
-    if (!grid) return;
+function autoScroll() {
+  if (!grid) return;
 
-    grid.scrollBy({
-      left: 1.5,  // speed
-      behavior: 'smooth'
-    });
+  const step = 40; // pixels per tick
 
-    // Loop back to start
-    if (grid.scrollLeft + grid.clientWidth >= grid.scrollWidth - 2) {
-      grid.scrollTo({ left: 0, behavior: 'smooth' });
-    }
+  // Advance
+  grid.scrollLeft += step;
+
+  // Loop back to start
+  if (grid.scrollLeft + grid.clientWidth >= grid.scrollWidth - step) {
+    grid.scrollLeft = 0;
   }
+}
 
-  setInterval(autoScroll, 3750); // adjust speed here
-
+setInterval(autoScroll, 3750); // every 2s, tune to taste
 
 
     // Year
