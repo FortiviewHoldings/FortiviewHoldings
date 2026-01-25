@@ -1378,7 +1378,7 @@
     </section>
 
       <!-- REVIEW SECTION -->
-<section class="section reviews">
+<section class="section reviews" id="reviews">
   <div class="card">
     <h2>Client <span style="color: var(--brand);">Reviews</span></h2>
 
@@ -1517,6 +1517,20 @@
 
 
 <script>
+
+  document.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
+  const shouldOpen = params.get("openReview");
+
+  if (shouldOpen === "true") {
+    const btn = document.getElementById("leaveReviewBtn");
+
+    // Wait a moment so the scroll finishes
+    setTimeout(() => {
+      btn?.click();
+    }, 600);
+  }
+});
 
 // GRID AUTOSCROLL (card-by-card, desktop + mobile)
 const grid = document.querySelector('.grid');
