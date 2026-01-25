@@ -1518,20 +1518,6 @@
 
 <script>
 
-  document.addEventListener("DOMContentLoaded", () => {
-  const params = new URLSearchParams(window.location.search);
-  const shouldOpen = params.get("openReview");
-
-  if (shouldOpen === "true") {
-    const btn = document.getElementById("leaveReviewBtn");
-
-    // Wait a moment so the scroll finishes
-    setTimeout(() => {
-      btn?.click();
-    }, 600);
-  }
-});
-
 // GRID AUTOSCROLL (card-by-card, desktop + mobile)
 const grid = document.querySelector('.grid');
 let gridIndex = 0;
@@ -1799,8 +1785,22 @@ loadReviews();
     });
   }
 })();
+/* ===========================
+   call to open in url 
+   =========================== */
+  document.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
+  const shouldOpen = params.get("openReview");
 
+  if (shouldOpen === "true") {
+    const btn = document.getElementById("leaveReviewBtn");
 
+    // Wait a moment so the scroll finishes
+    setTimeout(() => {
+      btn?.click();
+    }, 600);
+  }
+});
 /* ===========================
    OmniTok Helper (canonical)
    =========================== */
