@@ -1421,35 +1421,6 @@ header.shrink .cta {
   });
 
 
-
-function resize() {
-
-  const ratio = window.devicePixelRatio || 1;
-
-  const w = window.innerWidth;
-
-  const h = window.innerHeight;
-
-
-
-  canvas.width = w * ratio;
-
-  canvas.height = h * ratio;
-
-
-
-  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-
-}
-
-resize();
-
-setTimeout(resize, 150);
-
-
-
-
-
   const header = document.querySelector("header");
 
 
