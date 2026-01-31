@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>Fortiview Holdings × Delgado Honey Bees — Website & Dropship Integration</title>
+
+  <meta name="description" content="A tailored path for Delgado Honey Bees to modernize their website, secure email, and integrate Shopify-based dropshipping with Apimaye through Fortiview Holdings.">
+
+  <meta name="color-scheme" content="dark light" />
+
+
+
+
+
+  <!-- Open Graph -->
+
+  <meta property="og:type" content="website">
+
+  <meta property="og:site_name" content="Fortiview Holdings × Delgado Honey Bees">
+
+  <meta property="og:title" content="Fortiview Holdings × Delgado Honey Bees — Website & Integration">
+
+  <meta property="og:description" content="A modern, secure, and scalable integration plan for Delgado Honey Bees, powered by Fortiview Holdings.">
+
+  <meta property="og:image" content="https://fortiviewholdings.com/images/social-preview.png">
+
+  <meta property="og:image:width" content="1200">
+
+  <meta property="og:image:height" content="630">
+
+
+
+  <!-- Twitter -->
+
+  <meta name="twitter:card" content="summary_large_image">
+
+  <meta name="twitter:image" content="https://fortiviewholdings.com/images/social-preview.png">
+
+
+
+  <!-- Icons -->
+
+  <link rel="icon" type="image/x-icon" href="https://fortiviewholdings.com/images/favicon.ico" sizes="48x48">
+
+  <link rel="icon" type="image/png" href="https://fortiviewholdings.com/images/favicon.png" sizes="192x192">
+
+  <link rel="apple-touch-icon" href="https://fortiviewholdings.com/images/apple-touch-icon.png">
+
+  <link rel="manifest" href="/manifest.webmanifest">
+
+
+
+  
+
+
+
+  <!-- Styling (copied/matched from Fortiview base) -->
+
+  <style>
+
+    :root{
+
+      --bg-deep:#000000cc;
+
+      --bg-accent:#101625cc;
+
+      --glass:#ffffff12;
+
+      --glass-2:#dcffbb12;
+
+      --glass-blur:#000000d0;
+
+      --border:#ffffff1a;
+
+      --ink:#e7ecff;
+
+      --muted:#c6d0f0a6;
+
+      --brand:#1ca490da;
+
+      --brand-600:#21bca5;
+
+      --aura:0 4px 8px rgba(17, 76, 67, 0.678);
+
+      --radius:16px;
+
+      --radius-sm:12px;
+
+      --maxw:1200px;
+
+      --grad:linear-gradient(135deg,#121b2d 0%,#060e1e 40%,#0f1824 100%);
+
+    }
+
+    *{box-sizing:border-box}
+
+    html,body{margin:0;padding:0;font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg-deep);color:var(--ink);scroll-behavior:smooth}
+
+    a{color:inherit;text-decoration:none}
+
+    img{display:block;max-width:100%}
+
+
+
+    .bg{
+
+      position:fixed; inset:0; z-index:-2;
+
+      background: var(--grad);
+
+      filter:blur(6px) brightness(.9) saturate(1.05);
+
+      transform:scale(1.03);
+
+    }
+
+    .bg::after{
+
+      content:""; position:absolute; inset:0;
+
+      background: radial-gradient(circle at top left, rgba(33,188,165,0.18), transparent 55%);
+
+    }
+
+
+
+    header{
+
+      position:sticky; top:0; z-index:50;
+
+      backdrop-filter:saturate(140%) blur(10px);
+
+      background:var(--glass);
+
+      border-bottom:1px solid var(--border);
+
+    }
+
+
+
+    /* ============================
+
+   SHRINK HEADER ON SCROLL
+
+   ============================ */
+
+
+
+header {
+
+  transition: padding 0.25s ease, backdrop-filter 0.25s ease, background 0.25s ease;
+
+}
+
+
+
+header.shrink {
+
+  padding: 0;
+
+  backdrop-filter: saturate(180%) blur(14px);
+
+  background: rgba(0,0,0,0.35);
+
+}
+
+
+
+header .nav {
+
+  transition: padding 0.25s ease;
+
+}
+
+
+
+header.shrink .nav {
+
+  padding: 6px 14px;
+
+}
+
+
+
+header.shrink .logo {
+
+  width: 26px;
+
+  height: 26px;
+
+}
+
+
+
+header.shrink nav ul a,
+
+header.shrink .dropdown-toggle {
+
+  padding: 6px 10px;
+
+  font-size: 0.85rem;
+
+}
+
+
+
+header.shrink .cta {
+
+  padding: 6px 12px;
+
+  font-size: 0.85rem;
+
+}
+
+
+
+
+
+    .nav{
+
+      max-width:var(--maxw); margin:0 auto; padding:14px 20px;
+
+      display:flex; align-items:center; justify-content:space-between; gap:16px;
+
+    }
+
+    .brand{display:flex; align-items:center; gap:10px; letter-spacing:.4px; flex-wrap:wrap;}
+
+    .site-label { color: var(--muted); font-size: .95rem; white-space: nowrap;}
+
+    .logo{
+
+      width:34px; height:34px; border-radius:10px;
+
+      background-image: url('https://fortiviewholdings.com/images/Logo.png');
+
+      background-size: cover;
+
+      background-position: center;
+
+      box-shadow: 0 0 0 2px rgba(92,140,69,.25), 0 10px 20px rgba(92,140,69,.18);
+
+    }
+
+    .brand strong{font-weight:800}
+
+    nav ul{display:flex; gap:14px; list-style:none; align-items:center; margin:0; padding:0}
+
+    .link{
+
+      padding:9px 14px; border-radius:999px; color:var(--muted);
+
+      border:1px solid transparent; transition:.2s ease;
+
+    }
+
+    .link:hover{color:#fff; border-color:#ffffff22; background:#ffffff12}
+
+    .cta{
+
+      background: linear-gradient(180deg, var(--brand), var(--brand-600));
+
+      color:#0c120a; font-weight:800; letter-spacing:.2px;
+
+      padding:10px 16px; border-radius:999px; box-shadow: var(--aura);
+
+      white-space: nowrap;
+
+      flex-shrink: 1;
+
+      max-width: 100%;
+
+    }
+
+    .cta:hover{filter:brightness(.95)}
+
+
+
+    .section{max-width:var(--maxw); margin:36px auto; padding:0 20px}
+
+    .glass{
+
+      background:var(--glass); border:1px solid var(--border); border-radius:var(--radius);
+
+      box-shadow:var(--aura);
+
+    }
+
+
+
+    .hero{
+
+      display:grid; grid-template-columns:1.2fr .8fr; gap:28px;
+
+      max-width:var(--maxw); margin:40px auto; padding:24px 20px;
+
+    }
+
+    .hero-card{padding:32px}
+
+    .kicker{color: var(--brand); font-weight:800; letter-spacing:.12em; text-transform:uppercase; font-size:.8rem}
+
+    h1{color: var(--ink);font-size:clamp(2rem, 3.2vw, 3rem); line-height:1.08; margin:.45rem 0 .8rem 0}
+
+    .sub{color:var(--muted); font-size:1.05rem}
+
+    .hero-side{display:grid; gap:16px}
+
+    .stat{
+
+      display:flex; gap:14px; align-items:flex-start;
+
+      padding:18px 20px; background:var(--glass-2); border-radius:var(--radius); border:1px solid var(--border);
+
+    }
+
+    .pill{
+
+      padding:6px 10px;
+
+      border-radius:999px;
+
+      font-weight:800;
+
+      font-size:.78rem;
+
+      color:#071008;
+
+      background:linear-gradient(180deg, var(--brand), var(--brand-600));
+
+      border:1px solid rgb(33, 188, 165);
+
+      white-space:nowrap;
+
+    }
+
+
+
+    .grid {
+
+      display: flex;
+
+      flex-wrap: nowrap;
+
+      gap: 1.25rem;
+
+      overflow-x: auto;
+
+      scroll-snap-type: x mandatory;
+
+      padding: 1rem 0;
+
+      -webkit-overflow-scrolling: touch;
+
+      scrollbar-width: none;
+
+    }
+
+    .grid::-webkit-scrollbar { display:none; }
+
+    .card{
+
+      position:relative; overflow:hidden;
+
+      padding:18px; border-radius:var(--radius);
+
+      background:var(--glass); border:1px solid var(--border);
+
+      cursor:pointer;
+
+      transform-style:preserve-3d;
+
+      transition:transform .18s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
+
+      min-width:260px;
+
+      scroll-snap-align:center;
+
+    }
+
+    .card:hover{transform:translateY(-4px); box-shadow: var(--aura)}
+
+    .card h3{color:var(--brand); font-size:1.1rem; margin:2px 0 6px 0}
+
+    .card p{color:var(--ink); opacity:.85; font-size:.94rem; line-height:1.4}
+
+
+
+    footer{margin:50px 0 30px 0; color:var(--muted); text-align:center; font-size:.9rem}
+
+
+
+    @media (max-width: 1000px){
+
+      .hero{grid-template-columns:1fr}
+
+    }
+
+    @media (max-width: 640px) {
+
+      .nav {
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+        text-align: center;
+
+      }
+
+      .brand {
+
+        flex-wrap: wrap;
+
+        justify-content: center;
+
+        gap: 6px;
+
+        margin-bottom: 8px;
+
+      }
+
+      .site-label {
+
+        flex-basis: 100%;
+
+        text-align: center;
+
+        margin-top: 2px;
+
+      }
+
+      nav ul {
+
+        flex-wrap: wrap;
+
+        justify-content: center;
+
+        gap: 10px 12px;
+
+      }
+
+        nav ul li {
+
+         flex: 1 1 45%; /* two-per-row, evenly spaced */
+
+         display: flex;
+
+         justify-content: center;
+
+        }
+
+
+
+         nav ul a,
+
+         .dropdown-toggle {
+
+           width: 100%;
+
+           padding: 10px 14px;
+
+          border-radius: 14px;
+
+        }
+
+
+
+      .hero-card{padding:22px}
+
+    }
+
+
+
+    @media (max-width: 900px) and (orientation: landscape) {
+
+  nav ul {
+
+    flex-wrap: wrap;
+
+    justify-content: center;
+
+    gap: 8px;
+
+  }
+
+
+
+  .cta {
+
+    padding: 8px 12px;
+
+    font-size: 0.9rem;
+
+    white-space: nowrap;
+
+    flex: 0 1 auto;
+
+  }
+
+}
+
+
+
+    /* ============================
+
+   SHIMMER OVERLAY ON PAGE LOAD
+
+   ============================ */
+
+
+
+#fv-shimmer-overlay {
+
+  position: fixed;
+
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.55);
+
+  backdrop-filter: blur(12px) saturate(140%);
+
+  z-index: 9999;
+
+  overflow: hidden;
+
+  animation: fvFadeOut 1.2s ease 1.4s forwards;
+
+}
+
+
+
+.fv-shimmer {
+
+  position: absolute;
+
+  inset: 0;
+
+  background: linear-gradient(
+
+    120deg,
+
+    transparent 0%,
+
+    rgba(255, 255, 255, 0.18) 40%,
+
+    rgba(255, 255, 255, 0.28) 50%,
+
+    rgba(255, 255, 255, 0.18) 60%,
+
+    transparent 100%
+
+  );
+
+  transform: translateX(-100%);
+
+  animation: fvShimmerSweep 1.4s ease forwards;
+
+}
+
+
+
+/* Sweep animation */
+
+@keyframes fvShimmerSweep {
+
+  0%   { transform: translateX(-100%); }
+
+  100% { transform: translateX(100%); }
+
+}
+
+
+
+/* Fade-out animation */
+
+@keyframes fvFadeOut {
+
+  to {
+
+    opacity: 0;
+
+    visibility: hidden;
+
+  }
+
+}
+
+
+
+/* ============================
+
+   STARFIELD BACKGROUND
+
+   ============================ */
+
+
+
+#bg-stars {
+
+  position: fixed;
+
+  inset: 0;
+
+  width: 100vw;
+
+  height: 100vh;
+
+  z-index: 0;
+
+  pointer-events: none;
+
+  opacity: 0;
+
+  animation: fvStarFade 3.7s ease forwards;
+
+}
+
+
+
+@keyframes fvStarFade {
+
+  0%   { opacity: 0; }
+
+  60%  { opacity: 0.2; }
+
+  100% { opacity: 0.5; }
+
+}
+
+
+
+
+
+
+
+  </style>
+
+</head>
+
+<body>
+
+    <canvas id="bg-stars"></canvas>
+
+
+
+    <!-- Shimmer Overlay -->
+
+<div id="fv-shimmer-overlay">
+
+  <div class="fv-shimmer"></div>
+
+</div>
+
+
+
+
+
+  <div class="bg"></div>
+
+
+
+  <header>
+
+    <div class="nav">
+
+      <div class="brand">
+
+        <div class="logo"></div>
+
+        <div>
+
+          <strong>Fortiview Holdings</strong><br>
+
+          <span class="site-label">For the Delgado Family · Delgado Honey Bees</span>
+
+        </div>
+
+      </div>
+
+      <nav>
+
+        <ul>
+
+          <li><a href="#overview" class="link">Overview</a></li>
+
+          <li><a href="#path" class="link">Path Forward</a></li>
+
+          <li><a href="#dropship" class="link">Dropship Integration</a></li>
+
+          <li><a href="#pricing" class="link">Pricing</a></li>
+
+          <li><a href="#contact" class="cta">Next Steps</a></li>
+
+        </ul>
+
+      </nav>
+
+    </div>
+
+  </header>
+
+
+
+  <main>
+
+        <p style="text-align: center; color: var(--muted); font-size: 0.9em; margin-bottom: 0.5em;">
+
+        ⟳ Rotate your 📱 for Mobile Friendly View
+
+        </p>
+
+    <!-- Hero -->
+
+    <section id="overview" class="section">
+
+      <div class="hero glass">
+
+        <div class="hero-card">
+
+          <div class="kicker">To the Delgado Family · Delgado Honey Bee's</div>
+
+          <h1>A modern, flexible home for <span style="color:var(--brand-600)">Delgado Honey Bee's.</span></h1>
+
+          <p class="sub">
+
+            This page outlines a clear, low-friction path to move off Wix, secure your domain and email,
+
+            and connect a custom Delgado Honey Bee's website to Shopify-based dropshipping with Apimaye → 
+
+            without losing control of your brand or your business.
+
+          </p>
+
+          <div style="margin-top:18px; display:flex; flex-wrap:wrap; gap:10px;">
+
+            <span class="pill">Custom front end, not a template</span>
+
+            <span class="pill">Your domain, your email, your data</span>
+
+            <span class="pill">Shopify only as the backend engine</span>
+
+          </div>
+
+        </div>
+
+        <div class="hero-side">
+
+          <div class="stat">
+
+            <div>
+
+              <strong>What this proposal covers</strong>
+
+              <p class="sub" style="font-size:.9rem; margin-top:6px;">
+
+                • Domain & email ownership<br>
+
+                • Rebuilding your website (no Wix lock-in)<br>
+
+                • Shopify setup for Apimaye dropshipping<br>
+
+                • How Fortiview routes orders securely through our backend
+
+              </p>
+
+            </div>
+
+          </div>
+
+          <div class="stat">
+
+            <div>
+
+              <strong>What stays yours</strong>
+
+              <p class="sub" style="font-size:.9rem; margin-top:6px;">
+
+                Your domain, your email addresses, your Shopify account, and your customer relationships.
+
+                Fortiview builds and maintains the technical bridge so you can focus on the bees, the honey,
+
+                and your customers.
+
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- Path Forward -->
+
+    <section id="path" class="section glass">
+
+      <div style="padding:24px 22px;">
+
+        <h2 style="margin-top:0;">A clear <span style="color:var(--brand-600)">path forward</span> with <span style="color:var(--brand-600)">Fortiview</span></h2>
+
+        <p class="sub" style="margin-bottom:18px;">
+
+          Below is the practical, step-by-step path we recommend for Delgado Honey Bee's. You can move at your pace,
+
+          and we can handle as much of the technical work as you’d like us to.
+
+        </p>
+
+
+
+        <div class="grid">
+
+          <div class="card">
+
+            <h3>1. Domain & email</h3>
+
+            <p>
+
+              We either transfer <strong>delgadohoneybees.com</strong> from GoDaddy into a managed registrar
+
+              under our care, or you grant us DNS access where it is today. From there, we configure:
+
+            </p>
+
+            <ul style="margin:8px 0 0 18px; font-size:.9rem; color:var(--muted);">
+
+              <li>DNS records for the new site</li>
+
+              <li>MX, SPF, DKIM, DMARC for email</li>
+
+              <li>A shared mailbox for your main business address</li>
+
+            </ul>
+
+          </div>
+
+
+
+          <div class="card">
+
+            <h3>2. Website content</h3>
+
+            <p>
+
+              We can either be granted temporary access to your current Wix site to pull content and structure,
+
+              or you can send us the text, images, and sections you want to keep. We rebuild it as a fast,
+
+              secure, custom Delgado Honey Bee's site—no templates, no drag-and-drop bloat.
+
+            </p>
+
+          </div>
+
+
+
+          <div class="card">
+
+            <h3>3. Shopify setup (backend only)</h3>
+
+            <p>
+
+              You create a <strong>Shopify Basic</strong> account in your business name with your billing details.
+
+              You don’t need to design a Shopify storefront—Shopify will only be used as the backend engine
+
+              for Apimaye dropshipping. You then add Fortiview as a staff member with app permissions.
+
+            </p>
+
+          </div>
+
+
+
+          <div class="card">
+
+            <h3>4. Fortiview integration</h3>
+
+            <p>
+
+              Fortiview creates a secure custom app in your Shopify store, connects to Apimaye’s products,
+
+              and wires your new Delgado Honey Bee's website into our backend. Orders that involve Apimaye
+
+              products are routed through Shopify for fulfillment, while the rest of your business logic
+
+              stays fully under your control.
+
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- Dropship Integration -->
+
+    <section id="dropship" class="section glass">
+
+      <div style="padding:24px 22px;">
+
+        <h2 style="margin-top:0;">How <span style="color:var(--brand-600)">Apimaye dropshipping</span> fits into your model</h2>
+
+        <p class="sub" style="margin-bottom:18px;">
+
+          Dropshipping is only one part of your business. The goal is to let Apimaye handle what they’re good at,
+
+          while Delgado Honey Bee's keeps ownership of the customer experience, the brand, and the rest of your
+
+          product and service offerings.
+
+        </p>
+
+
+
+        <div class="grid">
+
+          <div class="card">
+
+            <h3>Order flow</h3>
+
+            <p>
+
+              Customer visits <strong>delgadohoneybees.com</strong> → places an order on your custom site →
+
+              your site calls the Fortiview backend → Fortiview creates a paid order in your Shopify store →
+
+              Shopify routes Apimaye products to Apimaye for fulfillment → tracking and status flow back through
+
+              our backend to your site.
+
+            </p>
+
+          </div>
+
+
+
+          <div class="card">
+
+            <h3>What Shopify does (and doesn’t) do</h3>
+
+            <p>
+
+              Shopify does not replace your website. It doesn’t own your brand. It simply acts as the
+
+              fulfillment and routing engine for Apimaye. You stay the merchant of record, and Fortiview
+
+              keeps the integration clean, secure, and maintainable.
+
+            </p>
+
+          </div>
+
+
+
+          <div class="card">
+
+            <h3>Beyond dropshipping</h3>
+
+            <p>
+
+              Because the front end is custom and the backend is ours, we can later add: local pickup logic,
+
+              in-house product lines, seasonal offerings, wholesale portals, or anything else Delgado Honey Bee's
+
+              grows into—without rebuilding from scratch.
+
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+        <!-- Pricing Overview -->
+
+<section id="pricing" class="section glass">
+
+  <div style="padding:24px 22px;">
+
+    <h2 style="margin-top:0;">High‑Level <span style="color:var(--brand-600)">Pricing Overview</span></h2>
+
+    <p class="sub" style="margin-bottom:18px;">
+
+      Fortiview Holdings keeps pricing simple, predictable, and built around your actual usage. 
+
+      You only pay for what you need, and your core infrastructure stays affordable as you grow.
+
+    </p>
+
+        <!-- Subtle CTA -->
+
+    <div style="margin-top:26px; text-align:center;">
+
+      <a href="https://fortiviewholdings.com" 
+
+         class="link" 
+
+         style="
+
+           display:inline-block;
+
+           padding:12px 20px;
+
+           border-radius:999x;
+
+           border:1px solid var(--brand);
+
+           background:var(--glass);
+
+           backdrop-filter:blur(10px);
+
+           color:var(--brand);
+
+           font-weight:600;
+
+           transition:0.25s ease;
+
+         ">
+
+        Click here to navigate and learn more about our integration services
+
+      </a>
+
+    </div>
+
+
+
+
+
+    <div class="grid">
+
+
+
+      <!-- Incentivized Setup -->
+
+      <div class="card">
+
+        <h3>Incentivized Initial Setup</h3>
+
+        <p>
+
+          <strong>$750 one‑time</strong><br>
+
+          A complete rebuild of your Delgado Honey Bee's website — fast, secure, mobile‑optimized, 
+
+          and fully integrated with Fortiview’s backend. This discounted setup cost is designed 
+
+          to help small businesses modernize without heavy upfront expense.
+
+        </p>
+
+        <ul style="margin:8px 0 0 18px; font-size:.9rem; color:var(--muted);">
+
+          <li>Custom website build</li>
+
+          <li>Domain wiring & DNS configuration</li>
+
+          <li>Email setup & verification</li>
+
+          <li>Backend integration hooks</li>
+
+        </ul>
+
+      </div>
+
+
+
+      <!-- Per-user plan -->
+
+      <div class="card">
+
+        <h3>Monthly Plan</h3>
+
+        <p>
+
+          <strong>$10 per user / month</strong><br>
+
+          A lightweight, scalable plan that covers your domain, email, hosting, and secure access 
+
+          to Fortiview’s backend services. Add users as your business grows.
+
+        </p>
+
+        <ul style="margin:8px 0 0 18px; font-size:.9rem; color:var(--muted);">
+
+          <li>Domain included</li>
+
+          <li>Business email included</li>
+
+          <li>Static hosting included</li>
+
+          <li>Backend API access</li>
+
+          <li>Support & maintenance</li>
+
+        </ul>
+
+      </div>
+
+
+
+      <!-- Integration layer -->
+
+      <div class="card">
+
+        <h3>Integration Layer</h3>
+
+        <p>
+
+          Fortiview provides the secure backend that routes your data, handles automation, and 
+
+          connects your website to the systems you rely on. You stay in control of your business 
+
+          while we manage the technical lift.
+
+        </p>
+
+        <ul style="margin:8px 0 0 18px; font-size:.9rem; color:var(--muted);">
+
+          <li>Order routing</li>
+
+          <li>Secure API endpoints</li>
+
+          <li>Scalable infrastructure</li>
+
+          <li>Future integrations supported</li>
+
+        </ul>
+
+      </div>
+
+
+
+      <!-- Optional add-ons -->
+
+      <div class="card">
+
+        <h3>Optional Add‑Ons</h3>
+
+        <p>
+
+          As Delgado Honey Bee's grows, additional features can be added without rebuilding anything. 
+
+          Everything scales cleanly through Fortiview’s backend.
+
+        </p>
+
+        <ul style="margin:8px 0 0 18px; font-size:.9rem; color:var(--muted);">
+
+          <li>Additional User mailboxes (our rated per-user cost)</li>
+
+          <li>Advanced automations (outside of proposal)</li>
+
+          <li>Wholesale or dealer portals (additional fee, upon request)</li>
+
+          <li>Inventory or product sync (additional fee, upon request)</li>
+
+          <li>Custom dashboards or reporting (additional fee, upon request)</li>
+
+          <li>Field Technical Support & In-Person Start-up (hardware integrations)</li>
+
+        </ul>
+
+      </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+  </div>
+
+</section>
+
+
+
+    <!-- Contact / Next Steps -->
+
+    <section id="contact" class="section glass">
+
+      <div style="padding:24px 22px;">
+
+        <h2 style="margin-top:0;">If you’d like to <span style="color:var(--brand-600)">move forward</span></h2>
+
+        <p class="sub">
+
+          When you’re ready, we can walk through this live, or you can simply follow these three starting steps:
+
+        </p>
+
+        <ol style="margin-top:10px; color:var(--muted); font-size:.95rem;">
+
+          <li>Confirm whether you’d like to transfer the domain or keep it at GoDaddy with DNS access.</li>
+
+          <li>Decide whether we should pull content from Wix or start from a curated set of content you provide.</li>
+
+          <li>Create a Shopify Basic account in your business name and add Fortiview as a staff member.</li>
+
+        </ol>
+
+        <p class="sub" style="margin-top:14px;">
+
+          From there, Fortiview handles the technical lift: domain wiring, email, website build, backend integration,
+
+          and Shopify dropship routing. You keep your focus on the bees, the honey, and your customers.
+
+        </p>
+
+
+
+      </div>
+
+    </section>
+
+
+
+
+
+  </main>
+
+
+
+  <footer>
+
+    From Fortiview Holdings to the Delgado Family · Delgado Honey Bee's · This as a personalized, private proposal page.
+
+  </footer>
+
+
+
+  <script>
+
+  window.addEventListener("load", () => {
+
+    // Prevent auto-jump to #pricing or any anchor
+
+    if (location.hash) {
+
+      history.replaceState(null, null, " ");
+
+    }
+
+    setTimeout(() => {
+
+      window.scrollTo(0, 0);
+
+    }, 0);
+
+  });
+
+
+
+  
+
+    window.addEventListener("load", () => {
+
+    const overlay = document.getElementById("fv-shimmer-overlay");
+
+    setTimeout(() => {
+
+      overlay?.remove();
+
+    }, 2600); // matches total animation duration
+
+  });
+
+
+
+
+
+
+
+  window.addEventListener("load", () => {
+
+    const canvas = document.getElementById("bg-stars");
+
+    const ctx = canvas.getContext("2d");
+
+
+
+    function resize() {
+
+      canvas.width = window.innerWidth;
+
+      canvas.height = window.innerHeight;
+
+    }
+
+    resize();
+
+    window.addEventListener("resize", resize);
+
+
+
+    const starCount = 160;
+
+    const stars = [];
+
+
+
+    for (let i = 0; i < starCount; i++) {
+
+      stars.push({
+
+        x: Math.random() * canvas.width,
+
+        y: Math.random() * canvas.height,
+
+        r: Math.random() * 1.2 + 0.4,
+
+        alpha: Math.random(),
+
+        delta: (Math.random() * 0.015) + 0.005
+
+      });
+
+    }
+
+
+
+    function animate() {
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+
+
+      for (let s of stars) {
+
+        s.alpha += s.delta;
+
+        if (s.alpha <= 0 || s.alpha >= 1) s.delta = -s.delta;
+
+
+
+        ctx.beginPath();
+
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+
+        ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
+
+        ctx.fill();
+
+      }
+
+
+
+      requestAnimationFrame(animate);
+
+    }
+
+
+
+    animate();
+
+  });
+
+
+
+function resize() {
+
+  const ratio = window.devicePixelRatio || 1;
+
+  const w = window.innerWidth;
+
+  const h = window.innerHeight;
+
+
+
+  canvas.width = w * ratio;
+
+  canvas.height = h * ratio;
+
+
+
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+}
+
+resize();
+
+setTimeout(resize, 150);
+
+
+
+
+
+  const header = document.querySelector("header");
+
+
+
+  window.addEventListener("scroll", () => {
+
+    if (window.scrollY > 40) {
+
+      header.classList.add("shrink");
+
+    } else {
+
+      header.classList.remove("shrink");
+
+    }
+
+  });
+
+
+
+   window.addEventListener("touchstart", () => {}, {passive:true});
+
+
+
+  if ('scrollRestoration' in history) {
+
+    history.scrollRestoration = 'manual';
+
+  }
+
+
+
+
+
+   
+
+
+
+</script>
+
+</body>
+
+</html>
