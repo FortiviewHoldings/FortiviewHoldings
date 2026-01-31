@@ -348,27 +348,30 @@ header.shrink .cta {
 
 
 
-    .grid {
+.grid {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 1.25rem;
+  overflow-x: auto;
+  overflow-y: visible;
+  scroll-snap-type: x mandatory;
+  padding: 1rem 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;          /* show a thin scrollbar in Firefox */
+}
 
-      display: flex;
+.grid::-webkit-scrollbar {
+  height: 6px;                    /* horizontal scrollbar height */
+}
 
-      flex-wrap: nowrap;
+.grid::-webkit-scrollbar-track {
+  background: transparent;
+}
 
-      gap: 1.25rem;
-
-      overflow-x: auto;
-
-      scroll-snap-type: x mandatory;
-
-      padding: 1rem 0;
-
-      -webkit-overflow-scrolling: touch;
-
-      scrollbar-width: none;
-
-    }
-
-    .grid::-webkit-scrollbar { display:none; }
+.grid::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.25);
+  border-radius: 999px;
+}
 
     .card{
 
@@ -479,6 +482,11 @@ header.shrink .cta {
 
 
       .hero-card{padding:22px}
+
+        .grid {
+    padding-bottom: 12px;
+  }
+
 
     }
 
@@ -871,23 +879,52 @@ header.shrink .cta {
 
             <h3>3. Shopify setup (backend only)</h3>
 
-            <p>
-
-              You create a <strong>Shopify Basic</strong> account in your business name with your billing details.
-
-              You don’t need to design a Shopify storefront—Shopify will only be used as the backend engine
-
-              for Apimaye dropshipping. You then add Fortiview as a staff member with app permissions.
-
-            </p>
+          <p>
+           You create a <strong>Shopify Basic</strong> account in your business name with your billing details.
+           You don’t need to design a storefront—Shopify will only be used as the backend engine for Apimaye dropshipping.
+            Since the Basic plan does not include staff accounts, you will generate a <strong>Custom App</strong> and provide
+            Fortiview with the <strong>API Key</strong>, <strong>API Secret</strong>, and <strong>Admin API Access Token</strong>
+           so we can integrate your store with Apimaye’s fulfillment system.
+          </p>
 
           </div>
+
+          <div class="card">
+  <h3>4. Generate Shopify API Credentials</h3>
+  <p>
+    Since the <strong>Shopify Basic</strong> plan does not include staff accounts, you will create a
+    <strong>Custom App</strong> inside your Shopify admin and send Fortiview the API credentials.
+    This allows us to integrate your store with Apimaye’s dropship system without requiring a higher-tier plan.
+  </p>
+
+  <p><strong>Steps:</strong></p>
+  <ul style="margin: 0; padding-left: 18px; color: var(--muted); line-height: 1.45;">
+    <li>
+      Log in to your Shopify admin and go to
+      <strong>Settings → Apps and sales channels → Develop apps</strong>.
+    </li>
+    <li>
+      Click <strong>Create an app</strong>, name it “Fortiview Integration”, and open the app settings.
+    </li>
+    <li>
+      Under <strong>Admin API access scopes</strong>, enable:
+      <em>Products, Inventory, Orders, Fulfillment, Locations</em>.
+    </li>
+    <li>
+      Click <strong>Install app</strong> (top right), then copy the:
+      <strong>API Key</strong>, <strong>API Secret</strong>, and <strong>Admin API Access Token</strong>.
+    </li>
+    <li>
+      Send these credentials securely to Fortiview so we can complete the Apimaye backend integration.
+    </li>
+  </ul>
+</div>
 
 
 
           <div class="card">
 
-            <h3>4. Fortiview integration</h3>
+            <h3>5. Fortiview integration</h3>
 
             <p>
 
@@ -1446,6 +1483,58 @@ setTimeout(resize, 150);
 
  
 
+  const grids = document.querySelectorAll(".grid");
+
+  grids.forEach(grid => {
+    let isUserInteracting = false;
+    let scrollInterval;
+
+    // Auto-scroll function
+    function startAutoScroll() {
+      scrollInterval = setInterval(() => {
+        if (!isUserInteracting) {
+          const cardWidth = grid.querySelector(".card").offsetWidth + 20; // card + gap
+          grid.scrollBy({ left: cardWidth, behavior: "smooth" });
+
+          // Loop back to start
+          if (grid.scrollLeft + grid.clientWidth >= grid.scrollWidth - 5) {
+            setTimeout(() => {
+              grid.scrollTo({ left: 0, behavior: "smooth" });
+            }, 600);
+          }
+        }
+      }, 2200); // delay between scrolls
+    }
+
+    function stopAutoScroll() {
+      clearInterval(scrollInterval);
+    }
+
+    // Detect user interaction
+    grid.addEventListener("touchstart", () => {
+      isUserInteracting = true;
+      stopAutoScroll();
+    });
+
+    grid.addEventListener("mousedown", () => {
+      isUserInteracting = true;
+      stopAutoScroll();
+    });
+
+    // Resume after user stops interacting
+    grid.addEventListener("touchend", () => {
+      isUserInteracting = false;
+      startAutoScroll();
+    });
+
+    grid.addEventListener("mouseup", () => {
+      isUserInteracting = false;
+      startAutoScroll();
+    });
+
+    // Start scrolling on load
+    startAutoScroll();
+  });
 </script>
 
 </body>
