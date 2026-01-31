@@ -14,6 +14,9 @@
 
   <meta name="color-scheme" content="dark light" />
 
+  <link rel="canonical" href="https://fortiviewholdings.com/proposals/delgado-honey-bees/">
+
+
 
 
 
@@ -33,6 +36,8 @@
   <meta property="og:image:width" content="1200">
 
   <meta property="og:image:height" content="630">
+
+  <meta property="og:url" content="https://fortiviewholdings.com/proposals/delgado-honey-bees/">
 
 
 
@@ -168,6 +173,13 @@ header.shrink {
 
   background: rgba(0,0,0,0.35);
 
+}
+
+    header {
+  min-height: 58px;
+}
+header.shrink {
+  min-height: 42px;
 }
 
 
@@ -634,11 +646,31 @@ header.shrink .cta {
 
 }
 
+/* ============================
+   MOBILE SHRINK BOOST
+   ============================ */
 
+@media (max-width: 640px) {
+  header.shrink .nav {
+    padding: 4px 10px;
+  }
 
+  header.shrink .logo {
+    width: 20px;
+    height: 20px;
+  }
 
+  header.shrink nav ul a,
+  header.shrink .dropdown-toggle {
+    padding: 4px 8px;
+    font-size: 0.78rem;
+  }
 
-
+  header.shrink .cta {
+    padding: 5px 10px;
+    font-size: 0.78rem;
+  }
+}
 
   </style>
 
@@ -1443,12 +1475,23 @@ setTimeout(resize, 150);
   }
 
 
+  const header = document.querySelector("header");
 
+  window.addEventListener("scroll", () => {
+    const y = document.documentElement.scrollTop || window.scrollY;
 
-
-   
-
-
+    // Mobile shrinks sooner + more aggressively
+    if (window.innerWidth < 640) {
+      if (y > 10) header.classList.add("shrink");
+      else header.classList.remove("shrink");
+    } 
+    // Desktop normal behavior
+    else {
+      if (y > 40) header.classList.add("shrink");
+      else header.classList.remove("shrink");
+    }
+  });
+ 
 
 </script>
 
