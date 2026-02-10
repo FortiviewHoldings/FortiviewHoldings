@@ -1,15 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PragOptics™ Dev Console</title>
+  <!-- Primary Meta -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PragOptics™ Dev Console</title>
+<meta name="description" content="PragOptics Developer Console — authenticate, explore APIs, and integrate with the PragOptics platform.">
+
+<!-- Canonical -->
+<link rel="canonical" href="https://fortiviewholdings.com/integration/pragoptics/api">
+
+<!-- Open Graph -->
+<meta property="og:title" content="PragOptics™ Dev Console">
+<meta property="og:description" content="Authenticate, explore APIs, and integrate with the PragOptics platform.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://fortiviewholdings.com/integration/pragoptics/api">
+<meta property="og:image" content="https://fortiviewholdings.com/images/social-preview.png">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="PragOptics™ Dev Console">
+<meta name="twitter:description" content="Authenticate, explore APIs, and integrate with the PragOptics platform.">
+<meta name="twitter:image" content="https://fortiviewholdings.com/images/social-preview.png">
+
+<!-- Icons -->
+<link rel="icon" href="https://fortiviewholdings.com/favicon.ico">
+<link rel="apple-touch-icon" href="https://fortiviewholdings.com/apple-touch-icon.png">
+
+<!-- Theme -->
+<meta name="theme-color" content="#000000">
 
   <style>
     :root{
-      --bg-deep:#000000cc;
-      --glass:#d9d9d912;
-      --glass-2:##00000088;
+      --bg-deep:#000000 !important;
+      --grad:linear-gradient(135deg,#121b2d 0%,#060e1e 40%,#0f1824 100%);
+      --glass:#0000006e;
+      --glass-2:#11101012;
       --border:#ffffff1a;
       --ink:#e7ecff;
       --muted:#c6d0f0a6;
@@ -27,14 +53,54 @@
       font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
       background:var(--bg-deep); color:var(--ink);
     }
+
     a{color:inherit;text-decoration:none}
 
-    .bg{
-      position:fixed; inset:0; z-index:-2;
-      background: var(--glass);
-      filter:blur(6px) brightness(.9) saturate(1.05);
-      transform:scale(1.03);
-    }
+    /* ============================
+       STARFIELD + BACKGROUND LAYERS
+       ============================ */
+
+html, body {
+  background: transparent !important;   /* REQUIRED for Delgado-style starfield */
+}
+
+/* STARFIELD ABOVE GRADIENT */
+#bg-stars {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;        /* stars ABOVE gradient */
+  pointer-events: none;
+  opacity: 0;
+  animation: fvStarFade 3.7s ease forwards;
+}
+
+/* GRADIENT BELOW STARS */
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: -2;        /* gradient BELOW stars */
+  background: var(--grad);
+  filter: blur(6px) brightness(.9) saturate(1.05);
+  transform: scale(1.03);
+}
+
+.bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top left, var(--bg-deep)), transparent 55%);
+}
+
+@keyframes fvStarFade {
+  0% { opacity: 0; }
+  60% { opacity: 0.2; }
+  100% { opacity: 0.5; }
+}
+    /* ============================
+       HEADER
+       ============================ */
 
     header{
       position:sticky; top:0; z-index:50;
@@ -42,17 +108,98 @@
       background:var(--glass);
       border-bottom:1px solid var(--border);
     }
+
     .nav{
       max-width:var(--maxw); margin:0 auto; padding:14px 20px;
       display:flex; align-items:center; gap:12px;
       justify-content:space-between;
     }
+
     .logo{
       width:34px; height:34px; border-radius:10px;
       background-image:url('https://fortiviewholdings.com/images/Logo.png');
       background-size:cover; background-position:center;
       box-shadow:0 0 0 2px rgba(92,140,69,.25), 0 10px 20px rgba(92,140,69,.18);
     }
+
+    /* ============================
+       MENU DROPDOWN
+       ============================ */
+
+    .dev-nav ul {
+      list-style:none;
+      margin:0;
+      padding:0;
+    }
+
+    .dropdown {
+      position:relative;
+    }
+
+    .dropdown-toggle {
+      background:none;
+      border:1px solid transparent;
+      color:var(--brand-600);
+      font-size:0.95rem;
+      padding:8px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      transition:0.2s ease;
+    }
+
+    .dropdown-toggle:hover {
+      background:rgba(33,188,165,0.12);
+      border:1px solid var(--brand-600);
+      color:var(--brand-600);
+    }
+
+    .dropdown-menu {
+      display:none;
+      position:absolute;
+      top:110%;
+      right:0;
+      background:var(--glass);
+      border:1px solid rgba(255,255,255,0.12);
+      border-radius:var(--radius-sm);
+      box-shadow:var(--aura);
+      min-width:220px;
+      padding:8px 0;
+      z-index:100;
+      backdrop-filter:blur(14px) saturate(160%);
+    }
+
+    .dropdown-menu li span.menu-section {
+      display:block;
+      padding:8px 16px 4px;
+      font-size:0.8rem;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      color:var(--brand-600);
+      font-weight:600;
+      opacity:0.9;
+    }
+
+    .dropdown-menu li a {
+      display:block;
+      padding:8px 16px;
+      color:var(--ink);
+      font-size:0.9rem;
+      font-weight:500;
+      transition:0.2s ease;
+    }
+
+    .dropdown-menu li a:hover {
+      background:rgba(33,188,165,0.12);
+      color:var(--brand-600);
+    }
+
+    .dropdown.open .dropdown-menu {
+      display:block;
+    }
+
+    /* ============================
+       MAIN LAYOUT
+       ============================ */
 
     .page{
       max-width:var(--maxw);
@@ -67,51 +214,17 @@
       box-shadow:var(--aura);
     }
 
-    .sidebar{
-      flex:0 0 260px;
-      padding:20px;
-      display:flex;
-      flex-direction:column;
-      gap:16px;
-    }
-
     .main{
-      flex:1;
       padding:20px;
       display:flex;
       flex-direction:column;
       gap:16px;
     }
 
-    .cta-btn{
-      display:block;
-      width:100%;
-      text-align:left;
-      background:var(--glass); 
-      color:var(--brand); font-weight:600;
-      padding:10px 14px; border-radius:999px;
-      border:1px solid var(--brand-600);
-      transition:all .2s ease; cursor:pointer;
-      font-size:0.95rem;
-    }
-    .cta-btn:hover{ background:#3a4661; transform:translateY(-2px); }
-
-    .cta-btn.secondary{
-      border-color:var(--border);
-      color:var(--muted);
-    }
-    .cta-btn.secondary:hover{
-      border-color:var(--brand-600);
-      color:var(--brand-600);
-    }
-
-    .section-title{
-      font-size:0.85rem;
-      text-transform:uppercase;
-      letter-spacing:.08em;
-      color:var(--muted);
-      margin-bottom:4px;
-    }
+    .glass.main {
+  background: var(--glass-2);   /* lighter glass */
+  backdrop-filter: blur(14px) saturate(160%);
+}
 
     .login-panel{
       padding:14px;
@@ -121,107 +234,34 @@
       font-size:0.9rem;
     }
 
+    .viewer{
+      flex:1;
+      min-height:260px;
+      padding:16px;
+      background:var(--glass);
+      border-radius:var(--radius-sm);
+      border:1px solid var(--border);
+      font-size:0.9rem;
+      overflow:auto;
+      color:var(--brand-600);
+      backdrop-filter:blur(14px) saturate(160%);
+    }
+
     pre{
       white-space:pre-wrap;
       word-break:break-word;
       margin:0;
     }
 
-    .viewer{
-      flex:1;
-      min-height:260px;
-      padding:16px;
-      background:var(--glass-2);
-      border-radius:var(--radius-sm);
-      border:1px solid var(--border);
-      font-size:0.9rem;
-      overflow:auto;
-      color:var(--brand-600);
-    }
+    /* ============================
+       COPY BUTTON + TOAST
+       ============================ */
 
-    @media (max-width: 800px){
-      .page{ flex-direction:column; }
-      .sidebar{ flex:1; }
-    }
-
-    /* Single Menu dropdown on right */
-    .dev-nav ul {
-      list-style:none;
-      margin:0;
-      padding:0;
-    }
-
-    .dropdown {
-      position:relative;
-    }
-
-    .dropdown-toggle {
-      background:none;
-      border:1px solid transparent;
-      color:var(--brand);
-      font-size:0.95rem;
-      padding:8px 12px;
-      border-radius:999px;
-      cursor:pointer;
-      transition:0.2s ease;
-    }
-
-    .dropdown-toggle:hover {
-      background:var(--glass-2);
-      border:1px solid var(--border);
-    }
-
-    .dropdown-menu {
-      display:none;
-      position:absolute;
-      top:110%;
-      right:0;
-      background:var(--glass);
-      border:1px solid var(--border);
-      border-radius:var(--radius-sm);
-      box-shadow:var(--aura);
-      min-width:220px;
-      padding:8px 0;
-      z-index:100;
-      backdrop-filter:blur(10px) saturate(140%);
-    }
-
-    .dropdown-menu li {
-      list-style:none;
-    }
-
-    .dropdown-menu li span.menu-section {
-      display:block;
-      padding:8px 16px 4px;
-      font-size:0.8rem;
-      text-transform:uppercase;
-      letter-spacing:.08em;
-      color:var(--brand);
-    }
-
-    .dropdown-menu li a {
-      display:block;
-      padding:8px 16px;
-      color:var(--muted);
-      font-size:0.9rem;
-      transition:0.2s ease;
-    }
-
-    .dropdown-menu li a:hover {
-      background:var(--glass-2);
-      color:var(--brand-600);
-    }
-
-    .dropdown.open .dropdown-menu {
-      display:block;
-    }
-
-    /* Copy button + toast */
     .copy-btn {
       margin-left:15px;
       padding:4px 10px;
-      font-size:1.0rem;
-      border-radius:24px;
+      font-size:0.8rem;
+      border-radius:12px;
       border:1px solid var(--brand-600);
       background:var(--glass-2);
       color:var(--brand-600);
@@ -230,7 +270,9 @@
     }
 
     .copy-btn:hover {
-      background:var(--glass-2);
+      background:rgba(33,188,165,0.12);
+      border-color:var(--brand-600);
+      color:var(--brand-600);
       transform:translateY(-2px);
     }
 
@@ -238,12 +280,12 @@
       position:fixed;
       bottom:20px;
       right:20px;
-      background:var(--glass);
-      border:1px solid var(--border);
+      background:rgba(0,0,0,0.55);
+      border:1px solid rgba(255,255,255,0.12);
       padding:10px 16px;
       border-radius:var(--radius-sm);
       color:var(--ink);
-      backdrop-filter:blur(10px) saturate(140%);
+      backdrop-filter:blur(12px) saturate(160%);
       box-shadow:var(--aura);
       opacity:0;
       transform:translateY(10px);
@@ -256,22 +298,30 @@
       opacity:1;
       transform:translateY(0);
     }
+
+    .global-darken {
+  position: fixed;
+  inset: 0;
+  z-index: -0.5; /* above stars (-1), below UI (0+) */
+  background: rgba(0, 0, 0, 0.25); /* adjust darkness here */
+  pointer-events: none;
+}
   </style>
 </head>
 
 <body>
 
-
-<canvas id="stars"></canvas>
-
-
+<!-- STARFIELD + BACKGROUND -->
+ <div class="global-darken"></div>
+<canvas id="bg-stars"></canvas>
+<div class="bg"></div>
 
 <header>
   <div class="nav">
     <div class="brand" style="display:flex;align-items:center;gap:10px;">
       <div class="logo"></div>
       <div>
-        <div style="font-weight:600;">PragOptics™ Dev Console</div>
+        <div style="font-weight:600;">PragOptics™ <span style="color:var(--brand-600);">Dev Console</span></div>
         <div style="font-size:0.85rem; color:var(--muted);">Developer Tools & API Explorer</div>
       </div>
     </div>
@@ -288,15 +338,12 @@
             <li><span class="menu-section">API Endpoints</span></li>
             <li><a href="#" onclick="event.preventDefault(); callPragOpticsAuth();">/auth</a></li>
             <li><a href="#" onclick="event.preventDefault(); callPragOpticsHealth();">/health</a></li>
-            <li><a href="#" onclick="event.preventDefault();">/data/table (coming soon)</a></li>
 
             <li><span class="menu-section">SDKs</span></li>
             <li><a href="#" onclick="event.preventDefault();">JavaScript SDK</a></li>
-            <li><a href="#" onclick="event.preventDefault();">Web Component</a></li>
 
             <li><span class="menu-section">Account</span></li>
             <li><a href="#" onclick="event.preventDefault();">Profile</a></li>
-            <li><a href="#" onclick="event.preventDefault();">Tenant Info</a></li>
           </ul>
         </li>
       </ul>
@@ -305,11 +352,11 @@
 </header>
 
 <main class="page">
-    <section class="glass main">
+  <section class="glass main">
     <div>
-      <h2 style="margin:0 0 6px; color:var(--brand-600);">API Response Viewer</h2>
-      <p style="margin:0; color:var(--muted); font-size:0.95rem;">
-        Use the actions on the left or in the menu to authenticate and call PragOptics APIs. Responses appear below.
+      <h2 style="margin:0 0 6px; color:var(--brand-600);">API <span style="color:var(--muted);">Viewer</span></h2>
+      <p style="margin:0; color:var(--muted); font-size:0.85rem;">
+        Use the Services menu to authenticate and call PragOptics APIs. Responses appear below.
       </p>
     </div>
 
@@ -322,7 +369,7 @@
       <div style="margin-bottom:4px; display:flex; align-items:center; flex-wrap:wrap;">
         Enter this code:
         <strong id="po-code" style="font-size:1.1rem; margin-left:6px;"></strong>
-        <button id="copy-code-btn" class="copy-btn" onclick="copyDeviceCode()">Copy</button>
+        <button id="copy-code-btn" class="copy-btn" onclick="copyDeviceCode()">Copy Device Code</button>
       </div>
       <div id="po-status" style="color:var(--muted); margin-top:4px;"></div>
     </div>
@@ -335,11 +382,15 @@
 </main>
 
 <script>
+/* ============================
+   API + LOGIN LOGIC
+   ============================ */
+
 let pragopticsToken = null;
 
 function setOutput(obj) {
-  const el = document.getElementById("po-output");
-  el.textContent = JSON.stringify(obj, null, 2);
+  document.getElementById("po-output").textContent =
+    JSON.stringify(obj, null, 2);
 }
 
 async function startPragOpticsLogin() {
@@ -351,7 +402,8 @@ async function startPragOpticsLogin() {
     document.getElementById("po-url").innerText = data.verification.url;
     document.getElementById("po-url").href = data.verification.url;
     document.getElementById("po-code").innerText = data.verification.userCode;
-    document.getElementById("po-status").innerText = "Waiting for you to complete sign-in…";
+    document.getElementById("po-status").innerText =
+      "Waiting for you to complete sign-in…";
 
     setOutput({
       endpoint: "/auth/login",
@@ -363,7 +415,11 @@ async function startPragOpticsLogin() {
 
     pollPragOptics(data.polling.token, data.polling.interval);
   } catch (err) {
-    setOutput({ endpoint: "/auth/login", error: "Failed to start login", detail: String(err) });
+    setOutput({
+      endpoint: "/auth/login",
+      error: "Failed to start login",
+      detail: String(err)
+    });
   }
 }
 
@@ -379,7 +435,8 @@ async function pollPragOptics(token, interval) {
       const data = await res.json();
 
       if (data.status === "pending") {
-        document.getElementById("po-status").innerText = "Waiting for authentication…";
+        document.getElementById("po-status").innerText =
+          "Waiting for authentication…";
         setTimeout(poll, interval * 1000);
         return;
       }
@@ -387,7 +444,6 @@ async function pollPragOptics(token, interval) {
       if (data.status === "authenticated") {
         pragopticsToken = data.accessToken;
         document.getElementById("po-status").innerText = "Authenticated.";
-        document.getElementById("protected-actions").style.display = "block";
         setOutput({
           endpoint: "/auth/poll",
           status: data.status,
@@ -398,7 +454,11 @@ async function pollPragOptics(token, interval) {
 
       if (data.status === "error") {
         document.getElementById("po-status").innerText = "Login failed.";
-        setOutput({ endpoint: "/auth/poll", status: "error", message: data.message });
+        setOutput({
+          endpoint: "/auth/poll",
+          status: "error",
+          message: data.message
+        });
       }
     } catch (err) {
       setOutput({ endpoint: "/auth/poll", error: String(err) });
@@ -411,7 +471,9 @@ async function pollPragOptics(token, interval) {
 async function callPragOpticsAuth() {
   try {
     const res = await fetch("https://api.pragoptics.com/api/v1/auth", {
-      headers: pragopticsToken ? { "Authorization": `Bearer ${pragopticsToken}` } : {}
+      headers: pragopticsToken
+        ? { Authorization: `Bearer ${pragopticsToken}` }
+        : {}
     });
 
     const data = await res.json();
@@ -424,7 +486,9 @@ async function callPragOpticsAuth() {
 async function callPragOpticsHealth() {
   try {
     const res = await fetch("https://api.pragoptics.com/api/v1/health", {
-      headers: pragopticsToken ? { "Authorization": `Bearer ${pragopticsToken}` } : {}
+      headers: pragopticsToken
+        ? { Authorization: `Bearer ${pragopticsToken}` }
+        : {}
     });
 
     const data = await res.json();
@@ -434,12 +498,15 @@ async function callPragOpticsHealth() {
   }
 }
 
-/* Dropdown behavior */
+/* ============================
+   DROPDOWN MENU
+   ============================ */
+
 document.addEventListener("click", (e) => {
   const isToggle = e.target.matches(".dropdown-toggle");
   const dropdowns = document.querySelectorAll(".dropdown");
 
-  dropdowns.forEach(d => {
+  dropdowns.forEach((d) => {
     if (d.contains(e.target) && isToggle) {
       d.classList.toggle("open");
     } else {
@@ -448,7 +515,10 @@ document.addEventListener("click", (e) => {
   });
 });
 
-/* Copy device code + toast */
+/* ============================
+   COPY DEVICE CODE + TOAST
+   ============================ */
+
 function copyDeviceCode() {
   const code = document.getElementById("po-code").innerText;
   if (!code) return;
@@ -469,7 +539,53 @@ function showToast(message) {
     setTimeout(() => toast.remove(), 300);
   }, 2000);
 }
-</script>
 
+/* ============================
+   STARFIELD (MATCHES DELGADO PAGE)
+   ============================ */
+
+window.addEventListener("load", () => {
+  const canvas = document.getElementById("bg-stars");
+  const ctx = canvas.getContext("2d");
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
+  const starCount = 160;
+  const stars = [];
+
+  for (let i = 0; i < starCount; i++) {
+    stars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.2 + 0.4,
+      alpha: Math.random(),
+      delta: Math.random() * 0.015 + 0.005
+    });
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (let s of stars) {
+      s.alpha += s.delta;
+            if (s.alpha <= 0 || s.alpha >= 1) s.delta = -s.delta;
+
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
+      ctx.fill();
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+});
+</script>
 </body>
 </html>
