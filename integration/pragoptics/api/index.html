@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PragOptics™ Dev Console</title>
+
+  <style>
+    :root{
+      --bg-deep:#000000cc;
+      --glass:#d9d9d912;
+      --glass-2:#00000012;
+      --border:#ffffff1a;
+      --ink:#e7ecff;
+      --muted:#c6d0f0a6;
+      --brand:#1ca490da;
+      --brand-600:#21bca5;
+      --aura:0 4px 8px rgba(17, 76, 67, 0.678);
+      --radius:16px;
+      --radius-sm:12px;
+      --maxw:1200px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{
+      margin:0; padding:0;
+      font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      background:var(--bg-deep); color:var(--ink);
+    }
+    a{color:inherit;text-decoration:none}
+
+    .bg{
+      position:fixed; inset:0; z-index:-2;
+      background: var(--glass);
+      filter:blur(6px) brightness(.9) saturate(1.05);
+      transform:scale(1.03);
+    }
+
+    header{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter:saturate(140%) blur(10px);
+      background:var(--glass);
+      border-bottom:1px solid var(--border);
+    }
+    .nav{
+      max-width:var(--maxw); margin:0 auto; padding:14px 20px;
+      display:flex; align-items:center; gap:12px;
+    }
+    .logo{
+      width:34px; height:34px; border-radius:10px;
+      background-image:url('https://fortiviewholdings.com/images/Logo.png');
+      background-size:cover; background-position:center;
+      box-shadow:0 0 0 2px rgba(92,140,69,.25), 0 10px 20px rgba(92,140,69,.18);
+    }
+
+    .page{
+      max-width:var(--maxw);
+      margin:32px auto;
+      padding:0 20px 40px;
+      display:flex;
+      gap:20px;
+    }
+
+    .glass{
+      background:var(--glass);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--aura);
+    }
+
+    .sidebar{
+      flex:0 0 260px;
+      padding:20px;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+    }
+
+    .main{
+      flex:1;
+      padding:20px;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+    }
+
+    .cta-btn{
+      display:block;
+      width:100%;
+      text-align:left;
+      background:var(--glass); 
+      color:var(--brand); font-weight:600;
+      padding:10px 14px; border-radius:999px;
+      border:1px solid var(--brand-600);
+      transition:all .2s ease; cursor:pointer;
+      font-size:0.95rem;
+    }
+    .cta-btn:hover{ background:#3a4661; transform:translateY(-2px); }
+
+    .cta-btn.secondary{
+      border-color:var(--border);
+      color:var(--muted);
+    }
+    .cta-btn.secondary:hover{
+      border-color:var(--brand-600);
+      color:var(--brand-600);
+    }
+
+    .section-title{
+      font-size:0.85rem;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      color:var(--muted);
+      margin-bottom:4px;
+    }
+
+    .login-panel{
+      padding:14px;
+      border-radius:var(--radius-sm);
+      background:var(--glass-2);
+      border:1px solid var(--border);
+      font-size:0.9rem;
+    }
+
+    pre{
+      white-space:pre-wrap;
+      word-break:break-word;
+      margin:0;
+    }
+
+    .viewer{
+      flex:1;
+      min-height:260px;
+      padding:16px;
+      background:var(--glass-2);
+      border-radius:var(--radius-sm);
+      border:1px solid var(--border);
+      font-size:0.9rem;
+      overflow:auto;
+      color:var(--brand-600);
+    }
+
+    @media (max-width: 800px){
+      .page{ flex-direction:column; }
+      .sidebar{ flex:1; }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="bg"></div>
+
+<header>
+  <div class="nav">
+    <div class="logo"></div>
+    <div>
+      <div style="font-weight:600;">PragOptics™ Dev Console</div>
+      <div style="font-size:0.85rem; color:var(--muted);">
+        Backend-driven identity & API viewer
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <!-- Sidebar: Actions -->
+  <aside class="glass sidebar">
+    <div>
+      <div class="section-title">Authentication</div>
+      <button class="cta-btn" onclick="startPragOpticsLogin()">Start Login</button>
+    </div>
+
+    <div>
+      <div class="section-title">Public APIs</div>
+      <button class="cta-btn secondary" onclick="callPragOpticsAuth()">Call /auth</button>
+    </div>
+
+    <div id="protected-actions" style="display:none;">
+      <div class="section-title">Protected APIs</div>
+      <button class="cta-btn secondary" onclick="callPragOpticsHealth()">Call /health</button>
+      <!-- Future: add more buttons here, all mapped to the viewer -->
+    </div>
+  </aside>
+
+  <!-- Main: Login status + Viewer -->
+  <section class="glass main">
+    <div>
+      <h2 style="margin:0 0 6px; color:var(--brand-600);">API Response Viewer</h2>
+      <p style="margin:0; color:var(--muted); font-size:0.95rem;">
+        Use the actions on the left to authenticate and call PragOptics APIs. Responses appear below.
+      </p>
+    </div>
+
+    <!-- Login Panel -->
+    <div id="po-login-panel" class="login-panel" style="display:none;">
+      <strong style="display:block; margin-bottom:6px;">Device Code Login</strong>
+      <div style="margin-bottom:4px;">
+        Go to: <a id="po-url" target="_blank" style="color:var(--brand-600);"></a>
+      </div>
+      <div style="margin-bottom:4px;">
+        Enter this code: <strong id="po-code" style="font-size:1.1rem;"></strong>
+      </div>
+      <div id="po-status" style="color:var(--muted); margin-top:4px;"></div>
+    </div>
+
+    <!-- Viewer -->
+    <div class="viewer">
+      <pre id="po-output">{ "hint": "Call /auth or start login to see responses here." }</pre>
+    </div>
+  </section>
+</main>
+
+<script>
+let pragopticsToken = null;
+
+function setOutput(obj) {
+  const el = document.getElementById("po-output");
+  el.textContent = JSON.stringify(obj, null, 2);
+}
+
+async function startPragOpticsLogin() {
+  try {
+    const res = await fetch("https://api.pragoptics.com/api/v1/auth/login");
+    const data = await res.json();
+
+    document.getElementById("po-login-panel").style.display = "block";
+    document.getElementById("po-url").innerText = data.verification.url;
+    document.getElementById("po-url").href = data.verification.url;
+    document.getElementById("po-code").innerText = data.verification.userCode;
+    document.getElementById("po-status").innerText = "Waiting for you to complete sign-in…";
+
+    setOutput({
+      endpoint: "/auth/login",
+      flow: data.flow,
+      status: data.status,
+      verification: data.verification,
+      polling: { interval: data.polling.interval }
+    });
+
+    pollPragOptics(data.polling.token, data.polling.interval);
+  } catch (err) {
+    setOutput({ error: "Failed to start login", detail: String(err) });
+  }
+}
+
+async function pollPragOptics(token, interval) {
+  const poll = async () => {
+    try {
+      const res = await fetch("https://api.pragoptics.com/api/v1/auth/poll", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token })
+      });
+
+      const data = await res.json();
+
+      if (data.status === "pending") {
+        document.getElementById("po-status").innerText = "Waiting for authentication…";
+        setTimeout(poll, interval * 1000);
+        return;
+      }
+
+      if (data.status === "authenticated") {
+        pragopticsToken = data.accessToken;
+        document.getElementById("po-status").innerText = "Authenticated.";
+        document.getElementById("protected-actions").style.display = "block";
+        setOutput({
+          endpoint: "/auth/poll",
+          status: data.status,
+          user: data.user
+        });
+        return;
+      }
+
+      if (data.status === "error") {
+        document.getElementById("po-status").innerText = "Login failed.";
+        setOutput({ endpoint: "/auth/poll", status: "error", message: data.message });
+      }
+    } catch (err) {
+      setOutput({ endpoint: "/auth/poll", error: String(err) });
+    }
+  };
+
+  poll();
+}
+
+async function callPragOpticsAuth() {
+  try {
+    const res = await fetch("https://api.pragoptics.com/api/v1/auth", {
+      headers: pragopticsToken ? { "Authorization": `Bearer ${pragopticsToken}` } : {}
+    });
+
+    const data = await res.json();
+    setOutput({ endpoint: "/auth", response: data });
+  } catch (err) {
+    setOutput({ endpoint: "/auth", error: String(err) });
+  }
+}
+
+async function callPragOpticsHealth() {
+  try {
+    const res = await fetch("https://api.pragoptics.com/api/v1/health", {
+      headers: pragopticsToken ? { "Authorization": `Bearer ${pragopticsToken}` } : {}
+    });
+
+    const data = await res.json();
+    setOutput({ endpoint: "/health", response: data });
+  } catch (err) {
+    setOutput({ endpoint: "/health", error: String(err) });
+  }
+}
+</script>
+
+</body>
+</html>
