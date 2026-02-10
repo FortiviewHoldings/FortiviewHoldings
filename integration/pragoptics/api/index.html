@@ -45,6 +45,7 @@
     .nav{
       max-width:var(--maxw); margin:0 auto; padding:14px 20px;
       display:flex; align-items:center; gap:12px;
+      justify-content:space-between;
     }
     .logo{
       width:34px; height:34px; border-radius:10px;
@@ -144,6 +145,119 @@
       .page{ flex-direction:column; }
       .sidebar{ flex:1; }
     }
+
+    /* Single Menu dropdown on right */
+    .dev-nav ul {
+      list-style:none;
+      margin:0;
+      padding:0;
+    }
+
+    .dropdown {
+      position:relative;
+    }
+
+    .dropdown-toggle {
+      background:none;
+      border:1px solid transparent;
+      color:var(--ink);
+      font-size:0.95rem;
+      padding:8px 12px;
+      border-radius:999px;
+      cursor:pointer;
+      transition:0.2s ease;
+    }
+
+    .dropdown-toggle:hover {
+      background:var(--glass-2);
+      border:1px solid var(--border);
+    }
+
+    .dropdown-menu {
+      display:none;
+      position:absolute;
+      top:110%;
+      right:0;
+      background:var(--glass);
+      border:1px solid var(--border);
+      border-radius:var(--radius-sm);
+      box-shadow:var(--aura);
+      min-width:220px;
+      padding:8px 0;
+      z-index:100;
+      backdrop-filter:blur(10px) saturate(140%);
+    }
+
+    .dropdown-menu li {
+      list-style:none;
+    }
+
+    .dropdown-menu li span.menu-section {
+      display:block;
+      padding:8px 16px 4px;
+      font-size:0.8rem;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      color:var(--muted);
+    }
+
+    .dropdown-menu li a {
+      display:block;
+      padding:8px 16px;
+      color:var(--muted);
+      font-size:0.9rem;
+      transition:0.2s ease;
+    }
+
+    .dropdown-menu li a:hover {
+      background:var(--glass-2);
+      color:var(--brand-600);
+    }
+
+    .dropdown.open .dropdown-menu {
+      display:block;
+    }
+
+    /* Copy button + toast */
+    .copy-btn {
+      margin-left:10px;
+      padding:4px 10px;
+      font-size:0.8rem;
+      border-radius:999px;
+      border:1px solid var(--brand-600);
+      background:var(--glass);
+      color:var(--brand-600);
+      cursor:pointer;
+      transition:0.2s ease;
+    }
+
+    .copy-btn:hover {
+      background:var(--glass-2);
+      transform:translateY(-2px);
+    }
+
+    .toast {
+      position:fixed;
+      bottom:20px;
+      right:20px;
+      background:var(--glass);
+      border:1px solid var(--border);
+      padding:10px 16px;
+      border-radius:var(--radius-sm);
+      color:var(--ink);
+      backdrop-filter:blur(10px) saturate(140%);
+      box-shadow:var(--aura);
+      opacity:0;
+      transform:translateY(10px);
+      transition:opacity .3s ease, transform .3s ease;
+      z-index:9999;
+      font-size:0.9rem;
+    }
+
+    .toast.show {
+      opacity:1;
+      transform:translateY(0);
+    }
   </style>
 </head>
 
@@ -153,13 +267,39 @@
 
 <header>
   <div class="nav">
-    <div class="logo"></div>
-    <div>
-      <div style="font-weight:600;">PragOptics™ Dev Console</div>
-      <div style="font-size:0.85rem; color:var(--muted);">
-        Backend-driven identity & API viewer
+    <div class="brand" style="display:flex;align-items:center;gap:10px;">
+      <div class="logo"></div>
+      <div>
+        <div style="font-weight:600;">PragOptics™ Dev Console</div>
+        <div style="font-size:0.85rem; color:var(--muted);">Developer Tools & API Explorer</div>
       </div>
     </div>
+
+    <nav class="dev-nav">
+      <ul>
+        <li class="dropdown">
+          <button class="dropdown-toggle">Menu ▾</button>
+          <ul class="dropdown-menu">
+            <li><span class="menu-section">Authentication</span></li>
+            <li><a href="#" onclick="event.preventDefault(); startPragOpticsLogin();">Start Login</a></li>
+            <li><a href="#" onclick="event.preventDefault(); callPragOpticsAuth();">Call /auth</a></li>
+
+            <li><span class="menu-section">API Endpoints</span></li>
+            <li><a href="#" onclick="event.preventDefault(); callPragOpticsAuth();">/auth</a></li>
+            <li><a href="#" onclick="event.preventDefault(); callPragOpticsHealth();">/health</a></li>
+            <li><a href="#" onclick="event.preventDefault();">/data/table (coming soon)</a></li>
+
+            <li><span class="menu-section">SDKs</span></li>
+            <li><a href="#" onclick="event.preventDefault();">JavaScript SDK</a></li>
+            <li><a href="#" onclick="event.preventDefault();">Web Component</a></li>
+
+            <li><span class="menu-section">Account</span></li>
+            <li><a href="#" onclick="event.preventDefault();">Profile</a></li>
+            <li><a href="#" onclick="event.preventDefault();">Tenant Info</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
   </div>
 </header>
 
@@ -188,7 +328,7 @@
     <div>
       <h2 style="margin:0 0 6px; color:var(--brand-600);">API Response Viewer</h2>
       <p style="margin:0; color:var(--muted); font-size:0.95rem;">
-        Use the actions on the left to authenticate and call PragOptics APIs. Responses appear below.
+        Use the actions on the left or in the menu to authenticate and call PragOptics APIs. Responses appear below.
       </p>
     </div>
 
@@ -198,8 +338,10 @@
       <div style="margin-bottom:4px;">
         Go to: <a id="po-url" target="_blank" style="color:var(--brand-600);"></a>
       </div>
-      <div style="margin-bottom:4px;">
-        Enter this code: <strong id="po-code" style="font-size:1.1rem;"></strong>
+      <div style="margin-bottom:4px; display:flex; align-items:center; flex-wrap:wrap;">
+        Enter this code:
+        <strong id="po-code" style="font-size:1.1rem; margin-left:6px;"></strong>
+        <button id="copy-code-btn" class="copy-btn" onclick="copyDeviceCode()">Copy</button>
       </div>
       <div id="po-status" style="color:var(--muted); margin-top:4px;"></div>
     </div>
@@ -240,7 +382,7 @@ async function startPragOpticsLogin() {
 
     pollPragOptics(data.polling.token, data.polling.interval);
   } catch (err) {
-    setOutput({ error: "Failed to start login", detail: String(err) });
+    setOutput({ endpoint: "/auth/login", error: "Failed to start login", detail: String(err) });
   }
 }
 
@@ -309,6 +451,42 @@ async function callPragOpticsHealth() {
   } catch (err) {
     setOutput({ endpoint: "/health", error: String(err) });
   }
+}
+
+/* Dropdown behavior */
+document.addEventListener("click", (e) => {
+  const isToggle = e.target.matches(".dropdown-toggle");
+  const dropdowns = document.querySelectorAll(".dropdown");
+
+  dropdowns.forEach(d => {
+    if (d.contains(e.target) && isToggle) {
+      d.classList.toggle("open");
+    } else {
+      d.classList.remove("open");
+    }
+  });
+});
+
+/* Copy device code + toast */
+function copyDeviceCode() {
+  const code = document.getElementById("po-code").innerText;
+  if (!code) return;
+  navigator.clipboard.writeText(code);
+  showToast("Device code copied to clipboard");
+}
+
+function showToast(message) {
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.innerText = message;
+  document.body.appendChild(toast);
+
+  setTimeout(() => toast.classList.add("show"), 10);
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => toast.remove(), 300);
+  }, 2000);
 }
 </script>
 
