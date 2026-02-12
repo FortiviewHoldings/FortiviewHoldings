@@ -315,7 +315,7 @@ html, body {
 <body>
 
 <!-- STARFIELD + BACKGROUND -->
- <div class="global-darken"></div>
+<div class="global-darken"></div>
 <canvas id="bg-stars"></canvas>
 <div class="bg"></div>
 
@@ -356,6 +356,7 @@ html, body {
 
 <main class="page">
   <section class="glass main">
+
     <div>
       <h2 style="margin:0 0 6px; color:var(--brand-600);">API <span style="color:var(--muted);">Viewer</span></h2>
       <p style="margin:0; color:var(--muted); font-size:0.85rem;">
@@ -363,44 +364,51 @@ html, body {
       </p>
     </div>
 
+    <!-- ⭐ NEW LOGIN PANEL (PKCE VERSION) -->
     <div id="po-login-panel" class="login-panel" style="display:none;">
-  <strong style="display:block; margin-bottom:6px;">PragOptics Login</strong>
+      <strong style="display:block; margin-bottom:6px;">PragOptics Login</strong>
 
-  <div id="po-login-status" style="color:var(--muted); margin-top:4px;">
-    Click the button below to begin authentication.
-  </div>
+      <div id="po-login-status" style="color:var(--muted); margin-top:4px;">
+        <!-- Filled dynamically -->
+      </div>
 
-  <button id="po-login-cta" class="copy-btn" style="margin-top:10px; display:none;">
-    Continue to Login
-  </button>
-</div>
-
+      <button id="po-login-cta" class="copy-btn" style="margin-top:10px; display:none;">
+        Continue to Login
+      </button>
+    </div>
 
     <!-- Viewer -->
     <div class="viewer">
       <pre id="po-output">{ "hint": "Call /auth or start login to see responses here." }</pre>
     </div>
+
   </section>
 </main>
 
 <script>
 /* ============================
-   API + LOGIN LOGIC
+   GLOBAL STATE
    ============================ */
-
 let pragopticsToken = null;
+let pragopticsAuthorizeUrl = null;
 
+/* ============================
+   OUTPUT VIEWER
+   ============================ */
 function setOutput(obj) {
   document.getElementById("po-output").textContent =
     JSON.stringify(obj, null, 2);
 }
 
+/* ============================
+   START LOGIN (Triggered from dropdown)
+   ============================ */
 async function startPragOpticsLogin() {
   try {
     const res = await fetch("https://api.pragoptics.com/api/v1/auth/login");
     const data = await res.json();
 
-    // Show the login panel
+    // Show login panel
     const panel = document.getElementById("po-login-panel");
     panel.style.display = "block";
 
@@ -408,16 +416,16 @@ async function startPragOpticsLogin() {
     document.getElementById("po-login-status").innerText =
       "Ready to authenticate. Click the button below.";
 
-    // Store authorizeUrl for later
-    window._pragopticsAuthorizeUrl = data.authorizeUrl;
+    // Store authorize URL
+    pragopticsAuthorizeUrl = data.authorizeUrl;
 
     // Show CTA button
     const cta = document.getElementById("po-login-cta");
     cta.style.display = "inline-block";
 
-    // When clicked → redirect to CIAM
+    // Open CIAM in a new tab
     cta.onclick = () => {
-      window.location.href = window._pragopticsAuthorizeUrl;
+      window.open(pragopticsAuthorizeUrl, "_blank");
     };
 
     // Show response in viewer
@@ -437,6 +445,9 @@ async function startPragOpticsLogin() {
   }
 }
 
+/* ============================
+   HANDLE CALLBACK
+   ============================ */
 async function handlePragOpticsCallback() {
   const params = new URLSearchParams(window.location.search);
   const code = params.get("code");
@@ -476,11 +487,48 @@ async function handlePragOpticsCallback() {
 
   status.innerText = "Authenticated successfully.";
 }
+
 window.addEventListener("load", handlePragOpticsCallback);
+
+/* ============================
+   CALL /auth
+   ============================ */
+async function callPragOpticsAuth() {
+  try {
+    const res = await fetch("https://api.pragoptics.com/api/v1/auth", {
+      headers: pragopticsToken
+        ? { Authorization: `Bearer ${pragopticsToken}` }
+        : {}
+    });
+
+    const data = await res.json();
+    setOutput({ endpoint: "/auth", response: data });
+  } catch (err) {
+    setOutput({ endpoint: "/auth", error: String(err) });
+  }
+}
+
+/* ============================
+   CALL /health
+   ============================ */
+async function callPragOpticsHealth() {
+  try {
+    const res = await fetch("https://api.pragoptics.com/api/v1/health", {
+      headers: pragopticsToken
+        ? { Authorization: `Bearer ${pragopticsToken}` }
+        : {}
+    });
+
+    const data = await res.json();
+    setOutput({ endpoint: "/health", response: data });
+  } catch (err) {
+    setOutput({ endpoint: "/health", error: String(err) });
+  }
+}
+
 /* ============================
    DROPDOWN MENU
    ============================ */
-
 document.addEventListener("click", (e) => {
   const isToggle = e.target.matches(".dropdown-toggle");
   const dropdowns = document.querySelectorAll(".dropdown");
@@ -494,12 +542,9 @@ document.addEventListener("click", (e) => {
   });
 });
 
-
-
 /* ============================
-   STARFIELD ANIMATION
+   STARFIELD (unchanged)
    ============================ */
-
 window.addEventListener("load", () => {
   const canvas = document.getElementById("bg-stars");
   const ctx = canvas.getContext("2d");
@@ -529,7 +574,7 @@ window.addEventListener("load", () => {
 
     for (let s of stars) {
       s.alpha += s.delta;
-            if (s.alpha <= 0 || s.alpha >= 1) s.delta = -s.delta;
+      if (s.alpha <= 0 || s.alpha >= 1) s.delta = -s.delta;
 
       ctx.beginPath();
       ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
@@ -543,5 +588,6 @@ window.addEventListener("load", () => {
   animate();
 });
 </script>
+
 </body>
 </html>
