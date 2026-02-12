@@ -340,7 +340,7 @@ html, body {
 
             <li><span class="menu-section">API Endpoints</span></li>
             <li><a href="#" onclick="event.preventDefault(); callPragOpticsAuth();">/auth</a></li>
-            <li><a href="#" onclick="event.preventDefault(); callPragOpticsHealth();">/health</a></li>
+            <li><a href="#" onclick="event.preventDefault(); callPragOpticsping();">/ping</a></li>
 
             <li><span class="menu-section">SDKs</span></li>
             <li><a href="#" onclick="event.preventDefault();">JavaScript SDK</a></li>
@@ -509,20 +509,20 @@ async function callPragOpticsAuth() {
 }
 
 /* ============================
-   CALL /health
+   CALL /ping
    ============================ */
-async function callPragOpticsHealth() {
+async function callPragOpticsping() {
   try {
-    const res = await fetch("https://api.pragoptics.com/api/v1/health", {
+    const res = await fetch("https://api.pragoptics.com/api/v1/ping", {
       headers: pragopticsToken
         ? { Authorization: `Bearer ${pragopticsToken}` }
         : {}
     });
 
     const data = await res.json();
-    setOutput({ endpoint: "/health", response: data });
+    setOutput({ endpoint: "/ping", response: data });
   } catch (err) {
-    setOutput({ endpoint: "/health", error: String(err) });
+    setOutput({ endpoint: "/ping", error: String(err) });
   }
 }
 
