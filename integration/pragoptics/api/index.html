@@ -363,19 +363,18 @@ html, body {
       </p>
     </div>
 
-    <!-- Login Panel -->
     <div id="po-login-panel" class="login-panel" style="display:none;">
-      <strong style="display:block; margin-bottom:6px;">Device Code Login</strong>
-      <div style="margin-bottom:4px;">
-        Go to: <a id="po-url" target="_blank" style="color:var(--brand-600);"></a>
-      </div>
-      <div style="margin-bottom:4px; display:flex; align-items:center; flex-wrap:wrap;">
-        Enter this code:
-        <strong id="po-code" style="font-size:1.1rem; margin-left:6px;"></strong>
-        <button id="copy-code-btn" class="copy-btn" onclick="copyDeviceCode()">Copy Device Code</button>
-      </div>
-      <div id="po-status" style="color:var(--muted); margin-top:4px;"></div>
-    </div>
+  <strong style="display:block; margin-bottom:6px;">PragOptics Login</strong>
+
+  <div id="po-login-status" style="color:var(--muted); margin-top:4px;">
+    Click the button below to begin authentication.
+  </div>
+
+  <button id="po-login-cta" class="copy-btn" style="margin-top:10px; display:none;">
+    Continue to Login
+  </button>
+</div>
+
 
     <!-- Viewer -->
     <div class="viewer">
@@ -401,22 +400,34 @@ async function startPragOpticsLogin() {
     const res = await fetch("https://api.pragoptics.com/api/v1/auth/login");
     const data = await res.json();
 
-    document.getElementById("po-login-panel").style.display = "block";
-    document.getElementById("po-url").innerText = data.verification.url;
-    document.getElementById("po-url").href = data.verification.url;
-    document.getElementById("po-code").innerText = data.verification.userCode;
-    document.getElementById("po-status").innerText =
-      "Waiting for you to complete sign-in…";
+    // Show the login panel
+    const panel = document.getElementById("po-login-panel");
+    panel.style.display = "block";
 
+    // Update status
+    document.getElementById("po-login-status").innerText =
+      "Ready to authenticate. Click the button below.";
+
+    // Store authorizeUrl for later
+    window._pragopticsAuthorizeUrl = data.authorizeUrl;
+
+    // Show CTA button
+    const cta = document.getElementById("po-login-cta");
+    cta.style.display = "inline-block";
+
+    // When clicked → redirect to CIAM
+    cta.onclick = () => {
+      window.location.href = window._pragopticsAuthorizeUrl;
+    };
+
+    // Show response in viewer
     setOutput({
       endpoint: "/auth/login",
       flow: data.flow,
-      status: data.status,
-      verification: data.verification,
-      polling: { interval: data.polling.interval }
+      authorizeUrl: data.authorizeUrl,
+      state: data.state
     });
 
-    pollPragOptics(data.polling.token, data.polling.interval);
   } catch (err) {
     setOutput({
       endpoint: "/auth/login",
@@ -426,81 +437,46 @@ async function startPragOpticsLogin() {
   }
 }
 
-async function pollPragOptics(token, interval) {
-  const poll = async () => {
-    try {
-      const res = await fetch("https://api.pragoptics.com/api/v1/auth/poll", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token })
-      });
+async function handlePragOpticsCallback() {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get("code");
+  const state = params.get("state");
+  const error = params.get("error");
+  const error_description = params.get("error_description");
 
-      const data = await res.json();
+  if (!code && !error) return; // Not a callback
 
-      if (data.status === "pending") {
-        document.getElementById("po-status").innerText =
-          "Waiting for authentication…";
-        setTimeout(poll, interval * 1000);
-        return;
-      }
+  // Show login panel
+  const panel = document.getElementById("po-login-panel");
+  panel.style.display = "block";
 
-      if (data.status === "authenticated") {
-        pragopticsToken = data.accessToken;
-        document.getElementById("po-status").innerText = "Authenticated.";
-        setOutput({
-          endpoint: "/auth/poll",
-          status: data.status,
-          user: data.user
-        });
-        return;
-      }
+  const status = document.getElementById("po-login-status");
 
-      if (data.status === "error") {
-        document.getElementById("po-status").innerText = "Login failed.";
-        setOutput({
-          endpoint: "/auth/poll",
-          status: "error",
-          message: data.message
-        });
-      }
-    } catch (err) {
-      setOutput({ endpoint: "/auth/poll", error: String(err) });
-    }
-  };
-
-  poll();
-}
-
-async function callPragOpticsAuth() {
-  try {
-    const res = await fetch("https://api.pragoptics.com/api/v1/auth", {
-      headers: pragopticsToken
-        ? { Authorization: `Bearer ${pragopticsToken}` }
-        : {}
-    });
-
-    const data = await res.json();
-    setOutput({ endpoint: "/auth", response: data });
-  } catch (err) {
-    setOutput({ endpoint: "/auth", error: String(err) });
+  if (error) {
+    status.innerText = `Login failed: ${error_description}`;
+    setOutput({ endpoint: "/auth/callback", error, error_description });
+    return;
   }
+
+  status.innerText = "Completing authentication…";
+
+  const res = await fetch(
+    "https://api.pragoptics.com/api/v1/auth/callback" +
+      window.location.search
+  );
+
+  const data = await res.json();
+
+  setOutput({
+    endpoint: "/auth/callback",
+    response: data
+  });
+
+  pragopticsToken = data.tokens?.access_token || null;
+
+  status.innerText = "Authenticated successfully.";
 }
-
-async function callPragOpticsHealth() {
-  try {
-    const res = await fetch("https://api.pragoptics.com/api/v1/health", {
-      headers: pragopticsToken
-        ? { Authorization: `Bearer ${pragopticsToken}` }
-        : {}
-    });
-
-    const data = await res.json();
-    setOutput({ endpoint: "/health", response: data });
-  } catch (err) {
-    setOutput({ endpoint: "/health", error: String(err) });
-  }
-}
-
+window.addEventListener("load", handlePragOpticsCallback);
 /* ============================
    DROPDOWN MENU
    ============================ */
@@ -518,33 +494,10 @@ document.addEventListener("click", (e) => {
   });
 });
 
-/* ============================
-   COPY DEVICE CODE + TOAST
-   ============================ */
 
-function copyDeviceCode() {
-  const code = document.getElementById("po-code").innerText;
-  if (!code) return;
-  navigator.clipboard.writeText(code);
-  showToast("Device code copied to clipboard");
-}
-
-function showToast(message) {
-  const toast = document.createElement("div");
-  toast.className = "toast";
-  toast.innerText = message;
-  document.body.appendChild(toast);
-
-  setTimeout(() => toast.classList.add("show"), 10);
-
-  setTimeout(() => {
-    toast.classList.remove("show");
-    setTimeout(() => toast.remove(), 300);
-  }, 2000);
-}
 
 /* ============================
-   STARFIELD (MATCHES DELGADO PAGE)
+   STARFIELD ANIMATION
    ============================ */
 
 window.addEventListener("load", () => {
