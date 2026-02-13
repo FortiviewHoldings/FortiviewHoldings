@@ -450,12 +450,10 @@ async function startPragOpticsLogin() {
    ============================ */
 async function handlePragOpticsCallback() {
   const params = new URLSearchParams(window.location.search);
-  const code = params.get("code");
-  const state = params.get("state");
-  const error = params.get("error");
-  const error_description = params.get("error_description");
+  const authResultEncoded = params.get("authResult");
 
-  if (!code && !error) return; // Not a callback
+  // Not a callback
+  if (!authResultEncoded) return;
 
   // Show login panel
   const panel = document.getElementById("po-login-panel");
@@ -463,29 +461,43 @@ async function handlePragOpticsCallback() {
 
   const status = document.getElementById("po-login-status");
 
-  if (error) {
-    status.innerText = `Login failed: ${error_description}`;
-    setOutput({ endpoint: "/auth/callback", error, error_description });
+  let authResult;
+  try {
+    authResult = JSON.parse(decodeURIComponent(authResultEncoded));
+  } catch (e) {
+    status.innerText = "Login failed: invalid callback payload.";
+    setOutput({
+      endpoint: "/auth/callback",
+      error: "invalid_payload",
+      details: e.toString()
+    });
     return;
   }
 
-  status.innerText = "Completing authentication…";
+  // Handle error
+  if (!authResult.success) {
+    status.innerText = `Login failed: ${authResult.errorDescription || authResult.error}`;
+    setOutput({
+      endpoint: "/auth/callback",
+      error: authResult.error,
+      details: authResult
+    });
+    return;
+  }
 
-  const res = await fetch(
-    "https://api.pragoptics.com/api/v1/auth/callback" +
-      window.location.search
-  );
+  // Success
+  status.innerText = "Authenticated successfully.";
 
-  const data = await res.json();
+  // Extract tokens
+  pragopticsToken = authResult.tokens?.access_token || null;
 
   setOutput({
     endpoint: "/auth/callback",
-    response: data
+    response: authResult
   });
 
-  pragopticsToken = data.tokens?.access_token || null;
-
-  status.innerText = "Authenticated successfully.";
+  // Optional: Clean up URL so authResult isn't visible
+  window.history.replaceState({}, document.title, window.location.pathname);
 }
 
 window.addEventListener("load", handlePragOpticsCallback);
