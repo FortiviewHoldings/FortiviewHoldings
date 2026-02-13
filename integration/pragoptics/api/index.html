@@ -357,33 +357,25 @@ html, body {
 <main class="page">
   <section class="glass main">
 
-<!-- LOGIN PANEL (DEVICE CODE FLOW) -->
-<div id="po-login-panel" class="login-panel" style="display:none;">
-  <strong style="display:block; margin-bottom:6px;">PragOptics Login</strong>
+    <div>
+      <h2 style="margin:0 0 6px; color:var(--brand-600);">API <span style="color:var(--muted);">Viewer</span></h2>
+      <p style="margin:0; color:var(--muted); font-size:0.85rem;">
+        Use the Services menu to authenticate and call PragOptics APIs. Responses appear below.
+      </p>
+    </div>
 
-  <!-- Status text -->
-  <div id="po-login-status" style="color:var(--muted); margin-top:4px;">
-    <!-- Filled dynamically -->
-  </div>
+    <!-- ⭐ NEW LOGIN PANEL (PKCE VERSION) -->
+    <div id="po-login-panel" class="login-panel" style="display:none;">
+      <strong style="display:block; margin-bottom:6px;">PragOptics Login</strong>
 
-  <!-- Device code -->
-  <div id="po-login-code"
-       style="margin-top:10px; font-size:1.4rem; font-weight:600; color:var(--brand-600); display:none;">
-  </div>
+      <div id="po-login-status" style="color:var(--muted); margin-top:4px;">
+        <!-- Filled dynamically -->
+      </div>
 
-  <!-- Verification URL -->
-  <div id="po-login-url"
-       style="margin-top:6px; font-size:0.9rem; color:var(--muted); display:none;">
-  </div>
-
-  <!-- Copy button -->
-  <button id="po-login-copy"
-          class="copy-btn"
-          style="margin-top:10px; display:none;"
-          onclick="copyPragOpticsCode()">
-    Copy Code
-  </button>
-</div>
+      <button id="po-login-cta" class="copy-btn" style="margin-top:10px; display:none;">
+        Continue to Login
+      </button>
+    </div>
 
     <!-- Viewer -->
     <div class="viewer">
@@ -407,16 +399,7 @@ function setOutput(obj) {
   document.getElementById("po-output").textContent =
     JSON.stringify(obj, null, 2);
 }
-  /* ============================
-   COPY BUTTON
-   ============================ */
-function copyPragOpticsCode() {
-  const code = document.getElementById("po-login-code").innerText;
-  navigator.clipboard.writeText(code);
 
-  // Optional: show a toast
-  alert("Code copied to clipboard.");
-}
 /* ============================
    START LOGIN (Triggered from dropdown)
    ============================ */
@@ -425,27 +408,26 @@ async function startPragOpticsLogin() {
     const res = await fetch("https://api.pragoptics.com/api/v1/auth/login");
     const data = await res.json();
 
+    // Show login panel
     const panel = document.getElementById("po-login-panel");
     panel.style.display = "block";
 
-    // Show instructions
+    // Update status
     document.getElementById("po-login-status").innerText =
-      data.message || "Enter the code shown below to sign in.";
+      "Redirecting to PragOptics login…";
 
-    // Display device code + URL
-    document.getElementById("po-login-code").innerText = data.userCode;
-    document.getElementById("po-login-url").innerText = data.verificationUri;
+    // Store authorize URL
+    pragopticsAuthorizeUrl = data.authorizeUrl;
 
-    // Start polling
-    pollForPragOpticsToken(data.pollingToken);
+    // Immediately redirect in the SAME tab
+    window.location = pragopticsAuthorizeUrl;
 
-    // Show output
+    // Show response in viewer
     setOutput({
       endpoint: "/auth/login",
-      status: data.status,
-      pollingToken: data.pollingToken,
-      verificationUri: data.verificationUri,
-      userCode: data.userCode
+      flow: data.flow,
+      authorizeUrl: data.authorizeUrl,
+      state: data.state
     });
 
   } catch (err) {
@@ -458,48 +440,61 @@ async function startPragOpticsLogin() {
 }
 
 /* ============================
-   HANDLE POLL
+   HANDLE CALLBACK
    ============================ */
-async function pollForPragOpticsToken(pollingToken) {
-  const statusEl = document.getElementById("po-login-status");
+async function handlePragOpticsCallback() {
+  const params = new URLSearchParams(window.location.search);
+  const authResultEncoded = params.get("authResult");
 
-  async function poll() {
-    const res = await fetch("https://api.pragoptics.com/api/v1/auth/poll", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: pollingToken })
+  // Not a callback
+  if (!authResultEncoded) return;
+
+  // Show login panel
+  const panel = document.getElementById("po-login-panel");
+  panel.style.display = "block";
+
+  const status = document.getElementById("po-login-status");
+
+  let authResult;
+  try {
+    authResult = JSON.parse(decodeURIComponent(authResultEncoded));
+  } catch (e) {
+    status.innerText = "Login failed: invalid callback payload.";
+    setOutput({
+      endpoint: "/auth/callback",
+      error: "invalid_payload",
+      details: e.toString()
     });
-
-    const data = await res.json();
-
-    if (data.status === "pending") {
-      statusEl.innerText = "Waiting for you to complete sign-in…";
-      setTimeout(poll, 2000);
-      return;
-    }
-
-    if (data.status === "error") {
-      statusEl.innerText = "Login failed: " + data.message;
-      setOutput({ endpoint: "/auth/poll", error: data.message });
-      return;
-    }
-
-    if (data.status === "authenticated") {
-      statusEl.innerText = "Authenticated successfully.";
-
-      pragopticsToken = data.accessToken;
-
-      setOutput({
-        endpoint: "/auth/poll",
-        response: data
-      });
-
-      return;
-    }
+    return;
   }
 
-  poll();
+  // Handle error
+  if (!authResult.success) {
+    status.innerText = `Login failed: ${authResult.errorDescription || authResult.error}`;
+    setOutput({
+      endpoint: "/auth/callback",
+      error: authResult.error,
+      details: authResult
+    });
+    return;
+  }
+
+  // Success
+  status.innerText = "Authenticated successfully.";
+
+  // Extract tokens
+  pragopticsToken = authResult.tokens?.access_token || null;
+
+  setOutput({
+    endpoint: "/auth/callback",
+    response: authResult
+  });
+
+  // Optional: Clean up URL so authResult isn't visible
+  window.history.replaceState({}, document.title, window.location.pathname);
 }
+
+window.addEventListener("load", handlePragOpticsCallback);
 
 /* ============================
    CALL /auth
