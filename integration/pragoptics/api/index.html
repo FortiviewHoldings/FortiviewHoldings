@@ -414,19 +414,13 @@ async function startPragOpticsLogin() {
 
     // Update status
     document.getElementById("po-login-status").innerText =
-      "Ready to authenticate. Click the button below.";
+      "Redirecting to PragOptics login…";
 
     // Store authorize URL
     pragopticsAuthorizeUrl = data.authorizeUrl;
 
-    // Show CTA button
-    const cta = document.getElementById("po-login-cta");
-    cta.style.display = "inline-block";
-
-    // Open CIAM in a new tab
-    cta.onclick = () => {
-      window.open(pragopticsAuthorizeUrl, "_blank");
-    };
+    // Immediately redirect in the SAME tab
+    window.location = pragopticsAuthorizeUrl;
 
     // Show response in viewer
     setOutput({
