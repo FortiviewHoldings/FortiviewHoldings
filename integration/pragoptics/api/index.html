@@ -322,7 +322,7 @@ html, body {
 <header>
   <div class="nav">
     <div class="brand" style="display:flex;align-items:center;gap:10px;">
-      <div class="logo"></div>
+      <a href="https://fortiviewholdings.com/integration/pragoptics/api" class="logo"></a>
       <div>
         <div style="font-weight:600;">PragOptics™ <span style="color:var(--brand-600);">Dev Console</span></div>
         <div style="font-size:0.85rem; color:var(--muted);">Developer Tools & API Explorer</div>
@@ -479,18 +479,24 @@ async function handlePragOpticsCallback() {
     return;
   }
 
-  // Success
+  // SUCCESS
   status.innerText = "Authenticated successfully.";
 
   // Extract tokens
-  pragopticsToken = authResult.tokens?.access_token || null;
+  const tokens = authResult.tokens;
+  const accessToken = tokens?.access_token || null;
 
+  // Store tokens for downstream API calls
+  sessionStorage.setItem("pragoptics_tokens", JSON.stringify(tokens));
+  pragopticsToken = accessToken;
+
+  // Show in viewer
   setOutput({
     endpoint: "/auth/callback",
     response: authResult
   });
 
-  // Optional: Clean up URL so authResult isn't visible
+  // Clean up URL so authResult isn't visible
   window.history.replaceState({}, document.title, window.location.pathname);
 }
 
@@ -501,10 +507,11 @@ window.addEventListener("load", handlePragOpticsCallback);
    ============================ */
 async function callPragOpticsAuth() {
   try {
+    const stored = JSON.parse(sessionStorage.getItem("pragoptics_tokens"));
+    const accessToken = stored?.access_token;
+
     const res = await fetch("https://api.pragoptics.com/api/v1/auth", {
-      headers: pragopticsToken
-        ? { Authorization: `Bearer ${pragopticsToken}` }
-        : {}
+      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
     });
 
     const data = await res.json();
@@ -514,15 +521,18 @@ async function callPragOpticsAuth() {
   }
 }
 
+
 /* ============================
    CALL /ping
    ============================ */
 async function callPragOpticsping() {
   try {
+    // Always reload token from sessionStorage
+    const stored = JSON.parse(sessionStorage.getItem("pragoptics_tokens"));
+    const accessToken = stored?.access_token;
+
     const res = await fetch("https://api.pragoptics.com/api/v1/ping", {
-      headers: pragopticsToken
-        ? { Authorization: `Bearer ${pragopticsToken}` }
-        : {}
+      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
     });
 
     const data = await res.json();
