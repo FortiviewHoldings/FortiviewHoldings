@@ -405,7 +405,14 @@ function setOutput(obj) {
    ============================ */
 async function startPragOpticsLogin() {
   try {
-    const res = await fetch("https://api.pragoptics.com/api/v1/auth/login");
+    // Capture the exact URL the user is currently on
+    const returnUrl = encodeURIComponent(window.location.href);
+
+    // Call your backend with the dynamic returnUrl
+    const res = await fetch(
+      `https://api.pragoptics.com/api/v1/auth/login?returnUrl=${returnUrl}`
+    );
+
     const data = await res.json();
 
     // Show login panel
@@ -416,7 +423,7 @@ async function startPragOpticsLogin() {
     document.getElementById("po-login-status").innerText =
       "Redirecting to PragOptics login…";
 
-    // Store authorize URL
+    // Store authorize URL (this stays exactly as before)
     pragopticsAuthorizeUrl = data.authorizeUrl;
 
     // Immediately redirect in the SAME tab
