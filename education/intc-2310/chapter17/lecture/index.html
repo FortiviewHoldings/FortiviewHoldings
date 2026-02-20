@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>INTC 2310 - Sixth Day Overview</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fff;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 6px;
+      padding: 20px 24px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 0.25rem;
+    }
+    h2 {
+      font-size: 1.2rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .session {
+      margin: 10px 0;
+      padding: 8px 10px;
+      border-left: 3px solid #333;
+      background-color: #fafafa;
+    }
+    .time {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 3px;
+    }
+    .note {
+      background: #fef3c7;
+      border: 1px solid #facc15;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    
+   .related {
+  background: #dbeafe;
+  border: 1px solid #60a5fa;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin: 1.5rem 0;
+  font-size: 0.95rem;
+  color: #1e3a8a;
+    }
+
+    .toggle-btn {
+  margin-top: 8px;
+  padding: 6px 10px;
+  background: #1ca490da;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.toggle-btn:hover {
+  background: #c6d0f0a6;
+  color: #000;
+}
+
+.collapsible {
+  display: none;
+  margin-top: 12px;
+  padding: 12px;
+  background: #dcffbb12;
+  border: 1px solid #c7d2fe;
+  border-radius: 6px;
+}
+
+  .lab-image {
+  width: 40%;
+  display: inline-block;
+  vertical-align: top;
+  margin: 1%;
+}
+
+.lab-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  display: block;
+}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>INTC 2310 – Principles of Industrial Measurement II</h1>
+    <h2>Feb 26 2026 - Sixth Day Overview</h2>
+
+    <div class="session">
+      <span class="time">6:00 p.m. – 6:15 p.m.</span>
+      <span>Safety Moment</span><br>
+      <span><iframe width="640" height="320" src="https://www.youtube.com/embed/C561PCq5E1g?list=PL0920C54C4FCB97C4" title="Runaway: Explosion at T2 Laboratories" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></span>
+    </div>
+
+
+    <div class="session">
+      <span class="time">6:15 p.m. – 7:30 p.m.</span>
+      <span>Chapter 15-16 Lecture (Zoom)</span>
+
+  <button class="toggle-btn" onclick="toggleSection('assessmentSummary')">
+    View Overview
+  </button>
+
+  <div id="assessmentSummary" class="collapsible">
+
+<h1>Chapter’s 15 – 16 Overview</h1>
+
+<div class="meta">
+  <div><span class="label">Instructor:</span> Cameron Bridges</div>
+  <div><span class="label">Topic:</span> Ultrasonic, Radar, Laser, Nuclear & Weigh‑Based Level Measurement</div>
+  <div><span class="label">Chapters Covered:</span> 15–16</div>
+  <div><span class="label">Extra Credit:</span> Compare NCR vs GWR vs Nuclear in difficult applications</div>
+</div>
+
+<div class="note">
+  <strong>Note:</strong> This handout is written from my point of view and connects the book material to how these instruments actually behave in the field.
+  Quiz questions will be based on the assigned textbook chapters, but this guide is meant to help you bridge theory and practice — especially where modern radar and nuclear systems outperform older technologies.
+</div>
+
+<section>
+  <h2>Chapter 15 – Ultrasonic, Radar & Laser Level Measurement</h2>
+
+  <h3>Ultrasonic Level Measurement</h3>
+  <p>
+    Ultrasonic instruments use <strong>sound waves</strong> traveling through air at a known velocity.
+    They measure level by timing how long it takes for the sound pulse to reflect off the product surface and return to the sensor.
+  </p>
+
+  <h4>Point Ultrasonic (Air‑Gap Sensors)</h4>
+  <p>
+    These act as switches. A transmitter emits a pulse and waits for a return.
+    If the return is interrupted or attenuated, the device interprets that as “material present.”
+    They work well in clean vapor spaces but struggle with:
+  </p>
+  <ul>
+    <li>Low‑atomic‑weight gases (e.g., hydrogen)</li>
+    <li>Heavy vapors or dense atmospheres</li>
+    <li>Steam, dust, or condensation</li>
+  </ul>
+
+  <h4>Continuous Ultrasonic (Time‑of‑Flight)</h4>
+  <p>
+    These measure distance using the time‑of‑flight formula:
+    <em>Distance = (Velocity × Time) / 2</em>.
+    They are simple and effective in basic applications but unreliable when:
+  </p>
+  <ul>
+    <li>The surface is foamy, aerated, or “shaving‑cream” consistency</li>
+    <li>Dust or vapor absorbs the sound energy</li>
+    <li>Floating solids scatter the signal</li>
+  </ul>
+
+  <h3>Non‑Contacting Radar (NCR)</h3>
+  <p>
+    NCR uses <strong>radio waves</strong> instead of sound.
+    A transmitter sends a microwave pulse through an antenna; the reflected signal is analyzed to determine level.
+  </p>
+  <div class="lab-image">
+  <img src="https://fortiviewholdings.com/education/intc-2310/images/radar_ncr.jpg" alt="NCR Echo" style="max-width: 100%; border-radius: 6px;">
+  </div>
+  
+  <p>
+    NCR is more robust than ultrasonic because it relies on <strong>dielectric constant (DK)</strong> rather than acoustic reflectivity.
+    However, older NCR struggled with:
+  </p>
+  <ul>
+    <li>Low DK powders</li>
+    <li>Wide beam angles (6–12°)</li>
+    <li>False echoes from internals</li>
+    <li>Dust and vapor interference</li>
+  </ul>
+
+  <h4>Modern High‑Frequency NCR</h4>
+  <p>
+    Newer 80+ GHz radars (e.g., Vega) use a <strong>1° beam angle</strong> and high energy density.
+    These can measure:
+  </p>
+  <ul>
+    <li>Low DK powders</li>
+    <li>Tall silos</li>
+    <li>Dusty or vapor‑rich environments</li>
+  </ul>
+  <p>
+    Software tools allow technicians to view and interpret the <strong>echo curve</strong>, which is the most important diagnostic in radar technology.
+  </p>
+
+  <h3>Guided Wave Radar (GWR)</h3>
+  <p>
+    GWR sends a radar pulse down a probe (rod or cable).
+    The pulse reflects off changes in dielectric — typically the product surface — and returns to the transmitter.
+  </p>
+
+  <div class="lab-image">
+  <img src="https://fortiviewholdings.com/education/intc-2310/images/radar_echo.png" alt="Radar Echo" style="max-width: 100%; border-radius: 6px;">
+  </div>
+
+  <h4>Probe End Projection (PEP)</h4>
+  <p>
+    In low DK or aerated products, the surface echo may never rise above the noise threshold.
+    In these cases, the instrument uses <strong>probe end projection</strong>:
+  </p>
+  <ul>
+    <li>The probe end reflection shifts as more probe becomes submerged</li>
+    <li>The shift is proportional to level</li>
+    <li>Technicians adjust probe offset / projection to scale the reading</li>
+  </ul>
+  <p>
+    This allows GWR to measure level even when no surface echo exists — a common scenario in powders, fluidized beds, and aerated liquids.
+  </p>
+
+  <h4>Echo Curve Interpretation</h4>
+  <p>
+    The echo curve is the first and most important diagnostic step.
+    It shows:
+  </p>
+  <ul>
+    <li>Reference pulse at the process connection</li>
+    <li>Surface echo (if present)</li>
+    <li>Probe end reflection</li>
+    <li>Noise, buildup, false echoes</li>
+  </ul>
+  <p>
+    A clean, empty‑tank echo curve is your baseline.
+    Without it, troubleshooting becomes reverse engineering.
+  </p>
+
+  <h3>Laser Level Measurement</h3>
+  <p>
+    Laser level uses a narrow optical beam to measure distance.
+    It works well on:
+  </p>
+  <ul>
+    <li>Clear liquids</li>
+    <li>Solids with good reflectivity</li>
+    <li>Long‑range measurements</li>
+  </ul>
+  <p>
+    It struggles with:
+  </p>
+  <ul>
+    <li>Dust</li>
+    <li>Vapor</li>
+    <li>Foam</li>
+    <li>Low reflectivity surfaces</li>
+  </ul>
+  <p>
+    Laser has niche applications but is not a universal solution.
+  </p>
+</section>
+
+<section>
+  <h2>Chapter 16 – Nuclear & Weigh‑Based Level Measurement</h2>
+
+  <h3>Nuclear Continuous Level</h3>
+  <p>
+    Nuclear level systems use a <strong>radioactive source</strong> on one side of the vessel and a <strong>detector</strong> on the other.
+    Radiation passes through the vessel; the amount that reaches the detector decreases as level increases.
+  </p>
+
+  <div class="lab-image">
+  <img src="https://fortiviewholdings.com/education/intc-2310/images/nuclear_multi.webp" alt="Nuclear" style="max-width: 100%; border-radius: 6px;">
+  </div>
+
+  <h4>How It Works</h4>
+  <p>
+    A photomultiplier tube (PMT) converts radiation into measurable counts.
+    As level rises:
+  </p>
+  <ul>
+    <li>More radiation is absorbed</li>
+    <li>Fewer photons reach the detector</li>
+    <li>Counts decrease</li>
+  </ul>
+  <p>
+    The instrument uses internal algorithms and linearization tables to map counts to level.
+  </p>
+
+  <h4>Field Realities</h4>
+  <ul>
+    <li>Sources decay — rapidly at first, then slowly</li>
+    <li>Tank wall buildup reduces photon transmission</li>
+    <li>Vapor density changes (air vs hydrocarbon) affect counts</li>
+    <li>“Live zero” must be maintained — never zero to process conditions</li>
+    <li>Management of Change (MOC) is mandatory for any configuration change</li>
+  </ul>
+
+  <h3>Nuclear Point Switches</h3>
+  <p>
+    These use the same principle but act as high/low switches.
+    When radiation drops below a threshold, the switch changes state.
+    They are extremely reliable and unaffected by:
+  </p>
+  <ul>
+    <li>Foam</li>
+    <li>Vapor</li>
+    <li>Solids</li>
+    <li>Temperature</li>
+    <li>Pressure</li>
+  </ul>
+
+  <h3>Weigh Cells (Load Cells)</h3>
+  <p>
+    Weigh cells measure the total weight of the vessel and its contents.
+    They are the most universal level measurement technology because they do not depend on:
+  </p>
+  <div class="lab-image">
+  <img src="https://fortiviewholdings.com/education/intc-2310/images/strain_gauge.png" alt="Strain Gauge" style="max-width: 100%; border-radius: 6px;">
+  </div>
+  <ul>
+    <li>Dielectric constant</li>
+    <li>Surface reflectivity</li>
+    <li>Vapor space conditions</li>
+    <li>Foam, dust, or buildup</li>
+  </ul>
+
+  <h4>How They Work</h4>
+  <p>
+    Load cells convert mechanical strain into electrical signals.
+    As weight increases, the strain gauge output increases proportionally.
+    The system subtracts the tare weight of the vessel to calculate material level.
+  </p>
+  <div class="lab-image">
+  <img src="https://fortiviewholdings.com/education/intc-2310/images/strain_simple.jpg" alt="Strain Gauge schematic" style="max-width: 100%; border-radius: 6px;">
+  </div>
+
+  <h4>Considerations</h4>
+  <ul>
+    <li>Must be mechanically isolated from piping strain</li>
+    <li>Require proper mounting hardware</li>
+    <li>Need calibration under known load conditions</li>
+    <li>Are expensive but extremely reliable</li>
+  </ul>
+</section>
+    <div class="related">
+  <strong>Adjacent Technical Consideration:</strong>
+  Advanced level technologies each carry application‑specific constraints that must be understood before installation. 
+  Ultrasonic and non‑contacting radar require a stable vapor space and can be severely affected by foam, dust loading, 
+  low‑dielectric materials, or entrained gas. Modern high‑frequency radars mitigate many of these issues, but correct 
+  antenna selection, beam angle, and echo‑curve interpretation remain critical. Guided Wave Radar (GWR) introduces its 
+  own considerations: probe length must match the vessel, anchoring may be required, and technicians must verify the 
+  reference pulse, surface threshold, and probe‑end reflection to ensure the device is operating within its physical 
+  limits. In low‑DK or aerated products, the surface echo may disappear entirely, and the instrument will rely on probe 
+  end projection—requiring proper scaling, offset adjustment, and validation against known level conditions.
+  <br><br>
+  Nuclear level systems require strict procedural control. Source decay, tank wall buildup, and vapor density changes 
+  directly affect detector counts, and any configuration changes must follow Management of Change (MOC) protocols. 
+  Photomultiplier tubes (PMTs) must be evaluated for stability, and linearization tables must be verified against 
+  actual process conditions. Nuclear point switches are extremely reliable but still require periodic functional checks 
+  to confirm shielding, alignment, and detector health.
+  <br><br>
+  Weigh cells offer a universal measurement method but must be mechanically isolated from piping strain, thermal 
+  expansion, and structural loading. Improper mounting or shared supports can introduce significant error. Calibration 
+  requires known loads or verified reference points, and the system must account for vessel tare weight and any 
+  mechanical changes over time.
+  <br><br>
+  Selecting the correct technology requires understanding not only the instrument’s theory of operation but also how 
+  the process behaves—vapor composition, product dielectric, agitation, flashing, aeration, buildup, and vessel geometry 
+  all influence measurement reliability. Proper commissioning, echo‑curve capture, and documentation ensure long‑term 
+  stability and prevent misinterpretation of normal process behavior as instrument failure.
+</div>
+</div>
+</div>
+
+
+      <div class="session">
+      <span class="time">7:30 p.m. – 7:45 p.m.</span>
+      <span>Chapter 17 (Lab Prep)</span>
+
+  <button class="toggle-btn" onclick="toggleSection('chapterSummary')">
+    View Overview
+  </button>
+
+  <div id="chapterSummary" class="collapsible">
+
+<h1>Chapter 17 Overview</h1>
+
+<div class="meta">
+  <div><span class="label">Instructor:</span> Cameron Bridges</div>
+  <div><span class="label">Topic:</span> Ultrasonic, Radar, Laser, Nuclear & Weigh‑Based Level Measurement</div>
+  <div><span class="label">Chapters Covered:</span> 17</div>
+  <div><span class="label">Extra Credit:</span> Practical Level Measurement</div>
+</div>
+
+  <section>
+  <h2>Chapter 17 – Practical Level Measurement & Calibration</h2>
+
+  <h3>Bulk Solids in Silos & Tanks</h3>
+  <p>
+    Bulk solids behave nothing like liquids. Their flow is irregular, surface profiles are unpredictable,
+    and the top of the material may heap, crater, or shift depending on how the silo is being filled or emptied.
+    As the text notes, “the flow and handling of bulk solids is extremely complex” and the surface “may not be even across the top.”
+  </p>
+
+  <h4>Flow Properties</h4>
+  <p>
+    Two primary flow regimes determine how reliable a level reading will be:
+  </p>
+  <ul>
+    <li><strong>Funnel Flow</strong> — Material flows down the center while stagnant zones form along the walls. This leads to ratholing and bridging.</li>
+    <li><strong>Mass Flow</strong> — All material moves uniformly toward the outlet. Ideal, but rarely achieved in real installations.</li>
+  </ul>
+  <p>
+    Ratholing occurs when material flows only through a central channel, leaving stagnant material along the sides.
+    Bridging occurs when material forms a stable arch over the outlet, blocking flow entirely.
+  </p>
+
+  <h4>Dust Interference</h4>
+  <p>
+    Many solids generate heavy dust clouds during filling. Dust can block optical and ultrasonic instruments entirely.
+    The text notes that dust “can interfere with most types of level measuring instruments” and can “block most light and laser measurement instruments.”
+    High‑frequency radar is often the only reliable non-contact option in these environments.
+  </p>
+
+  <h3>Load Cell Calibration</h3>
+  <p>
+    Load cells are universal, but only if calibrated correctly. Calibration must account for real mechanical forces,
+    not just the electronics. The book emphasizes that the readout is “zeroed with no weight in the vessel” and that
+    piping stresses can shift readings if not accounted for.
+  </p>
+
+  <h4>Calibration Methods</h4>
+  <ul>
+    <li><strong>Load Cell Simulator</strong> — Injects an electronic signal equivalent to load cell output. Fast, but does not detect piping strain.</li>
+    <li><strong>Physical Weights</strong> — Add known weights to the vessel. Accurate but labor‑intensive and often impractical for full‑range calibration.</li>
+    <li><strong>Weighed Liquid Addition</strong> — Add known quantities of liquid. Covers full range but requires accurate weighing or a mass flowmeter.</li>
+    <li><strong>Portable Load Cell Calibration System</strong> — Uses hydraulic jacks and portable calibration cells. Fast and accurate but expensive.</li>
+  </ul>
+  <p>
+    Calibration must be checked while increasing and decreasing weight to detect hysteresis.
+  </p>
+
+  <h3>Water Level in a Boiler</h3>
+  <p>
+    Boiler level measurement is safety‑critical. Regulations require two independent means of determining water level.
+    The text states that boilers must have “two means of measuring the water level” and two automatic low‑water shutdown devices.
+  </p>
+
+  <h4>Water Column</h4>
+  <p>
+    A water column reduces turbulence so the gauge glass shows the true water level.
+    Without it, boiling action makes the level unreadable. The water column provides a stable reference point for operators.
+  </p>
+
+  <h4>Try Cocks</h4>
+  <p>
+    Try cocks are mechanical verification points used when the gauge glass is unreliable.
+    Three valves are installed:
+  </p>
+  <ul>
+    <li><strong>Top Try Cock</strong> — Indicates high water when water discharges.</li>
+    <li><strong>Middle Try Cock</strong> — Installed at the <strong>NOWL</strong> (Normal Operating Water Level). Should discharge a mix of steam and water.</li>
+    <li><strong>Bottom Try Cock</strong> — Steam discharge indicates low water.</li>
+  </ul>
+  <p>
+    The text notes: “Steam discharged from the bottom try cock indicates a low water condition.”
+  </p>
+
+  <h4>Gauge Glass Blowdown</h4>
+  <p>
+    Blowdown removes sludge and sediment from the water column and gauge glass.
+    If the top connection clogs, the gauge glass fills with water and falsely indicates a high level.
+    If the bottom connection clogs, the level appears frozen and slowly rises due to condensation.
+  </p>
+
+  <h4>Low Water Fuel Cutoff</h4>
+  <p>
+    A float‑based safety device that shuts down the burner if water level drops below a safe point.
+    This prevents tube burnout and boiler explosions. It is part of the burner permissive interlock system.
+  </p>
+
+  <h3>Corrosive Fluids</h3>
+  <p>
+    When process fluid would damage a transmitter, diaphragm seals are used.
+    Capillary tubes filled with a stable fluid isolate the transmitter from corrosive liquids.
+  </p>
+
+  <h4>Diaphragm Seals & Capillary Systems</h4>
+  <p>
+    Seal fluid density affects calibration. The text explains that the pressure at each transmitter port is determined by:
+  </p>
+  <p><em>P = p × H</em></p>
+  <p>
+    where <strong>p</strong> is the specific gravity of the seal fluid and <strong>H</strong> is the height of the capillary column.
+  </p>
+
+  <h4>Zero Suppression & Elevation</h4>
+  <p>
+    When the transmitter sees a non‑zero differential pressure at an empty tank, zero must be suppressed.
+    In the sulfuric acid example, the empty‑tank differential was <strong>–115.2 in. WC</strong>, requiring a zero suppression of the same amount.
+  </p>
+  <p>
+    Elevation is the opposite case — when the transmitter is mounted below the tank and always sees a positive head,
+    that constant head must be added to the calibration.
+  </p>
+</section>
+  </div>
+  </div>
+
+    <p class="note">
+      Times are approximate and may be adjusted based on class needs and discussion.
+    </p>
+  
+  
+  
+  </div>
+<script>
+function toggleSection(id) {
+  const target = document.getElementById(id);
+  const isOpening = target.style.display !== 'block';
+
+  // Close ALL collapsibles
+  document.querySelectorAll('.collapsible').forEach(sec => {
+    sec.style.display = 'none';
+  });
+
+  // If the clicked one was closed, open it
+  if (isOpening) {
+    target.style.display = 'block';
+  }
+}
+</script>
+</body>
+</html>
