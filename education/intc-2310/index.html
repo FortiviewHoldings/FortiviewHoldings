@@ -567,6 +567,198 @@
   stability and prevent misinterpretation of normal process behavior as instrument failure.
 </div>
   </div>
+
+       <div class="session">
+  <span class="time">RTD Fundamentals</span>
+  <span>Platinum RTDs, Linear Approximation, Lead Wires & Field Behavior</span>
+
+  <button class="toggle-btn" onclick="toggleSection('rtdSummary')">
+    View RTD Overview
+  </button>
+
+  <div id="rtdSummary" class="collapsible">
+
+    <h1>RTD Overview</h1>
+
+    <div class="meta">
+      <div><span class="label">Author:</span> Cameron Bridges</div>
+      <div><span class="label">Topic:</span> PT100 RTDs, Lead Wire Effects, Drift & Field Calibration</div>
+    </div>
+
+    <div class="note">
+      <strong>Note:</strong> This is written as a technical field guide from my point of view, not as a textbook definition.
+    </div>
+
+    <section>
+      <h2>What an RTD Actually Is</h2>
+      <p>
+        A <strong>Resistance Temperature Detector (RTD)</strong> is a temperature sensor that uses the predictable change
+        in electrical resistance of a metal as temperature changes. In industrial work, that metal is almost always
+        <strong>platinum</strong> because it is stable, repeatable, and has a smooth, well‑defined resistance‑versus‑temperature curve.
+      </p>
+      <p>
+        The most common industrial RTD is the <strong>PT100</strong>, which has a resistance of <strong>100&nbsp;Ω at 0&nbsp;°C</strong>
+        and follows the IEC&nbsp;60751 standard with a temperature coefficient of approximately
+        <strong>0.00385&nbsp;Ω/Ω/°C</strong> (often referred to as a “385 curve”).
+      </p>
+    </section>
+
+    <section>
+      <h2>Linear Approximation (Field Method)</h2>
+      <p>
+        For most day‑to‑day work in the <strong>0&nbsp;°C to 100&nbsp;°C</strong> range, a PT100 can be treated as nearly linear.
+        That allows a simple field formula to convert resistance to temperature without needing the full polynomial.
+      </p>
+
+      <h3>Field Formula for PT100 (385 Curve)</h3>
+      <p>
+        For a PT100 with a 0.00385 coefficient:
+      </p>
+      <pre><code>T(°C) = (R<sub>measured</sub> − 100) / 0.385</code></pre>
+
+      <p><strong>Example:</strong> PT100, measured resistance = <strong>119&nbsp;Ω</strong></p>
+      <ol>
+        <li><strong>Subtract the 0&nbsp;°C resistance:</strong> 119 − 100 = 19&nbsp;Ω</li>
+        <li><strong>Divide by the slope:</strong> 19 / 0.385 ≈ 49.35&nbsp;°C</li>
+        <li><strong>Convert to °F:</strong> 49.35 × 1.8 + 32 ≈ 120.83&nbsp;°F</li>
+      </ol>
+
+      <p>
+        This is the kind of quick calculation a tech can do to sanity‑check a transmitter or a handheld calibrator.
+        It is “good enough” in the mid‑range, but it is still an approximation.
+      </p>
+    </section>
+
+    <section>
+      <h2>The Real RTD Curve (Callendar–Van Dusen)</h2>
+      <p>
+        RTDs are <strong>not perfectly linear</strong>. The true behavior follows the
+        <strong>Callendar–Van Dusen equation</strong>, which introduces curvature into the resistance‑temperature relationship:
+      </p>
+      <pre><code>R(T) = R₀ (1 + A·T + B·T²)   (above 0 °C)
+R(T) = R₀ (1 + A·T + B·T² + C·(T − 100)·T³)   (below 0 °C)</code></pre>
+      <p>
+        Transmitters and calibrators use this full equation internally. Techs do not need to memorize the constants,
+        but they do need to understand the implications:
+      </p>
+      <ul>
+        <li>The simple linear formula is accurate only in a limited range (roughly 0–100&nbsp;°C).</li>
+        <li>Below 0&nbsp;°C, the curve bends and error grows if you assume linear behavior.</li>
+        <li>Above ~200&nbsp;°C, linear error becomes significant and can no longer be ignored.</li>
+        <li>High‑accuracy work always relies on the full Callendar–Van Dusen implementation inside the transmitter.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Lead Wire Effects (2‑Wire, 3‑Wire, 4‑Wire)</h2>
+      <p>
+        RTDs do not output a voltage; they present a <strong>resistance</strong>. That means any resistance in the lead wires
+        looks like extra temperature unless it is compensated. Understanding wiring configuration is critical.
+      </p>
+
+      <h3>2‑Wire RTD</h3>
+      <ul>
+        <li>Lead wire resistance adds directly to the RTD resistance.</li>
+        <li>Only acceptable for very short runs or low‑accuracy applications.</li>
+        <li>Any change in lead resistance (corrosion, temperature, loose terminals) shows up as temperature error.</li>
+      </ul>
+
+      <h3>3‑Wire RTD</h3>
+      <ul>
+        <li>Most common industrial configuration.</li>
+        <li>Assumes both lead wires have equal resistance.</li>
+        <li>The transmitter measures and subtracts one leg from the other to cancel lead resistance.</li>
+        <li>Works well as long as the wiring is balanced and connections are clean.</li>
+      </ul>
+
+      <h3>4‑Wire RTD</h3>
+      <ul>
+        <li>Highest accuracy configuration.</li>
+        <li>Lead resistance is fully canceled by separate sense and excitation leads.</li>
+        <li>Used in labs, calibration rigs, and critical control loops.</li>
+      </ul>
+
+      <h3>Field Reality</h3>
+      <p>
+        If a 3‑wire RTD suddenly starts reading <strong>high</strong>, suspect:
+      </p>
+      <ul>
+        <li>Corroded or loose terminals in the connection head.</li>
+        <li>One lead wire broken or partially open.</li>
+        <li>Moisture ingress into the junction box or cable.</li>
+        <li>Unbalanced lead resistance due to damage or poor installation.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Drift & Failure Mechanisms</h2>
+      <p>
+        RTDs do not usually fail instantly; they tend to <strong>drift</strong> or become unstable over time. Understanding how
+        they fail helps separate sensor issues from transmitter or process issues.
+      </p>
+
+      <h3>Common Drift Mechanisms</h3>
+      <ul>
+        <li>Mechanical strain relief in the platinum element loosens over thermal cycles.</li>
+        <li>Moisture enters the sheath or terminal head and changes resistance paths.</li>
+        <li>Vibration causes micro‑cracks or intermittent connections.</li>
+        <li>Lead wire corrosion increases resistance gradually.</li>
+      </ul>
+
+      <h3>Typical Symptoms</h3>
+      <ul>
+        <li><strong>Slow upward drift:</strong> moisture, corrosion, or lead resistance increasing.</li>
+        <li><strong>Intermittent jumps:</strong> loose terminals, cable movement, or vibration.</li>
+        <li><strong>Stable but offset:</strong> calibration error or uncompensated lead resistance.</li>
+        <li><strong>Stuck at very high temperature:</strong> open circuit or broken element.</li>
+        <li><strong>Stuck at very low temperature:</strong> short circuit or insulation breakdown.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Field Calibration & Sanity Checks</h2>
+      <p>
+        Full metrology‑grade calibration is one thing; field sanity checks are another. Techs need a simple way to
+        decide whether the RTD is believable before they start chasing ghosts in the process.
+      </p>
+
+      <h3>Simple Two‑Point Check</h3>
+      <ol>
+        <li><strong>Ice bath (0&nbsp;°C):</strong> Pack crushed ice and water, immerse the RTD, and let it stabilize.</li>
+        <li><strong>Boiling water (~100&nbsp;°C):</strong> Immerse the RTD in boiling water, corrected for altitude if needed.</li>
+        <li>Compare measured resistance to a PT100 table or the transmitter’s indicated temperature.</li>
+      </ol>
+
+      <h3>Interpreting the Results</h3>
+      <ul>
+        <li><strong>Offset is constant at both points:</strong> lead wire or configuration issue.</li>
+        <li><strong>Error grows with temperature:</strong> element drift or incorrect curve selection.</li>
+        <li><strong>Random or unstable readings:</strong> moisture, loose connections, or cable damage.</li>
+      </ul>
+    </section>
+
+    <div class="related">
+      <strong>Adjacent Technical Consideration:</strong>
+      RTDs are only one half of the temperature‑measurement chain. The transmitter’s configuration
+      (curve selection, wiring type, damping, and scaling) is just as important as the sensor itself.
+      A PT100 wired as a 2‑wire device into a 3‑wire configuration will read high. A transmitter set
+      for the wrong RTD curve (e.g., 392 instead of 385) will introduce a systematic error that looks
+      like “bad process data” unless someone checks the configuration against the datasheet.
+      <br><br>
+      In practice, RTD issues often show up as “the loop is off by 5–10&nbsp;°C” rather than a total failure.
+      Before replacing hardware, a good technician verifies lead wiring, terminal tightness, moisture
+      ingress, and transmitter settings. Only after the electrical and configuration pieces are confirmed
+      should the RTD element itself be condemned.
+      <br><br>
+      The same mindset carries directly into thermocouples and cold junction compensation (CJC):
+      understanding where the reference is, how the transmitter is interpreting it, and how wiring
+      and environment affect the measurement is more important than memorizing tables. Once a
+      tech understands RTD behavior at this level, the jump to thermocouples, CJC, and advanced
+      temperature diagnostics becomes much more natural.
+    </div>
+
+  </div>
+</div>
     
 <script>
 function toggleSection(id) {
