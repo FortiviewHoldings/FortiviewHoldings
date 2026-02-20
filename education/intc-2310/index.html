@@ -628,7 +628,111 @@
         This is the kind of quick calculation a tech can do to sanity‑check a transmitter or a handheld calibrator.
         It is “good enough” in the mid‑range, but it is still an approximation.
       </p>
+    </section>
 
+<section>
+  <h2>The Real RTD Curve (Callendar–Van Dusen)</h2>
+  <p>
+    RTDs are <strong>not perfectly linear</strong>. The true behavior follows the
+    <strong>Callendar–Van Dusen equation</strong>, which models the curvature in the
+    resistance–temperature relationship. Transmitters use this internally to convert
+    measured resistance into an accurate temperature.
+  </p>
+
+  <h3>Callendar–Van Dusen Equations</h3>
+  <pre><code>
+Above 0 °C:
+R(T) = R₀ · (1 + A·T + B·T²)
+
+Below 0 °C:
+R(T) = R₀ · (1 + A·T + B·T² + C·(T − 100)·T³)
+  </code></pre>
+
+  <h3>Variable Definitions</h3>
+  <ul>
+    <li><strong>R(T)</strong> — Resistance at temperature T (Ω)</li>
+    <li><strong>R₀</strong> — Resistance at 0 °C (100 Ω for PT100)</li>
+    <li><strong>T</strong> — Temperature in °C</li>
+    <li><strong>A</strong> — 3.9083 × 10⁻³ °C⁻¹</li>
+    <li><strong>B</strong> — −5.775 × 10⁻⁷ °C⁻²</li>
+    <li><strong>C</strong> — −4.183 × 10⁻¹² °C⁻⁴ (used only below 0 °C)</li>
+  </ul>
+
+  <h3>Worked Example (Full Quadratic Solution)</h3>
+  <p>
+    Suppose a PT100 measures <strong>119.00 Ω</strong>. Using the above‑0 °C Callendar–Van Dusen equation:
+  </p>
+
+  <pre><code>
+Given:
+R(T) = 119.00 Ω
+R₀ = 100 Ω
+A = 3.9083×10⁻³
+B = −5.775×10⁻⁷
+
+Start with:
+119 = 100(1 + A·T + B·T²)
+
+Divide by 100:
+1.19 = 1 + A·T + B·T²
+
+Subtract 1:
+0.19 = A·T + B·T²
+
+Rearrange into quadratic form:
+B·T² + A·T − 0.19 = 0
+
+Substitute constants:
+(−5.775×10⁻⁷)T² + (3.9083×10⁻³)T − 0.19 = 0
+  </code></pre>
+
+  <h3>Quadratic Formula</h3>
+  <pre><code>
+T = [ −A ± √(A² − 4·B·(−0.19)) ] / (2B)
+  </code></pre>
+
+  <h3>Compute the Discriminant</h3>
+  <pre><code>
+A² = (3.9083×10⁻³)² = 1.5285×10⁻⁵
+
+4·B·(−0.19) = 4(−5.775×10⁻⁷)(−0.19)
+            = 4.3815×10⁻⁷
+
+Discriminant:
+A² − 4B(−0.19) = 1.5285×10⁻⁵ + 4.3815×10⁻⁷
+               = 1.5723×10⁻⁵
+
+√Discriminant = 0.003965
+  </code></pre>
+
+  <h3>Apply the Quadratic Formula</h3>
+  <pre><code>
+T = [ −0.0039083 ± 0.003965 ] / (2·−5.775×10⁻⁷)
+T = [ −0.0039083 ± 0.003965 ] / −1.155×10⁻⁶
+  </code></pre>
+
+  <h3>Compute Both Roots</h3>
+  <pre><code>
+Root 1 (positive numerator):
+T = (0.0000567) / (−1.155×10⁻⁶)
+T = −49.1 °C   ← invalid (resistance is too high for negative temp)
+
+Root 2 (negative numerator):
+T = (−0.0078733) / (−1.155×10⁻⁶)
+T = 49.35 °C   ← correct physical solution
+  </code></pre>
+
+  <h3>Final Answer</h3>
+  <pre><code>
+T = 49.35 °C
+  </code></pre>
+
+  <p>
+    This matches the linear approximation extremely well because the RTD curve is nearly
+    linear in this region. At higher or lower temperatures, the curvature becomes more
+    significant and the full Callendar–Van Dusen equation is required for accuracy.
+  </p>
+  
   <h3>Why This Matters</h3>
   <ul>
     <li>The linear formula is accurate only from roughly 0–100 °C.</li>
