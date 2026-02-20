@@ -122,7 +122,7 @@
   </div>
 
   <div class="note">
-    <strong>Note:</strong> This is written as a technical field guide/ overivew from my point of view.
+    <strong>Note:</strong> This is written as a technical field guide/ overview from my point of view.
   </div>
 
   <section>
@@ -566,7 +566,8 @@
   all influence measurement reliability. Proper commissioning, echo‑curve capture, and documentation ensure long‑term 
   stability and prevent misinterpretation of normal process behavior as instrument failure.
 </div>
-  </div>
+</div>
+</div>
 
        <div class="session">
   <span class="time">RTD Fundamentals</span>
@@ -755,6 +756,199 @@ R(T) = R₀ (1 + A·T + B·T² + C·(T − 100)·T³)   (below 0 °C)</code></pr
       and environment affect the measurement is more important than memorizing tables. Once a
       tech understands RTD behavior at this level, the jump to thermocouples, CJC, and advanced
       temperature diagnostics becomes much more natural.
+    </div>
+
+  </div>
+</div>
+
+    <div class="session">
+  <span class="time">Thermocouple Fundamentals</span>
+  <span>Seebeck Effect, Polarity, CJC & Field Behavior</span>
+
+  <button class="toggle-btn" onclick="toggleSection('tcSummary')">
+    View Thermocouple Overview
+  </button>
+
+  <div id="tcSummary" class="collapsible">
+
+    <h1>Thermocouple Overview</h1>
+
+    <div class="meta">
+      <div><span class="label">Author:</span> Cameron Bridges</div>
+      <div><span class="label">Topic:</span> Thermocouples, Polarity, CJC, Drift & Troubleshooting</div>
+    </div>
+
+    <div class="note">
+      <strong>Note:</strong> This is written as a technical field guide from my point of view, not as a textbook definition.
+    </div>
+
+    <section>
+      <h2>What a Thermocouple Actually Is</h2>
+      <p>
+        A <strong>thermocouple</strong> is a temperature sensor made from two dissimilar metals welded together at one end.
+        When the junction is heated, it produces a small voltage due to the <strong>Seebeck effect</strong>.
+        This voltage is proportional to temperature difference, not absolute temperature.
+      </p>
+      <p>
+        Thermocouples are rugged, inexpensive, and capable of extremely high temperatures, but they require
+        <strong>Cold Junction Compensation (CJC)</strong> to produce an accurate reading.
+      </p>
+    </section>
+
+    <section>
+      <h2>The Seebeck Effect (Why Thermocouples Work)</h2>
+      <p>
+        When two different metals are joined and the junction is heated, electrons flow differently in each metal.
+        This creates a measurable voltage. The hotter the junction, the larger the voltage.
+      </p>
+      <p>
+        Important: A thermocouple does <strong>not</strong> measure absolute temperature. It measures the
+        <strong>difference</strong> between:
+      </p>
+      <ul>
+        <li>The <strong>hot junction</strong> (process end)</li>
+        <li>The <strong>cold junction</strong> (reference end, usually inside the transmitter)</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Cold Junction Compensation (CJC)</h2>
+      <p>
+        Because thermocouples measure temperature difference, the transmitter must know the temperature at the
+        <strong>cold junction</strong> to calculate the true process temperature.
+      </p>
+
+      <h3>How CJC Works</h3>
+      <ul>
+        <li>A small sensor (usually a thermistor or RTD) measures the terminal block temperature.</li>
+        <li>The transmitter adds this temperature to the thermocouple’s measured voltage.</li>
+        <li>This produces the actual process temperature.</li>
+      </ul>
+
+      <h3>Field Reality</h3>
+      <ul>
+        <li>If CJC fails, the reading is wrong even if the thermocouple is perfect.</li>
+        <li>Loose terminals, drafts, or cold spots around the transmitter cause CJC error.</li>
+        <li>Remote junction boxes without CJC will always produce incorrect readings.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Thermocouple Types (K, J, T, E, N, R, S, B)</h2>
+      <p>
+        Each thermocouple type uses different metals and has different temperature ranges and sensitivities.
+        The most common industrial types:
+      </p>
+
+      <h3>Type K (Chromel–Alumel)</h3>
+      <ul>
+        <li>General purpose</li>
+        <li>−200 to 1260&nbsp;°C</li>
+        <li>Good for oxidizing environments</li>
+      </ul>
+
+      <h3>Type J (Iron–Constantan)</h3>
+      <ul>
+        <li>−40 to 750&nbsp;°C</li>
+        <li>Not good in moist or oxidizing environments (iron rusts)</li>
+      </ul>
+
+      <h3>Type T (Copper–Constantan)</h3>
+      <ul>
+        <li>Excellent for low temperatures</li>
+        <li>−200 to 350&nbsp;°C</li>
+      </ul>
+
+      <h3>Type N, R, S, B</h3>
+      <ul>
+        <li>High‑temperature and high‑stability applications</li>
+        <li>Used in furnaces, reactors, and critical processes</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Polarity & Wiring (The #1 Student Mistake)</h2>
+      <p>
+        Thermocouples are polarity‑sensitive. Reversing the leads causes the temperature to go <strong>down</strong> when
+        the process heats up.
+      </p>
+
+      <h3>Field Rules</h3>
+      <ul>
+        <li><strong>Red is always negative</strong> in ANSI thermocouple wiring.</li>
+        <li>Extension wire must match the thermocouple type.</li>
+        <li>Never mix types (K with J, etc.) or you create new junctions.</li>
+        <li>Every junction of dissimilar metals creates a new thermocouple.</li>
+      </ul>
+
+      <p>
+        If a thermocouple reads backwards or jumps around, polarity or junction contamination is usually the cause.
+      </p>
+    </section>
+
+    <section>
+      <h2>Drift & Failure Mechanisms</h2>
+      <p>
+        Thermocouples drift more than RTDs. They are not precision devices; they are rugged devices.
+      </p>
+
+      <h3>Common Drift Causes</h3>
+      <ul>
+        <li>Oxidation of the metals</li>
+        <li>Contamination from the sheath or process</li>
+        <li>Grain growth at high temperature</li>
+        <li>Thermal cycling</li>
+        <li>Mechanical shock or vibration</li>
+      </ul>
+
+      <h3>Failure Symptoms</h3>
+      <ul>
+        <li><strong>Open circuit:</strong> reading jumps to maximum temperature</li>
+        <li><strong>Short circuit:</strong> reading stuck near ambient</li>
+        <li><strong>Drift:</strong> slow change over time, especially at high temperature</li>
+        <li><strong>Noise:</strong> unstable readings due to poor shielding or grounding</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Field Troubleshooting</h2>
+      <p>
+        Thermocouple troubleshooting is about verifying the loop, not just the sensor.
+      </p>
+
+      <h3>Checklist</h3>
+      <ul>
+        <li>Verify polarity (red = negative)</li>
+        <li>Check for opens with a meter</li>
+        <li>Inspect terminal tightness</li>
+        <li>Check for moisture in junction boxes</li>
+        <li>Verify extension wire type matches the thermocouple</li>
+        <li>Check transmitter CJC sensor for stability</li>
+      </ul>
+
+      <h3>Quick Field Test</h3>
+      <ul>
+        <li>Warm the junction with your fingers — the reading should rise smoothly</li>
+        <li>If it drops or jumps, polarity or CJC is wrong</li>
+      </ul>
+    </section>
+
+    <div class="related">
+      <strong>Adjacent Technical Consideration:</strong>
+      Thermocouples are simple devices, but the measurement chain is not. Every junction, terminal block,
+      extension wire, and transmitter input affects accuracy. Cold Junction Compensation is the most
+      misunderstood part of thermocouple measurement, and most field errors come from:
+      <br><br>
+      • Incorrect wiring or polarity<br>
+      • Wrong thermocouple type selected in the transmitter<br>
+      • CJC sensor drift or failure<br>
+      • Drafts or temperature gradients around the transmitter<br>
+      • Mixed metal junctions in terminal boxes<br>
+      <br>
+      Once a technician understands that a thermocouple measures <em>difference</em> and that the transmitter
+      reconstructs the absolute temperature using CJC, the entire system becomes easier to troubleshoot.
+      This understanding also bridges directly into advanced diagnostics, multi‑junction systems, and
+      high‑temperature furnace applications.
     </div>
 
   </div>
