@@ -26,6 +26,8 @@
   <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.webmanifest">
   <!-- Preload brand background -->
+  <!-- If you keep this, ensure it's used above the fold; otherwise remove or switch to prefetch to silence the console warning. -->
+  <!-- <link rel="prefetch" href="https://fortiviewholdings.com/images/bg.png"> -->
   <link rel="preload" as="image" href="https://fortiviewholdings.com/images/bg.png">
   <!-- Structured Data -->
   <script type="application/ld+json">
@@ -42,6 +44,7 @@
     ]
   }
   </script>
+
   <style>
     :root{
       --bg-deep:#000000cc;
@@ -70,35 +73,25 @@
     }
     a{color:inherit;text-decoration:none}
     img{display:block;max-width:100%}
+
     .bg{
       position:fixed; inset:0; z-index:-2;
       background: var(--glass);
       filter:blur(6px) brightness(.9) saturate(1.05);
       transform:scale(1.03);
     }
-    .bg::after{
-      content:""; position:absolute; inset:0;
-      background: var(--glass);
-    }
-    #bg-stars{
-      position:fixed; inset:0; width:100vw; height:100vh; z-index:-1; pointer-events:none;
-    }
+    .bg::after{ content:""; position:absolute; inset:0; background: var(--glass); }
+    #bg-stars{ position:fixed; inset:0; width:100vw; height:100vh; z-index:-1; pointer-events:none; }
+
     /* Screen-reader only helper */
-    .sr-only {
-      position:absolute !important;
-      width:1px; height:1px;
-      padding:0; margin:-1px;
-      overflow:hidden; clip:rect(0,0,0,0);
-      white-space:nowrap; border:0;
-    }
+    .sr-only { position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
 
     /* ===== Global full-screen shimmer overlay (hidden by default) ===== */
     .loader-shimmer{
       position:fixed; inset:0; z-index:9999;
-      pointer-events:auto; /* block clicks while loading */
+      pointer-events:auto;
       opacity:0; visibility:hidden;
       transition:opacity 160ms ease, visibility 0s linear 160ms;
-      /* subtle dim + shimmer sweep (keeps content visible underneath) */
       background-color:rgba(0,0,0,0.06);
       background-image:linear-gradient(
         90deg,
@@ -113,23 +106,12 @@
       -webkit-font-smoothing:antialiased;
       -moz-osx-font-smoothing:grayscale;
     }
-    html.is-loading .loader-shimmer{
-      opacity:1; visibility:visible;
-      transition:opacity 160ms ease;
-      animation:shimmer-sweep 1.25s linear infinite;
-    }
-    @keyframes shimmer-sweep{
-      0%{ background-position:-200% 0; }
-      100%{ background-position:200% 0; }
-    }
-    /* Freeze page scroll (optional) */
+    html.is-loading .loader-shimmer{ opacity:1; visibility:visible; transition:opacity 160ms ease; animation:shimmer-sweep 1.25s linear infinite; }
+    @keyframes shimmer-sweep{ 0%{ background-position:-200% 0; } 100%{ background-position:200% 0; } }
     html.is-loading{ overflow:hidden; }
-    /* Respect reduced-motion */
-    @media (prefers-reduced-motion: reduce){
-      html.is-loading .loader-shimmer{ animation:none; }
-    }
-    /* Keep iOS from zooming inputs on focus */
-    input, select, textarea { font-size:16px; }
+    @media (prefers-reduced-motion: reduce){ html.is-loading .loader-shimmer{ animation:none; } }
+
+    input, select, textarea { font-size:16px; } /* Keep iOS from zooming inputs */
 
     header{
       position:sticky; top:0; z-index:50;
@@ -137,10 +119,7 @@
       background:var(--glass);
       border-bottom:1px solid var(--border);
     }
-    .nav{
-      max-width:var(--maxw); margin:0 auto; padding:14px 20px;
-      display:flex; align-items:center; justify-content:space-between; gap:16px;
-    }
+    .nav{ max-width:var(--maxw); margin:0 auto; padding:14px 20px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
     .brand{display:flex; align-items:center; gap:10px; letter-spacing:.4px; flex-wrap: wrap;}
     .site-label { color: var(--muted); font-size: .95rem; white-space: nowrap;}
     .logo{
@@ -151,151 +130,64 @@
     }
     .brand strong{font-weight:800}
     nav ul{display:flex; gap:14px; list-style:none; align-items:center; margin:0; padding:0}
-    .link{
-      padding:9px 14px; border-radius:999px; color:var(--muted);
-      border:1px solid transparent; transition:.2s ease;
-    }
+    .link{ padding:9px 14px; border-radius:999px; color:var(--muted); border:1px solid transparent; transition:.2s ease; }
     .link:hover{color:#fff; border-color:#ffffff22; background:#ffffff12}
-    .cta{
-      background:linear-gradient(180deg, var(--brand), var(--brand-600));
-      color:#0c120a; font-weight:800; letter-spacing:.2px;
-      padding:10px 16px; border-radius:999px; box-shadow:var(--aura);
-    }
+    .cta{ background:linear-gradient(180deg, var(--brand), var(--brand-600)); color:#0c120a; font-weight:800; letter-spacing:.2px; padding:10px 16px; border-radius:999px; box-shadow:var(--aura); }
     .cta:hover{filter:brightness(.95)}
     .cta-btn{
-      display:inline-block;
-      background:var(--glass);
-      color:var(--brand); font-weight:600;
-      padding:10px 18px; border-radius:999px;
-      border:1px solid var(--brand-600);
+      display:inline-block; background:var(--glass); color:var(--brand); font-weight:600;
+      padding:10px 18px; border-radius:999px; border:1px solid var(--brand-600);
       transition:all .2s ease; cursor:pointer;
     }
     .cta-btn:hover{ background:#3a4661; transform:translateY(-2px); }
-    /* Success lock state for the CTA button */
-    .cta-btn.is-selected{
-      background:linear-gradient(180deg, var(--brand), var(--brand-600));
-      color:#0c120a;
-      border-color:var(--brand-600);
-      box-shadow:0 0 0 3px rgba(92,140,69,.28);
-      cursor:default;
-    }
+    .cta-btn.is-selected{ background:linear-gradient(180deg, var(--brand), var(--brand-600)); color:#0c120a; border-color:var(--brand-600); box-shadow:0 0 0 3px rgba(92,140,69,.28); cursor:default; }
     .cta-btn.is-selected:disabled{ opacity:1; }
-    .cta-btn.is-selected::after{
-      content:" ✓";
-      font-weight:700;
-    }
+    .cta-btn.is-selected::after{ content:" ✓"; font-weight:700; }
 
     .section{max-width:var(--maxw); margin:36px auto; padding:0 20px}
-    .glass{
-      background:var(--glass); border:1px solid var(--border); border-radius:var(--radius);
-      box-shadow:var(--aura); padding:32px;
-    }
+    .glass{ background:var(--glass); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--aura); padding:32px; }
 
     .dropdown { position: relative; }
     .dropdown-toggle {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font: inherit;
-      color: var(--muted);
-      padding: 9px 14px;
-      border-radius: 999px;
-      transition: .2s ease;
+      background: none; border: none; cursor: pointer; font: inherit;
+      color: var(--muted); padding: 9px 14px; border-radius: 999px; transition: .2s ease;
     }
-    .dropdown-toggle:hover {
-      color: var(--muted);
-      background: #ffffff12;
-      border: 1px solid #ffffff22;
-    }
+    .dropdown-toggle:hover { color: var(--muted); background: #ffffff12; border: 1px solid #ffffff22; }
     .dropdown-menu {
-      display: none;
-      position: absolute;
-      top: 110%;
-      left: 0;
-      background: var(--glass-blur);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      box-shadow: var(--aura);
-      list-style: none;
-      margin: 0;
-      padding: 8px 0;
-      min-width: 240px;
-      z-index: 100;
+      display: none; position: absolute; top: 110%; left: 0; background: var(--glass-blur);
+      border: 1px solid var(--border); border-radius: var(--radius-sm); box-shadow: var(--aura);
+      list-style: none; margin: 0; padding: 8px 0; min-width: 240px; z-index: 100;
     }
-    .dropdown-menu li { padding: 0; }
-    .dropdown-menu a {
-      display: block;
-      padding: 10px 16px;
-      color: var(--muted);
-      transition: background .2s ease;
-    }
-    .dropdown-menu a:hover {
-      background: #ffffff12;
-      color: var(--ink);
-    }
+    .dropdown-menu a { display: block; padding: 10px 16px; color: var(--muted); transition: background .2s ease; }
+    .dropdown-menu a:hover { background: #ffffff12; color: var(--ink); }
 
     .option-card{
-      flex:1 1 200px;
-      background:var(--glass);
-      border:1px solid var(--border);
-      border-radius:var(--radius-sm);
-      text-align: center;
-      padding:16px; cursor:pointer; transition:all .2s ease;
+      flex:1 1 200px; background:var(--glass); border:1px solid var(--border);
+      border-radius:var(--radius-sm); text-align: center; padding:16px; cursor:pointer; transition:all .2s ease;
     }
     .option-card:hover{ background: var(--glass-2); border-color:var(--brand); }
-    .option-card.selected{
-      background: var(--glass-2); border-color:var(--brand);
-      box-shadow:0 0 0 2px rgba(92,140,69,.35);
-    }
+    .option-card.selected{ background: var(--glass-2); border-color:var(--brand); box-shadow:0 0 0 2px rgba(92,140,69,.35); }
 
     .table-wrapper{ width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
-    .table-wrapper table{
-      width:100%; border-collapse:collapse; min-width:500px;
-      margin-top:1rem; font-size:.95rem;
-    }
+    .table-wrapper table{ width:100%; border-collapse:collapse; min-width:500px; margin-top:1rem; font-size:.95rem; }
     th, td{ padding:12px; border-bottom:1px solid var(--border); }
     th{ background:var(--glass); color: var(--ink); }
     td:first-child{ text-align:left; }
     .check{ color:var(--brand-600); font-weight:700; text-align:center; }
     .cross{ color:var(--muted); font-weight:700; text-align:center; }
     .check::before {
-      content: "";
-      display: inline-block;
-      width: 18px;
-      height: 18px;
+      content: ""; display: inline-block; width: 18px; height: 18px;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpolyline points='20 6 9 17 4 12' fill='none' stroke='%231ca490' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-      background-size: contain;
-      background-repeat: no-repeat;
-      vertical-align: middle;
+      background-size: contain; background-repeat: no-repeat; vertical-align: middle;
     }
-    .cross::before {
-      content: "✘";
-      color: var(--muted);
-      font-weight: bold;
-      font-size: 1.2rem;
-    }
-    table td:nth-child(2),
-    table td:nth-child(3),
-    table td:nth-child(4),
-    table td:nth-child(5),
-    table th:nth-child(2),
-    table th:nth-child(3),
-    table th:nth-child(4),
-    table th:nth-child(5){ text-align:center; }
+    .cross::before { content: "✘"; color: var(--muted); font-weight: bold; font-size: 1.2rem; }
+    table td:nth-child(2), table td:nth-child(3), table td:nth-child(4), table td:nth-child(5),
+    table th:nth-child(2), table th:nth-child(3), table th:nth-child(4), table th:nth-child(5){ text-align:center; }
 
     #ctaBox{ position:relative; }
 
-    .sms-consent {
-      display: flex;
-      align-items: flex-start;
-      margin: 8px 0;
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-    .sms-consent input[type="checkbox"] {
-      margin-right: 8px;
-      accent-color: var(--brand-600); /* modern browsers */
-    }
+    .sms-consent { display: flex; align-items: flex-start; margin: 8px 0; font-size: 0.9rem; color: var(--muted); }
+    .sms-consent input[type="checkbox"] { margin-right: 8px; accent-color: var(--brand-600); }
     #loadingOverlay{ display:none !important; }
     [hidden]{ display:none !important; }
 
@@ -325,63 +217,44 @@
       nav ul li{ flex:1 1 auto; display:flex; justify-content:center; }
       nav ul a{ width:100%; text-align:center; }
     }
-    .sms-consent .privacy-link {
-      color: #4ecdc4; /* your mint accent */
-      text-decoration: underline; /* optional */
-      font-weight: 500; /* optional */
-    }
-    .sms-consent .privacy-link:hover {
-      color: #38a89d; /* darker mint on hover */
-    }
-    .icon {
-      width: 1.2rem;
-      height: 1.2rem;
-      fill: var(--brand-600);
-      vertical-align: -0.2em;
-      margin-right: 8px;
-    }
+    .sms-consent .privacy-link { color: #4ecdc4; text-decoration: underline; font-weight: 500; }
+    .sms-consent .privacy-link:hover { color: #38a89d; }
+
+    .icon { width: 1.2rem; height: 1.2rem; fill: var(--brand-600); vertical-align: -0.2em; margin-right: 8px; }
 
     /* === Markdown Agreement Modal (public-facing) === */
-    .modal-overlay {
-      position: fixed; inset: 0; z-index: 10000;
-      background: rgba(0,0,0,.55);
-      display: none;
-    }
+    .modal-overlay { position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,.55); display: none; }
     .modal-overlay.is-open { display: block; }
-    .modal {
-      position: fixed; inset: 0; z-index: 10001;
-      display: grid; place-items: center;
-      pointer-events: none;
-    }
-    .modal.is-open { pointer-events: auto; }
+
+    /* IMPORTANT: hidden by default to prevent showing on first paint */
+    .modal { position: fixed; inset: 0; z-index: 10001; display: none; place-items: center; pointer-events: none; }
+    .modal.is-open { display: grid; pointer-events: auto; }
+
     .modal-card {
       width: min(900px, 92vw); max-height: 85vh;
       background: var(--glass); border: 1px solid var(--border);
       border-radius: var(--radius); box-shadow: var(--aura);
       overflow: hidden; display: grid; grid-template-rows: auto 1fr auto;
     }
-    .modal-head {
-      padding: 14px 18px; border-bottom: 1px solid var(--border);
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      background: var(--glass-2);
-    }
+    .modal-head { padding: 14px 18px; border-bottom: 1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:10px; background: var(--glass-2); }
     .modal-title { font-weight: 800; color: var(--ink); margin: 0; font-size: 1.05rem; }
     .modal-close { background: none; border: 0; color: var(--muted); font-weight: 700; cursor: pointer; }
-    .modal-body {
-      padding: 0; overflow: auto; background: #0a0f19;
-    }
+    .modal-body { padding: 0; overflow: auto; background: #0a0f19; }
     .md-view { padding: 18px 22px; color: #dfe7ff; font-size: .98rem; line-height: 1.55; }
     .md-view h1,.md-view h2,.md-view h3,.md-view h4 { margin: 1.1em 0 .5em; }
     .md-view pre { background: #0f1626; padding: 10px 12px; border-radius: 10px; overflow: auto; }
     .md-view code { background: #0f1626; padding: 2px 6px; border-radius: 6px; }
+
+    /* tables inside Markdown preview */
+    .md-view table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+    .md-view th, .md-view td { padding: 8px; border: 1px solid var(--border); }
+    .md-view thead th { background: var(--glass); color: var(--ink); text-align: left; }
+
     .modal-foot {
       display:flex; gap:14px; align-items:center; justify-content:space-between;
       border-top: 1px solid var(--border); padding: 12px 16px; background: var(--glass-2);
     }
-    .modal-foot .ack {
-      display:flex; gap:10px; align-items:flex-start; color: var(--muted);
-      font-size: .95rem;
-    }
+    .modal-foot .ack { display:flex; gap:10px; align-items:flex-start; color: var(--muted); font-size: .95rem; }
     .modal-foot .ack input[type="checkbox"] { accent-color: var(--brand-600); margin-top: 4px; }
     .modal-foot .actions { display: flex; gap: 10px; }
     .modal-foot .secondary { background:#ffffff12; border:1px solid #ffffff22; }
@@ -451,19 +324,19 @@
         into dashboards that drive clarity and accountability.
       </p>
       <ul style="margin-top:16px; color:var(--ink); line-height:1.6; list-style:none; padding-left:0;">
-        <li><svg class="icon"><use href="https://fortiviewholdings.com/icons/sprite.svg#icon-integrate" xlink:href="https://fortiviewholdings.com/icons/sprite.svg#icon-integrate"></use></svg>
+        <li><svg class="icon"><use href="https://fortiviewholdings.com/icons/sprite.svg#icon-integrate"></use></svg>
           Seamless integration of Microsoft 365, CRM, and POS systems</li>
-        <li><svg class="icon"><use href="https://fortiviewholdings.com/icons/sprite.svg#icon-puzzle" xlink:href="https://fortiviewholdings.com/icons/sprite.svg#icon-puzzle"></use></svg>
+        <li><svg class="icon"><use href="https://fortiviewholdings.com/icons/sprite.svg#icon-puzzle"></use></svg>
           Software as a Solution (SaaS), delivering ready‑to‑use cloud applications that streamline operations without infrastructure overhead</li>
-        <li><svg class="icon"><use href="https://fortiviewholdings.com/icons/sprite.svg#icon-dashboard" xlink:href="https://fortiviewholdings.com/icons/sprite.svg#icon-dashboard"></use></svg>
+        <li><svg class="icon"><use href="https://fortiviewholdings.com/icons/sprite.svg#icon-dashboard"></use></svg>
           Unified dashboards for finance, operations, and customer experience</li>
-        <li><svg class="icon"><use href="https://fortiviewholdings.com/icons/sprite.svg#icon-energy" xlink:href="https://fortiviewholdings.com/icons/sprite.svg#icon-energy"></use></svg>
+        <li><svg class="icon"><use href="https://fortiviewholdings.com/icons/sprite.svg#icon-energy"></use></svg>
           Automation pipelines (Power Automate, PowerShell, Python)</li>
-        <li><svg class="icon"><use href="https://fortiviewholdings.com/icons/sprite.svg#icon-phone" xlink:href="https://fortiviewholdings.com/icons/sprite.svg#icon-phone"></use></svg>
+        <li><svg class="icon"><use href="https://fortiviewholdings.com/icons/sprite.svg#icon-phone"></use></svg>
           iOS & Web App Development – high‑performance mobile experiences that connect your customers and operations</li>
-        <li><svg class="icon"><use href="https://fortiviewholdings.com/icons/sprite.svg#icon-fingerprint" xlink:href="https://fortiviewholdings.com/icons/sprite.svg#icon-fingerprint"></use></svg>
+        <li><svg class="icon"><use href="https://fortiviewholdings.com/icons/sprite.svg#icon-fingerprint"></use></svg>
           Identity-aware access control and compliance-ready logging</li>
-        <li><svg class="icon"><use href="https://fortiviewholdings.com/icons/sprite.svg#icon-scale" xlink:href="https://fortiviewholdings.com/icons/sprite.svg#icon-scale"></use></svg>
+        <li><svg class="icon"><use href="https://fortiviewholdings.com/icons/sprite.svg#icon-scale"></use></svg>
           Scalable architecture designed for growth and partnerships</li>
       </ul>
 
@@ -471,7 +344,7 @@
       <div style="margin-top:28px;">
         <button class="cta-btn" onclick="openCtaBox()">Select Your Package</button>
         <!-- NEW: API path CTA -->
-        <button class="cta-btn" style="margin-left:12px" onclick="openAgreementModal()">
+        <button class="cta-btn" style="margin-left:12px" onclick="openAgreementModal(event)">
           Use PragOptics API
         </button>
       </div>
@@ -546,56 +419,23 @@
               <select id="custState" name="address-level1" autocomplete="address-level1"
                 required style="width:100%; padding:8px; margin:6px 0;">
                 <option value="">Select a state</option>
-                <option value="AL">Alabama</option>
-                <option value="AK">Alaska</option>
-                <option value="AZ">Arizona</option>
-                <option value="AR">Arkansas</option>
-                <option value="CA">California</option>
-                <option value="CO">Colorado</option>
-                <option value="CT">Connecticut</option>
-                <option value="DE">Delaware</option>
-                <option value="FL">Florida</option>
-                <option value="GA">Georgia</option>
-                <option value="HI">Hawaii</option>
-                <option value="ID">Idaho</option>
-                <option value="IL">Illinois</option>
-                <option value="IN">Indiana</option>
-                <option value="IA">Iowa</option>
-                <option value="KS">Kansas</option>
-                <option value="KY">Kentucky</option>
-                <option value="LA">Louisiana</option>
-                <option value="ME">Maine</option>
-                <option value="MD">Maryland</option>
-                <option value="MA">Massachusetts</option>
-                <option value="MI">Michigan</option>
-                <option value="MN">Minnesota</option>
-                <option value="MS">Mississippi</option>
-                <option value="MO">Missouri</option>
-                <option value="MT">Montana</option>
-                <option value="NE">Nebraska</option>
-                <option value="NV">Nevada</option>
-                <option value="NH">New Hampshire</option>
-                <option value="NJ">New Jersey</option>
-                <option value="NM">New Mexico</option>
-                <option value="NY">New York</option>
-                <option value="NC">North Carolina</option>
-                <option value="ND">North Dakota</option>
-                <option value="OH">Ohio</option>
-                <option value="OK">Oklahoma</option>
-                <option value="OR">Oregon</option>
-                <option value="PA">Pennsylvania</option>
-                <option value="RI">Rhode Island</option>
-                <option value="SC">South Carolina</option>
-                <option value="SD">South Dakota</option>
-                <option value="TN">Tennessee</option>
-                <option value="TX">Texas</option>
-                <option value="UT">Utah</option>
-                <option value="VT">Vermont</option>
-                <option value="VA">Virginia</option>
-                <option value="WA">Washington</option>
-                <option value="WV">West Virginia</option>
-                <option value="WI">Wisconsin</option>
-                <option value="WY">Wyoming</option>
+                <option value="AL">Alabama</option><option value="AK">Alaska</option><option value="AZ">Arizona</option>
+                <option value="AR">Arkansas</option><option value="CA">California</option><option value="CO">Colorado</option>
+                <option value="CT">Connecticut</option><option value="DE">Delaware</option><option value="FL">Florida</option>
+                <option value="GA">Georgia</option><option value="HI">Hawaii</option><option value="ID">Idaho</option>
+                <option value="IL">Illinois</option><option value="IN">Indiana</option><option value="IA">Iowa</option>
+                <option value="KS">Kansas</option><option value="KY">Kentucky</option><option value="LA">Louisiana</option>
+                <option value="ME">Maine</option><option value="MD">Maryland</option><option value="MA">Massachusetts</option>
+                <option value="MI">Michigan</option><option value="MN">Minnesota</option><option value="MS">Mississippi</option>
+                <option value="MO">Missouri</option><option value="MT">Montana</option><option value="NE">Nebraska</option>
+                <option value="NV">Nevada</option><option value="NH">New Hampshire</option><option value="NJ">New Jersey</option>
+                <option value="NM">New Mexico</option><option value="NY">New York</option><option value="NC">North Carolina</option>
+                <option value="ND">North Dakota</option><option value="OH">Ohio</option><option value="OK">Oklahoma</option>
+                <option value="OR">Oregon</option><option value="PA">Pennsylvania</option><option value="RI">Rhode Island</option>
+                <option value="SC">South Carolina</option><option value="SD">South Dakota</option><option value="TN">Tennessee</option>
+                <option value="TX">Texas</option><option value="UT">Utah</option><option value="VT">Vermont</option>
+                <option value="VA">Virginia</option><option value="WA">Washington</option><option value="WV">West Virginia</option>
+                <option value="WI">Wisconsin</option><option value="WY">Wyoming</option>
               </select>
             </label><br>
             <label class="sms-consent">
@@ -712,6 +552,7 @@
           </form>
         </div>
       </div>
+
     </div>
   </section>
 
@@ -786,30 +627,10 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Email Essentials</td>
-              <td>$10</td>
-              <td>$28.50</td>
-              <td>$108</td>
-            </tr>
-            <tr>
-              <td>Productivity Suite</td>
-              <td>$20</td>
-              <td>$57.00</td>
-              <td>$216</td>
-            </tr>
-            <tr>
-              <td>Automation Builder</td>
-              <td>$65</td>
-              <td>$185.25</td>
-              <td>$702</td>
-            </tr>
-            <tr>
-              <td>Super User Suite</td>
-              <td>$350</td>
-              <td>$997.50</td>
-              <td>$3,780</td>
-            </tr>
+            <tr><td>Email Essentials</td><td>$10</td><td>$28.50</td><td>$108</td></tr>
+            <tr><td>Productivity Suite</td><td>$20</td><td>$57.00</td><td>$216</td></tr>
+            <tr><td>Automation Builder</td><td>$65</td><td>$185.25</td><td>$702</td></tr>
+            <tr><td>Super User Suite</td><td>$350</td><td>$997.50</td><td>$3,780</td></tr>
           </tbody>
         </table>
       </div>
@@ -846,9 +667,9 @@
     </div>
   </div>
 
-  <script>
+<script>
   // ===========================
-  // Dropdown handling
+  // Dropdown handling (UNCHANGED)
   // ===========================
   function toggleDropdown() {
     const menu = document.getElementById('servicesDropdown');
@@ -863,7 +684,7 @@
   });
 
   // ===========================
-  // Global shimmer loader + viewport reset
+  // Global shimmer loader + viewport reset (UNCHANGED)
   // ===========================
   function resetViewportScale(options = { allowPinchAfter: true }) {
     let meta = document.querySelector('meta[name="viewport"]');
@@ -884,8 +705,10 @@
     }
     setTimeout(() => { window.scrollTo(0, Math.max(0, window.pageYOffset + 0)); }, 0);
   }
+
   const htmlEl = document.documentElement;
   const loaderEl = document.getElementById('page-loader');
+
   function startLoading({ resetZoom = true } = {}) {
     if (resetZoom) resetViewportScale();
     htmlEl.classList.add('is-loading');
@@ -898,14 +721,16 @@
   window.pageLoader = { start: startLoading, stop: stopLoading, resetViewportScale };
 
   // ===========================
-  // Tier/Plan selection (existing)
+  // Tier/Plan selection (UNCHANGED)
   // ===========================
   let selectedTier = null;
   let selectedPlan = null;
+
   function openCtaBox() {
     document.getElementById('ctaBox').style.display = 'block';
     try { document.getElementById('ctaBox').scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch {}
   }
+
   function selectTier(el, tier) {
     document.querySelectorAll('#tierOptions .option-card').forEach(c => c.classList.remove('selected'));
     el.classList.add('selected');
@@ -913,12 +738,14 @@
     document.getElementById('planBox').style.display = 'block';
     updateSummary();
   }
+
   function selectPlan(el, plan) {
     document.querySelectorAll('#planOptions .option-card').forEach(c => c.classList.remove('selected'));
     el.classList.add('selected');
     selectedPlan = plan.toLowerCase();
     updateSummary();
   }
+
   function updateSummary() {
     if (selectedTier && selectedPlan) {
       document.getElementById('summaryBox').style.display = 'block';
@@ -927,10 +754,11 @@
       document.getElementById('submitBtn').style.display = 'inline-block';
     }
   }
+
   function showContactForm() { document.getElementById('contactForm').style.display = 'block'; }
 
   // ===========================
-  // Phone formatting
+  // Phone formatting (UNCHANGED)
   // ===========================
   function formatPhone(input) {
     let digits = input.value.replace(/\D/g, '').substring(0, 10);
@@ -947,7 +775,7 @@
   }
 
   // ===========================
-  // Pricing configuration (existing for services)
+  // Pricing configuration (UNCHANGED)
   // ===========================
   const INITIAL_SETUP_FEE = 1500;
   const PRICING_MATRIX = {
@@ -958,11 +786,12 @@
   };
 
   // ===========================
-  // OmniTok integration (existing)
+  // OmniTok integration (UNCHANGED)
   // ===========================
   const API = {
-    issueOmniTok: 'https://default6eda43f3fbf04e2b9978b543d9dd31.e3.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/4be2293ea9ca4e418ac17059d7209cf1/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=vGhxzQ1mnf06FenEffQzPjo1iP_OLyKLH-yzAkPGUjo' // replace with endpoint
+    issueOmniTok: 'https://default6eda43f3fbf04e2b9978b543d9dd31.e3.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/4be2293ea9ca4e418ac17059d7209cf1/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=vGhxzQ1mnf06FenEffQzPjo1iP_OLyKLH-yzAkPGUjo'
   };
+
   async function getOmniTok(act) {
     let sid = sessionStorage.getItem('sid');
     if (!sid) { sid = crypto.randomUUID(); sessionStorage.setItem('sid', sid); }
@@ -978,7 +807,7 @@
   }
 
   // ===========================
-  // Existing contact form handler (unchanged)
+  // Existing contact form handler (UNCHANGED)
   // ===========================
   async function handleFormSubmit(e) {
     e.preventDefault();
@@ -986,6 +815,7 @@
     const act = btn?.dataset.act ?? 'integration';
     const jobId = `IntReq-${crypto.randomUUID()}`;
     const perUserPrice = PRICING_MATRIX[selectedTier]?.[selectedPlan] ?? 0;
+
     const customerData = {
       jobId,
       name: document.getElementById('custName').value,
@@ -1000,12 +830,15 @@
       perUserPrice: Number(perUserPrice),
       smsConsent: document.getElementById('smsConsent').checked
     };
+
     btn.disabled = true;
     document.querySelectorAll('#ctaBox input, #ctaBox select, #ctaBox button').forEach(el => el.disabled = true);
     startLoading({ resetZoom: true });
+
     try {
       const omni = await getOmniTok(act);
       if (!omni.endpoint) throw new Error("Omnitok preflight did not return an endpoint");
+
       const response = await fetch(omni.endpoint, {
         method: 'POST',
         headers: {
@@ -1017,16 +850,20 @@
         },
         body: JSON.stringify(customerData)
       });
+
       if (!response.ok) throw new Error("Backend rejected request");
       const result = await response.json();
+
       const ctaBox = document.getElementById('ctaBox');
       if (ctaBox) ctaBox.setAttribute('hidden', '');
+
       const selectBtn = document.querySelector('.cta-btn');
       if (selectBtn) {
         selectBtn.textContent = 'Package selected';
         selectBtn.classList.add('is-selected');
         selectBtn.disabled = true;
       }
+
       alert(
         `✅ Your request has been sent!\n\n` +
         `We've emailed a confirmation to: ${result.email ?? customerData.email}\n` +
@@ -1043,126 +880,176 @@
     }
   }
 
+
+/* =====================================================================
+   PragOptics API flow
+   Markdown → Agree → Continue → CIAM → Callback → Ping → Wizard
+   (EXACT Dev Console semantics)
+   ===================================================================== */
+
+const AGREEMENT_MD_URL = 'https://fortiviewholdings.com/docs/PragOptics-Subscriber-Agreement.md';
+const PRAG_API_BASE    = 'https://api.pragoptics.com/api/v1';
+const CIAM_LOGIN_INIT  = `${PRAG_API_BASE}/auth/login`;
+const PING_URL         = `${PRAG_API_BASE}/ping`;
+
+/* ===========================
+   Modal DOM
+   =========================== */
+const $modal = document.getElementById('agreementModal');
+const $mask  = document.getElementById('agreementMask');
+const $md    = document.getElementById('mdContainer');
+const $agree = document.getElementById('agreeChk');
+const $go    = document.getElementById('agreeGoBtn');
+
+let modalFocusTrap = null;
+let openerBtn = null;
+
+/* ===========================
+   Minimal Markdown renderer
+   =========================== */
+function mdToHtml(md) {
+  const esc = s => s.replace(/[&<>]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[c]));
+  md = md.replace(/\r\n?/g, '\n');
+  md = md.replace(/^\s*(?:-{3,}|\*{3,})\s*$/gm, '<hr>');
+  md = md.replace(/```([\s\S]*?)```/g, (_,c)=>`<pre><code>${esc(c)}</code></pre>`);
+  md = md.replace(/`([^`]+)`/g, (_,c)=>`<code>${esc(c)}</code>`);
+  md = md.replace(/^######\s?(.*)$/gm,'<h6>$1</h6>')
+         .replace(/^#####\s?(.*)$/gm,'<h5>$1</h5>')
+         .replace(/^####\s?(.*)$/gm,'<h4>$1</h4>')
+         .replace(/^###\s?(.*)$/gm,'<h3>$1</h3>')
+         .replace(/^##\s?(.*)$/gm,'<h2>$1</h2>')
+         .replace(/^#\s?(.*)$/gm,'<h1>$1</h1>');
+  md = md.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
+         .replace(/\*([^*]+)\*/g,'<em>$1</em>');
+  md = md.replace(/^(?!<h|<ul|<pre|<table|<hr|<\/|\s*$)(.+)$/gm,'<p>$1</p>');
+  return md;
+}
+
+/* ===========================
+   Modal helpers
+   =========================== */
+function trapFocus(scope) {
+  const nodes = [...scope.querySelectorAll('a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])')]
+    .filter(el => !el.disabled && el.offsetParent !== null);
+  if (!nodes.length) return;
+  const first = nodes[0], last = nodes[nodes.length - 1];
+  modalFocusTrap = e => {
+    if (e.key !== 'Tab') return;
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  };
+  scope.addEventListener('keydown', modalFocusTrap);
+}
+function releaseFocus() {
+  if (modalFocusTrap) $modal.removeEventListener('keydown', modalFocusTrap);
+  modalFocusTrap = null;
+}
+
+function openAgreementModal(ev) {
+  openerBtn = ev?.currentTarget || document.activeElement;
+  $md.innerHTML = '<p style="color:var(--muted)">Loading agreement…</p>';
+  $agree.checked = false;
+  $go.disabled = true;
+
+  $mask.classList.add('is-open');
+  $modal.classList.add('is-open');
+
+  fetch(AGREEMENT_MD_URL, { cache: 'no-store' })
+    .then(r => r.text())
+    .then(t => $md.innerHTML = mdToHtml(t))
+    .finally(() => trapFocus($modal));
+}
+
+function closeAgreementModal() {
+  releaseFocus();
+  $mask.classList.remove('is-open');
+  $modal.classList.remove('is-open');
+  openerBtn?.focus();
+}
+
+/* ===========================
+   Agree checkbox
+   =========================== */
+$agree.addEventListener('change', () => {
+  $go.disabled = !$agree.checked;
+});
+$mask.addEventListener('click', closeAgreementModal);
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && $modal.classList.contains('is-open')) closeAgreementModal();
+});
+
+/* ===========================
+   DEV CONSOLE LOGIN FLOW
+   =========================== */
+let pragopticsToken = null;
+
+/* EXACT Dev Console login-init */
+async function submitAgreementAck() {
+  if (!$agree.checked) return;
+
+  const returnUrl = encodeURIComponent(
+    `${location.origin}${location.pathname}?post=subscribe`
+  );
+
+  const res = await fetch(`${CIAM_LOGIN_INIT}?returnUrl=${returnUrl}`);
+  const data = await res.json();
+
+  if (!data?.authorizeUrl) {
+    alert("Unable to start login.");
+    return;
+  }
+
+  closeAgreementModal();
+  window.location = data.authorizeUrl;
+}
+window.submitAgreementAck = submitAgreementAck;
+
+/* ===========================
+   CALLBACK (EXACT order)
+   =========================== */
+async function handlePragOpticsCallback() {
+  const params = new URLSearchParams(location.search);
+  const encoded = params.get("authResult");
+  if (!encoded) return;
+
+  const authResult = JSON.parse(decodeURIComponent(encoded));
+  if (!authResult.success) {
+    alert(`Login failed: ${authResult.errorDescription || authResult.error}`);
+    return;
+  }
+
+  // 1️⃣ Store token
+  const tokens = authResult.tokens;
+  pragopticsToken = tokens.access_token;
+  sessionStorage.setItem("pragoptics_tokens", JSON.stringify(tokens));
+
+  // 2️⃣ Clean URL
+  window.history.replaceState({}, document.title, location.pathname + "?post=subscribe");
+
+  // 3️⃣ NOW call /ping (AFTER callback, like Dev Console)
+  const pingRes = await fetch(PING_URL, {
+    headers: { Authorization: `Bearer ${pragopticsToken}` }
+  });
+  const ping = await pingRes.json();
+  sessionStorage.setItem("pragoptics_ping", JSON.stringify(ping));
+
+  // 4️⃣ Launch wizard
+  initPostLoginWizard(pragopticsToken);
+}
+
+window.addEventListener("load", handlePragOpticsCallback);
+
   // ===========================
-  // Agreement Modal + Markdown viewer
+  // Post-login: show Platform Wizard, prefill fields, compute pricing (existing)
   // ===========================
-  const AGREEMENT_MD_URL = 'https://fortiviewholdings.com/docs/PragOptics-Subscriber-Agreement.md'; // update path if needed
-  const CIAM_LOGIN_INIT = '/api/v1/auth/login'; // backend that returns { authorizeUrl, state, flow } (like devconsole)
-  const $modal = document.getElementById('agreementModal');
-  const $mask  = document.getElementById('agreementMask');
-  const $md    = document.getElementById('mdContainer');
-  const $agree = document.getElementById('agreeChk');
-  const $go    = document.getElementById('agreeGoBtn');
-  let modalFocusTrap = null;
+  const PLATFORM_PRICING = {
+    userBase: 7.50,
+    partnerPremium: 49.00,
+    addons: { domainsEmail: 7.50, storage5gb: 2.00, flows10k: 3.00, api50k: 5.00 }
+  };
 
-  function mdToHtml(md) {
-    const esc = s => s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-    md = md.replace(/```([\s\S]*?)```/g, (_,code)=>`<pre><code>${esc(code)}</code></pre>`);
-    md = md.replace(/`([^`]+)`/g, (_,c)=>`<code>${esc(c)}</code>`);
-    md = md.replace(/^######\s?(.*)$/gm,'<h6>$1</h6>')
-           .replace(/^#####\s?(.*)$/gm,'<h5>$1</h5>')
-           .replace(/^####\s?(.*)$/gm,'<h4>$1</h4>')
-           .replace(/^###\s?(.*)$/gm,'<h3>$1</h3>')
-           .replace(/^##\s?(.*)$/gm,'<h2>$1</h2>')
-           .replace(/^#\s?(.*)$/gm,'<h1>$1</h1>');
-    md = md.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
-           .replace(/\*([^*]+)\*/g,'<em>$1</em>');
-    md = md.replace(/^(?:\s*[-*+]\s+.*(?:\n|$))+?/gm, block => {
-      const items = block.trim().split(/\n/).map(l => l.replace(/^\s*[-*+]\s+/, '')).map(t=>`<li>${t}</li>`).join('');
-      return `<ul>${items}</ul>`;
-    });
-    md = md.replace(/^(?!<h\d|<ul|<pre|<p|<\/|\s*$)(.+)$/gm,'<p>$1</p>');
-    return md;
-  }
-  async function openAgreementModal() {
-    try {
-      $md.innerHTML = '<p style="color:var(--muted)">Loading agreement…</p>';
-      $agree.checked = false; $go.disabled = true;
-      $mask.classList.add('is-open'); $modal.classList.add('is-open');
-      $modal.setAttribute('aria-hidden','false'); $mask.setAttribute('aria-hidden','false');
+  let selectedType = null;
 
-      const res = await fetch(AGREEMENT_MD_URL, { cache: 'no-store' });
-      if (!res.ok) throw new Error('Agreement not available');
-      const text = await res.text();
-      $md.innerHTML = mdToHtml(text);
-
-      const card = $modal.querySelector('.modal-card'); card.focus(); trapFocus($modal);
-    } catch(err) {
-      console.error(err);
-      $md.innerHTML = '<p style="color:#ffb4a4">Unable to load agreement. Please try again later.</p>';
-    }
-  }
-  function closeAgreementModal() {
-    $mask.classList.remove('is-open'); $modal.classList.remove('is-open');
-    $modal.setAttribute('aria-hidden','true'); $mask.setAttribute('aria-hidden','true');
-    releaseFocus();
-  }
-  $agree?.addEventListener('change', () => { $go.disabled = !$agree.checked; });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $modal.classList.contains('is-open')) closeAgreementModal(); });
-  $mask?.addEventListener('click', closeAgreementModal);
-
-  function trapFocus(scope) {
-    const FOCUSABLE = 'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
-    const nodes = Array.from(scope.querySelectorAll(FOCUSABLE)).filter(el => el.offsetParent !== null);
-    const first = nodes[0], last = nodes[nodes.length - 1];
-    modalFocusTrap = (e) => {
-      if (e.key !== 'Tab') return;
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-    };
-    scope.addEventListener('keydown', modalFocusTrap);
-  }
-  function releaseFocus() {
-    if (!modalFocusTrap) return;
-    $modal.removeEventListener('keydown', modalFocusTrap);
-    modalFocusTrap = null;
-  }
-
-  // Agreement submit -> OmniTok log -> CIAM redirect -> return here
-  async function submitAgreementAck() {
-    if (!$agree.checked) return;
-    const jobId = `Agree-${crypto.randomUUID()}`;
-    const sid = sessionStorage.getItem('sid') || (sessionStorage.setItem('sid', crypto.randomUUID()), sessionStorage.getItem('sid'));
-    const payload = { act: 'api_agreement_ack_v1', sid, jobId, agreed: true, mdVersion: 'v1.0', source: 'public_site', timestamp: new Date().toISOString() };
-
-    try {
-      startLoading({ resetZoom: true });
-      // Log acceptance
-      const omni = await getOmniTok(payload);
-      if (!omni.endpoint) throw new Error('Omnitok did not return an endpoint');
-      await fetch(omni.endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-auth-token': omni.authToken, 'x-omnitok': omni.OmniTok, 'x-sid': omni.sid, 'x-act': omni.act
-        },
-        body: JSON.stringify({ jobId, sid, agreed: true, mdVersion: 'v1.0' })
-      });
-
-      // Start CIAM login like devconsole: request authorizeUrl then redirect (preserve a post=subscribe hint)
-      const returnUrl = encodeURIComponent(`${location.origin}${location.pathname}?post=subscribe`);
-      const authInit = await fetch(`${CIAM_LOGIN_INIT}?returnUrl=${returnUrl}`);
-      const data = await authInit.json(); // expects { authorizeUrl, state, flow }
-      closeAgreementModal();
-      location.href = data.authorizeUrl; // redirect to CIAM
-    } catch (err) {
-      console.error(err);
-      alert('Unable to proceed. Please try again.');
-    } finally {
-      stopLoading();
-    }
-  }
-
-  // ===========================
-  // DevConsole-like callback handler (reads ?authResult=...)
-  // ===========================
-  let pragopticsToken = null;
-  function readTokensFromSession() {
-    try {
-      const stored = JSON.parse(sessionStorage.getItem("pragoptics_tokens"));
-      return stored || null;
-    } catch { return null; }
-  }
   function decodeJwtPayload(tok) {
     try {
       const parts = tok.split('.');
@@ -1172,92 +1059,39 @@
       return JSON.parse(atob(pad));
     } catch { return {}; }
   }
-  async function handlePragOpticsCallback() {
-    const params = new URLSearchParams(window.location.search);
-    const authResultEncoded = params.get("authResult"); // same as devconsole
-    if (!authResultEncoded) {
-      // not a callback; if already logged in and post=subscribe, open the wizard
-      const existing = readTokensFromSession();
-      if (existing?.access_token && (params.get('post') === 'subscribe')) { initPostLoginWizard(existing.access_token); }
-      return;
-    }
-    const statusBadge = document.getElementById('authBadge');
-    let authResult;
-    try { authResult = JSON.parse(decodeURIComponent(authResultEncoded)); }
-    catch (e) {
-      statusBadge.textContent = "Login failed";
-      alert("Login failed: invalid callback payload.");
-      return;
-    }
-    if (!authResult.success) {
-      statusBadge.textContent = "Login failed";
-      alert(`Login failed: ${authResult.errorDescription ?? authResult.error}`);
-      return;
-    }
-    // SUCCESS
-    const tokens = authResult.tokens;
-    const accessToken = tokens?.access_token ?? null;
-    sessionStorage.setItem("pragoptics_tokens", JSON.stringify(tokens));
-    pragopticsToken = accessToken;
 
-    // Clean authResult off URL
-    const post = (new URLSearchParams(window.location.search)).get('post') ?? 'subscribe';
-    window.history.replaceState({}, document.title, `${location.pathname}?post=${post}`);
-
-    initPostLoginWizard(accessToken);
-  }
-  window.addEventListener("load", handlePragOpticsCallback);
-
-  // ===========================
-  // Post-login: show Platform Wizard, prefill fields, compute pricing
-  // ===========================
-  const PLATFORM_PRICING = {
-    userBase: 7.50,
-    partnerPremium: 49.00,
-    addons: { domainsEmail: 7.50, storage5gb: 2.00, flows10k: 3.00, api50k: 5.00 }
-  };
-  let selectedType = null;
   function initPostLoginWizard(accessToken) {
-    // Show signed-in badge
     const badge = document.getElementById('authBadge');
-    badge.textContent = "Signed in";
-    badge.style.color = '#21bca5';
-    // Try to prefill from JWT
+    if (badge) { badge.textContent = "Signed in"; badge.style.color = '#21bca5'; }
+
     const claims = decodeJwtPayload(accessToken || "");
-    document.getElementById('bpEmail').value = claims.email || '';
-    document.getElementById('bpName').value = claims.name || '';
-    // Show wizard
-    document.getElementById('platformFlow').style.display = 'block';
-    // wire radios
+    const bpEmail = document.getElementById('bpEmail');
+    const bpName = document.getElementById('bpName');
+    if (bpEmail) bpEmail.value = claims.email || '';
+    if (bpName) bpName.value  = claims.name  || '';
+
+    const flow = document.getElementById('platformFlow');
+    if (flow) flow.style.display = 'block';
+
     document.querySelectorAll('input[name="subType"]').forEach(r => {
       r.addEventListener('change', () => {
-        selectedType = r.value; document.getElementById('toStep2').disabled = !selectedType;
+        selectedType = r.value;
+        const toStep2 = document.getElementById('toStep2');
+        if (toStep2) toStep2.disabled = !selectedType;
         updatePriceSummary();
       });
     });
     document.querySelectorAll('input[name="cadence"]').forEach(r => r.addEventListener('change', updatePriceSummary));
-    ['aoDomains','aoStorage','aoFlows','aoApi'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.addEventListener('change', updatePriceSummary);
-    });
+    ['aoDomains','aoStorage','aoFlows','aoApi'].forEach(id => document.getElementById(id)?.addEventListener('change', updatePriceSummary));
+
     updatePriceSummary();
-    // Scroll into view
-    try { document.getElementById('platformFlow').scrollIntoView({ behavior: 'smooth' }); } catch {}
+    try { flow?.scrollIntoView({ behavior: 'smooth' }); } catch {}
   }
-  function gotoStep1() {
-    document.querySelectorAll('.wizard .step').forEach(s => s.classList.remove('is-active'));
-    document.getElementById('step1').classList.add('is-active');
-  }
-  function gotoStep2() {
-    if (!selectedType) return;
-    document.querySelectorAll('.wizard .step').forEach(s => s.classList.remove('is-active'));
-    document.getElementById('step2').classList.add('is-active');
-    updatePriceSummary();
-  }
-  function gotoStep3() {
-    document.querySelectorAll('.wizard .step').forEach(s => s.classList.remove('is-active'));
-    document.getElementById('step3').classList.add('is-active');
-  }
+
+  function gotoStep1() { document.querySelectorAll('.wizard .step').forEach(s => s.classList.remove('is-active')); document.getElementById('step1')?.classList.add('is-active'); }
+  function gotoStep2() { if (!selectedType) return; document.querySelectorAll('.wizard .step').forEach(s => s.classList.remove('is-active')); document.getElementById('step2')?.classList.add('is-active'); updatePriceSummary(); }
+  function gotoStep3() { document.querySelectorAll('.wizard .step').forEach(s => s.classList.remove('is-active')); document.getElementById('step3')?.classList.add('is-active'); }
+
   function updatePriceSummary() {
     const cadence = (document.querySelector('input[name="cadence"]:checked')?.value) || 'monthly';
     const ao = {
@@ -1273,13 +1107,10 @@
       if (ao.storage) addons += PLATFORM_PRICING.addons.storage5gb;
       if (ao.flows)   addons += PLATFORM_PRICING.addons.flows10k;
       if (ao.api)     addons += PLATFORM_PRICING.addons.api50k;
-    } else {
-      // partner: keep summary minimal (addons are typically per-user)
-      if (ao.domains || ao.storage || ao.flows || ao.api) addons += 0; // informational
     }
-    // annual simple 10% off preview
     const est = (cadence === 'annual') ? (base + addons) * 12 * 0.90 : (base + addons);
     const summary = document.getElementById('priceSummary');
+    if (!summary) return;
     summary.innerHTML = `
       <div><strong>${selectedType ? selectedType.toUpperCase() : 'Select type'}</strong> — base: $${base.toFixed(2)} ${selectedType==='user'?'/user/mo':''}</div>
       ${selectedType==='user' ? `<div>Add‑ons est.: $${addons.toFixed(2)} /mo</div>` : ``}
@@ -1290,13 +1121,18 @@
   }
 
   // ===========================
-  // Billing Profile submit (needs token)
+  // Billing Profile submit (keeps OmniTok; can now use token + ping routing)
   // ===========================
   async function handleBillingProfile(e) {
     e.preventDefault();
-    const tokens = readTokensFromSession();
-    const accessToken = tokens?.access_token;
+    const stored = getStoredTokens();
+    const accessToken = stored?.access_token;
     if (!accessToken) { alert('Please sign in first.'); return; }
+
+    // Ensure ping happened; routing cached in sessionStorage
+    if (!sessionStorage.getItem("pragoptics_ping")) {
+      try { await callPragOpticsPing(); } catch {}
+    }
 
     const cadence = (document.querySelector('input[name="cadence"]:checked')?.value) || 'monthly';
     const payload = {
@@ -1311,35 +1147,39 @@
         api:     !!document.getElementById('aoApi')?.checked
       },
       contact: {
-        name:  document.getElementById('bpName').value,
-        email: document.getElementById('bpEmail').value,
-        phone: document.getElementById('bpPhone').value,
-        org:   document.getElementById('bpOrg').value
+        name:  document.getElementById('bpName')?.value,
+        email: document.getElementById('bpEmail')?.value,
+        phone: document.getElementById('bpPhone')?.value,
+        org:   document.getElementById('bpOrg')?.value
       },
-      tokenPreview: accessToken?.slice(0,18) + '…' // do not send full token to client logs
+      pingRouting: (() => {
+        try { return JSON.parse(sessionStorage.getItem("pragoptics_ping") || "null"); } catch { return null; }
+      })(),
+      tokenPreview: accessToken?.slice(0,18) + '…'
     };
 
     try {
       startLoading({ resetZoom: true });
-      // OmniTok preflight
       const omni = await getOmniTok(payload);
       if (!omni.endpoint) throw new Error('Omnitok did not return an endpoint');
 
-      // Send to backend (Power Automate / your function)
       const res = await fetch(omni.endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`, // token required to create billing profile
-          'x-auth-token': omni.authToken, 'x-omnitok': omni.OmniTok, 'x-sid': omni.sid, 'x-act': omni.act
+          'Authorization': `Bearer ${accessToken}`,
+          'x-auth-token': omni.authToken,
+          'x-omnitok': omni.OmniTok,
+          'x-sid': omni.sid,
+          'x-act': omni.act
         },
         body: JSON.stringify(payload)
       });
+
       if (!res.ok) throw new Error('Backend rejected billing profile request');
-      const data = await res.json();
+      await res.json();
+
       alert('✅ Billing profile request received. Check your email to continue in Stripe.');
-      // optionally redirect or advance flow here:
-      // location.href = data.next ?? '/onboarding';
     } catch (err) {
       console.error(err);
       alert('❌ Could not create billing profile. Please try again.');
@@ -1349,13 +1189,14 @@
   }
 
   // ===========================
-  // Starfield background (existing)
+  // Starfield background (UNCHANGED)
   // ===========================
   function initStarField() {
     const canvas = document.getElementById('bg-stars');
     const ctx = canvas.getContext('2d');
     function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     resize(); window.addEventListener('resize', resize);
+
     const stars = Array.from({ length: 120 }, () => ({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
@@ -1363,6 +1204,7 @@
       a: Math.random()
     }));
     let frame = 0, reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     function animate() {
       ctx.clearRect(0,0,canvas.width,canvas.height);
       for (const s of stars) {
@@ -1370,13 +1212,16 @@
         ctx.fillStyle = `rgba(255,255,255,${s.a})`;
         ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
         ctx.fill();
-        if(!reduce){ s.a = 0.25 + Math.abs(Math.sin((frame/60) + s.x*0.001 + s.y*0.001)) * 0.75; }
+        if(!reduce){
+          s.a = 0.25 + Math.abs(Math.sin((frame/60) + s.x*0.001 + s.y*0.001)) * 0.75;
+        }
       }
-      frame++; requestAnimationFrame(animate);
+      frame++;
+      requestAnimationFrame(animate);
     }
     animate();
   }
   window.addEventListener('load', initStarField);
-  </script>
+</script>
 </body>
 </html>
