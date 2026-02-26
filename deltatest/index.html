@@ -341,13 +341,22 @@
       </ul>
 
       <!-- Existing CTA Button (unchanged) -->
-      <div style="margin-top:28px;">
-        <button class="cta-btn" onclick="openCtaBox()">Select Your Package</button>
-        <!-- NEW: API path CTA -->
-        <button class="cta-btn" style="margin-left:12px" onclick="openAgreementModal(event)">
-          Use PragOptics API
-        </button>
-      </div>
+<div style="margin-top:28px;">
+  <button
+    id="packageSelectorBtn"
+    class="cta-btn"
+    onclick="openCtaBox()">
+    Select Your Package
+  </button>
+
+  <button
+    id="usePragOpticsApiBtn"
+    class="cta-btn"
+    style="margin-left:12px"
+    onclick="openAgreementModal(event)">
+    Use PragOptics API
+  </button>
+</div>
 
       <!-- Hidden Container (existing) -->
       <div id="ctaBox" class="glass" style="display:none; margin-top:20px; padding:20px;">
@@ -1050,22 +1059,46 @@ async function handlePragOpticsCallback() {
   pragopticsToken = tokens.access_token;
   sessionStorage.setItem("pragoptics_tokens", JSON.stringify(tokens));
 
-  // 2️⃣ Clean URL + add post=subscribe ourselves (since returnUrl was clean)
+  // 2️⃣ Clean URL (authResult removed)
   window.history.replaceState({}, document.title, location.pathname + "?post=subscribe");
 
-  // 3️⃣ NOW call /ping (AFTER callback)
+  // 3️⃣ Call /ping (authoritative user state)
   const pingRes = await fetch(PING_URL, {
     headers: { Authorization: `Bearer ${pragopticsToken}` }
   });
-
   const ping = await pingRes.json();
   sessionStorage.setItem("pragoptics_ping", JSON.stringify(ping));
 
-  // 4️⃣ Launch wizard
-  initPostLoginWizard(pragopticsToken);
+  // 4️⃣ Centralized UI decision (single source of truth)
+  handlePostLoginUI(ping);
 }
 
 window.addEventListener("load", handlePragOpticsCallback);
+
+
+// Hide entry buttons after login (both CTAs)
+function hideEntryButtons() {
+  document.getElementById('packageSelectorBtn')?.classList.add('hidden');
+  document.getElementById('usePragOpticsApiBtn')?.classList.add('hidden');
+}
+
+// Post-login handler: decides billed-user view vs wizard
+function handlePostLoginUI(ping) {
+  const user = ping?.user || {};
+
+  // Always hide CTAs once we have a real token/ping
+  hideEntryButtons();
+
+  // ✅ Case A: Billing exists → toast + account overview (no wizard)
+  if (user.billingProfileId) {
+    showLoginToast(user);
+    renderAccountOverview(ping);
+    return;
+  }
+
+  // ✅ Case B: No billing profile → wizard only (no CTAs)
+  initPostLoginWizard(pragopticsToken, ping);
+}
 
   // ===========================
   // Post-login: show Platform Wizard, prefill fields, compute pricing (existing)
