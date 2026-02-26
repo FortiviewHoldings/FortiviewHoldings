@@ -25,7 +25,10 @@
   <link rel="icon" type="image/png" href="/images/favicon.png" sizes="192x192">
   <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.webmanifest">
-
+  <!-- Preload brand background -->
+  <!-- If you keep this, ensure it's used above the fold; otherwise remove or switch to prefetch to silence the console warning. -->
+  <!-- <link rel="prefetch" href="https://fortiviewholdings.com/images/bg.png"> -->
+  <link rel="preload" as="image" href="https://fortiviewholdings.com/images/bg.png">
   <!-- Structured Data -->
   <script type="application/ld+json">
   {
@@ -980,13 +983,34 @@ document.addEventListener('keydown', e => {
    =========================== */
 let pragopticsToken = null;
 
-/* EXACT Dev Console login-init */
+/* Helper: robustly extract authResult even if CIAM appends a second '?' */
+function extractAuthResultFromLocation() {
+  // normal case
+  let params = new URLSearchParams(location.search);
+  let encoded = params.get('authResult');
+  if (encoded) return encoded;
+
+  // broken case: ?post=subscribe?authResult=...
+  const post = params.get('post');
+  if (post && post.includes('authResult=')) {
+    // post looks like "subscribe?authResult=%7B...%7D"
+    return post.split('authResult=')[1] || null;
+  }
+
+  // alternative broken case: raw search contains "?authResult=" after another "?"
+  const idx = location.search.indexOf('authResult=');
+  if (idx >= 0) return location.search.slice(idx + 'authResult='.length);
+
+  return null;
+}
+
+/* EXACT Dev Console login-init, but with CLEAN returnUrl to avoid double '?' */
 async function submitAgreementAck() {
   if (!$agree.checked) return;
 
-  const returnUrl = encodeURIComponent(
-    `${location.origin}${location.pathname}?post=subscribe`
-  );
+  // ✅ FIX: returnUrl MUST NOT contain ?post=subscribe
+  // Let CIAM append ?authResult=... safely.
+  const returnUrl = encodeURIComponent(`${location.origin}${location.pathname}`);
 
   const res = await fetch(`${CIAM_LOGIN_INIT}?returnUrl=${returnUrl}`);
   const data = await res.json();
@@ -1002,14 +1026,20 @@ async function submitAgreementAck() {
 window.submitAgreementAck = submitAgreementAck;
 
 /* ===========================
-   CALLBACK (EXACT order)
+   CALLBACK (EXACT order: token -> ping -> wizard)
    =========================== */
 async function handlePragOpticsCallback() {
-  const params = new URLSearchParams(location.search);
-  const encoded = params.get("authResult");
+  const encoded = extractAuthResultFromLocation();
   if (!encoded) return;
 
-  const authResult = JSON.parse(decodeURIComponent(encoded));
+  let authResult;
+  try {
+    authResult = JSON.parse(decodeURIComponent(encoded));
+  } catch {
+    alert("Login failed: invalid callback payload.");
+    return;
+  }
+
   if (!authResult.success) {
     alert(`Login failed: ${authResult.errorDescription || authResult.error}`);
     return;
@@ -1020,13 +1050,14 @@ async function handlePragOpticsCallback() {
   pragopticsToken = tokens.access_token;
   sessionStorage.setItem("pragoptics_tokens", JSON.stringify(tokens));
 
-  // 2️⃣ Clean URL
+  // 2️⃣ Clean URL + add post=subscribe ourselves (since returnUrl was clean)
   window.history.replaceState({}, document.title, location.pathname + "?post=subscribe");
 
-  // 3️⃣ NOW call /ping (AFTER callback, like Dev Console)
+  // 3️⃣ NOW call /ping (AFTER callback)
   const pingRes = await fetch(PING_URL, {
     headers: { Authorization: `Bearer ${pragopticsToken}` }
   });
+
   const ping = await pingRes.json();
   sessionStorage.setItem("pragoptics_ping", JSON.stringify(ping));
 
