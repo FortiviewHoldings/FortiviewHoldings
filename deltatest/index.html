@@ -268,6 +268,65 @@
     .row { display:flex; gap:16px; flex-wrap:wrap; }
     .field { flex:1 1 260px; }
     .hint { color:var(--muted); font-size:.9rem; }
+
+      /* === New API CSS === */
+    .hidden { display: none !important; }
+
+.toast {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 9999;
+  max-width: 360px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(20, 24, 32, .82);
+  backdrop-filter: blur(14px);
+  color: #fff;
+  box-shadow: 0 18px 50px rgba(0,0,0,.35);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+.toast strong { display:block; margin-bottom: 4px; }
+.toast .muted { opacity: .8; font-size: 13px; }
+.toast.success { border-color: rgba(33, 188, 165, .35); }
+
+.account-overview {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+}
+.card {
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(20, 24, 32, .55);
+  backdrop-filter: blur(10px);
+  padding: 14px 14px 12px;
+  color: #fff;
+}
+.card h3 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  letter-spacing: .02em;
+  opacity: .92;
+}
+.kv { display:flex; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+.kv:last-child { border-bottom: none; }
+.k { opacity:.75; font-size: 13px; }
+.v { font-size: 13px; text-align: right; overflow-wrap: anywhere; }
+
+.pill {
+  display: inline-flex;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  font-size: 12px;
+  opacity: .95;
+}
+.pill.good { border-color: rgba(33,188,165,.35); color: #a7fff1; }
+.pill.warn { border-color: rgba(255, 190, 120, .35); color: #ffd7b0; }
   </style>
 </head>
 <body>
@@ -354,6 +413,8 @@
     Use PragOptics API
   </button>
 </div>
+
+<div id="accountOverview" class="account-overview hidden"></div>
 
       <!-- Hidden Container (existing) -->
       <div id="ctaBox" class="glass" style="display:none; margin-top:20px; padding:20px;">
@@ -973,6 +1034,90 @@ function closeAgreementModal() {
   openerBtn?.focus();
 }
 
+
+
+function toast({ title, message, tone = "success", duration = 4000 }) {
+  // Remove any existing toast to avoid stacking
+  document.querySelectorAll('.toast').forEach(t => t.remove());
+
+  const el = document.createElement('div');
+  el.className = `toast ${tone}`;
+  el.innerHTML = `
+    <strong>${title}</strong>
+    <div class="muted">${message}</div>
+  `;
+  document.body.appendChild(el);
+
+  setTimeout(() => el.remove(), duration);
+}
+
+function showLoginToast(user) {
+  const email = user?.email || "your account";
+  toast({
+    title: "Signed in",
+    message: `Authenticated as ${email}.`,
+    tone: "success",
+    duration: 4200
+  });
+}
+
+function renderAccountOverview(ping) {
+  const el = document.getElementById('accountOverview');
+  if (!el) return;
+
+  const user = ping?.user || {};
+  const deployment = ping?.deployment || {};
+  const resources = Array.isArray(ping?.operatorResources) ? ping.operatorResources : [];
+
+  const statusPill = (() => {
+    const s = (user.status || "").toUpperCase();
+    if (s === "ACTIVE") return `<span class="pill good">ACTIVE</span>`;
+    if (s) return `<span class="pill warn">${s}</span>`;
+    return `<span class="pill warn">UNKNOWN</span>`;
+  })();
+
+  const tierPill = (() => {
+    const t = (user.tier || "").toUpperCase();
+    if (t === "PAID") return `<span class="pill good">PAID</span>`;
+    if (t) return `<span class="pill warn">${t}</span>`;
+    return `<span class="pill warn">UNSET</span>`;
+  })();
+
+  // Compact resources list (descriptor only)
+  const resourceList = resources
+    .map(r => r?.descriptor)
+    .filter(Boolean)
+    .map(d => `<div class="kv"><div class="k">•</div><div class="v" style="text-align:left">${d}</div></div>`)
+    .join('') || `<div class="muted">No operator resources returned.</div>`;
+
+  el.innerHTML = `
+    <div class="card">
+      <h3>Account</h3>
+      <div class="kv"><div class="k">Email</div><div class="v">${user.email || "—"}</div></div>
+      <div class="kv"><div class="k">Role</div><div class="v">${user.role || "—"}</div></div>
+      <div class="kv"><div class="k">Tier</div><div class="v">${tierPill}</div></div>
+      <div class="kv"><div class="k">Status</div><div class="v">${statusPill}</div></div>
+      <div class="kv"><div class="k">Billing Profile</div><div class="v">${user.billingProfileId || "—"}</div></div>
+      <div class="kv"><div class="k">Environment</div><div class="v">${user.environmentId || "—"}</div></div>
+    </div>
+
+    <div class="card">
+      <h3>Deployment</h3>
+      <div class="kv"><div class="k">Service</div><div class="v">${ping?.service || "—"}</div></div>
+      <div class="kv"><div class="k">Lane</div><div class="v">${deployment.lane || "—"}</div></div>
+      <div class="kv"><div class="k">Build</div><div class="v">${deployment.build || "—"}</div></div>
+      <div class="kv"><div class="k">Timestamp</div><div class="v">${ping?.timestamp || "—"}</div></div>
+    </div>
+
+    <div class="card">
+      <h3>Operator Resources</h3>
+      ${resourceList}
+    </div>
+  `;
+
+  el.classList.remove('hidden');
+}
+
 /* ===========================
    Agree checkbox
    =========================== */
@@ -1090,6 +1235,9 @@ function handlePostLoginUI(ping) {
   if (user.billingProfileId) {
     showLoginToast(user);
     renderAccountOverview(ping);
+    
+    // Ensure wizard is not shown
+    document.getElementById('platformFlow')?.classList.add('hidden');
     return;
   }
 
