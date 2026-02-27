@@ -328,6 +328,11 @@ html, body {
         <div style="font-size:0.85rem; color:var(--muted);">Developer Tools & API Explorer</div>
       </div>
     </div>
+    <button id="po-api-console-btn"
+            style="display:none; margin-left:20px;"
+            class="dropdown-toggle">
+      API Console
+    </button>
 
     <nav class="dev-nav">
       <ul>
@@ -377,6 +382,27 @@ html, body {
       </button>
     </div>
 
+    <div id="po-api-console" class="login-panel" style="display:none; margin-top:10px;">
+  <strong style="display:block; margin-bottom:6px;">Direct API Call</strong>
+
+  <input id="po-api-url"
+         type="text"
+         placeholder="https://api.pragoptics.com/api/v1/..."
+         style="width:100%; padding:8px; border-radius:8px; border:1px solid var(--border); background:var(--glass-2); color:var(--ink);">
+
+  <button id="po-api-send"
+          class="copy-btn"
+          style="margin-top:10px;">
+    Send Request
+  </button>
+
+  <button id="po-api-curl"
+          class="copy-btn"
+          style="margin-top:10px;">
+    Copy curl
+  </button>
+</div>
+
     <!-- Viewer -->
     <div class="viewer">
       <pre id="po-output">{ "hint": "Call /auth or start login to see responses here." }</pre>
@@ -400,6 +426,65 @@ function setOutput(obj) {
     JSON.stringify(obj, null, 2);
 }
 
+/* ============================
+   API CONSOLE
+   ============================ */
+  // Toggle API Console panel
+document.getElementById("po-api-console-btn").addEventListener("click", () => {
+  const panel = document.getElementById("po-api-console");
+  panel.style.display = panel.style.display === "none" ? "block" : "none";
+});
+
+// Send request
+document.getElementById("po-api-send").addEventListener("click", async () => {
+  const url = document.getElementById("po-api-url").value.trim();
+  if (!url) return;
+
+  const stored = JSON.parse(sessionStorage.getItem("pragoptics_tokens"));
+  const accessToken = stored?.access_token;
+
+  try {
+    const res = await fetch(url, {
+      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+    });
+
+    const data = await res.json();
+    setOutput({ endpoint: url, response: data });
+  } catch (err) {
+    setOutput({ endpoint: url, error: String(err) });
+  }
+});
+
+// Copy curl
+document.getElementById("po-api-curl").addEventListener("click", () => {
+  const url = document.getElementById("po-api-url").value.trim();
+  if (!url) return;
+
+  const stored = JSON.parse(sessionStorage.getItem("pragoptics_tokens"));
+  const accessToken = stored?.access_token;
+
+  const curl = accessToken
+    ? `curl -H "Authorization: Bearer ${accessToken}" "${url}"`
+    : `curl "${url}"`;
+
+  navigator.clipboard.writeText(curl);
+  showToast("Copied curl command");
+});
+
+/* ============================
+  TOAST HELPER
+   ============================ */
+  function showToast(msg) {
+  const t = document.createElement("div");
+  t.className = "toast show";
+  t.innerText = msg;
+  document.body.appendChild(t);
+
+  setTimeout(() => {
+    t.classList.remove("show");
+    setTimeout(() => t.remove(), 300);
+  }, 2000);
+}
 /* ============================
    START LOGIN (Triggered from dropdown)
    ============================ */
@@ -496,6 +581,7 @@ async function handlePragOpticsCallback() {
   // Store tokens for downstream API calls
   sessionStorage.setItem("pragoptics_tokens", JSON.stringify(tokens));
   pragopticsToken = accessToken;
+  document.getElementById("po-api-console-btn").style.display = "inline-block";
 
   // Show in viewer
   setOutput({
@@ -508,6 +594,13 @@ async function handlePragOpticsCallback() {
 }
 
 window.addEventListener("load", handlePragOpticsCallback);
+
+  window.addEventListener("load", () => {
+  const stored = JSON.parse(sessionStorage.getItem("pragoptics_tokens"));
+  if (stored?.access_token) {
+    document.getElementById("po-api-console-btn").style.display = "inline-block";
+  }
+});
 
 /* ============================
    CALL /auth
