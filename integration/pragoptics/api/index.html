@@ -385,20 +385,22 @@ html, body {
     <div id="po-api-console" class="login-panel" style="display:none; margin-top:10px;">
   <strong style="display:block; margin-bottom:6px;">Direct API Call</strong>
 
-  <input id="po-api-url"
-         type="text"
-         placeholder="https://api.pragoptics.com/api/v1/..."
-         style="width:100%; padding:8px; border-radius:8px; border:1px solid var(--border); background:var(--glass-2); color:var(--ink);">
+  <div style="display:flex; align-items:center; gap:6px;">
+    <span style="font-size:0.85rem; color:var(--muted);">
+      https://api.pragoptics.com/api/v1/
+    </span>
 
-  <button id="po-api-send"
-          class="copy-btn"
-          style="margin-top:10px;">
+    <input id="po-api-route"
+           type="text"
+           placeholder="ping"
+           style="flex:1; padding:8px; border-radius:8px; border:1px solid var(--border); background:var(--glass-2); color:var(--ink);">
+  </div>
+
+  <button id="po-api-send" class="copy-btn" style="margin-top:10px;">
     Send Request
   </button>
 
-  <button id="po-api-curl"
-          class="copy-btn"
-          style="margin-top:10px;">
+  <button id="po-api-curl" class="copy-btn" style="margin-top:10px;">
     Copy curl
   </button>
 </div>
@@ -437,8 +439,10 @@ document.getElementById("po-api-console-btn").addEventListener("click", () => {
 
 // Send request
 document.getElementById("po-api-send").addEventListener("click", async () => {
-  const url = document.getElementById("po-api-url").value.trim();
-  if (!url) return;
+  const route = document.getElementById("po-api-route").value.trim();
+  if (!route) return;
+
+  const url = `https://api.pragoptics.com/api/v1/${route}`;
 
   const stored = JSON.parse(sessionStorage.getItem("pragoptics_tokens"));
   const accessToken = stored?.access_token;
@@ -454,11 +458,12 @@ document.getElementById("po-api-send").addEventListener("click", async () => {
     setOutput({ endpoint: url, error: String(err) });
   }
 });
-
 // Copy curl
 document.getElementById("po-api-curl").addEventListener("click", () => {
-  const url = document.getElementById("po-api-url").value.trim();
-  if (!url) return;
+  const route = document.getElementById("po-api-route").value.trim();
+  if (!route) return;
+
+  const url = `https://api.pragoptics.com/api/v1/${route}`;
 
   const stored = JSON.parse(sessionStorage.getItem("pragoptics_tokens"));
   const accessToken = stored?.access_token;
