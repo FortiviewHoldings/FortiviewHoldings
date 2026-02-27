@@ -54,6 +54,7 @@
       --muted:#c6d0f0a6;
       --brand:#1ca490da;
       --brand-600:#21bca5;
+      --brandsoft:#21bca588;
       --aura:0 4px 8px rgba(17, 76, 67, 0.678);
       --radius:16px;
       --radius-sm:12px;
@@ -178,6 +179,8 @@
       background-size: contain; background-repeat: no-repeat; vertical-align: middle;
     }
     .cross::before { content: "✘"; color: var(--muted); font-weight: bold; font-size: 1.2rem; }
+    .star{ color:var(--brand); font-weight:700; text-align:center; }
+    .star::before { content: "★"; color: var(--brand-600); font-weight: bold; font-size: 1.2rem; }
     table td:nth-child(2), table td:nth-child(3), table td:nth-child(4), table td:nth-child(5),
     table th:nth-child(2), table th:nth-child(3), table th:nth-child(4), table th:nth-child(5){ text-align:center; }
 
@@ -220,7 +223,7 @@
     .icon { width: 1.2rem; height: 1.2rem; fill: var(--brand-600); vertical-align: -0.2em; margin-right: 8px; }
 
     /* === Markdown Agreement Modal (public-facing) === */
-    .modal-overlay { position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,.55); display: none; }
+    .modal-overlay { position: fixed; inset: 0; z-index: 10000; background: var(--glass-blur); display: none; }
     .modal-overlay.is-open { display: block; }
 
     /* IMPORTANT: hidden by default to prevent showing on first paint */
@@ -236,6 +239,7 @@
     .modal-head { padding: 14px 18px; border-bottom: 1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:10px; background: var(--glass-2); }
     .modal-title { font-weight: 800; color: var(--ink); margin: 0; font-size: 1.05rem; }
     .modal-close { background: none; border: 0; color: var(--muted); font-weight: 700; cursor: pointer; }
+    .modal-close:hover { background: var(--brandsoft); border: 1px solid var(--brand-600); border-radius: 4px; color: var(--muted); font-weight: 700; cursor: pointer; }
     .modal-body { padding: 0; overflow: auto; background: #0a0f19; }
     .md-view { padding: 18px 22px; color: #dfe7ff; font-size: .98rem; line-height: 1.55; }
     .md-view h1,.md-view h2,.md-view h3,.md-view h4 { margin: 1.1em 0 .5em; }
@@ -402,7 +406,7 @@
     id="packageSelectorBtn"
     class="cta-btn"
     onclick="openCtaBox()">
-    Select Your Package
+    Strategic Service Packages
   </button>
 
   <button
@@ -410,7 +414,7 @@
     class="cta-btn"
     style="margin-left:12px"
     onclick="openAgreementModal(event)">
-    Use PragOptics API
+    PragOptics API Subscription
   </button>
 </div>
 
@@ -632,6 +636,9 @@
         domain integration, and Fortiview-managed security.
       </p>
       <h3 style="margin-top:0; color:var(--muted)">One-Time Fee <span style="color: var(--brand-600)">$1500</span></h3>
+            <p style="color:var(--ink); margin-bottom:24px;">
+        This covers the initial setup and configuration of your PragOptics™ environment, including:
+      </p>
       <ul>
         <li>Dedicated Microsoft 365 tenant creation</li>
         <li>Domain integration and DNS configuration</li>
@@ -641,6 +648,13 @@
         <li>Initial user provisioning and license assignment</li>
         <li>Backend security enforcement and monitoring</li>
       </ul>
+      <br>
+
+      <h2 style="margin-top:0; color:var(--brand)">PragOptics™ <span style="color: var(--muted)">API Subscription</span></h2>
+              <h3 style="margin-top:0; color:var(--muted)">One-Time Fee <span style="color: var(--brand-600)">WAIVED</span></h3>
+            <p style="color:var(--ink); margin-bottom:24px;">
+      Setup fee not included in PragOptics™ API subscripton; PragOptics™ API subscription is a self service product.
+      </p>
 
       <h3 style="margin-top:0; color:var(--muted)">Subscription Tiers <span style="color: var(--brand-600)">(Per User)</span></h3>
       <p style="text-align: center; color: var(--fg-light); font-size: 0.9em; margin-bottom: 0.5em;">
@@ -655,26 +669,30 @@
               <th>Productivity Suite</th>
               <th>Automation Builder</th>
               <th>Super User Suite</th>
+              <th>PragOptics™ API User</th>
+              <th>PragOptics™ API Partner</th>
             </tr>
           </thead>
           <tbody>
-            <tr><td>Branded email under your domain</td><td class="check"></td><td class="check"></td><td class="check"></td><td class="check"></td></tr>
-            <tr><td>Microsoft 365 license</td><td>Basic</td><td>Standard</td><td>Standard</td><td>Standard</td></tr>
-            <tr><td>SharePoint access for document storage</td><td class="check"></td><td class="check"></td><td class="check"></td><td class="check"></td></tr>
-            <tr><td>DNS management (SPF, DKIM, DMARC)</td><td class="check"></td><td class="check"></td><td class="check"></td><td class="check"></td></tr>
-            <tr><td>Fortiview-managed updates & security</td><td class="check"></td><td class="check"></td><td class="check"></td><td class="check"></td></tr>
-            <tr><td>Ongoing backend support</td><td class="check"></td><td class="check"></td><td class="check"></td><td class="check"></td></tr>
-            <tr><td>Business training & onboarding</td><td class="check"></td><td class="check"></td><td class="check"></td><td class="check"></td></tr>
-            <tr><td>Microsoft Teams collaboration</td><td class="cross"></td><td class="check"></td><td class="check"></td><td class="check"></td></tr>
-            <tr><td>Microsoft Office apps (Word, Excel, Outlook, PowerPoint)</td><td class="cross"></td><td class="check"></td><td class="check"></td><td class="check"></td></tr>
-            <tr><td>Advanced SharePoint features</td><td class="cross"></td><td class="check"></td><td class="check"></td><td class="check"></td></tr>
-            <tr><td>Custom automation flows & app development</td><td class="cross"></td><td class="check"></td><td class="check"></td><td class="check"></td></tr>
-            <tr><td>PowerApps Developer license</td><td class="cross"></td><td class="cross"></td><td class="check"></td><td class="check"></td></tr>
-            <tr><td>Power Automate Premium license</td><td class="cross"></td><td class="cross"></td><td class="check"></td><td class="check"></td></tr>
-            <tr><td>iOS App development & connected customer experience</td><td class="cross"></td><td class="cross"></td><td class="check"></td><td class="check"></td></tr>
-            <tr><td>Fortiview workflow sharing & cloud development</td><td class="cross"></td><td class="cross"></td><td class="check"></td><td class="check"></td></tr>
-            <tr><td>MS Agent access (up to 25k credits/month)</td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="check"></td></tr>
-            <tr><td>Additional agent usage billed separately</td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="check"></td></tr>
+            <tr><td>Initial Set-Up fee required</td><td class="check"></td><td class="check"></td><td class="check"></td><td class="check"></td><td class="cross"></td><td class="cross"></td></tr>
+            <tr><td>Branded email under your domain</td><td class="check"></td><td class="check"></td><td class="check"></td><td class="check"></td><td class="star"></td><td class="star"></td></tr>
+            <tr><td>Microsoft 365 license</td><td>Basic</td><td>Standard</td><td>Standard</td><td>Standard</td><td class="star"></td><td class="star"></td></tr>
+            <tr><td>SharePoint access for document storage</td><td class="check"></td><td class="check"></td><td class="check"></td><td class="check"></td><td class="star"></td><td class="star"></td></tr>
+            <tr><td>DNS management (SPF, DKIM, DMARC)</td><td class="check"></td><td class="check"></td><td class="check"></td><td class="check"></td><td class="star"></td><td class="star"></td></tr>
+            <tr><td>Fortiview-managed updates & security</td><td class="check"></td><td class="check"></td><td class="check"></td><td class="check"></td><td class="check"></td><td class="check"></td></tr>
+            <tr><td>Ongoing backend support</td><td class="check"></td><td class="check"></td><td class="check"></td><td class="check"></td><td class="check"></td><td class="check"></td></tr>
+            <tr><td>Business training & onboarding</td><td class="check"></td><td class="check"></td><td class="check"></td><td class="check"></td><td class="check"></td><td class="check"></td></tr>
+            <tr><td>Microsoft Teams collaboration</td><td class="cross"></td><td class="check"></td><td class="check"></td><td class="check"></td><td class="star"></td><td class="star"></td></tr>
+            <tr><td>Microsoft Office apps (Word, Excel, Outlook, PowerPoint)</td><td class="cross"></td><td class="check"></td><td class="check"></td><td class="check"></td><td class="star"></td><td class="star"></td></tr>
+            <tr><td>Advanced SharePoint features</td><td class="cross"></td><td class="check"></td><td class="check"></td><td class="check"></td><td class="star"></td><td class="star"></td></tr>
+            <tr><td>Custom automation flows & app development</td><td class="cross"></td><td class="check"></td><td class="check"></td><td class="check"></td><td class="cross"></td><td class="check"></td></tr>
+            <tr><td>PowerApps Developer license</td><td class="cross"></td><td class="cross"></td><td class="check"></td><td class="check"></td><td class="star"></td><td class="star"></td></tr>
+            <tr><td>Power Automate Premium license</td><td class="cross"></td><td class="cross"></td><td class="check"></td><td class="check"></td><td class="star"></td><td class="star"></td></tr>
+            <tr><td>iOS App development & connected customer experience</td><td class="cross"></td><td class="cross"></td><td class="check"></td><td class="check"></td><td class="cross"></td><td class="star"></td></tr>
+            <tr><td>Fortiview workflow sharing & cloud development</td><td class="cross"></td><td class="cross"></td><td class="check"></td><td class="check"></td><td class="cross"></td><td class="check"></td></tr>
+            <tr><td>MS Agent access (up to 25k credits/month)</td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="check"></td><td class="cross"></td><td class="star"></td></tr>
+            <tr><td>Additional agent usage billed separately</td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="check"></td><td class="cross"></td><td class="check"></td></tr>
+            <tr><td class="star">Optional feature included with API access for custom development and integration purposes.</td></tr>
           </tbody>
         </table>
       </div>
@@ -698,6 +716,8 @@
             <tr><td>Productivity Suite</td><td>$20</td><td>$57.00</td><td>$216</td></tr>
             <tr><td>Automation Builder</td><td>$65</td><td>$185.25</td><td>$702</td></tr>
             <tr><td>Super User Suite</td><td>$350</td><td>$997.50</td><td>$3,780</td></tr>
+            <tr><td>PragOptics™ API User</td><td>$7.50</td><td class="cross"></td><td>$81</td></tr>
+            <tr><td>PragOptics™ API Partner</td><td>$49</td><td class="cross"></td><td>$529</td></tr>
           </tbody>
         </table>
       </div>
