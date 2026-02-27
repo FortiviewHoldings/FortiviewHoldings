@@ -995,20 +995,77 @@ let openerBtn = null;
    Minimal Markdown renderer
    =========================== */
 function mdToHtml(md) {
-  const esc = s => s.replace(/[&<>]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[c]));
+  const esc = s => s.replace(/[&<>]/g, c =>
+    ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[c])
+  );
+
   md = md.replace(/\r\n?/g, '\n');
+
+  // Horizontal rules
   md = md.replace(/^\s*(?:-{3,}|\*{3,})\s*$/gm, '<hr>');
-  md = md.replace(/```([\s\S]*?)```/g, (_,c)=>`<pre><code>${esc(c)}</code></pre>`);
+
+  // Code fences
+  md = md.replace(/```([\s\S]*?)```/g, (_,code)=>
+    `<pre><code>${esc(code)}</code></pre>`
+  );
+
+  // Inline code
   md = md.replace(/`([^`]+)`/g, (_,c)=>`<code>${esc(c)}</code>`);
+
+  // Headings
   md = md.replace(/^######\s?(.*)$/gm,'<h6>$1</h6>')
          .replace(/^#####\s?(.*)$/gm,'<h5>$1</h5>')
          .replace(/^####\s?(.*)$/gm,'<h4>$1</h4>')
          .replace(/^###\s?(.*)$/gm,'<h3>$1</h3>')
          .replace(/^##\s?(.*)$/gm,'<h2>$1</h2>')
          .replace(/^#\s?(.*)$/gm,'<h1>$1</h1>');
+
+  // Bold / Italic
   md = md.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
          .replace(/\*([^*]+)\*/g,'<em>$1</em>');
-  md = md.replace(/^(?!<h|<ul|<pre|<table|<hr|<\/|\s*$)(.+)$/gm,'<p>$1</p>');
+
+  // ✅ GFM tables
+  md = md.replace(
+    /(^\|.+\|\s*\n\|(?:\s*:?-+:?\s*\|)+\s*\n(?:\|.*\|\s*\n)+)/gm,
+    block => {
+      const lines = block.trim().split('\n');
+      const header = lines[0].slice(1,-1).split('|').map(c=>c.trim());
+      const body = lines.slice(2).map(row =>
+        row.slice(1,-1).split('|').map(c=>c.trim())
+      );
+
+      const thead = `<thead><tr>${
+        header.map(h=>`<th>${h}</th>`).join('')
+      }</tr></thead>`;
+
+      const tbody = `<tbody>${
+        body.map(r=>`<tr>${
+          r.map(c=>`<td>${c}</td>`).join('')
+        }</tr>`).join('')
+      }</tbody>`;
+
+      return `<table>${thead}${tbody}</table>`;
+    }
+  );
+
+  // ✅ Protect tables before paragraph wrapping
+  const TABLE_PLACEHOLDER = '§§TABLE_BLOCK§§';
+  const tables = [];
+
+  md = md.replace(/<table[\s\S]*?<\/table>/g, match => {
+    tables.push(match);
+    return TABLE_PLACEHOLDER;
+  });
+
+  // Paragraphs
+  md = md.replace(
+    /^(?!<h\d|<ul|<pre|<p|<table|<hr|<\/|\s*$)(.+)$/gm,
+    '<p>$1</p>'
+  );
+
+  // ✅ Restore tables
+  md = md.replace(new RegExp(TABLE_PLACEHOLDER, 'g'), () => tables.shift());
+
   return md;
 }
 
