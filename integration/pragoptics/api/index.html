@@ -384,6 +384,26 @@ html, body {
 
     <div id="po-api-console" class="login-panel" style="display:none; margin-top:10px;">
   <strong style="display:block; margin-bottom:6px;">Direct API Call</strong>
+      <!-- HTTP Method -->
+<div style="margin-top:10px;">
+  <label style="font-size:0.85rem; color:var(--muted);">Method</label>
+  <select id="po-api-method"
+          style="width:120px; padding:6px; border-radius:6px; border:1px solid var(--border); background:var(--glass-2); color:var(--ink);">
+    <option value="GET" selected>GET</option>
+    <option value="POST">POST</option>
+    <option value="PUT">PUT</option>
+    <option value="PATCH">PATCH</option>
+    <option value="DELETE">DELETE</option>
+  </select>
+</div>
+
+<!-- Request Body -->
+<div id="po-api-body-container" style="display:none; margin-top:10px;">
+  <label style="font-size:0.85rem; color:var(--muted);">Request Body (JSON)</label>
+  <textarea id="po-api-body"
+            placeholder="{ }"
+            style="width:100%; height:120px; padding:8px; border-radius:8px; border:1px solid var(--border); background:var(--glass-2); color:var(--ink); font-family:monospace;"></textarea>
+</div>
 
   <div style="display:flex; align-items:center; gap:6px;">
     <span style="font-size:0.85rem; color:var(--muted);">
@@ -427,7 +447,20 @@ function setOutput(obj) {
   document.getElementById("po-output").textContent =
     JSON.stringify(obj, null, 2);
 }
+/* ============================
+  CONSOLE HELPER
+   ============================ */
+const methodSelect = document.getElementById("po-api-method");
+const bodyContainer = document.getElementById("po-api-body-container");
+const bodyInput = document.getElementById("po-api-body");
 
+// Show/hide body editor based on method
+methodSelect.addEventListener("change", () => {
+  const m = methodSelect.value;
+  bodyContainer.style.display = ["POST", "PUT", "PATCH"].includes(m)
+    ? "block"
+    : "none";
+});
 /* ============================
    API CONSOLE
    ============================ */
@@ -442,18 +475,40 @@ document.getElementById("po-api-send").addEventListener("click", async () => {
   const route = document.getElementById("po-api-route").value.trim();
   if (!route) return;
 
+  const method = methodSelect.value;
   const url = `https://api.pragoptics.com/api/v1/${route}`;
 
   const stored = JSON.parse(sessionStorage.getItem("pragoptics_tokens"));
   const accessToken = stored?.access_token;
 
-  try {
-    const res = await fetch(url, {
-      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
-    });
+  const options = {
+    method,
+    headers: {
+      "Authorization": accessToken ? `Bearer ${accessToken}` : "",
+      "Content-Type": "application/json"
+    }
+  };
 
-    const data = await res.json();
-    setOutput({ endpoint: url, response: data });
+  // Attach body for POST/PUT/PATCH
+  if (["POST", "PUT", "PATCH"].includes(method)) {
+    try {
+      const parsed = JSON.parse(bodyInput.value || "{}");
+      options.body = JSON.stringify(parsed);
+    } catch (err) {
+      setOutput({ endpoint: url, error: "Invalid JSON in request body" });
+      return;
+    }
+  }
+
+  try {
+    const res = await fetch(url, options);
+    const text = await res.text();
+
+    let json;
+    try { json = JSON.parse(text); }
+    catch { json = text; }
+
+    setOutput({ endpoint: url, response: json, status: res.status });
   } catch (err) {
     setOutput({ endpoint: url, error: String(err) });
   }
@@ -463,18 +518,29 @@ document.getElementById("po-api-curl").addEventListener("click", () => {
   const route = document.getElementById("po-api-route").value.trim();
   if (!route) return;
 
+  const method = methodSelect.value;
   const url = `https://api.pragoptics.com/api/v1/${route}`;
 
   const stored = JSON.parse(sessionStorage.getItem("pragoptics_tokens"));
   const accessToken = stored?.access_token;
 
-  const curl = accessToken
-    ? `curl -H "Authorization: Bearer ${accessToken}" "${url}"`
-    : `curl "${url}"`;
+  let curl = `curl -X ${method}`;
+
+  if (accessToken) {
+    curl += ` -H "Authorization: Bearer ${accessToken}"`;
+  }
+
+  if (["POST", "PUT", "PATCH"].includes(method)) {
+    curl += ` -H "Content-Type: application/json"`;
+    curl += ` -d '${bodyInput.value || "{}"}'`;
+  }
+
+  curl += ` "${url}"`;
 
   navigator.clipboard.writeText(curl);
   showToast("Copied curl command");
 });
+
 
 /* ============================
   TOAST HELPER
