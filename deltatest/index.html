@@ -616,12 +616,92 @@
                 </label>
               </div>
             </div>
+            <div class="row">
+             <div class="field">
+              <label>Address Line 1<br>
+              <input id="bpAddr1" type="text" required style="width:100%; padding:8px; margin:6px 0;">
+             </label>
+            </div>
+            <div class="field">
+              <label>Address Line 2 (optional)<br>
+                <input id="bpAddr2" type="text" style="width:100%; padding:8px; margin:6px 0;">
+              </label>
+           </div>
+          </div>
+
+          <div class="row">
+           <div class="field">
+             <label>City<br>
+               <input id="bpCity" type="text" required style="width:100%; padding:8px; margin:6px 0;">
+              </label>
+           </div>
+           <div class="field">
+              <label>Postal Code<br>
+                <input id="bpPostal" type="text" required style="width:100%; padding:8px; margin:6px 0;">
+             </label>
+            </div>
+          </div>
+
+          <div class="row">
+           <div class="field">
+              <label>State<br>
+                <select id="bpState" required style="width:100%; padding:8px; margin:6px 0;">
+                <option value="">Select a state</option>
+                <option value="AL">Alabama</option><option value="AK">Alaska</option><option value="AZ">Arizona</option>
+                <option value="AR">Arkansas</option><option value="CA">California</option><option value="CO">Colorado</option>
+                <option value="CT">Connecticut</option><option value="DE">Delaware</option><option value="FL">Florida</option>
+                <option value="GA">Georgia</option><option value="HI">Hawaii</option><option value="ID">Idaho</option>
+                <option value="IL">Illinois</option><option value="IN">Indiana</option><option value="IA">Iowa</option>
+                <option value="KS">Kansas</option><option value="KY">Kentucky</option><option value="LA">Louisiana</option>
+                <option value="ME">Maine</option><option value="MD">Maryland</option><option value="MA">Massachusetts</option>
+                <option value="MI">Michigan</option><option value="MN">Minnesota</option><option value="MS">Mississippi</option>
+                <option value="MO">Missouri</option><option value="MT">Montana</option><option value="NE">Nebraska</option>
+                <option value="NV">Nevada</option><option value="NH">New Hampshire</option><option value="NJ">New Jersey</option>
+                <option value="NM">New Mexico</option><option value="NY">New York</option><option value="NC">North Carolina</option>
+                <option value="ND">North Dakota</option><option value="OH">Ohio</option><option value="OK">Oklahoma</option>
+                <option value="OR">Oregon</option><option value="PA">Pennsylvania</option><option value="RI">Rhode Island</option>
+                <option value="SC">South Carolina</option><option value="SD">South Dakota</option><option value="TN">Tennessee</option>
+                <option value="TX">Texas</option><option value="UT">Utah</option><option value="VT">Vermont</option>
+                <option value="VA">Virginia</option><option value="WA">Washington</option><option value="WV">West Virginia</option>
+                <option value="WI">Wisconsin</option><option value="WY">Wyoming</option>
+              </select>
+              </label>
+            </div>
+          </div>
+
+          <div class="row">
+           <div class="field">
+             <label>Country<br>
+               <select id="bpCountry" required style="width:100%; padding:8px; margin:6px 0;">
+                  <option value="US" selected>United States</option>
+                  <option value="CA">Canada</option>
+               </select>
+             </label>
+            </div>
+          </div>
             <div class="controls">
               <button class="cta-btn secondary" type="button" onclick="gotoStep2()">Back</button>
               <button class="cta-btn" type="submit">Create Billing Profile</button>
             </div>
+
           </form>
         </div>
+                                <!-- Step 4: Payment (Stripe Elements) -->
+            <div id="step4" class="step">
+             <h3>Step 4 — Payment</h3>
+             <p class="hint">Secure payment powered by Stripe.</p>
+
+             <div class="option-card" style="text-align:left;">
+                <div id="payment-element"></div>
+              </div>
+
+             <div class="controls">
+                <button class="cta-btn secondary" type="button" onclick="gotoStep3()">Back</button>
+                <button class="cta-btn" type="button" id="payNowBtn">Pay & Activate</button>
+              </div>
+
+             <div id="payMsg" class="hint" style="margin-top:10px;"></div>
+            </div>
       </div>
 
     </div>
@@ -753,8 +833,12 @@
       </div>
     </div>
   </div>
-
 <script>
+  window.STRIPE_PUBLISHABLE_KEY = "pk_test_51SX4Ap1tawWN5DfLopaUfzzIYXmUhIxl8L91YRm5X1bp3X7A9Ugomzz65W1Y0HmnI7zesrfTFj0bnUWFyHcgq5lN00EQwSd4TO"; // or pk_test_xxx
+</script>
+<script src="https://js.stripe.com/v3"></script>
+<script>
+
   // ===========================
   // Dropdown handling (UNCHANGED)
   // ===========================
@@ -978,6 +1062,65 @@ const AGREEMENT_MD_URL = 'https://fortiviewholdings.com/docs/PragOptics-Subscrib
 const PRAG_API_BASE    = 'https://api.pragoptics.com/api/v1';
 const CIAM_LOGIN_INIT  = `${PRAG_API_BASE}/auth/login`;
 const PING_URL         = `${PRAG_API_BASE}/ping`;
+// ---- Billing endpoints (matches your Azure Functions routes) ----
+const BILLING_PROFILE_URL  = `${PRAG_API_BASE}/billing/profile`;          // POST 
+const CHECKOUT_SESSION_URL = `${PRAG_API_BASE}/billing/checkout-session`; // POST 
+
+function getStoredTokens() {
+  try { return JSON.parse(sessionStorage.getItem("pragoptics_tokens") || "null"); }
+  catch { return null; }
+}
+
+async function fetchJson(url, options = {}) {
+  const res = await fetch(url, options);
+  const text = await res.text();
+
+  let data = null;
+  try { data = text ? JSON.parse(text) : null; } catch { data = { raw: text }; }
+
+  if (!res.ok) {
+    const msg = data?.error || data?.raw || `${res.status} ${res.statusText}`;
+    const err = new Error(msg);
+    err.status = res.status;
+    err.data = data;
+    throw err;
+  }
+  return data;
+}
+
+function catalogMapFromPing(ping) {
+  const arr = Array.isArray(ping?.productCatalog) ? ping.productCatalog : [];
+  const map = new Map();
+  for (const p of arr) map.set(p.lookupKey, p);
+  return map;
+}
+
+function centsToDollars(amountStr) {
+  const n = Number(amountStr || 0);
+  return n / 100;
+}
+
+// UI-only intent object (backend remains authoritative) 
+function buildRequestedSubscription({ subType, cadence, addons }) {
+  return { subType, cadence, addons: subType === "user" ? { ...addons } : {} };
+}
+
+// Mirrors backend lookupKey conventions so summary matches what checkout-session will resolve 
+function lookupKeysFromSelection({ subType, cadence, addons }) {
+  const suffix = cadence === "annual" ? "annual" : "monthly";
+  const baseKey = subType === "partner"
+    ? `po.partner.premium.${suffix}`
+    : `po.user.base.${suffix}`;
+
+  const keys = [baseKey];
+  if (subType === "user") {
+    if (addons.domains) keys.push(`po.addon.domains.${suffix}`);
+    if (addons.storage) keys.push(`po.addon.storage5gb.${suffix}`);
+    if (addons.flows)   keys.push(`po.addon.flows10k.${suffix}`);
+    if (addons.api)     keys.push(`po.addon.api50k.${suffix}`);
+  }
+  return keys;
+}
 
 /* ===========================
    Modal DOM
@@ -1375,101 +1518,140 @@ function handlePostLoginUI(ping) {
   function gotoStep2() { if (!selectedType) return; document.querySelectorAll('.wizard .step').forEach(s => s.classList.remove('is-active')); document.getElementById('step2')?.classList.add('is-active'); updatePriceSummary(); }
   function gotoStep3() { document.querySelectorAll('.wizard .step').forEach(s => s.classList.remove('is-active')); document.getElementById('step3')?.classList.add('is-active'); }
 
-  function updatePriceSummary() {
-    const cadence = (document.querySelector('input[name="cadence"]:checked')?.value) || 'monthly';
-    const ao = {
-      domains: document.getElementById('aoDomains')?.checked,
-      storage: document.getElementById('aoStorage')?.checked,
-      flows:   document.getElementById('aoFlows')?.checked,
-      api:     document.getElementById('aoApi')?.checked
-    };
-    let base = (selectedType === 'partner') ? PLATFORM_PRICING.partnerPremium : PLATFORM_PRICING.userBase;
-    let addons = 0;
-    if (selectedType === 'user') {
-      if (ao.domains) addons += PLATFORM_PRICING.addons.domainsEmail;
-      if (ao.storage) addons += PLATFORM_PRICING.addons.storage5gb;
-      if (ao.flows)   addons += PLATFORM_PRICING.addons.flows10k;
-      if (ao.api)     addons += PLATFORM_PRICING.addons.api50k;
-    }
-    const est = (cadence === 'annual') ? (base + addons) * 12 * 0.90 : (base + addons);
-    const summary = document.getElementById('priceSummary');
-    if (!summary) return;
-    summary.innerHTML = `
-      <div><strong>${selectedType ? selectedType.toUpperCase() : 'Select type'}</strong> — base: $${base.toFixed(2)} ${selectedType==='user'?'/user/mo':''}</div>
-      ${selectedType==='user' ? `<div>Add‑ons est.: $${addons.toFixed(2)} /mo</div>` : ``}
-      <div><em>Cadence:</em> ${cadence}</div>
-      <div style="margin-top:6px;"><strong>Estimated ${cadence === 'annual' ? 'Annualized' : 'Monthly'} Total:</strong> $${est.toFixed(2)} ${selectedType==='user' && cadence!=='annual' ? '/user/mo' : ''}</div>
-      <div class="hint" style="margin-top:6px;">Final pricing occurs in Stripe after identity is verified.</div>
-    `;
+function updatePriceSummary() {
+  const cadence = (document.querySelector('input[name="cadence"]:checked')?.value) || 'monthly';
+  const addons = {
+    domains: !!document.getElementById('aoDomains')?.checked,
+    storage: !!document.getElementById('aoStorage')?.checked,
+    flows:   !!document.getElementById('aoFlows')?.checked,
+    api:     !!document.getElementById('aoApi')?.checked
+  };
+  const subType = selectedType || null;
+
+  const summary = document.getElementById('priceSummary');
+  if (!summary) return;
+
+  if (!subType) {
+    summary.innerHTML = `Select options to view an estimate.`;
+    return;
   }
+
+  const ping = (() => { try { return JSON.parse(sessionStorage.getItem("pragoptics_ping")||"null"); } catch { return null; }})();
+  const catalog = catalogMapFromPing(ping);
+
+  const keys = lookupKeysFromSelection({ subType, cadence, addons });
+  let total = 0;
+  const lines = [];
+
+  for (const k of keys) {
+    const row = catalog.get(k);
+    if (!row) { lines.push(`• ${k}: (missing)`); continue; }
+    const dollars = centsToDollars(row.amount);
+    total += dollars;
+    lines.push(`• ${k}: $${dollars.toFixed(2)}/${row.interval === "year" ? "yr" : "mo"}`);
+  }
+
+  summary.innerHTML = `
+    <div><strong>${subType.toUpperCase()}</strong> — cadence: <strong>${cadence}</strong></div>
+    <div style="margin-top:6px;">${lines.join("<br>")}</div>
+    <div style="margin-top:8px;"><strong>Estimated total:</strong> $${total.toFixed(2)}${subType==="user" ? " per user" : ""} / ${cadence==="annual" ? "yr" : "mo"}</div>
+    <div class="hint" style="margin-top:6px;">Finalized in Stripe. Backend remains authoritative.</div>
+  `;
+}
 
   // ===========================
   // Billing Profile submit (keeps OmniTok; can now use token + ping routing)
   // ===========================
-  async function handleBillingProfile(e) {
-    e.preventDefault();
-    const stored = getStoredTokens();
-    const accessToken = stored?.access_token;
-    if (!accessToken) { alert('Please sign in first.'); return; }
+  let stripe = null;
+let elements = null;
 
-    // Ensure ping happened; routing cached in sessionStorage
-    if (!sessionStorage.getItem("pragoptics_ping")) {
-      try { await callPragOpticsPing(); } catch {}
-    }
+function gotoStep4() {
+  document.querySelectorAll('.wizard .step').forEach(s => s.classList.remove('is-active'));
+  document.getElementById('step4')?.classList.add('is-active');
+}
 
-    const cadence = (document.querySelector('input[name="cadence"]:checked')?.value) || 'monthly';
-    const payload = {
-      act: 'billing_profile_request_v1',
-      jobId: `BP-${crypto.randomUUID()}`,
-      subType: selectedType || 'user',
-      cadence,
-      addons: {
-        domains: !!document.getElementById('aoDomains')?.checked,
-        storage: !!document.getElementById('aoStorage')?.checked,
-        flows:   !!document.getElementById('aoFlows')?.checked,
-        api:     !!document.getElementById('aoApi')?.checked
-      },
-      contact: {
-        name:  document.getElementById('bpName')?.value,
-        email: document.getElementById('bpEmail')?.value,
-        phone: document.getElementById('bpPhone')?.value,
-        org:   document.getElementById('bpOrg')?.value
-      },
-      pingRouting: (() => {
-        try { return JSON.parse(sessionStorage.getItem("pragoptics_ping") || "null"); } catch { return null; }
-      })(),
-      tokenPreview: accessToken?.slice(0,18) + '…'
+async function handleBillingProfile(e) {
+  e.preventDefault();
+
+  const stored = getStoredTokens?.();
+  const accessToken = stored?.access_token || pragopticsToken;
+  if (!accessToken) { alert('Please sign in first.'); return; }
+
+  const cadence = (document.querySelector('input[name="cadence"]:checked')?.value) || 'monthly';
+  const addons = {
+    domains: !!document.getElementById('aoDomains')?.checked,
+    storage: !!document.getElementById('aoStorage')?.checked,
+    flows:   !!document.getElementById('aoFlows')?.checked,
+    api:     !!document.getElementById('aoApi')?.checked
+  };
+
+  const subType = selectedType || "user";
+  const requestedSubscription = buildRequestedSubscription({ subType, cadence, addons });
+
+  // REQUIRED by /v1/billing/profile 
+  const profilePayload = {
+    customerName: document.getElementById('bpName')?.value?.trim(),
+    primaryEmail: document.getElementById('bpEmail')?.value?.trim(),
+    phone:        document.getElementById('bpPhone')?.value?.trim() || "",
+    addressLine1: document.getElementById('bpAddr1')?.value?.trim(),
+    addressLine2: document.getElementById('bpAddr2')?.value?.trim() || "",
+    city:         document.getElementById('bpCity')?.value?.trim(),
+    state:        (document.getElementById('bpState')?.value || "").trim(), 
+    postalCode:   document.getElementById('bpPostal')?.value?.trim(),
+    country:      document.getElementById('bpCountry')?.value?.trim(),
+    requestedSubscription
+  };
+
+  try {
+    startLoading({ resetZoom: true });
+
+    // 1) Create/merge BillingProfile 
+    const bpResp = await fetchJson(BILLING_PROFILE_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${accessToken}` },
+      body: JSON.stringify(profilePayload)
+    });
+
+    // 2) Create checkout session (Elements subscription) -> client_secret 
+    const csResp = await fetchJson(CHECKOUT_SESSION_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${accessToken}` },
+      body: JSON.stringify({})
+    });
+
+    const clientSecret = csResp?.paymentIntentClientSecret;
+    if (!clientSecret) throw new Error("Missing Stripe client secret.");
+
+    // 3) Mount Stripe Elements
+    const PUBLISHABLE_KEY = window.STRIPE_PUBLISHABLE_KEY || ""; // set this globally or inline
+    if (!PUBLISHABLE_KEY) throw new Error("Stripe publishable key not configured.");
+
+    stripe = Stripe(PUBLISHABLE_KEY);
+    elements = stripe.elements({ clientSecret });
+
+        document.getElementById("payment-element").innerHTML = "";
+        const paymentEl = elements.create("payment");
+        paymentEl.mount("#payment-element");
+
+    // 4) Wire Pay button
+    document.getElementById("payNowBtn").onclick = async () => {
+      document.getElementById("payMsg").textContent = "Confirming payment…";
+      const { error } = await stripe.confirmPayment({
+        elements,
+        confirmParams: { return_url: `${location.origin}${location.pathname}?post=subscribe` }
+      });
+      if (error) document.getElementById("payMsg").textContent = error.message || "Payment error.";
     };
 
-    try {
-      startLoading({ resetZoom: true });
-      const omni = await getOmniTok(payload);
-      if (!omni.endpoint) throw new Error('Omnitok did not return an endpoint');
+    gotoStep4();
 
-      const res = await fetch(omni.endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`,
-          'x-auth-token': omni.authToken,
-          'x-omnitok': omni.OmniTok,
-          'x-sid': omni.sid,
-          'x-act': omni.act
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!res.ok) throw new Error('Backend rejected billing profile request');
-      await res.json();
-
-      alert('✅ Billing profile request received. Check your email to continue in Stripe.');
-    } catch (err) {
-      console.error(err);
-      alert('❌ Could not create billing profile. Please try again.');
-    } finally {
-      stopLoading();
-    }
+  } catch (err) {
+    console.error(err);
+    alert(`❌ ${err.message || "Billing setup failed."}`);
+  } finally {
+    stopLoading();
   }
+}
 
   // ===========================
   // Starfield background (UNCHANGED)
