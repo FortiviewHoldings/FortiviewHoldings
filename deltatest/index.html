@@ -697,7 +697,7 @@
 
              <div class="controls">
                 <button class="cta-btn secondary" type="button" onclick="gotoStep3()">Back</button>
-                <button class="cta-btn" type="button" id="payNowBtn">Pay & Activate</button>
+                <button class="cta-btn" type="button" id="payNowBtn">Save Payment Method & Activate</button>
               </div>
 
              <div id="payMsg" class="hint" style="margin-top:10px;"></div>
@@ -1633,15 +1633,19 @@ async function handleBillingProfile(e) {
         const paymentEl = elements.create("payment");
         paymentEl.mount("#payment-element");
 
-    // 4) Wire Pay button
-    document.getElementById("payNowBtn").onclick = async () => {
-      document.getElementById("payMsg").textContent = "Confirming payment…";
-      const { error } = await stripe.confirmPayment({
-        elements,
-        confirmParams: { return_url: `${location.origin}${location.pathname}?post=subscribe` }
-      });
-      if (error) document.getElementById("payMsg").textContent = error.message || "Payment error.";
-    };
+        // 4) Wire Pay button
+      document.getElementById("payNowBtn").onclick = async () => {
+        const msg = document.getElementById("payMsg");
+        msg.textContent = "Saving payment method…";
+
+        const { error } = await stripe.confirmSetup({
+          elements,
+          confirmParams: { return_url: `${location.origin}${location.pathname}?post=subscribe` },
+          redirect: "if_required"
+        });
+
+        if (error) msg.textContent = error.message || "Setup error.";
+      };
 
     gotoStep4();
 
