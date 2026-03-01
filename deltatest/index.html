@@ -1623,15 +1623,33 @@ async function handleBillingProfile(e) {
     if (!clientSecret) throw new Error("Missing Stripe client secret.");
 
     // 3) Mount Stripe Elements
-    const PUBLISHABLE_KEY = window.STRIPE_PUBLISHABLE_KEY || ""; // set this globally or inline
-    if (!PUBLISHABLE_KEY) throw new Error("Stripe publishable key not configured.");
+const PUBLISHABLE_KEY = window.STRIPE_PUBLISHABLE_KEY || "";
+if (!PUBLISHABLE_KEY) throw new Error("Stripe publishable key not configured.");
 
-    stripe = Stripe(PUBLISHABLE_KEY);
-    elements = stripe.elements({ clientSecret });
+stripe = Stripe(PUBLISHABLE_KEY);
 
-        document.getElementById("payment-element").innerHTML = "";
-        const paymentEl = elements.create("payment");
-        paymentEl.mount("#payment-element");
+// KEEP clientSecret here — required for Payment Element
+elements = stripe.elements({
+  clientSecret,
+  appearance: {
+    theme: 'night',   // Stripe’s built‑in dark theme
+    variables: {
+      colorPrimary: "#6c5ce7",
+      colorBackground: "#111",
+      colorText: "#fff",
+      colorDanger: "#ff6b6b",
+      colorTextSecondary: "#9BA3AF",
+      borderRadius: "8px"
+    }
+  }
+});
+
+// Clear previous mount
+document.getElementById("payment-element").innerHTML = "";
+
+// Create + mount
+const paymentEl = elements.create("payment");
+paymentEl.mount("#payment-element");
 
         // 4) Wire Pay button
       document.getElementById("payNowBtn").onclick = async () => {
