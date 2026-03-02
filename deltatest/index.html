@@ -702,6 +702,19 @@
 
              <div id="payMsg" class="hint" style="margin-top:10px;"></div>
             </div>
+        <!-- Step 5: Processing (waiting on webhook + ping resolution) -->
+<div id="step5" class="step">
+  <h3>Step 5 — Finalizing</h3>
+  <p class="hint">We’re confirming your subscription with Stripe. This usually takes a few seconds.</p>
+
+  <div class="option-card" style="text-align:left;">
+    <div id="finalizeMsg" class="hint">Finalizing subscription…</div>
+  </div>
+
+  <div class="controls">
+    <button class="cta-btn secondary" type="button" onclick="pollUntilResolved()">Refresh Status</button>
+  </div>
+</div>        
       </div>
 
     </div>
@@ -1280,7 +1293,9 @@ function showLoginToast(user) {
     duration: 4200
   });
 }
-
+/* ===========================
+   ACCOUNT OVERVIEW
+   =========================== */
 function renderAccountOverview(ping) {
   const el = document.getElementById('accountOverview');
   if (!el) return;
@@ -1296,14 +1311,22 @@ function renderAccountOverview(ping) {
     return `<span class="pill warn">UNKNOWN</span>`;
   })();
 
+  // ✅ Tiers are now: FREE | USER | PARTNER
   const tierPill = (() => {
     const t = (user.tier || "").toUpperCase();
-    if (t === "PAID") return `<span class="pill good">PAID</span>`;
-    if (t) return `<span class="pill warn">${t}</span>`;
+    if (t === "USER" || t === "PARTNER") return `<span class="pill good">${t}</span>`;
+    if (t === "FREE") return `<span class="pill warn">FREE</span>`;
     return `<span class="pill warn">UNSET</span>`;
   })();
 
-  // Compact resources list (descriptor only)
+  // ✅ BillingProfile status (authoritative billing state)
+  const bpStatus = (ping?.billingProfile?.status || "").toUpperCase() || "—";
+  const bpPill = (() => {
+    if (bpStatus === "ACTIVE") return `<span class="pill good">ACTIVE</span>`;
+    if (bpStatus && bpStatus !== "—") return `<span class="pill warn">${bpStatus}</span>`;
+    return `<span class="pill warn">—</span>`;
+  })();
+
   const resourceList = resources
     .map(r => r?.descriptor)
     .filter(Boolean)
@@ -1316,7 +1339,8 @@ function renderAccountOverview(ping) {
       <div class="kv"><div class="k">Email</div><div class="v">${user.email || "—"}</div></div>
       <div class="kv"><div class="k">Role</div><div class="v">${user.role || "—"}</div></div>
       <div class="kv"><div class="k">Tier</div><div class="v">${tierPill}</div></div>
-      <div class="kv"><div class="k">Status</div><div class="v">${statusPill}</div></div>
+      <div class="kv"><div class="k">User Status</div><div class="v">${statusPill}</div></div>
+      <div class="kv"><div class="k">Billing Status</div><div class="v">${bpPill}</div></div>
       <div class="kv"><div class="k">Billing Profile</div><div class="v">${user.billingProfileId || "—"}</div></div>
       <div class="kv"><div class="k">Environment</div><div class="v">${user.environmentId || "—"}</div></div>
     </div>
@@ -1447,22 +1471,55 @@ function hideEntryButtons() {
 // Post-login handler: decides billed-user view vs wizard
 function handlePostLoginUI(ping) {
   const user = ping?.user || {};
+  const bp   = ping?.billingProfile || null;
 
-  // Always hide CTAs once we have a real token/ping
-  hideEntryButtons();
+  hideEntryButtons(); // always hide CTAs once logged in
 
-  // ✅ Case A: Billing exists → toast + account overview (no wizard)
-  if (user.billingProfileId) {
+  // If no BillingProfile exists at all: start wizard from step 1
+  if (!bp) {
+    initPostLoginWizard(pragopticsToken, ping);
+    gotoStep1();
+    return;
+  }
+
+  const bpStatus = (bp.status || "").toUpperCase();
+
+  // ACTIVE: show account overview
+  if (bpStatus === "ACTIVE") {
     showLoginToast(user);
     renderAccountOverview(ping);
-    
-    // Ensure wizard is not shown
     document.getElementById('platformFlow')?.classList.add('hidden');
     return;
   }
 
-  // ✅ Case B: No billing profile → wizard only (no CTAs)
+  // PAYMENT_PENDING: show processing and poll
+  if (bpStatus === "PAYMENT_PENDING") {
+    initPostLoginWizard(pragopticsToken, ping);
+    showProcessingState("Finalizing subscription…");
+    pollUntilResolved();
+    return;
+  }
+
+  // PENDING_SUBSCRIPTION or PAST_DUE: resume payment step (mount Elements)
+  if (bpStatus === "PENDING_SUBSCRIPTION" || bpStatus === "PAST_DUE") {
+    initPostLoginWizard(pragopticsToken, ping);
+
+    (async () => {
+      try {
+        const stored = getStoredTokens?.();
+        const accessToken = stored?.access_token || pragopticsToken;
+        await startPaymentStep(accessToken);
+      } catch (e) {
+        toast({ title: "Billing", message: e.message || "Unable to start payment.", tone: "warn" });
+      }
+    })();
+
+    return;
+  }
+
+  // CANCELED or unknown: restart wizard
   initPostLoginWizard(pragopticsToken, ping);
+  gotoStep1();
 }
 
   // ===========================
@@ -1562,12 +1619,80 @@ function updatePriceSummary() {
   // ===========================
   // Billing Profile submit (keeps OmniTok; can now use token + ping routing)
   // ===========================
-  let stripe = null;
+let stripe = null;
 let elements = null;
 
 function gotoStep4() {
   document.querySelectorAll('.wizard .step').forEach(s => s.classList.remove('is-active'));
   document.getElementById('step4')?.classList.add('is-active');
+}
+
+function gotoStep5() {
+  document.querySelectorAll('.wizard .step').forEach(s => s.classList.remove('is-active'));
+  document.getElementById('step5')?.classList.add('is-active');
+}
+  
+  async function startPaymentStep(accessToken) {
+  // 1) Create SetupIntent (server) -> client secret
+  const csResp = await fetchJson(CHECKOUT_SESSION_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${accessToken}` },
+    body: JSON.stringify({})
+  });
+
+  const clientSecret = csResp?.paymentIntentClientSecret; // (compat field name)
+  if (!clientSecret) throw new Error("Missing Stripe client secret.");
+
+  // 2) Mount Stripe Elements
+  const PUBLISHABLE_KEY = window.STRIPE_PUBLISHABLE_KEY || "";
+  if (!PUBLISHABLE_KEY) throw new Error("Stripe publishable key not configured.");
+
+  stripe = Stripe(PUBLISHABLE_KEY);
+  elements = stripe.elements({
+    clientSecret,
+    appearance: {
+      theme: 'night',
+      variables: {
+        colorPrimary: "#6c5ce7",
+        colorBackground: "#111",
+        colorText: "#fff",
+        colorDanger: "#ff6b6b",
+        colorTextSecondary: "#9BA3AF",
+        borderRadius: "8px"
+      }
+    }
+  });
+
+  document.getElementById("payment-element").innerHTML = "";
+  const paymentEl = elements.create("payment");
+  paymentEl.mount("#payment-element");
+
+  // 3) Wire Pay button (confirmSetup + poll)
+  const btn = document.getElementById("payNowBtn");
+  btn.disabled = false;
+  btn.onclick = async () => {
+    const msg = document.getElementById("payMsg");
+    msg.textContent = "Saving payment method…";
+
+    const { error } = await stripe.confirmSetup({
+      elements,
+      confirmParams: { return_url: `${location.origin}${location.pathname}?post=subscribe` },
+      redirect: "if_required"
+    });
+
+    if (error) {
+      msg.textContent = error.message || "Setup error.";
+      return;
+    }
+
+    showProcessingState("Finalizing subscription…");
+    await pollUntilResolved();
+  };
+
+  // 4) Show Step 4
+  gotoStep4();
+  const msg = document.getElementById("payMsg");
+  if (msg) msg.textContent = "Enter payment details to activate.";
 }
 
 async function handleBillingProfile(e) {
@@ -1588,7 +1713,7 @@ async function handleBillingProfile(e) {
   const subType = selectedType || "user";
   const requestedSubscription = buildRequestedSubscription({ subType, cadence, addons });
 
-  // REQUIRED by /v1/billing/profile 
+  // REQUIRED by /v1/billing/profile
   const profilePayload = {
     customerName: document.getElementById('bpName')?.value?.trim(),
     primaryEmail: document.getElementById('bpEmail')?.value?.trim(),
@@ -1596,7 +1721,7 @@ async function handleBillingProfile(e) {
     addressLine1: document.getElementById('bpAddr1')?.value?.trim(),
     addressLine2: document.getElementById('bpAddr2')?.value?.trim() || "",
     city:         document.getElementById('bpCity')?.value?.trim(),
-    state:        (document.getElementById('bpState')?.value || "").trim(), 
+    state:        (document.getElementById('bpState')?.value || "").trim(),
     postalCode:   document.getElementById('bpPostal')?.value?.trim(),
     country:      document.getElementById('bpCountry')?.value?.trim(),
     requestedSubscription
@@ -1605,67 +1730,15 @@ async function handleBillingProfile(e) {
   try {
     startLoading({ resetZoom: true });
 
-    // 1) Create/merge BillingProfile 
-    const bpResp = await fetchJson(BILLING_PROFILE_URL, {
+    // 1) Create/merge BillingProfile (authoritative intent + contact)
+    await fetchJson(BILLING_PROFILE_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${accessToken}` },
       body: JSON.stringify(profilePayload)
     });
 
-    // 2) Create checkout session (Elements subscription) -> client_secret 
-    const csResp = await fetchJson(CHECKOUT_SESSION_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${accessToken}` },
-      body: JSON.stringify({})
-    });
-
-    const clientSecret = csResp?.paymentIntentClientSecret;
-    if (!clientSecret) throw new Error("Missing Stripe client secret.");
-
-    // 3) Mount Stripe Elements
-const PUBLISHABLE_KEY = window.STRIPE_PUBLISHABLE_KEY || "";
-if (!PUBLISHABLE_KEY) throw new Error("Stripe publishable key not configured.");
-
-stripe = Stripe(PUBLISHABLE_KEY);
-
-// KEEP clientSecret here — required for Payment Element
-elements = stripe.elements({
-  clientSecret,
-  appearance: {
-    theme: 'night',   // Stripe’s built‑in dark theme
-    variables: {
-      colorPrimary: "#6c5ce7",
-      colorBackground: "#111",
-      colorText: "#fff",
-      colorDanger: "#ff6b6b",
-      colorTextSecondary: "#9BA3AF",
-      borderRadius: "8px"
-    }
-  }
-});
-
-// Clear previous mount
-document.getElementById("payment-element").innerHTML = "";
-
-// Create + mount
-const paymentEl = elements.create("payment");
-paymentEl.mount("#payment-element");
-
-        // 4) Wire Pay button
-      document.getElementById("payNowBtn").onclick = async () => {
-        const msg = document.getElementById("payMsg");
-        msg.textContent = "Saving payment method…";
-
-        const { error } = await stripe.confirmSetup({
-          elements,
-          confirmParams: { return_url: `${location.origin}${location.pathname}?post=subscribe` },
-          redirect: "if_required"
-        });
-
-        if (error) msg.textContent = error.message || "Setup error.";
-      };
-
-    gotoStep4();
+    // 2) Start payment step (creates SetupIntent + mounts Elements + wires button + polling)
+    await startPaymentStep(accessToken);
 
   } catch (err) {
     console.error(err);
@@ -1674,7 +1747,55 @@ paymentEl.mount("#payment-element");
     stopLoading();
   }
 }
+  // ===========================
+  // POLLING STATE HELPER
+  // ===========================
+function showProcessingState(message = "Finalizing subscription…") {
+  gotoStep5();
 
+  const msg = document.getElementById("finalizeMsg");
+  if (msg) msg.textContent = message;
+
+  // Prevent double submits if Step 4 is still visible somewhere
+  const btn = document.getElementById("payNowBtn");
+  if (btn) btn.disabled = true;
+}
+  // ===========================
+  // POLL/PING 
+  // ===========================
+async function pollUntilResolved() {
+  const stored = getStoredTokens?.();
+  const accessToken = stored?.access_token || pragopticsToken;
+  if (!accessToken) return;
+
+  const started = Date.now();
+  const TIMEOUT = 60_000;
+
+  while (Date.now() - started < TIMEOUT) {
+    await new Promise(r => setTimeout(r, 1500));
+
+    const res = await fetch(PING_URL, {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+    const ping = await res.json();
+
+    const status = ping?.billingProfile?.status;
+    if (!status) continue;
+
+    if (status === "ACTIVE" || status === "PAST_DUE" || status === "CANCELED") {
+      handlePostLoginUI(ping);
+      return;
+    }
+  }
+
+  // Timeout fallback
+  toast({
+    title: "Still working…",
+    message: "Your subscription is taking longer than expected. You can refresh safely.",
+    tone: "warn"
+  });
+}
+  
   // ===========================
   // Starfield background (UNCHANGED)
   // ===========================
