@@ -594,8 +594,14 @@
           <form onsubmit="handleBillingProfile(event)">
             <div class="row">
               <div class="field">
-                <label>Name<br>
-                  <input id="bpName" type="text" required style="width:100%; padding:8px; margin:6px 0;">
+                <label>First Name<br>
+                  <input id="bpFirstName" type="text" required style="width:100%; padding:8px; margin:6px 0;">
+                </label>
+              </div>
+
+              <div class="field">
+                <label>Last Name<br>
+                  <input id="bpLastName" type="text" required style="width:100%; padding:8px; margin:6px 0;">
                 </label>
               </div>
               <div class="field">
@@ -674,7 +680,6 @@
              <label>Country<br>
                <select id="bpCountry" required style="width:100%; padding:8px; margin:6px 0;">
                   <option value="US" selected>United States</option>
-                  <option value="CA">Canada</option>
                </select>
              </label>
             </div>
@@ -1543,15 +1548,67 @@ function handlePostLoginUI(ping) {
     } catch { return {}; }
   }
 
+  // ===========================
+// Billing Profile Autofill Helpers
+// ===========================
+function prefillNameFields(fullName) {
+  if (!fullName) return;
+
+  const parts = String(fullName).trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return;
+
+  const first = parts.shift() || "";
+  const last  = parts.join(" "); // supports middle names
+
+  const f = document.getElementById("bpFirstName");
+  const l = document.getElementById("bpLastName");
+
+  if (f && !f.value) f.value = first;
+  if (l && !l.value) l.value = last;
+}
+
+function prefillBillingProfileFromPing(ping) {
+  const bp = ping?.billingProfile;
+  if (!bp) return;
+
+  prefillNameFields(bp.customerName);
+
+  const set = (id, val) => {
+    const el = document.getElementById(id);
+    if (el && val != null && val !== "" && !el.value) {
+      el.value = String(val);
+    }
+  };
+
+  set("bpEmail",   bp.primaryEmail);
+  set("bpPhone",   bp.phone);
+  set("bpOrg",     bp.organizationName || "");
+  set("bpAddr1",   bp.addressLine1);
+  set("bpAddr2",   bp.addressLine2);
+  set("bpCity",    bp.city);
+  set("bpState",   bp.state);
+  set("bpPostal",  bp.postalCode);
+  set("bpCountry", bp.country || "US");
+}
+
   function initPostLoginWizard(accessToken) {
     const badge = document.getElementById('authBadge');
     if (badge) { badge.textContent = "Signed in"; badge.style.color = '#21bca5'; }
 
     const claims = decodeJwtPayload(accessToken || "");
     const bpEmail = document.getElementById('bpEmail');
-    const bpName = document.getElementById('bpName');
-    if (bpEmail) bpEmail.value = claims.email || '';
-    if (bpName) bpName.value  = claims.name  || '';
+    if (bpEmail && !bpEmail.value) {
+      bpEmail.value = claims.email || '';
+    }
+
+    // ✅ Fill first / last from JWT name (first login)
+    prefillNameFields(claims.name || "");
+
+    // ✅ Resume autofill from BillingProfile (refresh / return)
+    try {
+      const ping = JSON.parse(sessionStorage.getItem("pragoptics_ping") || "null");
+      prefillBillingProfileFromPing(ping);
+    }     catch {}
 
     const flow = document.getElementById('platformFlow');
     if (flow) flow.style.display = 'block';
@@ -1702,6 +1759,18 @@ async function handleBillingProfile(e) {
   const accessToken = stored?.access_token || pragopticsToken;
   if (!accessToken) { alert('Please sign in first.'); return; }
 
+  // --- NEW: first / last name handling ---
+  const firstName = document.getElementById('bpFirstName')?.value?.trim();
+  const lastName  = document.getElementById('bpLastName')?.value?.trim();
+
+  if (!firstName || !lastName) {
+    alert("Please enter both first and last name.");
+    return;
+  }
+
+  const customerName = `${firstName} ${lastName}`;
+  // --------------------------------------
+
   const cadence = (document.querySelector('input[name="cadence"]:checked')?.value) || 'monthly';
   const addons = {
     domains: !!document.getElementById('aoDomains')?.checked,
@@ -1715,7 +1784,7 @@ async function handleBillingProfile(e) {
 
   // REQUIRED by /v1/billing/profile
   const profilePayload = {
-    customerName: document.getElementById('bpName')?.value?.trim(),
+    customerName, // ✅ joined first + last, same backend field as before
     primaryEmail: document.getElementById('bpEmail')?.value?.trim(),
     phone:        document.getElementById('bpPhone')?.value?.trim() || "",
     addressLine1: document.getElementById('bpAddr1')?.value?.trim(),
@@ -1730,14 +1799,17 @@ async function handleBillingProfile(e) {
   try {
     startLoading({ resetZoom: true });
 
-    // 1) Create/merge BillingProfile (authoritative intent + contact)
+    // 1) Create/merge BillingProfile
     await fetchJson(BILLING_PROFILE_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${accessToken}` },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${accessToken}`
+      },
       body: JSON.stringify(profilePayload)
     });
 
-    // 2) Start payment step (creates SetupIntent + mounts Elements + wires button + polling)
+    // 2) Start payment step (SetupIntent / resume logic)
     await startPaymentStep(accessToken);
 
   } catch (err) {
