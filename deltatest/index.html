@@ -1591,7 +1591,7 @@ function prefillBillingProfileFromPing(ping) {
   set("bpCountry", bp.country || "US");
 }
 
-  function initPostLoginWizard(accessToken) {
+  function initPostLoginWizard(accessToken, ping) {
     const badge = document.getElementById('authBadge');
     if (badge) { badge.textContent = "Signed in"; badge.style.color = '#21bca5'; }
 
@@ -1604,11 +1604,8 @@ function prefillBillingProfileFromPing(ping) {
     // ✅ Fill first / last from JWT name (first login)
     prefillNameFields(claims.name || "");
 
-    // ✅ Resume autofill from BillingProfile (refresh / return)
-    try {
-      const ping = JSON.parse(sessionStorage.getItem("pragoptics_ping") || "null");
-      prefillBillingProfileFromPing(ping);
-    }     catch {}
+    // ✅ Resume autofill from BillingProfile using the freshest ping we already have
+    prefillBillingProfileFromPing(ping);
 
     const flow = document.getElementById('platformFlow');
     if (flow) flow.style.display = 'block';
@@ -1691,11 +1688,22 @@ function gotoStep5() {
   
   async function startPaymentStep(accessToken) {
   // 1) Create SetupIntent (server) -> client secret
-  const csResp = await fetchJson(CHECKOUT_SESSION_URL, {
+let csResp;
+try {
+  csResp = await fetchJson(CHECKOUT_SESSION_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json", "Authorization": `Bearer ${accessToken}` },
     body: JSON.stringify({})
   });
+} catch (err) {
+  // ✅ If backend says we're already processing, switch to Finalizing + poll
+  if (err?.status === 409) {
+    showProcessingState("Finalizing subscription…");
+    await pollUntilResolved();
+    return;
+  }
+  throw err;
+}
 
   const clientSecret = csResp?.paymentIntentClientSecret; // (compat field name)
   if (!clientSecret) throw new Error("Missing Stripe client secret.");
