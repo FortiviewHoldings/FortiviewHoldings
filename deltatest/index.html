@@ -1592,38 +1592,89 @@ function prefillBillingProfileFromPing(ping) {
 }
 
   function initPostLoginWizard(accessToken, ping) {
-    const badge = document.getElementById('authBadge');
-    if (badge) { badge.textContent = "Signed in"; badge.style.color = '#21bca5'; }
+  // ✅ FIX 1: guard against duplicate listener wiring
+  if (window.__wizardInit) return;
+  window.__wizardInit = true;
 
-    const claims = decodeJwtPayload(accessToken || "");
-    const bpEmail = document.getElementById('bpEmail');
-    if (bpEmail && !bpEmail.value) {
-      bpEmail.value = claims.email || '';
-    }
-
-    // ✅ Fill first / last from JWT name (first login)
-    prefillNameFields(claims.name || "");
-
-    // ✅ Resume autofill from BillingProfile using the freshest ping we already have
-    prefillBillingProfileFromPing(ping);
-
-    const flow = document.getElementById('platformFlow');
-    if (flow) flow.style.display = 'block';
-
-    document.querySelectorAll('input[name="subType"]').forEach(r => {
-      r.addEventListener('change', () => {
-        selectedType = r.value;
-        const toStep2 = document.getElementById('toStep2');
-        if (toStep2) toStep2.disabled = !selectedType;
-        updatePriceSummary();
-      });
-    });
-    document.querySelectorAll('input[name="cadence"]').forEach(r => r.addEventListener('change', updatePriceSummary));
-    ['aoDomains','aoStorage','aoFlows','aoApi'].forEach(id => document.getElementById(id)?.addEventListener('change', updatePriceSummary));
-
-    updatePriceSummary();
-    try { flow?.scrollIntoView({ behavior: 'smooth' }); } catch {}
+  const badge = document.getElementById('authBadge');
+  if (badge) {
+    badge.textContent = "Signed in";
+    badge.style.color = '#21bca5';
   }
+
+  const claims = decodeJwtPayload(accessToken || "");
+
+  const bpEmail = document.getElementById('bpEmail');
+  if (bpEmail && !bpEmail.value) {
+    bpEmail.value = claims.email || '';
+  }
+
+  // ✅ existing, correct
+  prefillNameFields(claims.name || "");
+  prefillBillingProfileFromPing(ping);
+
+  const flow = document.getElementById('platformFlow');
+  if (flow) flow.style.display = 'block';
+
+  /* =====================================================
+     ✅ ADD‑ON VISIBILITY CONTROLLER (THIS IS THE CORE)
+     ===================================================== */
+  function applySubTypeUI() {
+    const isPartner = (selectedType === "partner");
+
+    ["aoDomains","aoStorage","aoFlows","aoApi"].forEach(id => {
+      const box = document.getElementById(id);
+      if (!box) return;
+
+      // ✅ Partner cannot have addons
+      if (isPartner) box.checked = false;
+
+      box.disabled = isPartner;
+      box.closest('.option-card')?.classList.toggle('hidden', isPartner);
+    });
+  }
+
+  /* =====================================================
+     ✅ STEP 1: SUBSCRIBER TYPE HANDLING
+     ===================================================== */
+  document.querySelectorAll('input[name="subType"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      selectedType = radio.value;
+
+      applySubTypeUI();
+
+      const nextBtn = document.getElementById('toStep2');
+      if (nextBtn) nextBtn.disabled = !selectedType;
+
+      updatePriceSummary();
+    });
+  });
+
+  // ✅ FIX 2: seed selectedType BEFORE first apply
+  selectedType =
+    document.querySelector('input[name="subType"]:checked')?.value || null;
+
+  applySubTypeUI();
+
+  /* =====================================================
+     ✅ REMAINING LISTENERS (UNCHANGED)
+     ===================================================== */
+  document
+    .querySelectorAll('input[name="cadence"]')
+    .forEach(r => r.addEventListener('change', updatePriceSummary));
+
+  ["aoDomains","aoStorage","aoFlows","aoApi"].forEach(id =>
+    document.getElementById(id)?.addEventListener('change', updatePriceSummary)
+  );
+
+  updatePriceSummary();
+
+  try {
+    flow?.scrollIntoView({ behavior: 'smooth' });
+  } catch {}
+}
+
+
 
   function gotoStep1() { document.querySelectorAll('.wizard .step').forEach(s => s.classList.remove('is-active')); document.getElementById('step1')?.classList.add('is-active'); }
   function gotoStep2() { if (!selectedType) return; document.querySelectorAll('.wizard .step').forEach(s => s.classList.remove('is-active')); document.getElementById('step2')?.classList.add('is-active'); updatePriceSummary(); }
