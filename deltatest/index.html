@@ -1717,7 +1717,7 @@ function updatePriceSummary() {
     <div><strong>${subType.toUpperCase()}</strong> — cadence: <strong>${cadence}</strong></div>
     <div style="margin-top:6px;">${lines.join("<br>")}</div>
     <div style="margin-top:8px;"><strong>Estimated total:</strong> $${total.toFixed(2)}${subType==="user" ? " per user" : ""} / ${cadence==="annual" ? "yr" : "mo"}</div>
-    <div class="hint" style="margin-top:6px;">Finalized in Stripe. Backend remains authoritative.</div>
+    <div class="hint" style="margin-top:6px;">Finalized in Stripe.</div>
   `;
 }
 
