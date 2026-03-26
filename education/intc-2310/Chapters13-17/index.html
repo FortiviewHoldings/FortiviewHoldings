@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>INTC 2310 – Chapters 13–17 Comprehensive Review</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fff;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 6px;
+      padding: 20px 24px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    h1 { font-size: 1.6rem; margin-bottom: 0.25rem; }
+    h2 { font-size: 1.2rem; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+    .session {
+      margin: 10px 0;
+      padding: 8px 10px;
+      border-left: 3px solid #333;
+      background-color: #fafafa;
+    }
+    .time {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 3px;
+    }
+    .note {
+      background: #fef3c7;
+      border: 1px solid #facc15;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .related {
+      background: #dbeafe;
+      border: 1px solid #60a5fa;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+      color: #1e3a8a;
+    }
+    .toggle-btn {
+      margin-top: 8px;
+      padding: 6px 10px;
+      background: #1ca490da;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .toggle-btn:hover {
+      background: #c6d0f0a6;
+      color: #000;
+    }
+    .collapsible {
+      display: none;
+      margin-top: 12px;
+      padding: 12px;
+      background: #f8fafc;
+      border: 1px solid #c7d2fe;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+
+<body>
+<div class="container">
+
+  <h1>INTC 2310 – Principles of Industrial Measurement II</h1>
+  <h2>March 26, 2026 — Chapters 13–17 Comprehensive Review</h2>
+
+  <div class="note">
+    <strong>Purpose:</strong> This session is a consolidated review of Chapters 13–17.
+    The goal is to reinforce how level instruments behave in the real world, how they fail,
+    and how technicians determine whether a measurement can be trusted.
+  </div>
+
+  <!-- SAFETY + ZOOM -->
+<div class="session">
+  <span class="time">6:00 p.m. – 6:15 p.m.</span>
+  <span>Safety Moment</span><br>
+
+  <iframe
+    width="640"
+    height="320"
+    src="https://www.youtube.com/embed/_ZkOLxHTo1c"
+    title="Outsourcing Responsibility: Explosion at Optima Belle"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen>
+  </iframe>
+</div>
+
+<div class="session">
+  <span class="time">Live Session Access</span>
+  <span>Zoom Meeting Information</span>
+
+  <button class="toggle-btn" onclick="toggleSection('zoomInfo')">
+    View Zoom Details
+  </button>
+
+  <div id="zoomInfo" class="collapsible">
+    <h2>Zoom Session Information</h2>
+
+    <div class="meta">
+      <div><span class="label">Date:</span> 03/26/2026</div>
+      <div><span class="label">Course:</span> INTC 2310 – Industrial Measurement II</div>
+      <div><span class="label">Instructor:</span> Cameron Bridges</div>
+    </div>
+
+    <p>
+      <strong>Zoom Link:</strong><br>
+      <a href="https://sanjac.zoom.us/j/92148953965?pwd=ezTbBkd30gnGXG1tSflq1VCFfJcQdr.1" target="_blank">
+        Join Live Class Session
+      </a>
+    </p>
+
+    <p>
+      <strong>Meeting ID:</strong> 921 4895 3965<br>
+      <strong>Passcode:</strong> 516191
+    </p>
+
+    <div class="note">
+      Please log in a few minutes early to confirm audio and video.
+      Attendance is taken based on Zoom presence.
+    </div>
+  </div>
+</div>
+
+  <!-- CH 13–14 -->
+  <div class="session">
+    <span class="time">6:15 p.m. – 7:00 p.m.</span>
+    <span><strong>Chapters 13–14 — Basic Level Measurement</strong></span>
+
+    <button class="toggle-btn" onclick="toggleSection('ch1314')">View Review</button>
+
+    <div id="ch1314" class="collapsible">
+      <h2>Chapters 13–14 Review</h2>
+      <ul>
+        <li>Point vs continuous level measurement</li>
+        <li>Sight glasses, magnetic gauges, and common failure modes</li>
+        <li>DP transmitters for open and closed tanks</li>
+        <li>Specific gravity assumptions and scaling</li>
+        <li>Bubblers and regulated air limitations</li>
+        <li>Zero suppression and elevation</li>
+      </ul>
+
+      <div class="related">
+        <strong>Key takeaway:</strong>
+        A stable reading does not guarantee a correct reading.
+        Always question installation assumptions before calibration.
+      </div>
+    </div>
+  </div>
+
+  <!-- CH 15–16 -->
+  <div class="session">
+    <span class="time">7:00 p.m. – 7:45 p.m.</span>
+    <span><strong>Chapters 15–16 — Advanced Level Technologies</strong></span>
+
+    <button class="toggle-btn" onclick="toggleSection('ch1516')">View Review</button>
+
+    <div id="ch1516" class="collapsible">
+      <h2>Chapters 15–16 Review</h2>
+      <ul>
+        <li>Ultrasonic limitations: foam, vapor, gas composition</li>
+        <li>NCR vs GWR: dielectric dependence and echo behavior</li>
+        <li>Echo curve interpretation as the primary diagnostic tool</li>
+        <li>Laser strengths and vapor/dust weaknesses</li>
+        <li>Nuclear measurement fundamentals and MOC requirements</li>
+        <li>Weigh cells and mechanical isolation requirements</li>
+      </ul>
+
+      <div class="related">
+        <strong>Key takeaway:</strong>
+        Advanced instruments fail quietly. Diagnostics matter more than specifications.
+      </div>
+    </div>
+  </div>
+
+  <!-- CH 17 -->
+  <div class="session">
+    <span class="time">7:45 p.m. – 8:30 p.m.</span>
+    <span><strong>Chapter 17 — Practical Level Measurement & Calibration</strong></span>
+
+    <button class="toggle-btn" onclick="toggleSection('ch17')">View Review</button>
+
+    <div id="ch17" class="collapsible">
+      <h2>Chapter 17 Review</h2>
+      <ul>
+        <li>Bulk solids behavior and unreliable surface profiles</li>
+        <li>Dust interference and technology survivability</li>
+        <li>Load cell calibration methods and hysteresis checks</li>
+        <li>Boiler water level, water columns, try cocks</li>
+        <li>Gauge glass blowdown and false indications</li>
+        <li>Diaphragm seals, capillary head effects</li>
+        <li>Zero suppression vs elevation</li>
+      </ul>
+
+      <div class="related">
+        <strong>Key takeaway:</strong>
+        Chapter 17 is about deciding whether a number is believable
+        before acting on it.
+      </div>
+    </div>
+  </div>
+
+  <p class="note">
+    Times are approximate and may shift based on discussion and questions.
+  </p>
+
+</div>
+
+<script>
+function toggleSection(id) {
+  const target = document.getElementById(id);
+  const isOpening = target.style.display !== 'block';
+
+  document.querySelectorAll('.collapsible').forEach(sec => {
+    sec.style.display = 'none';
+  });
+
+  if (isOpening) {
+    target.style.display = 'block';
+  }
+}
+</script>
+</body>
+</html>
