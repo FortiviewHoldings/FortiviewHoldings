@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How a CPU Thinks — The Foundry — Idea Lab</title>
+<meta name="description" content="Run a tiny program by hand. Step a toy CPU through fetch, decode, and execute, watch its registers fill, and see it compute the answer. Free, factual, no accounts.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../../assets/logo.svg">
+<link rel="stylesheet" href="../../assets/cosmos.css">
+<style>
+  /* CPU bench: the program tape, the phase lights, and the registers */
+  .cpu{display:grid;gap:18px}
+  @media (min-width:760px){ .cpu{grid-template-columns:1.2fr .8fr} }
+
+  /* the program, one instruction per row */
+  .prog{border:1px solid var(--border);border-radius:var(--radius);background:#070b16;overflow:hidden}
+  .prog__head{display:flex;justify-content:space-between;align-items:center;gap:10px;
+    padding:9px 14px;background:#0c1326;border-bottom:1px solid var(--border);font-weight:700;font-size:.86em}
+  .prog__head .muted{font-weight:600}
+  .inst{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;
+    padding:11px 14px;border-bottom:1px solid var(--border);opacity:.5;transition:.2s}
+  .inst:last-child{border-bottom:0}
+  .inst.is-active{opacity:1;background:#0c142880;box-shadow:inset 3px 0 0 var(--plasma)}
+  .inst.is-past{opacity:.78}
+  .inst__num{width:26px;height:26px;border-radius:8px;background:#0e1530;border:1px solid var(--border);
+    display:grid;place-items:center;font-family:ui-monospace,monospace;font-size:.8em;color:var(--muted)}
+  .inst.is-active .inst__num{background:var(--grad-cosmic);color:#04060d;border-color:transparent}
+  .inst__code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.95em;color:#cdd6f4}
+  .inst__code b{color:var(--star)}
+
+  /* the three phases, lit one at a time */
+  .phases{display:flex;gap:8px}
+  .phase{flex:1;text-align:center;border:1px solid var(--border);border-radius:12px;
+    background:var(--glass);padding:10px 8px;opacity:.5;transition:.2s}
+  .phase.is-on{opacity:1;border-color:var(--plasma);box-shadow:0 0 0 1px var(--plasma)}
+  .phase .ico{font-size:22px;display:block}
+  .phase b{display:block;margin-top:4px;font-size:.92em}
+  .phase small{color:var(--muted);font-size:.74em}
+
+  /* the register panel */
+  .regs{border:1px solid var(--border);border-radius:var(--radius);background:var(--glass);padding:16px}
+  .regs h3{margin:0 0 12px;font-size:1.02em}
+  .reg{display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:9px 0;border-bottom:1px dashed var(--border)}
+  .reg:last-of-type{border-bottom:0}
+  .reg__name{font-family:ui-monospace,monospace;font-weight:700;color:var(--muted)}
+  .reg__val{font-family:ui-monospace,monospace;font-weight:800;font-size:1.25em;min-width:42px;
+    text-align:center;border-radius:8px;padding:3px 10px;background:#0a0f1f;border:1px solid var(--border)}
+  .reg__val.flash{background:radial-gradient(circle,#fff6c0,#ffd76a 70%,#a9810f);color:#04060d;
+    border-color:#ffd76a;box-shadow:0 0 22px #ffd76a88}
+
+  .cpu__say{font-family:ui-monospace,monospace;color:var(--star);font-weight:700;
+    min-height:1.4em;margin-top:4px}
+  .out{margin-top:10px;text-align:center;font-weight:800;font-size:1.1em}
+  .out .lamp{width:72px;height:72px;font-size:30px;margin:8px auto}
+  .ctrls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px}
+</style>
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section lab">
+
+  <header class="center">
+    <span class="kicker">The Foundry · Level 2</span>
+    <h1 style="font-size:clamp(28px,5vw,46px);margin:.2em 0">How a CPU Thinks</h1>
+    <p class="muted">A computer's brain does the same tiny loop, billions of times a second. Run one by hand and watch it think.</p>
+  </header>
+
+  <div class="steps" id="dots" aria-hidden="true"></div>
+
+  <!-- ============ ACT 1: THE LOOP ============ -->
+  <section class="act" data-act="0">
+    <h2>The loop behind everything</h2>
+    <p class="muted">A CPU does not really "think" like you. It repeats three small jobs, over and over.</p>
+
+    <div class="phases" style="margin-top:6px">
+      <div class="phase is-on"><span class="ico" aria-hidden="true">📥</span><b>Fetch</b><small>Get the next instruction</small></div>
+      <div class="phase is-on"><span class="ico" aria-hidden="true">🔎</span><b>Decode</b><small>Work out what it means</small></div>
+      <div class="phase is-on"><span class="ico" aria-hidden="true">⚙️</span><b>Execute</b><small>Do it</small></div>
+    </div>
+
+    <div class="fact" style="margin-top:18px">
+      <span aria-hidden="true">🧠</span>
+      <span>A CPU repeats <b>fetch, decode, execute</b> billions of times every second. That loop is the
+      whole show. Everything a computer does is this tiny cycle, run faster than you can blink.</span>
+    </div>
+
+    <div class="fact" style="margin-top:12px">
+      <span aria-hidden="true">🔢</span>
+      <span>Here is the secret: the instructions and the data are <b>just numbers</b>. A program is a list
+      of numbers, and the answers are numbers too. The CPU only ever moves and adds numbers around.</span>
+    </div>
+
+    <div class="act__nav">
+      <span></span>
+      <button class="btn btn--go" data-next>Next: meet the program →</button>
+    </div>
+  </section>
+
+  <!-- ============ ACT 2: THE PROGRAM ============ -->
+  <section class="act" data-act="1" hidden>
+    <h2>Read the program</h2>
+    <p class="muted">This toy CPU knows only three commands. Here is a tiny program written in them.</p>
+
+    <div class="prog" style="margin-top:6px">
+      <div class="prog__head"><span>The program</span><span class="muted">3 instructions</span></div>
+      <div class="inst is-active"><span class="inst__num">0</span><span class="inst__code"><b>SET</b> a, 2</span></div>
+      <div class="inst"><span class="inst__num">1</span><span class="inst__code"><b>ADD</b> a, 3</span></div>
+      <div class="inst"><span class="inst__num">2</span><span class="inst__code"><b>SHOW</b> a</span></div>
+    </div>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">📜</span>
+      <span><b>SET a, 2</b> puts the number 2 into a box called <b>a</b>. <b>ADD a, 3</b> adds 3 to
+      whatever is in <b>a</b>. <b>SHOW a</b> reads it out loud. Those boxes are called
+      <button class="term" data-term="bit">registers</button>, and each one just holds a number.</span>
+    </div>
+
+    <div class="fact" style="margin-top:12px">
+      <span aria-hidden="true">⚡</span>
+      <span>Down inside the chip, every one of these steps is built from
+      <button class="term" data-term="logic-gate">logic gates</button> and
+      <button class="term" data-term="transistor">transistors</button>, the same switches you wired
+      earlier. Stack enough of them and switches turn into a machine that runs programs.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" data-next>Next: run it →</button>
+    </div>
+  </section>
+
+  <!-- ============ ACT 3: RUN IT ============ -->
+  <section class="act" data-act="2" hidden>
+    <h2>Run it, one step at a time</h2>
+    <p class="muted">Press Step. Watch the CPU fetch the line, decode it, then execute it. The register fills as it goes.</p>
+
+    <div class="cpu" style="margin-top:6px">
+      <div>
+        <div class="prog" id="progBench">
+          <div class="prog__head"><span>Program</span><span class="muted" id="pcLabel">next line: 0</span></div>
+          <div class="inst" data-line="0"><span class="inst__num">0</span><span class="inst__code"><b>SET</b> a, 2</span></div>
+          <div class="inst" data-line="1"><span class="inst__num">1</span><span class="inst__code"><b>ADD</b> a, 3</span></div>
+          <div class="inst" data-line="2"><span class="inst__num">2</span><span class="inst__code"><b>SHOW</b> a</span></div>
+        </div>
+
+        <div class="phases" id="phases" style="margin-top:14px">
+          <div class="phase" data-phase="fetch"><span class="ico" aria-hidden="true">📥</span><b>Fetch</b><small>Get the line</small></div>
+          <div class="phase" data-phase="decode"><span class="ico" aria-hidden="true">🔎</span><b>Decode</b><small>What does it mean?</small></div>
+          <div class="phase" data-phase="execute"><span class="ico" aria-hidden="true">⚙️</span><b>Execute</b><small>Do it</small></div>
+        </div>
+
+        <div class="cpu__say" id="say" aria-live="polite">Ready. Press Step to start the cycle.</div>
+      </div>
+
+      <div class="regs">
+        <h3>Registers</h3>
+        <div class="reg">
+          <span class="reg__name">a</span>
+          <span class="reg__val" id="regA">–</span>
+        </div>
+        <div class="reg">
+          <span class="reg__name">PC</span>
+          <span class="reg__val" id="regPC">0</span>
+        </div>
+        <p class="muted tiny" style="margin:.6em 0 0">PC is the "program counter": it remembers which line is next.</p>
+
+        <div class="out" id="outBox" hidden>
+          <div class="lamp is-on" aria-hidden="true" id="outLamp">5</div>
+          <div>Output: <span id="outVal">5</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ctrls">
+      <button class="btn btn--go" id="stepBtn" type="button">Step ▶</button>
+      <button class="btn btn--ghost" id="resetBtn" type="button">Reset ↺</button>
+      <span class="muted tiny" id="hint">Tip: each Step moves one phase forward.</span>
+    </div>
+
+    <div class="fact" style="margin-top:18px">
+      <span aria-hidden="true">✦</span>
+      <span>You just ran a program the slow way. A real CPU does this exact loop, but billions of times
+      a second, and never gets tired. That speed is the only magic. The steps are simple.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <a class="btn btn--cosmic" href="../">Back to the Foundry →</a>
+    </div>
+  </section>
+
+  <p class="center muted tiny" style="margin-top:26px">
+    <a href="../">← The Foundry</a> · every fact here is real science, kept simple. Tap the
+    <span class="term" style="cursor:default;border:0">underlined words</span> to dig deeper.
+  </p>
+</main>
+
+<script src="../../assets/manifest.js"></script>
+<script src="../../assets/glossary.js"></script>
+<script src="../../assets/shell.js"></script>
+<script>
+(function () {
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("foundry", "../..");
+  IdeaLab.disclosure();
+  IdeaLab.glossary(window.IDEA_LAB_GLOSSARY);
+
+  /* ---------- stepper ---------- */
+  var acts = Array.prototype.slice.call(document.querySelectorAll(".act"));
+  var dots = document.getElementById("dots");
+  var done = [false, false, false];
+  var current = 0;
+  acts.forEach(function (_, i) {
+    var d = document.createElement("span");
+    d.className = "dot" + (i === 0 ? " is-active" : "");
+    dots.appendChild(d);
+  });
+  function show(i) {
+    current = Math.max(0, Math.min(acts.length - 1, i));
+    acts.forEach(function (a, k) { a.hidden = k !== current; });
+    Array.prototype.forEach.call(dots.children, function (d, k) {
+      d.className = "dot" + (k === current ? " is-active" : (done[k] ? " is-done" : ""));
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.body.addEventListener("click", function (e) {
+    if (e.target.matches("[data-next]")) { done[current] = true; show(current + 1); }
+    if (e.target.matches("[data-prev]")) show(current - 1);
+  });
+
+  /* ---------- ACT 3: the toy CPU ----------
+     A tiny preset program. Each instruction is just data:
+     an opcode and a number. The CPU walks fetch -> decode ->
+     execute for each line, exactly like the real loop. */
+  var PROGRAM = [
+    { op: "SET",  reg: "a", val: 2 },
+    { op: "ADD",  reg: "a", val: 3 },
+    { op: "SHOW", reg: "a" }
+  ];
+  var PHASES = ["fetch", "decode", "execute"];
+
+  var lines = Array.prototype.slice.call(document.querySelectorAll("#progBench .inst"));
+  var phaseEls = Array.prototype.slice.call(document.querySelectorAll("#phases .phase"));
+  var regAEl = document.getElementById("regA");
+  var regPCEl = document.getElementById("regPC");
+  var pcLabel = document.getElementById("pcLabel");
+  var sayEl = document.getElementById("say");
+  var stepBtn = document.getElementById("stepBtn");
+  var resetBtn = document.getElementById("resetBtn");
+  var hint = document.getElementById("hint");
+  var outBox = document.getElementById("outBox");
+  var outVal = document.getElementById("outVal");
+
+  var state, pc, phase, finished;
+
+  function reset() {
+    state = { a: null };
+    pc = 0;
+    phase = 0;
+    finished = false;
+    regAEl.textContent = "–";
+    regAEl.classList.remove("flash");
+    regPCEl.textContent = "0";
+    pcLabel.textContent = "next line: 0";
+    sayEl.textContent = "Ready. Press Step to start the cycle.";
+    outBox.hidden = true;
+    stepBtn.disabled = false;
+    stepBtn.textContent = "Step ▶";
+    hint.textContent = "Tip: each Step moves one phase forward.";
+    highlightLine(0);
+    lightPhase(-1);
+  }
+
+  function highlightLine(idx) {
+    lines.forEach(function (el, i) {
+      el.classList.toggle("is-active", i === idx);
+      el.classList.toggle("is-past", i < idx);
+    });
+  }
+  function lightPhase(idx) {
+    phaseEls.forEach(function (el, i) { el.classList.toggle("is-on", i === idx); });
+  }
+
+  function decodeText(inst) {
+    if (inst.op === "SET")  return "It means: put " + inst.val + " into register " + inst.reg + ".";
+    if (inst.op === "ADD")  return "It means: add " + inst.val + " to register " + inst.reg + ".";
+    if (inst.op === "SHOW") return "It means: read register " + inst.reg + " out loud.";
+    return "";
+  }
+
+  function execute(inst) {
+    if (inst.op === "SET") {
+      state[inst.reg] = inst.val;
+      regAEl.textContent = state.a;
+      flash(regAEl);
+      return "Done. Register " + inst.reg + " now holds " + state[inst.reg] + ".";
+    }
+    if (inst.op === "ADD") {
+      state[inst.reg] = state[inst.reg] + inst.val;
+      regAEl.textContent = state.a;
+      flash(regAEl);
+      return "Done. Register " + inst.reg + " is now " + state[inst.reg] + ".";
+    }
+    if (inst.op === "SHOW") {
+      outVal.textContent = state[inst.reg];
+      document.getElementById("outLamp").textContent = state[inst.reg];
+      outBox.hidden = false;
+      return "Output: " + state[inst.reg] + ". The program is finished.";
+    }
+    return "";
+  }
+
+  function flash(el) {
+    el.classList.remove("flash");
+    /* force reflow so the class re-applies and the glow replays */
+    void el.offsetWidth;
+    el.classList.add("flash");
+  }
+
+  function finish() {
+    finished = true;
+    stepBtn.disabled = true;
+    stepBtn.textContent = "Done ✓";
+    lightPhase(-1);
+    highlightLine(-1);
+    hint.textContent = "That is the whole loop. Press Reset to run it again.";
+    IdeaLab.award("cpu-operator", 50);
+  }
+
+  function step() {
+    if (finished) return;
+    var inst = PROGRAM[pc];
+    lightPhase(phase);
+
+    if (phase === 0) {            /* fetch */
+      highlightLine(pc);
+      regPCEl.textContent = pc;
+      pcLabel.textContent = "running line: " + pc;
+      sayEl.textContent = "Fetch: get line " + pc + "  ( " + format(inst) + " ).";
+      phase = 1;
+    } else if (phase === 1) {     /* decode */
+      sayEl.textContent = "Decode: " + decodeText(inst);
+      phase = 2;
+    } else {                      /* execute */
+      sayEl.textContent = "Execute: " + execute(inst);
+      phase = 0;
+      pc = pc + 1;
+      if (pc >= PROGRAM.length) {
+        regPCEl.textContent = PROGRAM.length;
+        finish();
+      } else {
+        regPCEl.textContent = pc;
+        pcLabel.textContent = "next line: " + pc;
+      }
+    }
+  }
+
+  function format(inst) {
+    if (inst.op === "SHOW") return inst.op + " " + inst.reg;
+    return inst.op + " " + inst.reg + ", " + inst.val;
+  }
+
+  stepBtn.addEventListener("click", step);
+  resetBtn.addEventListener("click", reset);
+  reset();
+})();
+</script>
+</body>
+</html>

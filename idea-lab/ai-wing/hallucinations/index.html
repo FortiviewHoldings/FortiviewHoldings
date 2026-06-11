@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>When AI Makes Things Up — AI Wing — Idea Lab</title>
+<meta name="description" content="An AI answers kid questions with total confidence. Some answers are real, some are made up. Check each one against a trusted source and learn to verify before you trust. No accounts.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../../assets/logo.svg">
+<link rel="stylesheet" href="../../assets/cosmos.css">
+<style>
+  .askbar{border:1px solid var(--border);border-radius:12px;background:#0a1020;padding:14px 16px;
+    display:flex;gap:10px;align-items:flex-start;font-weight:700}
+  .askbar .q{flex:1;min-width:0}
+  .askbar .qlabel{font-size:.72em;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:800}
+
+  .bot{border:1px solid var(--border);border-radius:12px;background:#0c1226;margin-top:12px;overflow:hidden}
+  .bot__head{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#101a36;
+    border-bottom:1px solid var(--border);font-weight:800}
+  .bot__head .av{width:30px;height:30px;border-radius:8px;background:var(--grad-cosmic);
+    display:grid;place-items:center;color:#04060d;flex:0 0 auto}
+  .bot__head .conf{margin-left:auto;font-size:.72em;font-weight:700;color:var(--warn);
+    text-transform:uppercase;letter-spacing:.06em}
+  .bot__say{padding:14px 16px;font-size:1.06em;line-height:1.55}
+
+  .src{border:1px solid var(--border);border-radius:12px;background:var(--glass);padding:14px;margin-top:12px;
+    display:flex;gap:10px;align-items:flex-start}
+  .src .ico{width:30px;height:30px;border-radius:8px;background:#0e1530;border:1px solid var(--border);
+    display:grid;place-items:center;flex:0 0 auto}
+  .src .stitle{font-size:.72em;color:var(--good);text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+  .src .sbody{font-weight:600}
+
+  .verdict{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+  .vbtn{cursor:pointer;flex:1;min-width:140px;border:1px solid var(--border);background:var(--glass);
+    border-radius:12px;padding:12px 14px;font:inherit;font-weight:800;color:var(--ink)}
+  .vbtn:hover{border-color:var(--plasma)}
+  .vbtn small{display:block;font-size:.74em;font-weight:600;color:var(--muted);margin-top:3px}
+  .verdict.graded{pointer-events:none;opacity:.96}
+  .vbtn.is-pick{border-color:var(--plasma);box-shadow:0 0 0 1px var(--plasma)}
+
+  .result{min-height:1.4em;margin-top:14px;font-weight:700;display:none}
+  .result.show{display:block}
+  .tag{display:inline-block;font-size:.74em;font-weight:800;text-transform:uppercase;letter-spacing:.06em;
+    padding:3px 10px;border-radius:999px;margin-right:8px}
+  .tag--true{background:#1ca49033;color:var(--brand-600);border:1px solid #21bca555}
+  .tag--fake{background:#ff6b6b22;color:var(--bad);border:1px solid #ff6b6b55}
+  .result.right{color:var(--good)}
+  .result.wrong{color:var(--warn)}
+
+  .qprog{font-size:.82em;color:var(--muted);font-weight:700;margin-bottom:6px}
+  .scoreline{font-weight:800;margin:6px 0 0}
+  .recap-row{border:1px solid var(--border);border-radius:10px;background:var(--glass);
+    padding:10px 12px;display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section lab">
+  <header class="center">
+    <span class="kicker">AI Wing</span>
+    <h1 style="font-size:clamp(28px,5vw,46px);margin:.2em 0">When AI Makes Things Up</h1>
+    <p class="muted">An AI sounds sure of itself every single time. That does not mean it is right.
+       You be the fact checker.</p>
+  </header>
+
+  <div class="steps" id="dots" aria-hidden="true"></div>
+
+  <!-- ACT 0: THE SETUP -->
+  <section class="act" data-act="0">
+    <h2>The confident machine</h2>
+    <p class="muted">An AI just answered a few questions. It sounds totally sure of all of them.
+       Here is the catch.</p>
+
+    <div class="fact">
+      <span aria-hidden="true">🌀</span>
+      <span>When an AI states something that sounds right but is actually false, that is called a
+        <button class="term" data-term="hallucination">hallucination</button>. The tricky part: it says
+        the made up stuff with the exact same confidence as the true stuff. So you cannot tell which is
+        which just by how sure it sounds.</span>
+    </div>
+
+    <div class="fact" style="margin-top:12px">
+      <span aria-hidden="true">🔎</span>
+      <span><b>Your job:</b> for each answer, read the trusted source card next to it, then mark the AI
+        either <b>Trust</b> or <b>Verify</b>. Catch every made up one to earn the badge.</span>
+    </div>
+
+    <div class="act__nav"><span></span>
+      <button class="btn btn--go" data-next>Start checking →</button></div>
+  </section>
+
+  <!-- ACT 1: FACT CHECK -->
+  <section class="act" data-act="1" hidden>
+    <h2>Check the AI</h2>
+    <p class="muted">Read the AI answer, then the trusted source. Do they match? Mark Trust or Verify.</p>
+
+    <div class="qprog" id="qprog"></div>
+
+    <div class="askbar">
+      <span aria-hidden="true">🙋</span>
+      <span class="q"><span class="qlabel">A kid asked</span><span id="qText"></span></span>
+    </div>
+
+    <div class="bot">
+      <div class="bot__head">
+        <span class="av" aria-hidden="true">🤖</span> The AI says
+        <span class="conf" id="confTag">very confident</span>
+      </div>
+      <div class="bot__say" id="botSay"></div>
+    </div>
+
+    <div class="src">
+      <span class="ico" aria-hidden="true">📘</span>
+      <span><span class="stitle" id="srcTitle">Trusted source</span>
+        <span class="sbody" id="srcBody"></span></span>
+    </div>
+
+    <div class="verdict" id="verdict">
+      <button class="vbtn" data-v="trust" type="button">✅ Trust it
+        <small>The source backs it up</small></button>
+      <button class="vbtn" data-v="verify" type="button">⚠️ Verify
+        <small>The source does not match</small></button>
+    </div>
+
+    <div class="result" id="result"></div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" id="nextQ" data-next disabled>Next answer →</button>
+    </div>
+  </section>
+
+  <!-- ACT 2: THE REVEAL + HABIT -->
+  <section class="act" data-act="2" hidden>
+    <h2>What just happened</h2>
+
+    <p class="scoreline" id="scoreOut"></p>
+
+    <div class="card" style="margin:10px 0">
+      <p class="muted" style="margin:0">Here is every answer, with the made up ones marked:</p>
+      <div id="recap" style="margin-top:10px;display:grid;gap:8px"></div>
+    </div>
+
+    <div class="fact">
+      <span aria-hidden="true">🌀</span>
+      <span><b>That is a hallucination.</b> The AI did not lie on purpose and it was not broken. It just
+        guesses words that sound right, and sometimes a wrong guess sounds just as smooth as a true one.
+        It never warns you when it is making something up.</span>
+    </div>
+
+    <div class="fact" style="margin-top:12px">
+      <span aria-hidden="true">✅</span>
+      <span><b>The fix is simple:</b> for anything that matters, check it against a
+        <button class="term" data-term="reliable-source">reliable source</button> before you trust it.
+        Confident does not mean correct.</span>
+    </div>
+
+    <div class="card" style="margin:14px 0">
+      <p class="muted" style="margin:0">The three second habit before you trust an AI:<br>
+        <b>1. Does it matter?</b> Homework, health, money, or facts you will repeat. Then check it.<br>
+        <b>2. Where can I verify it?</b> A book, an official site, a grown up, two sources that agree.<br>
+        <b>3. Does the AI show its source?</b> If it cannot point to one, treat the claim as a guess.</p>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <a class="btn btn--cosmic" href="../">Back to the AI Wing →</a>
+    </div>
+  </section>
+
+  <p class="center muted tiny" style="margin-top:26px">
+    <a href="../">← AI Wing</a> · real fact checkers do exactly this: never trust a claim on confidence alone
+  </p>
+</main>
+
+<script src="../../assets/manifest.js"></script>
+<script src="../../assets/glossary.js"></script>
+<script src="../../assets/shell.js"></script>
+<script>
+(function () {
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("ai-wing", "../..");
+  IdeaLab.disclosure();
+
+  /* terms for this page, layered on top of the shared glossary so we
+     do not touch the shared file. Sourced, kept true. */
+  var pageTerms = {
+    "hallucination": {
+      term: "AI hallucination",
+      short: "When an AI confidently states something that is false or made up, as if it were a fact.",
+      deep: "An AI like a chatbot does not look facts up the way you look in a book. It predicts likely words one after another, so it can produce a smooth, sure sounding answer that is simply wrong. People call this a hallucination. The danger is that it sounds exactly as confident when it is wrong as when it is right, so the only safe habit is to verify important claims against a reliable source.",
+      source: "https://en.wikipedia.org/wiki/Hallucination_(artificial_intelligence)"
+    },
+    "reliable-source": {
+      term: "Reliable source",
+      short: "A place that has to get facts right and can be checked, like an official site, a reference book, or an expert.",
+      deep: "A reliable source is one with a reason to be accurate and a way to be checked: an official website, a published reference, a trusted encyclopedia, or two independent sources that agree. To verify a claim you compare it against one of these. If a claim only comes from one place that cannot be checked, or from an AI that shows no source, treat it as a guess until you confirm it.",
+      source: "https://en.wikipedia.org/wiki/Information_literacy"
+    }
+  };
+  var merged = {};
+  var shared = window.IDEA_LAB_GLOSSARY || {};
+  for (var k in shared) if (shared.hasOwnProperty(k)) merged[k] = shared[k];
+  for (var k2 in pageTerms) if (pageTerms.hasOwnProperty(k2)) merged[k2] = pageTerms[k2];
+  IdeaLab.glossary(merged);
+
+  /* ---------- stepper ---------- */
+  var acts = Array.prototype.slice.call(document.querySelectorAll(".act"));
+  var dots = document.getElementById("dots");
+  var done = [false, false, false];
+  var current = 0;
+  acts.forEach(function (_, i) {
+    var d = document.createElement("span");
+    d.className = "dot" + (i === 0 ? " is-active" : "");
+    dots.appendChild(d);
+  });
+  function show(i) {
+    current = Math.max(0, Math.min(acts.length - 1, i));
+    acts.forEach(function (a, k) { a.hidden = k !== current; });
+    Array.prototype.forEach.call(dots.children, function (d, k) {
+      d.className = "dot" + (k === current ? " is-active" : (done[k] ? " is-done" : ""));
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.body.addEventListener("click", function (e) {
+    if (e.target.matches("[data-next]") && !e.target.disabled) { done[current] = true; show(current + 1); }
+    if (e.target.matches("[data-prev]")) show(current - 1);
+  });
+
+  /* ---------- the questions ----------
+     fake:true means the AI answer is a hallucination and the right
+     verdict is Verify. Source cards are obviously checkable facts. */
+  var QS = [
+    {
+      q: "How many legs does a spider have?",
+      ai: "A spider has six legs, just like an insect.",
+      src: "Reference book: a spider is an arachnid. Every spider has eight legs. Insects have six.",
+      fake: true,
+      why: "The book says eight. The AI said six and sounded sure. That confident wrong answer is the hallucination."
+    },
+    {
+      q: "What planet do we live on?",
+      ai: "We live on Earth, the third planet from the Sun.",
+      src: "Space agency page: Earth is the third planet from the Sun and the only known planet with life.",
+      fake: false,
+      why: "The source matches the AI exactly. This one is safe to trust."
+    },
+    {
+      q: "Who painted the Mona Lisa?",
+      ai: "The Mona Lisa was painted by Pablo Picasso in the 1950s.",
+      src: "Museum page: the Mona Lisa was painted by Leonardo da Vinci in the early 1500s.",
+      fake: true,
+      why: "Wrong painter and wrong century. The museum says Leonardo da Vinci in the early 1500s. The AI made it up."
+    },
+    {
+      q: "How many days are in a week?",
+      ai: "There are seven days in a week.",
+      src: "Calendar reference: a week is seven days, from Monday to Sunday.",
+      fake: false,
+      why: "The reference agrees. Trust it."
+    },
+    {
+      q: "What is the biggest land animal?",
+      ai: "The biggest land animal is the giant penguin, which can weigh ten tons.",
+      src: "Nature encyclopedia: the largest land animal is the African elephant. Penguins are birds and far smaller.",
+      fake: true,
+      why: "The encyclopedia says the African elephant. There is no ten ton penguin. A smooth, totally invented answer."
+    }
+  ];
+
+  var idx = 0;
+  var picks = [];           /* what the kid chose per question */
+  var caughtFakes = 0;      /* fakes correctly marked Verify */
+  var totalFakes = QS.filter(function (x) { return x.fake; }).length;
+  var awarded = false;
+
+  var qprog = document.getElementById("qprog");
+  var qText = document.getElementById("qText");
+  var botSay = document.getElementById("botSay");
+  var srcBody = document.getElementById("srcBody");
+  var verdict = document.getElementById("verdict");
+  var result = document.getElementById("result");
+  var nextQ = document.getElementById("nextQ");
+
+  function paint() {
+    var item = QS[idx];
+    qprog.textContent = "Answer " + (idx + 1) + " of " + QS.length;
+    qText.textContent = " " + item.q;
+    botSay.textContent = item.ai;
+    srcBody.textContent = item.src;
+    result.className = "result";
+    result.textContent = "";
+    verdict.className = "verdict";
+    Array.prototype.forEach.call(verdict.children, function (b) {
+      b.classList.remove("is-pick");
+    });
+    nextQ.disabled = true;
+    nextQ.textContent = (idx === QS.length - 1) ? "See the reveal →" : "Next answer →";
+  }
+
+  verdict.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-v]");
+    if (!b || verdict.classList.contains("graded")) return;
+    var said = b.dataset.v;               /* "trust" or "verify" */
+    var item = QS[idx];
+    var correct = item.fake ? (said === "verify") : (said === "trust");
+    picks[idx] = said;
+
+    verdict.classList.add("graded");
+    b.classList.add("is-pick");
+
+    var tag = item.fake
+      ? '<span class="tag tag--fake">Made up</span>'
+      : '<span class="tag tag--true">True</span>';
+    result.innerHTML = tag + (correct ? "Nice catch. " : "Careful here. ") + IdeaLab.esc(item.why);
+    result.className = "result show " + (correct ? "right" : "wrong");
+
+    if (item.fake && said === "verify") caughtFakes++;
+    nextQ.disabled = false;
+    IdeaLab.addXP(5);
+  });
+
+  nextQ.addEventListener("click", function () {
+    if (nextQ.disabled) return;
+    if (idx < QS.length - 1) {
+      idx++;
+      paint();
+    } else {
+      buildReveal();
+      if (caughtFakes === totalFakes && !awarded) {
+        awarded = true;
+        IdeaLab.award("ai-fact-checker", 50);
+      }
+    }
+  });
+
+  /* ---------- ACT 2 reveal ---------- */
+  function buildReveal() {
+    var scoreOut = document.getElementById("scoreOut");
+    var recap = document.getElementById("recap");
+    scoreOut.textContent = "You caught " + caughtFakes + " of " + totalFakes +
+      " made up answers." +
+      (caughtFakes === totalFakes ? " Every fake, spotted. That is the skill." : " Take another look at the ones below.");
+
+    recap.innerHTML = "";
+    QS.forEach(function (item) {
+      var row = document.createElement("div");
+      row.className = "recap-row";
+      var tag = item.fake
+        ? '<span class="tag tag--fake">Made up</span>'
+        : '<span class="tag tag--true">True</span>';
+      row.innerHTML = tag +
+        '<span style="font-weight:600">' + IdeaLab.esc(item.ai) + "</span>";
+      recap.appendChild(row);
+    });
+  }
+
+  paint();
+})();
+</script>
+</body>
+</html>

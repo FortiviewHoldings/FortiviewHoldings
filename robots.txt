@@ -1,9 +1,9 @@
 User-agent: *
 Allow: /
 
-# Block sensitive or non-public directories if any
-Disallow: /PragOptics/
-Disallow: /deltatest/
+# Keep non-public areas out of search
+Disallow: /integration/pragoptics/api/
+Disallow: /_archive/
 
 # Point crawlers to your sitemap
 Sitemap: https://fortiviewholdings.com/sitemap.xml

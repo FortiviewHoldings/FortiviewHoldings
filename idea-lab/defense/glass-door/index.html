@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Glass Door — Defense Range — Idea Lab</title>
+<meta name="description" content="A safe, pretend vault that teaches why a website can never trust your browser. Peek inside, walk through a fake lock, then build one that actually holds.">
+<meta name="color-scheme" content="dark">
+<link rel="stylesheet" href="../../assets/cosmos.css">
+<style>
+  /* lab-local styles, built on the cosmos tokens */
+  .stage{display:grid;grid-template-columns:1fr;gap:18px}
+  @media(min-width:760px){ .stage{grid-template-columns:1.1fr .9fr} }
+
+  .win{border:1px solid var(--border);border-radius:14px;overflow:hidden;background:#0a1020;
+    box-shadow:0 18px 50px #0008}
+  .win__bar{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#0d1428;
+    border-bottom:1px solid var(--border)}
+  .win__dot{width:11px;height:11px;border-radius:50%;background:#ffffff2a}
+  .win__url{margin-left:8px;font-size:.78em;color:var(--muted);font-family:ui-monospace,monospace}
+  .win__body{padding:26px 20px;text-align:center;display:grid;gap:14px;place-items:center}
+  .vaultface{font-size:64px;line-height:1;transition:transform .3s}
+  .vaultface.open{transform:scale(1.08)}
+  .vault__status{min-height:1.4em;font-weight:700}
+  .ok{color:var(--good)} .no{color:var(--bad)}
+  .vault input{font:inherit;text-align:center;letter-spacing:.4em;font-weight:800;width:140px;
+    padding:10px;border-radius:10px;border:1px solid var(--border);background:#060a16;color:var(--ink)}
+
+  .insp{border:1px solid var(--border);border-radius:14px;background:#070b16;overflow:hidden}
+  .insp__bar{display:flex;align-items:center;gap:8px;padding:9px 12px;background:#0c1326;
+    border-bottom:1px solid var(--border);font-size:.8em;color:var(--muted);font-weight:700}
+  .insp__code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82em;line-height:1.7;
+    padding:14px;color:#cdd6f4;white-space:pre-wrap;word-break:break-word}
+  .insp .k{color:#c792ea} .insp .s{color:#a6e3a1} .insp .c{color:#6c7393;font-style:italic}
+  .insp .reveal{color:var(--star);font-weight:700}
+  .insp .ghost{opacity:.55}
+  .miniswitch{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-family:inherit;
+    background:#0e1530;border:1px solid var(--border);border-radius:8px;padding:3px 8px;font-size:.92em}
+  .miniswitch input{position:absolute;opacity:0;width:0;height:0}
+  .mini-track{width:34px;height:18px;border-radius:999px;background:#ffffff22;position:relative;transition:.2s}
+  .mini-track::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;
+    background:#fff;transition:.2s}
+  .miniswitch input:checked + .mini-track{background:var(--plasma)}
+  .miniswitch input:checked + .mini-track::after{left:18px}
+  .insp .locked-line{display:block}
+  .miniswitch{vertical-align:middle}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section lab">
+  <header class="center">
+    <span class="kicker">Defense Range</span>
+    <h1 style="font-size:clamp(28px,5vw,46px);margin:.2em 0">The Glass Door</h1>
+    <p class="muted">A vault with a glass door. The lock is painted on the glass. Watch.</p>
+  </header>
+
+  <div class="steps" id="dots" aria-hidden="true"></div>
+
+  <!-- ACT 0: PEEK -->
+  <section class="act" data-act="0">
+    <h2>Peek inside</h2>
+    <p class="muted">Here is a pretend vault on a pretend website. Open the Inspector and read what it
+       is made of. This is not breaking in. It is just looking.</p>
+
+    <div class="stage">
+      <div class="win">
+        <div class="win__bar"><span class="win__dot"></span><span class="win__dot"></span>
+          <span class="win__dot"></span><span class="win__url">vaultbox.example</span></div>
+        <div class="win__body">
+          <div class="vaultface">🔒</div>
+          <div class="muted tiny">Members only</div>
+        </div>
+      </div>
+
+      <div class="insp">
+        <div class="insp__bar">🔎 Inspector</div>
+        <div class="insp__code" id="peekCode"><span class="c">// press the button to look inside</span></div>
+        <div style="padding:0 14px 14px"><button class="btn btn--cosmic tiny" id="peekBtn">Open the Inspector</button></div>
+      </div>
+    </div>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">🔎</span>
+      <span><b>Anything your browser shows you, you can read.</b> The page has to keep its rules
+      somewhere your browser can use them, so you can find them too.</span>
+    </div>
+
+    <div class="act__nav"><span></span>
+      <button class="btn btn--go" data-next>Next: try the door →</button></div>
+  </section>
+
+  <!-- ACT 1: WEAK DOOR -->
+  <section class="act" data-act="1" hidden>
+    <h2>The fake lock</h2>
+    <p class="muted">This vault checks the code <b>inside your browser</b>. Find two ways in.</p>
+
+    <div class="stage">
+      <div class="win">
+        <div class="win__bar"><span class="win__dot"></span><span class="win__dot"></span>
+          <span class="win__dot"></span><span class="win__url">vaultbox.example</span></div>
+        <div class="win__body">
+          <div class="vaultface" id="wFace">🔒</div>
+          <input id="wInput" inputmode="numeric" placeholder="????" aria-label="vault code">
+          <button class="btn btn--go" id="wEnter">Enter</button>
+          <div class="vault__status" id="wStatus">Locked.</div>
+        </div>
+      </div>
+
+      <div class="insp">
+        <div class="insp__bar">🔎 Inspector · runs in YOUR browser</div>
+        <div class="insp__code">
+<span class="c">// this code runs on your screen</span>
+<span class="k">const</span> code = <span class="s reveal">"4921"</span>;   <span class="c">// the answer is right here</span>
+<span class="locked-line"><span class="k">let</span> forceOpen = <label class="miniswitch"><input type="checkbox" id="wForce"><span class="mini-track"></span><span id="wForceTxt">false</span></label> ;</span>
+<span class="k">function</span> tryOpen(x){
+  <span class="k">if</span> (x === code <span class="k">||</span> forceOpen) open();
+}
+        </div>
+      </div>
+    </div>
+
+    <div class="fact hidden" id="wLesson" style="margin-top:16px">
+      <span aria-hidden="true">⚠️</span>
+      <span><b>You got in two ways:</b> you read the code, or you flipped the page's own switch.
+      The vault trusted itself. <b>If the screen decides, anyone who changes the screen walks in.</b></span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" id="wNext" data-next disabled>Next: build a real lock →</button>
+    </div>
+  </section>
+
+  <!-- ACT 2: STRONG DOOR -->
+  <section class="act" data-act="2" hidden>
+    <h2>The lock that holds</h2>
+    <p class="muted">Same vault, one change: the real check now happens <b>on the server</b>, somewhere
+       your screen cannot reach. You are a real member. Your code is <b>4921</b>. First try to cheat.
+       Then enter it the honest way.</p>
+
+    <div class="stage">
+      <div class="win">
+        <div class="win__bar"><span class="win__dot"></span><span class="win__dot"></span>
+          <span class="win__dot"></span><span class="win__url">vaultbox.example · server mode</span></div>
+        <div class="win__body">
+          <div class="vaultface" id="sFace">🔒</div>
+          <input id="sInput" inputmode="numeric" placeholder="????" aria-label="vault code">
+          <button class="btn btn--go" id="sEnter">Enter</button>
+          <div class="vault__status" id="sStatus">Locked.</div>
+        </div>
+      </div>
+
+      <div class="insp">
+        <div class="insp__bar">🔎 Inspector · runs in YOUR browser</div>
+        <div class="insp__code">
+<span class="c">// this code runs on your screen</span>
+<span class="locked-line"><span class="k">let</span> forceOpen = <label class="miniswitch"><input type="checkbox" id="sForce"><span class="mini-track"></span><span id="sForceTxt">false</span></label> ; <span class="c">// the server ignores this</span></span>
+<span class="k">function</span> tryOpen(x){ sendToServer(x); }
+
+<span class="ghost c">// the real check lives on the server:</span>
+<span class="ghost">🔒 [hidden] you cannot see or change this</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fact hidden" id="sLesson" style="margin-top:16px">
+      <span aria-hidden="true">🛡️</span>
+      <span><b>Flipping the switch did nothing.</b> The honest code worked. The vault put its real lock
+      on the server, where visitors cannot reach it. <b>That is the fix, every time: the server decides.</b></span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--cosmic" id="sNext" data-next disabled>Last: the real world →</button>
+    </div>
+  </section>
+
+  <!-- ACT 3: WRAP -->
+  <section class="act" data-act="3" hidden>
+    <h2>You just learned a real job</h2>
+    <p class="muted">Trusting the browser to enforce the rules is one of the most common mistakes on
+       the whole internet. People are paid to find it and fix it. You just did both.</p>
+
+    <div class="card" style="margin:8px 0">
+      <h3>🧪 See it for real (safe)</h3>
+      <p class="muted">Right-click this box and choose <b>Inspect</b>. You will see its real code. Change
+         a word, then look at the page. It changes only on <b>your</b> screen, and only until you reload.
+         Your browser trusts you on your own screen. That is why a careful website never trusts your browser.</p>
+    </div>
+
+    <div class="fact">
+      <span aria-hidden="true">✅</span>
+      <span><b>The one rule:</b> check it on the screen to be friendly, check it on the server to be safe.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <a class="btn btn--cosmic" href="../">Back to the Defense Range →</a>
+    </div>
+  </section>
+
+  <p class="center muted tiny" style="margin-top:26px">
+    <a href="../">← Defense Range</a> · everything here is a pretend target in a sandbox
+  </p>
+</main>
+
+<script src="../../assets/manifest.js"></script>
+<script src="../../assets/shell.js"></script>
+<script>
+(function () {
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("defense", "../..");
+  IdeaLab.disclosure();
+
+  var CODE = "4921";
+
+  /* ---------- stepper ---------- */
+  var acts = Array.prototype.slice.call(document.querySelectorAll(".act"));
+  var dots = document.getElementById("dots");
+  var done = [false, false, false, false];
+  var current = 0;
+  acts.forEach(function (_, i) {
+    var d = document.createElement("span");
+    d.className = "dot" + (i === 0 ? " is-active" : "");
+    dots.appendChild(d);
+  });
+  function show(i) {
+    current = Math.max(0, Math.min(acts.length - 1, i));
+    acts.forEach(function (a, k) { a.hidden = k !== current; });
+    Array.prototype.forEach.call(dots.children, function (d, k) {
+      d.className = "dot" + (k === current ? " is-active" : (done[k] ? " is-done" : ""));
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.body.addEventListener("click", function (e) {
+    if (e.target.matches("[data-next]") && !e.target.disabled) { done[current] = true; show(current + 1); }
+    if (e.target.matches("[data-prev]")) show(current - 1);
+  });
+
+  /* ---------- ACT 0: peek ---------- */
+  document.getElementById("peekBtn").addEventListener("click", function () {
+    document.getElementById("peekCode").innerHTML =
+      '<span class="c">// inside vaultbox.example</span>\n' +
+      '<span class="k">const</span> code = <span class="s reveal">"4921"</span>;\n' +
+      '<span class="k">let</span> locked = <span class="reveal">true</span>;\n' +
+      '<span class="k">function</span> tryOpen(x){\n' +
+      '  <span class="k">if</span> (x === code) open();\n}';
+    this.disabled = true;
+    this.textContent = "Found it";
+    IdeaLab.award("loophole-scout", 30);
+  });
+
+  /* ---------- ACT 1: weak door ---------- */
+  var wForced = false;
+  var wForce = document.getElementById("wForce");
+  wForce.addEventListener("change", function () {
+    wForced = wForce.checked;
+    document.getElementById("wForceTxt").textContent = wForced ? "true" : "false";
+  });
+  function wOpen() {
+    document.getElementById("wFace").textContent = "🔓";
+    document.getElementById("wFace").classList.add("open");
+    var st = document.getElementById("wStatus");
+    st.textContent = "Open."; st.className = "vault__status ok";
+    document.getElementById("wLesson").classList.remove("hidden");
+    document.getElementById("wNext").disabled = false;
+    IdeaLab.addXP(10);
+  }
+  document.getElementById("wEnter").addEventListener("click", function () {
+    var v = document.getElementById("wInput").value.trim();
+    if (v === CODE || wForced) { wOpen(); }
+    else {
+      var st = document.getElementById("wStatus");
+      st.textContent = "Nope. Peek at the inspector."; st.className = "vault__status no";
+    }
+  });
+
+  /* ---------- ACT 2: strong (server) door ---------- */
+  var triedCheat = false;
+  var sForce = document.getElementById("sForce");
+  sForce.addEventListener("change", function () {
+    document.getElementById("sForceTxt").textContent = sForce.checked ? "true" : "false";
+    triedCheat = true;
+    var st = document.getElementById("sStatus");
+    st.textContent = "You flipped your screen. The server did not care.";
+    st.className = "vault__status no";
+  });
+  /* this check stands in for code that runs on the server, out of reach */
+  function serverChecks(x) { return x === CODE; }
+  function sOpen() {
+    document.getElementById("sFace").textContent = "🔓";
+    document.getElementById("sFace").classList.add("open");
+    var st = document.getElementById("sStatus");
+    st.textContent = "Open. The honest way."; st.className = "vault__status ok";
+    document.getElementById("sLesson").classList.remove("hidden");
+    document.getElementById("sNext").disabled = false;
+    IdeaLab.award("doorkeeper", 50);
+  }
+  document.getElementById("sEnter").addEventListener("click", function () {
+    var v = document.getElementById("sInput").value.trim();
+    if (serverChecks(v)) { sOpen(); }
+    else {
+      var st = document.getElementById("sStatus");
+      st.textContent = "The server said no."; st.className = "vault__status no";
+    }
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Idea Lab — Fortiview Holdings</title>
+<meta name="description" content="A free cosmic academy where kids learn how a rock becomes a computer, how to stay safe online, and how to build their own ideas. No accounts. No cost.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="assets/logo.svg">
+<link rel="stylesheet" href="assets/cosmos.css">
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap">
+
+  <!-- disclosure mounts here -->
+  <div id="il-disclose-mount"></div>
+
+  <header class="hero center">
+    <img src="assets/logo.svg" width="96" height="96" alt="Idea Lab"
+         style="display:block;margin:0 auto 6px;filter:drop-shadow(0 8px 28px #3ee0ff55)">
+    <span class="kicker">✦ Idea Lab ✦</span>
+    <h1>A rock can become a<br><span class="accent">computer.</span></h1>
+    <p>So can your idea. Pick a place to explore. Nothing here costs anything, and nothing is saved
+       about you. Just you, the stars, and how real things get built.</p>
+    <p style="margin-top:18px">
+      <a class="btn btn--cosmic" href="foundry/">Start in the Foundry →</a>
+    </p>
+  </header>
+
+  <!-- rank + badges -->
+  <section class="section" aria-label="Your explorer log">
+    <div class="card" style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;justify-content:space-between">
+      <div>
+        <div class="muted tiny">Explorer rank</div>
+        <div class="big" id="rankLine">Stardust</div>
+        <div class="muted tiny" id="nextLine"></div>
+      </div>
+      <div style="flex:1;min-width:220px">
+        <div class="muted tiny" style="margin-bottom:8px">Badges</div>
+        <div class="shelf" id="badgeShelf"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- the star map -->
+  <section class="section">
+    <h2 class="center">The Star Map</h2>
+    <p class="center muted">Five places to fly to. All systems open. Pick a star.</p>
+    <div class="grid grid--wings" id="wingGrid" style="margin-top:22px"></div>
+  </section>
+
+  <!-- for grownups -->
+  <section class="section">
+    <div class="card">
+      <h3>🪐 For grownups and teachers</h3>
+      <p>The Idea Lab is free and asks for nothing. There is no account, no login, no email, and no
+         data about your child leaves this browser. Progress is kept only on this device and can be
+         cleared at any time. Everything is built on facts you can check, and the safety labs run
+         against pretend targets inside a locked sandbox, so a child can never reach a real website.
+         Our goal is simple: turn screen time into building time.</p>
+    </div>
+  </section>
+
+  <footer class="section center muted tiny">
+    <a href="/">← Back to Fortiview Holdings</a>
+    <p>Made for curious kids everywhere. Free, forever.</p>
+  </footer>
+</main>
+
+<script src="assets/manifest.js"></script>
+<script src="assets/shell.js"></script>
+<script>
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav(null, ".");
+  IdeaLab.disclosure("il-disclose-mount");
+
+  /* rank line */
+  var r = IdeaLab.rank(), nx = IdeaLab.nextRank();
+  document.getElementById("rankLine").textContent = r.name + " · " + IdeaLab.xp() + " XP";
+  document.getElementById("nextLine").textContent = nx
+    ? (nx.min - IdeaLab.xp()) + " XP to " + nx.name
+    : "Top rank reached. You are a Quasar.";
+
+  /* badge shelf, every badge shown, locked ones dimmed */
+  var shelf = document.getElementById("badgeShelf");
+  IdeaLab.data.badges.forEach(function (b) {
+    var got = IdeaLab.hasBadge(b.id);
+    var el = document.createElement("span");
+    el.className = "badge" + (got ? "" : " badge--locked");
+    el.title = b.note;
+    el.innerHTML = '<span class="b-ico">' + b.icon + "</span>" + IdeaLab.esc(b.name);
+    shelf.appendChild(el);
+  });
+
+  /* the star map, built from the manifest */
+  var grid = document.getElementById("wingGrid");
+  IdeaLab.data.wings.forEach(function (w) {
+    var live = w.status === "live";
+    var card = document.createElement(live ? "a" : "div");
+    card.className = "card card--wing" + (live ? "" : " card--locked");
+    if (live) card.href = w.href;
+    card.innerHTML =
+      '<span class="card__glow" style="background:' + w.color + '"></span>' +
+      '<span class="card__icon">' + w.icon + "</span>" +
+      '<span class="pill ' + (live ? "pill--live" : "pill--soon") + '">' +
+        (live ? "Open" : "Charting") + "</span>" +
+      "<h3>" + IdeaLab.esc(w.name) + "</h3>" +
+      '<p class="muted" style="margin:.3em 0">' + IdeaLab.esc(w.tagline) + "</p>" +
+      "<p>" + IdeaLab.esc(w.blurb) + "</p>";
+    grid.appendChild(card);
+  });
+</script>
+</body>
+</html>

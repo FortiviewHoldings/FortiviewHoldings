@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grain of Sand to Logic Gate — The Foundry — Idea Lab</title>
+<meta name="description" content="Zoom from the cosmic web to a single atom, refine sand into a chip, build a switch with no moving parts, wire real logic gates, and see them as code. Free, factual, no accounts.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../../assets/logo.svg">
+<link rel="stylesheet" href="../../assets/cosmos.css">
+<style>
+  .codepanel{border:1px solid var(--border);border-radius:12px;background:#070b16;margin-top:16px;overflow:hidden}
+  .codepanel__bar{display:flex;gap:6px;flex-wrap:wrap;padding:8px 10px;background:#0c1326;border-bottom:1px solid var(--border)}
+  .langbtn{border:1px solid var(--border);background:var(--glass);color:var(--muted);font:inherit;font-weight:700;font-size:.8em;border-radius:8px;padding:5px 11px;cursor:pointer}
+  .langbtn.on{background:var(--grad-cosmic);color:#04060d;border-color:transparent}
+  .codepanel pre{margin:0;padding:14px 16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88em;color:#cdd6f4;white-space:pre-wrap;line-height:1.7}
+  .codepanel .runline{padding:0 16px 14px;font-family:ui-monospace,monospace;font-size:.95em;color:var(--star);font-weight:700}
+  .gate__pick .chip small{display:block;font-size:.72em;color:var(--muted);font-weight:600}
+  .gate__pick .chip.is-sel small{color:#04060dcc}
+</style>
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section lab">
+
+  <header class="center">
+    <span class="kicker">The Foundry · Level 1</span>
+    <h1 style="font-size:clamp(28px,5vw,46px);margin:.2em 0">Grain of Sand to Logic Gate</h1>
+    <p class="muted">From the biggest things we know, down to one atom, then back up into a thinking machine.</p>
+  </header>
+
+  <div class="steps" id="dots" aria-hidden="true"></div>
+
+  <!-- ============ ACT 1: ZOOM ============ -->
+  <section class="act" data-act="0">
+    <h2>What is everything made of?</h2>
+    <p class="muted">Drag the dial. Start as big as we can see, and zoom all the way down.</p>
+
+    <div class="zoom" id="zoomStage"></div>
+    <input class="range" id="zoomDial" type="range" min="0" max="6" value="0" step="1"
+           aria-label="Zoom from the cosmic web to an atom">
+    <div class="scale-row"><span>Cosmic web</span><span>Atom</span></div>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">✦</span>
+      <span><b>Same pieces, every size.</b> A galaxy, a grain of sand, a chip, and you are all built
+      from the same tiny <button class="term" data-term="silicon">atoms</button>, just arranged
+      differently. Learning to arrange them on purpose is the whole adventure.</span>
+    </div>
+
+    <details style="margin-top:12px">
+      <summary class="muted tiny" style="cursor:pointer">🔭 A real rhyme (the cool part)</summary>
+      <div class="fact" style="margin-top:8px">
+        <span aria-hidden="true">🪐</span>
+        <span>The gravity that holds planets around the sun and the electric pull inside an atom follow
+        the <b>same math</b>: twice as far away, one quarter the pull. That is why people first drew the
+        atom like a tiny solar system. The real atom turned out fuzzier and stranger, but the guess was
+        a good one.</span>
+      </div>
+    </details>
+
+    <div class="act__nav">
+      <span></span>
+      <button class="btn btn--go" data-next>Next: refine the rock →</button>
+    </div>
+  </section>
+
+  <!-- ============ ACT 2: REFINE ============ -->
+  <section class="act" data-act="1" hidden>
+    <h2>Refine the rock</h2>
+    <p class="muted">Sand is already half a computer. Tap each step to finish it.</p>
+
+    <div class="pipe" id="pipe"></div>
+
+    <div class="fact" id="pipeFact" style="margin-top:16px">
+      <span aria-hidden="true">🪨</span>
+      <span>Start at the sand. Each tap pulls it one step closer to a chip.</span>
+    </div>
+
+    <div class="wordbank">
+      <span class="lbl">New words:</span>
+      <button class="wordchip" data-term="silica">silica</button>
+      <button class="wordchip" data-term="silicon">silicon</button>
+      <button class="wordchip" data-term="doping">doping</button>
+      <button class="wordchip" data-term="wafer">wafer</button>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" data-next>Next: build a switch →</button>
+    </div>
+  </section>
+
+  <!-- ============ ACT 3: SWITCH ============ -->
+  <section class="act" data-act="2" hidden>
+    <h2>Build a switch</h2>
+    <p class="muted">A chip is millions, even billions of tiny switches. Here is one. Flip it.</p>
+
+    <div class="switchbox">
+      <div class="lamp" id="switchLamp" aria-hidden="true">○</div>
+      <label class="toggle">
+        <input type="checkbox" id="switchToggle">
+        <span class="track" aria-hidden="true"></span>
+        <span id="switchWord">Gate: off</span>
+      </label>
+    </div>
+
+    <div class="fact" style="margin-top:18px">
+      <span aria-hidden="true">⚡</span>
+      <span>A <button class="term" data-term="transistor">transistor</button> is a switch with no
+      moving parts. A small voltage at the "gate" lets a bigger current flow, or stops it. That doped
+      <button class="term" data-term="semiconductor">silicon</button> you just made is what does it.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" data-next>Next: wire a logic gate →</button>
+    </div>
+  </section>
+
+  <!-- ============ ACT 4: LOGIC GATE + CODE ============ -->
+  <section class="act" data-act="3" hidden>
+    <h2>Light your first bit</h2>
+    <p class="muted">Two switches in, one light out. Pick a rule, flip the inputs, then see it as code.</p>
+
+    <div class="gate__pick" id="gatePick"></div>
+
+    <div class="gate">
+      <div class="gate__inputs">
+        <label class="toggle"><input type="checkbox" id="inA"><span class="track"></span> A</label>
+        <label class="toggle"><input type="checkbox" id="inB"><span class="track"></span> B</label>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="wire" id="wA"></div>
+        <div class="wire" id="wB"></div>
+      </div>
+      <div class="gate__core">
+        <div class="muted tiny">Output</div>
+        <div class="lamp" id="outLamp" aria-hidden="true">0</div>
+        <div id="outWord" class="muted tiny" style="margin-top:8px">off · 0</div>
+      </div>
+    </div>
+
+    <!-- the same gate, as real code -->
+    <div class="codepanel">
+      <div class="codepanel__bar" id="langBar"></div>
+      <pre id="codeBlock"></pre>
+      <div class="runline" id="runLine"></div>
+    </div>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">💡</span>
+      <span>That light is a <button class="term" data-term="bit">bit</button>: on or off, 1 or 0. Stack
+      millions, even billions of these <button class="term" data-term="logic-gate">logic gates</button>
+      and you get every game, every message, every mind made of code. Including the one you are talking to.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <a class="btn btn--cosmic" href="../">Back to the Foundry →</a>
+    </div>
+  </section>
+
+  <p class="center muted tiny" style="margin-top:26px">
+    <a href="../">← The Foundry</a> · every fact here is real science, kept simple. Tap the
+    <span class="term" style="cursor:default;border:0">underlined words</span> to dig deeper.
+  </p>
+</main>
+
+<script src="../../assets/manifest.js"></script>
+<script src="../../assets/glossary.js"></script>
+<script src="../../assets/shell.js"></script>
+<script>
+(function () {
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("foundry", "../..");
+  IdeaLab.disclosure();
+  IdeaLab.glossary(window.IDEA_LAB_GLOSSARY);
+
+  /* ---------- stepper ---------- */
+  var acts = Array.prototype.slice.call(document.querySelectorAll(".act"));
+  var dots = document.getElementById("dots");
+  var done = [false, false, false, false];
+  var current = 0;
+  acts.forEach(function (_, i) {
+    var d = document.createElement("span");
+    d.className = "dot" + (i === 0 ? " is-active" : "");
+    dots.appendChild(d);
+  });
+  function show(i) {
+    current = Math.max(0, Math.min(acts.length - 1, i));
+    acts.forEach(function (a, k) { a.hidden = k !== current; });
+    Array.prototype.forEach.call(dots.children, function (d, k) {
+      d.className = "dot" + (k === current ? " is-active" : (done[k] ? " is-done" : ""));
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.body.addEventListener("click", function (e) {
+    if (e.target.matches("[data-next]")) { done[current] = true; show(current + 1); }
+    if (e.target.matches("[data-prev]")) show(current - 1);
+  });
+
+  /* ---------- ACT 1: zoom (cosmic web → atom) ---------- */
+  var web = '<svg width="128" height="128" viewBox="0 0 100 100" fill="none">' +
+    '<g stroke="#7c5cff66" stroke-width="1">' +
+    '<line x1="20" y1="30" x2="50" y2="18"/><line x1="50" y1="18" x2="78" y2="34"/>' +
+    '<line x1="20" y1="30" x2="30" y2="62"/><line x1="78" y1="34" x2="62" y2="58"/>' +
+    '<line x1="30" y1="62" x2="62" y2="58"/><line x1="30" y1="62" x2="46" y2="82"/>' +
+    '<line x1="62" y1="58" x2="46" y2="82"/><line x1="62" y1="58" x2="84" y2="72"/>' +
+    '<line x1="50" y1="18" x2="62" y2="58"/></g><g>' +
+    '<circle cx="20" cy="30" r="3" fill="#3ee0ff"/><circle cx="50" cy="18" r="3.6" fill="#fff"/>' +
+    '<circle cx="78" cy="34" r="3" fill="#7c5cff"/><circle cx="30" cy="62" r="3.6" fill="#fff"/>' +
+    '<circle cx="62" cy="58" r="4.2" fill="#3ee0ff"/><circle cx="46" cy="82" r="3" fill="#ff6ea9"/>' +
+    '<circle cx="84" cy="72" r="2.6" fill="#fff"/></g></svg>';
+  var sandDot = '<span style="display:inline-block;width:34px;height:34px;border-radius:50%;' +
+    'background:radial-gradient(circle at 35% 30%,#ffe7a8,#c79a3f);box-shadow:0 0 24px #ffd76a88"></span>';
+  var scenes = [
+    { orb: web, label: "The cosmic web", sub: "The biggest thing we can map: galaxies strung in threads across billions of light-years." },
+    { orb: "🌌", label: "A galaxy", sub: "One bright knot in that web. Hundreds of billions of suns." },
+    { orb: "🪐", label: "A solar system", sub: "One sun, with planets going around it." },
+    { orb: "🌍", label: "A planet", sub: "A giant ball of rock and metal." },
+    { orb: "🪨", label: "A rock", sub: "Crack it open. Inside are tiny grains." },
+    { orb: sandDot, label: "A grain of sand", sub: "Mostly silicon and oxygen atoms, locked together." },
+    { orb: "⚛️", label: "An atom", sub: "Zoom all the way in. Once pictured as a tiny solar system, the real atom is fuzzier: the electrons act more like a cloud than little planets." }
+  ];
+  var stage = document.getElementById("zoomStage");
+  scenes.forEach(function (s, i) {
+    var el = document.createElement("div");
+    el.className = "zoom__scene" + (i === 0 ? " is-on" : "");
+    el.dataset.i = i;
+    el.innerHTML = '<div class="zoom__orb">' + s.orb + "</div>" +
+      '<div class="zoom__label">' + IdeaLab.esc(s.label) +
+      '<div class="zoom__sub">' + IdeaLab.esc(s.sub) + "</div></div>";
+    stage.appendChild(el);
+  });
+  document.getElementById("zoomDial").addEventListener("input", function () {
+    var v = +this.value;
+    Array.prototype.forEach.call(stage.children, function (c) { c.classList.toggle("is-on", +c.dataset.i === v); });
+  });
+
+  /* ---------- ACT 2: refine pipeline ---------- */
+  var steps = [
+    { ico: "🏖️", b: "Sand",        s: "SiO₂" },
+    { ico: "🔥", b: "Heat + carbon", s: "carbon pulls the oxygen away → silicon" },
+    { ico: "💎", b: "Grow",         s: "one perfect crystal" },
+    { ico: "🥏", b: "Slice",        s: "thin round wafers" },
+    { ico: "⚡", b: "Dope it",      s: "now it can switch the way we want" }
+  ];
+  var pipe = document.getElementById("pipe");
+  var pipeFact = document.getElementById("pipeFact").querySelector("span:last-child");
+  var reached = 0;
+  steps.forEach(function (st, i) {
+    var el = document.createElement("button");
+    el.type = "button";
+    el.className = "pipe__step" + (i === 0 ? " is-on" : "");
+    el.innerHTML = '<span class="ico">' + st.ico + "</span><b>" + st.b + "</b><small>" + IdeaLab.esc(st.s) + "</small>";
+    el.addEventListener("click", function () {
+      if (i > reached + 1) return;
+      reached = Math.max(reached, i);
+      Array.prototype.forEach.call(pipe.children, function (c, k) { c.classList.toggle("is-on", k <= reached); });
+      pipeFact.innerHTML = "<b>" + IdeaLab.esc(steps[reached].b) + ":</b> " + IdeaLab.esc(steps[reached].s) + ".";
+      if (reached === steps.length - 1) IdeaLab.award("rocksmith", 40);
+    });
+    pipe.appendChild(el);
+  });
+
+  /* ---------- ACT 3: switch ---------- */
+  var sw = document.getElementById("switchToggle");
+  var swLamp = document.getElementById("switchLamp");
+  var swWord = document.getElementById("switchWord");
+  sw.addEventListener("change", function () {
+    swLamp.classList.toggle("is-on", sw.checked);
+    swLamp.textContent = sw.checked ? "●" : "○";
+    swWord.textContent = "Gate: " + (sw.checked ? "on" : "off");
+    if (sw.checked) IdeaLab.addXP(5);
+  });
+
+  /* ---------- ACT 4: logic gates + code ---------- */
+  var GATES = {
+    AND:  { rule: "both on",     fn: function (a, b) { return a && b; },
+      code: { Python: "def AND(a, b):\n    return a & b", JavaScript: "const AND = (a, b) => a && b ? 1 : 0;", C: "int AND(int a, int b) {\n    return a && b;\n}", Java: "int and(int a, int b) {\n    return (a == 1 && b == 1) ? 1 : 0;\n}", Plain: "IF a is 1 AND b is 1\n    output 1\nELSE\n    output 0" } },
+    OR:   { rule: "either on",   fn: function (a, b) { return a || b; },
+      code: { Python: "def OR(a, b):\n    return a | b", JavaScript: "const OR = (a, b) => a || b ? 1 : 0;", C: "int OR(int a, int b) {\n    return a || b;\n}", Java: "int or(int a, int b) {\n    return (a == 1 || b == 1) ? 1 : 0;\n}", Plain: "IF a is 1 OR b is 1\n    output 1\nELSE\n    output 0" } },
+    NAND: { rule: "not both on", fn: function (a, b) { return !(a && b); },
+      code: { Python: "def NAND(a, b):\n    return 1 - (a & b)", JavaScript: "const NAND = (a, b) => a && b ? 0 : 1;", C: "int NAND(int a, int b) {\n    return !(a && b);\n}", Java: "int nand(int a, int b) {\n    return (a == 1 && b == 1) ? 0 : 1;\n}", Plain: "IF a is 1 AND b is 1\n    output 0\nELSE\n    output 1" } },
+    NOR:  { rule: "both off",    fn: function (a, b) { return !(a || b); },
+      code: { Python: "def NOR(a, b):\n    return 1 - (a | b)", JavaScript: "const NOR = (a, b) => a || b ? 0 : 1;", C: "int NOR(int a, int b) {\n    return !(a || b);\n}", Java: "int nor(int a, int b) {\n    return (a == 0 && b == 0) ? 1 : 0;\n}", Plain: "IF a is 0 AND b is 0\n    output 1\nELSE\n    output 0" } },
+    XOR:  { rule: "different",   fn: function (a, b) { return a !== b; },
+      code: { Python: "def XOR(a, b):\n    return a ^ b", JavaScript: "const XOR = (a, b) => a !== b ? 1 : 0;", C: "int XOR(int a, int b) {\n    return a != b;\n}", Java: "int xor(int a, int b) {\n    return (a != b) ? 1 : 0;\n}", Plain: "IF a is different from b\n    output 1\nELSE\n    output 0" } }
+  };
+  var LANGS = ["Python", "JavaScript", "C", "Java", "Plain"];
+  var gate = "AND", lang = "Python";
+
+  var gatePick = document.getElementById("gatePick");
+  Object.keys(GATES).forEach(function (g) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "chip" + (g === gate ? " is-sel" : ""); b.dataset.gate = g;
+    b.innerHTML = g + "<small>" + GATES[g].rule + "</small>";
+    gatePick.appendChild(b);
+  });
+  gatePick.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-gate]"); if (!b) return;
+    gate = b.dataset.gate;
+    Array.prototype.forEach.call(this.children, function (c) { c.classList.remove("is-sel"); });
+    b.classList.add("is-sel");
+    compute();
+  });
+
+  var langBar = document.getElementById("langBar");
+  LANGS.forEach(function (L) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "langbtn" + (L === lang ? " on" : ""); b.textContent = L;
+    b.addEventListener("click", function () {
+      lang = L;
+      Array.prototype.forEach.call(langBar.children, function (c) { c.classList.toggle("on", c.textContent === L); });
+      renderCode();
+    });
+    langBar.appendChild(b);
+  });
+
+  var inA = document.getElementById("inA"), inB = document.getElementById("inB");
+  var wA = document.getElementById("wA"), wB = document.getElementById("wB");
+  var outLamp = document.getElementById("outLamp"), outWord = document.getElementById("outWord");
+  var codeBlock = document.getElementById("codeBlock"), runLine = document.getElementById("runLine");
+
+  function renderCode() {
+    codeBlock.textContent = GATES[gate].code[lang];
+    var a = inA.checked ? 1 : 0, b = inB.checked ? 1 : 0;
+    var out = GATES[gate].fn(inA.checked, inB.checked) ? 1 : 0;
+    var call = (lang === "Plain")
+      ? "a = " + a + ", b = " + b + "  →  " + out
+      : gate + "(" + a + ", " + b + ")  →  " + out;
+    runLine.textContent = "Right now:  " + call;
+  }
+  function compute() {
+    var a = inA.checked, b = inB.checked;
+    wA.classList.toggle("hot", a); wB.classList.toggle("hot", b);
+    var out = GATES[gate].fn(a, b);
+    outLamp.classList.toggle("is-on", out);
+    outLamp.textContent = out ? "1" : "0";
+    outWord.textContent = out ? "on · 1" : "off · 0";
+    renderCode();
+    if (out) {
+      IdeaLab.award("first-light", 60);
+      if (gate === "AND" && a && b) IdeaLab.award("gatekeeper", 50);
+    }
+  }
+  inA.addEventListener("change", compute);
+  inB.addEventListener("change", compute);
+  renderCode();
+})();
+</script>
+</body>
+</html>

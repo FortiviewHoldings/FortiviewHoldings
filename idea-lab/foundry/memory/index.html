@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memory: a switch that remembers — The Foundry — Idea Lab</title>
+<meta name="description" content="Build a circuit that holds one bit on its own. Press Set and it stays 1; press Reset and it stays 0. That holding is the seed of all computer memory. Free, factual, no accounts.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../../assets/logo.svg">
+<link rel="stylesheet" href="../../assets/cosmos.css">
+<style>
+  /* one latch cell: a big held lamp with Set / Reset on either side */
+  .cell{display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:center;
+    justify-items:center;margin:6px auto;max-width:520px}
+  .cell .btn{min-width:120px;justify-content:center}
+  .cell__held{display:flex;flex-direction:column;align-items:center;gap:8px}
+  .cell__tag{font-size:.72em;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .lamp--bit{font-weight:800;color:var(--muted)}
+  .lamp--bit.is-on{color:#5a3c00}
+  .holdline{margin-top:14px;text-align:center;font-weight:700;min-height:1.6em;transition:.2s}
+  .holdline.is-on{color:var(--star)}
+  .holdline.is-off{color:var(--plasma)}
+
+  /* the 4-cell memory row + live readout */
+  .ram{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:8px}
+  .ramcell{border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--glass);
+    padding:14px 10px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px}
+  .ramcell .dotlamp{width:54px;height:54px;border-radius:50%;border:2px solid var(--border);
+    background:#0a0f1f;display:grid;place-items:center;font-size:22px;font-weight:800;color:var(--muted);transition:.2s}
+  .ramcell .dotlamp.is-on{background:radial-gradient(circle,#fff6c0,#ffd76a 60%,#a9810f);
+    color:#5a3c00;box-shadow:0 0 26px #ffd76a99;border-color:#ffd76a}
+  .ramcell__no{font-size:.7em;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .ramcell__btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+  .minibtn{font:inherit;font-weight:700;font-size:.8em;border-radius:8px;padding:6px 12px;cursor:pointer;
+    border:1px solid var(--border);background:var(--glass);color:var(--ink);min-height:38px}
+  .minibtn--set{background:var(--grad-brand);color:#04060d;border-color:transparent}
+  .minibtn--reset{background:transparent}
+  .readout{margin-top:20px;text-align:center}
+  .readout__bits{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:800;
+    font-size:clamp(34px,9vw,58px);letter-spacing:.14em;color:var(--star);text-shadow:0 0 22px #ffd76a55}
+  /* the cross-coupled-pair sketch in act 2 */
+  .loopart{display:flex;align-items:center;justify-content:center;gap:0;margin:6px auto 2px;flex-wrap:wrap}
+  .loopgate{border:1px solid var(--border);border-radius:12px;background:#0c1428;padding:14px 18px;
+    font-weight:800;text-align:center;min-width:120px}
+  .loopgate small{display:block;color:var(--muted);font-weight:600;font-size:.74em;margin-top:2px}
+  .looparrow{color:var(--plasma);font-size:1.6em;padding:0 10px;line-height:1}
+</style>
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section lab">
+
+  <header class="center">
+    <span class="kicker">The Foundry · Level 1</span>
+    <h1 style="font-size:clamp(28px,5vw,46px);margin:.2em 0">A Switch That Remembers</h1>
+    <p class="muted">A plain switch only knows "right now". Loop two together and the circuit can hold a value on its own. That holding is memory.</p>
+  </header>
+
+  <div class="steps" id="dots" aria-hidden="true"></div>
+
+  <!-- ============ ACT 1: THE LATCH CELL ============ -->
+  <section class="act" data-act="0">
+    <h2>Hold a bit</h2>
+    <p class="muted">Press <b>Set</b> to store a 1. Press <b>Reset</b> to store a 0. Then let go and watch: the value stays.</p>
+
+    <div class="cell">
+      <button class="btn btn--go" id="btnSet" type="button">Set → 1</button>
+      <div class="cell__held">
+        <div class="lamp lamp--bit" id="cellLamp" aria-hidden="true">0</div>
+        <div class="cell__tag">stored bit</div>
+      </div>
+      <button class="btn btn--ghost" id="btnReset" type="button">Reset → 0</button>
+    </div>
+
+    <p class="holdline" id="holdline" aria-live="polite">The cell is empty, holding 0.</p>
+
+    <div class="fact" style="margin-top:14px">
+      <span aria-hidden="true">✦</span>
+      <span><b>You let go, and it kept the value.</b> A light switch on your wall does the same trick:
+      it stays where you left it. This circuit holds its <button class="term" data-term="bit">bit</button>
+      with no one pressing anything. Remembering one thing is the start of memory.</span>
+    </div>
+
+    <div class="act__nav">
+      <span></span>
+      <button class="btn btn--go" data-next>Next: how does it hold? →</button>
+    </div>
+  </section>
+
+  <!-- ============ ACT 2: HOW IT HOLDS ============ -->
+  <section class="act" data-act="1" hidden>
+    <h2>Two gates, holding hands</h2>
+    <p class="muted">A single switch only knows "right now". The secret is to loop two gates so each one feeds the other.</p>
+
+    <div class="loopart">
+      <div class="loopgate">Gate A<small>tells Gate B</small></div>
+      <span class="looparrow" aria-hidden="true">⇄</span>
+      <div class="loopgate">Gate B<small>tells Gate A</small></div>
+    </div>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">🔁</span>
+      <span><b>Each gate's output is the other gate's input.</b> So they keep agreeing with each other,
+      over and over, and that agreement is what gets <i>held</i>. Press Set and the loop locks onto 1.
+      Press Reset and it locks onto 0. This little holder has a name: a <b>latch</b>.</span>
+    </div>
+
+    <div class="fact" style="margin-top:12px">
+      <span aria-hidden="true">⚡</span>
+      <span>Each gate is built from a handful of <button class="term" data-term="transistor">transistors</button>,
+      the tiny no-moving-parts switches you met earlier. Loop them up and they can remember. This is exactly
+      how the fast memory in a computer (called RAM) is built.</span>
+    </div>
+
+    <details style="margin-top:12px">
+      <summary class="muted tiny" style="cursor:pointer">🔬 The real circuit (the cool part)</summary>
+      <div class="fact" style="margin-top:8px">
+        <span aria-hidden="true">🧩</span>
+        <span>The classic version is called an <b>SR latch</b>: two NOR gates (or two NAND gates) cross-wired
+        so each one's output goes into the other's input. "S" sets it to 1, "R" resets it to 0, and when you
+        leave both alone, the loop holds whatever it had. Same idea as the buttons you just pressed.</span>
+      </div>
+    </details>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" data-next>Next: a row of memory →</button>
+    </div>
+  </section>
+
+  <!-- ============ ACT 3: 4-CELL MEMORY ============ -->
+  <section class="act" data-act="2" hidden>
+    <h2>Memory is many cells</h2>
+    <p class="muted">One cell holds one bit. Line up four and you can hold four. Set and reset each one, then read the row.</p>
+
+    <div class="ram" id="ram"></div>
+
+    <div class="readout">
+      <div class="muted tiny" style="letter-spacing:.1em;text-transform:uppercase">Reading the row, left to right</div>
+      <div class="readout__bits" id="bits" aria-live="polite">0000</div>
+    </div>
+
+    <div class="fact" style="margin-top:18px">
+      <span aria-hidden="true">💾</span>
+      <span><b>Each cell holds its own bit, all at once.</b> A real computer does not stop at four. It stacks
+      millions, even billions of these cells. Together they hold every tab, photo, and game open on your screen
+      right now. Memory is just a huge wall of one-bit holders, each one a tiny latch like the one you built.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <a class="btn btn--cosmic" href="../">Back to the Foundry →</a>
+    </div>
+  </section>
+
+  <p class="center muted tiny" style="margin-top:26px">
+    <a href="../">← The Foundry</a> · every fact here is real science, kept simple. Tap the
+    <span class="term" style="cursor:default;border:0">underlined words</span> to dig deeper.
+  </p>
+</main>
+
+<script src="../../assets/manifest.js"></script>
+<script src="../../assets/glossary.js"></script>
+<script src="../../assets/shell.js"></script>
+<script>
+(function () {
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("foundry", "../..");
+  IdeaLab.disclosure();
+  IdeaLab.glossary(window.IDEA_LAB_GLOSSARY);
+
+  /* ---------- stepper (same pattern as logic-gates) ---------- */
+  var acts = Array.prototype.slice.call(document.querySelectorAll(".act"));
+  var dots = document.getElementById("dots");
+  var done = [false, false, false];
+  var current = 0;
+  acts.forEach(function (_, i) {
+    var d = document.createElement("span");
+    d.className = "dot" + (i === 0 ? " is-active" : "");
+    dots.appendChild(d);
+  });
+  function show(i) {
+    current = Math.max(0, Math.min(acts.length - 1, i));
+    acts.forEach(function (a, k) { a.hidden = k !== current; });
+    Array.prototype.forEach.call(dots.children, function (d, k) {
+      d.className = "dot" + (k === current ? " is-active" : (done[k] ? " is-done" : ""));
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.body.addEventListener("click", function (e) {
+    if (e.target.matches("[data-next]")) { done[current] = true; show(current + 1); }
+    if (e.target.matches("[data-prev]")) show(current - 1);
+  });
+
+  /* ---------- the proof: did the kid hold BOTH a 1 and a 0? ---------- */
+  var sawOne = false, sawZero = false;
+  function provedHold() {
+    if (sawOne && sawZero) IdeaLab.award("memory-keeper", 55);
+  }
+
+  /* ---------- ACT 1: one latch cell ---------- */
+  var cellBit = 0;
+  var cellLamp = document.getElementById("cellLamp");
+  var holdline = document.getElementById("holdline");
+  function paintCell() {
+    cellLamp.textContent = cellBit ? "1" : "0";
+    cellLamp.classList.toggle("is-on", cellBit === 1);
+    holdline.classList.toggle("is-on", cellBit === 1);
+    holdline.classList.toggle("is-off", cellBit === 0);
+    holdline.textContent = cellBit
+      ? "Holding 1. Take your finger off the button. It stays 1."
+      : "Holding 0. Nobody is pressing, and it keeps the 0.";
+  }
+  document.getElementById("btnSet").addEventListener("click", function () {
+    cellBit = 1; sawOne = true; paintCell(); provedHold();
+  });
+  document.getElementById("btnReset").addEventListener("click", function () {
+    cellBit = 0; sawZero = true; paintCell(); provedHold();
+  });
+
+  /* ---------- ACT 3: a row of 4 independent cells ---------- */
+  var N = 4;
+  var ramBits = [0, 0, 0, 0];
+  var ram = document.getElementById("ram");
+  var bitsOut = document.getElementById("bits");
+  var lamps = [];
+
+  function paintRam() {
+    var s = "";
+    for (var i = 0; i < N; i++) {
+      lamps[i].textContent = ramBits[i] ? "1" : "0";
+      lamps[i].classList.toggle("is-on", ramBits[i] === 1);
+      s += ramBits[i];
+    }
+    bitsOut.textContent = s;
+  }
+
+  for (var i = 0; i < N; i++) {
+    (function (idx) {
+      var cell = document.createElement("div");
+      cell.className = "ramcell";
+
+      var no = document.createElement("div");
+      no.className = "ramcell__no";
+      no.textContent = "Cell " + (idx + 1);
+
+      var lamp = document.createElement("div");
+      lamp.className = "dotlamp";
+      lamp.setAttribute("aria-hidden", "true");
+      lamp.textContent = "0";
+      lamps[idx] = lamp;
+
+      var btns = document.createElement("div");
+      btns.className = "ramcell__btns";
+
+      var set = document.createElement("button");
+      set.type = "button";
+      set.className = "minibtn minibtn--set";
+      set.textContent = "Set";
+      set.addEventListener("click", function () {
+        ramBits[idx] = 1; sawOne = true; paintRam(); provedHold();
+      });
+
+      var rst = document.createElement("button");
+      rst.type = "button";
+      rst.className = "minibtn minibtn--reset";
+      rst.textContent = "Reset";
+      rst.addEventListener("click", function () {
+        ramBits[idx] = 0; sawZero = true; paintRam(); provedHold();
+      });
+
+      btns.appendChild(set);
+      btns.appendChild(rst);
+      cell.appendChild(no);
+      cell.appendChild(lamp);
+      cell.appendChild(btns);
+      ram.appendChild(cell);
+    })(i);
+  }
+
+  paintCell();
+  paintRam();
+})();
+</script>
+</body>
+</html>

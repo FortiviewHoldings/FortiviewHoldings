@@ -1,0 +1,19 @@
+# Fortiview Holdings
+
+> Fortiview Holdings is the parent company behind industrial automation and technical training, PragOptics technology, and the Idea Lab. Based in League City, Texas. Contact: support@fortiviewholdings.com, +1 (832) 425-0421.
+
+Fortiview Holdings designs and integrates industrial automation and instrumentation systems, provides hands-on technical training (including community-college instruction), and operates PragOptics, its technology arm. PragOptics is the platform behind the OmniBus universal HART communicator, business automation and workflows, managed Microsoft 365, dashboards, and connected apps. Fortiview also runs the Idea Lab, a free coding and cybersecurity academy for kids.
+
+## Core pages
+- [Home](https://fortiviewholdings.com/): Parent company overview.
+- [Industrial Automation & Technical Training](https://fortiviewholdings.com/industrial/): Instrumentation and controls, PLC and DCS, motor and relay logic, calibration, PID and safety instrumented functions, IT/OT integration, and hands-on technical training. Fifteen years of field experience.
+- [Partnerships](https://fortiviewholdings.com/partnerships/): A vetted network of vendors and integrators. Vendor network, bulk procurement, co-selling, referrals, integration partners.
+- [PragOptics](https://fortiviewholdings.com/integration/): The technology arm. OmniBus and field data, automation and workflows, managed Microsoft 365, dashboards, security and audit, iOS and connected apps. Tiers are User at $7.50, Partner at $49, and Super at $350 per user per month, with 10 percent off annual billing. Subscribe and manage at https://pragoptics.com.
+- [Idea Lab](https://fortiviewholdings.com/idea-lab/): A free, cosmic coding and cybersecurity academy for kids. Teaches how a rock becomes a computer, online safety, how AI works, and how to launch an idea. No accounts, no cost, runs in the browser.
+
+## Contact
+- Email: support@fortiviewholdings.com
+- Phone: +1 (832) 425-0421
+- Location: League City, TX, USA
+- LinkedIn: https://www.linkedin.com/company/fortiviewholdings
+- Instagram: https://www.instagram.com/fortiviewholdings

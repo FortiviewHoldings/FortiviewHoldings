@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Use AI for Good — AI Wing — Idea Lab</title>
+<meta name="description" content="Design a small AI helper, then walk the responsible-builder checklist: fair, private, honest, helpful, and no harm. A reflection and design tool. No accounts, saved only on your device.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../../assets/logo.svg">
+<link rel="stylesheet" href="../../assets/cosmos.css">
+<style>
+  .field{display:grid;gap:6px;margin-top:14px}
+  .field label{font-weight:700;font-size:.86em;color:var(--ink)}
+  .field .hint{font-size:.8em;color:var(--muted);font-weight:600}
+  .field input,.field textarea{font:inherit;background:#060a16;color:var(--ink);border:1px solid var(--border);
+    border-radius:10px;padding:11px 13px;width:100%}
+  .field textarea{min-height:58px;resize:vertical}
+  .field input:focus-visible,.field textarea:focus-visible{outline:3px solid var(--brand-600);outline-offset:1px}
+
+  /* checklist */
+  .checks{display:grid;gap:12px}
+  .check{border:1px solid var(--border);border-radius:14px;background:var(--glass);padding:14px 16px;transition:.2s}
+  .check.on{border-color:var(--good);background:#46e0a814}
+  .check__top{display:flex;align-items:flex-start;gap:12px}
+  .check__ico{font-size:24px;width:44px;height:44px;border-radius:12px;background:#0e1530;border:1px solid var(--border);
+    display:grid;place-items:center;flex:0 0 auto}
+  .check.on .check__ico{background:#1ca49022;border-color:#21bca555}
+  .check__body{flex:1;min-width:0}
+  .check__body h3{margin:0;font-size:1.06em}
+  .check__body p{margin:.25em 0 0;color:var(--muted);font-size:.9em}
+  .tickbtn{font:inherit;font-weight:700;cursor:pointer;border-radius:999px;padding:8px 15px;flex:0 0 auto;
+    border:1px solid var(--border);background:var(--glass);color:var(--ink);white-space:nowrap;align-self:center}
+  .check.on .tickbtn{background:var(--grad-brand);color:#04060d;border-color:transparent}
+
+  .progress{height:14px;border-radius:8px;background:#ffffff14;overflow:hidden;margin:6px 0}
+  .progress > i{display:block;height:100%;background:var(--grad-brand);width:0;transition:width .35s}
+
+  /* mission card (the built summary) */
+  .mcard{border:1px solid var(--border);border-radius:var(--radius);background:#0a1020;
+    padding:20px;overflow:hidden;position:relative}
+  .mcard__glow{position:absolute;inset:auto -30% -50% auto;width:200px;height:200px;border-radius:50%;
+    background:var(--nebula);filter:blur(46px);opacity:.4;pointer-events:none}
+  .mcard h3{margin:0 0 2px;font-size:1.3em;display:flex;align-items:center;gap:10px}
+  .mcard__tag{color:var(--muted);font-weight:700;margin:0 0 14px}
+  .mcard__row{position:relative;display:flex;gap:10px;padding:9px 0;border-top:1px solid var(--border)}
+  .mcard__row .k{flex:0 0 110px;color:var(--muted);font-weight:700;font-size:.86em}
+  .mcard__row .v{flex:1;min-width:0}
+  .mcard__seals{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .seal{display:inline-flex;align-items:center;gap:6px;font-size:.8em;font-weight:700;
+    padding:6px 12px;border-radius:999px;background:#1ca49033;color:var(--brand-600);border:1px solid #21bca555}
+
+  .savedflag{display:none;align-items:center;gap:8px;color:var(--good);font-weight:700;font-size:.9em;margin-top:12px}
+  .savedflag.show{display:inline-flex}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section lab">
+  <div id="il-disclose-mount"></div>
+
+  <header class="center">
+    <span class="kicker">AI Wing · Level 3 · Builder</span>
+    <h1 style="font-size:clamp(28px,5vw,46px);margin:.2em 0">Use AI for Good</h1>
+    <p class="muted">You have met the machine. Now design one of your own, the right way. A good AI helper
+       is fair, private, honest, helpful, and does no harm.</p>
+  </header>
+
+  <div class="steps" id="dots" aria-hidden="true"></div>
+
+  <!-- ============ ACT 0: PICK A PROBLEM ============ -->
+  <section class="act" data-act="0">
+    <h2>Pick a real problem</h2>
+    <p class="muted">The best AI helpers fix one small, real thing. Start there. Stuck? Tap an idea to borrow it.</p>
+
+    <div class="field">
+      <label for="fName">What is your helper called?</label>
+      <input id="fName" maxlength="40" placeholder="Homework Hero">
+    </div>
+    <div class="field">
+      <label for="fProblem">What problem does it solve?</label>
+      <span class="hint">One real thing that bugs people you know.</span>
+      <textarea id="fProblem" maxlength="160" placeholder="Kids forget which day each subject's homework is due."></textarea>
+    </div>
+
+    <div class="wordbank" id="seedBank" style="margin-top:16px">
+      <span class="lbl">Borrow an idea:</span>
+    </div>
+
+    <div class="act__nav">
+      <span></span>
+      <button class="btn btn--go" id="a0Next" data-next disabled>Next: what it does →</button>
+    </div>
+  </section>
+
+  <!-- ============ ACT 1: WHAT IT DOES ============ -->
+  <section class="act" data-act="1" hidden>
+    <h2>What it does, and who it helps</h2>
+    <p class="muted">Say it plainly. A helper you can explain in one breath is a helper people will use.</p>
+
+    <div class="field">
+      <label for="fDoes">What does it do?</label>
+      <span class="hint">Finish this: "It helps people by..."</span>
+      <textarea id="fDoes" maxlength="160" placeholder="It reminds you what homework is due tomorrow and breaks big projects into small steps."></textarea>
+    </div>
+    <div class="field">
+      <label for="fWho">Who does it help?</label>
+      <input id="fWho" maxlength="80" placeholder="busy students and their families">
+    </div>
+    <div class="field">
+      <label for="fData">What does it need to know? (its inputs)</label>
+      <span class="hint">Only what it truly needs. Less is safer.</span>
+      <input id="fData" maxlength="100" placeholder="your class names and due dates">
+    </div>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">💡</span>
+      <span>An AI learns from <button class="term" data-term="training-data">examples</button> and turns your
+      <button class="term" data-term="model-input">inputs</button> into an answer. So what you feed it, and
+      what you train it on, decides how good and how fair it is.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" id="a1Next" data-next disabled>Next: the checklist →</button>
+    </div>
+  </section>
+
+  <!-- ============ ACT 2: RESPONSIBLE-BUILDER CHECKLIST ============ -->
+  <section class="act" data-act="2" hidden>
+    <h2>The responsible-builder checklist</h2>
+    <p class="muted">Real builders run this list before they ship. Read each one, decide how your helper
+       handles it, then tick it. Every tick adds a line to your mission card.</p>
+
+    <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+    <p class="muted tiny" id="progTxt" style="margin:0 0 16px">0 of 5 checked</p>
+
+    <div class="checks" id="checks"></div>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">⚖️</span>
+      <span>This is not a test you pass once. <b>Good builders keep asking these questions</b> as their helper
+      grows, because the answers can change. Ticking them means you thought it through, not that the work is over.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" id="a2Next" data-next disabled>See your mission card →</button>
+    </div>
+  </section>
+
+  <!-- ============ ACT 3: MISSION CARD + SAVE ============ -->
+  <section class="act" data-act="3" hidden>
+    <h2>Your mission card</h2>
+    <p class="muted">Here is the helper you designed, and the promises you made for it. Read it back.</p>
+
+    <div class="mcard" id="mcard">
+      <span class="mcard__glow" aria-hidden="true"></span>
+      <h3><span aria-hidden="true">✨</span><span id="cardName">My AI Helper</span></h3>
+      <p class="mcard__tag" id="cardProblem">A problem worth solving.</p>
+      <div class="mcard__row"><span class="k">It does</span><span class="v" id="cardDoes">—</span></div>
+      <div class="mcard__row"><span class="k">It helps</span><span class="v" id="cardWho">—</span></div>
+      <div class="mcard__row"><span class="k">It needs</span><span class="v" id="cardData">—</span></div>
+      <div class="mcard__seals" id="cardSeals"></div>
+    </div>
+
+    <p class="center" style="margin-top:18px">
+      <button class="btn btn--cosmic" id="saveBtn" type="button">💾 Save my design</button>
+    </p>
+    <span class="savedflag" id="savedFlag"><span aria-hidden="true">✓</span> Saved on this device only.</span>
+    <p class="note muted tiny center" id="saveNote" style="margin-top:8px">
+      Saved only in this browser. Nothing is sent anywhere, and no account is made. Clear your history and it resets.</p>
+
+    <div class="fact" style="margin-top:18px">
+      <span aria-hidden="true">🌍</span>
+      <span><b>This is the real job.</b> The people who build AI for a living run a checklist just like this.
+      Fair, private, honest, helpful, no harm. If you keep asking those five, you are already building it right.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <a class="btn btn--cosmic" href="../">Back to the AI Wing →</a>
+    </div>
+  </section>
+
+  <p class="center" style="margin-top:22px">
+    <button class="btn btn--ghost tiny" id="resetBtn" type="button">Start a new design</button>
+  </p>
+
+  <p class="center muted tiny" style="margin-top:14px">
+    <a href="../">← AI Wing</a> · this is a thinking and design tool. Your helper is an idea you sketch,
+    not a live AI. Tap the <span class="term" style="cursor:default;border:0">underlined words</span> to dig deeper.
+  </p>
+</main>
+
+<script src="../../assets/manifest.js"></script>
+<script src="../../assets/glossary.js"></script>
+<script src="../../assets/shell.js"></script>
+<script>
+(function () {
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("ai-wing", "../..");
+  IdeaLab.disclosure("il-disclose-mount");
+
+  /* a couple of extra glossary terms this module leans on, merged in
+     without touching the shared file */
+  var GLOSS = window.IDEA_LAB_GLOSSARY || {};
+  if (!GLOSS["training-data"]) GLOSS["training-data"] = {
+    term: "Training data",
+    short: "The pile of examples an AI learns from. Lopsided examples teach a lopsided AI.",
+    deep: "An AI model learns by studying many examples, called training data. It copies the patterns it sees, good or bad. If the examples are unfair or leave people out, the AI repeats that unfairness. This is why a fair helper has to start from good, balanced examples: garbage in, garbage out.",
+    source: "https://en.wikipedia.org/wiki/Training,_validation,_and_test_data_sets"
+  };
+  if (!GLOSS["model-input"]) GLOSS["model-input"] = {
+    term: "Input",
+    short: "The information you give an AI so it can answer. Give it only what it really needs.",
+    deep: "An AI turns an input into an output: you give it words, a picture, or some data, and it gives back a guess or an answer. Whatever you put in can shape the answer, so a careful builder asks for the least information needed and never asks for secrets it does not require.",
+    source: "https://en.wikipedia.org/wiki/Artificial_intelligence"
+  };
+  IdeaLab.glossary(GLOSS);
+  var esc = IdeaLab.esc;
+
+  /* ---------- stepper ---------- */
+  var acts = Array.prototype.slice.call(document.querySelectorAll(".act"));
+  var dots = document.getElementById("dots");
+  var done = [false, false, false, false];
+  var current = 0;
+  acts.forEach(function (_, i) {
+    var d = document.createElement("span");
+    d.className = "dot" + (i === 0 ? " is-active" : "");
+    dots.appendChild(d);
+  });
+  function show(i) {
+    current = Math.max(0, Math.min(acts.length - 1, i));
+    acts.forEach(function (a, k) { a.hidden = k !== current; });
+    Array.prototype.forEach.call(dots.children, function (d, k) {
+      d.className = "dot" + (k === current ? " is-active" : (done[k] ? " is-done" : ""));
+    });
+    if (current === 3) renderCard();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.body.addEventListener("click", function (e) {
+    if (e.target.matches("[data-next]") && !e.target.disabled) { done[current] = true; show(current + 1); }
+    if (e.target.matches("[data-prev]")) show(current - 1);
+  });
+
+  /* ---------- state + save ---------- */
+  var KEY = "ideaLab.responsible.v1";
+  var CHECKS = [
+    { id: "fair", ico: "⚖️", h: "Is it fair?",
+      p: "Was it trained on good, balanced examples, so it treats everyone the same? An AI copies its examples. Leave people out and it leaves them out too.",
+      seal: "Fair", line: "Trained on good, balanced examples so it treats people the same." },
+    { id: "private", ico: "🤫", h: "Is it private?",
+      p: "Does it collect only what it needs, and never secrets like passwords, home address, or other people's private details?",
+      seal: "Private", line: "Asks only for what it needs, and never for secrets." },
+    { id: "honest", ico: "🙋", h: "Is it honest?",
+      p: "Does it say when it is not sure, instead of making up a confident answer? A good helper admits a guess is a guess.",
+      seal: "Honest", line: "Says when it is unsure instead of faking a sure answer." },
+    { id: "helpful", ico: "💪", h: "Is it helpful?",
+      p: "Does it actually make the problem better for the person using it, not just look clever?",
+      seal: "Helpful", line: "Truly makes the problem better for the person using it." },
+    { id: "noharm", ico: "🛟", h: "Could it harm anyone?",
+      p: "Who might it hurt, or treat unfairly, or trick? If you can name a risk, you can plan to avoid it. Naming the risk is the responsible part.",
+      seal: "No harm", line: "I thought through who it could hurt, and how to avoid it." }
+  ];
+
+  var state = { name: "", problem: "", does: "", who: "", data: "", checks: {}, saved: false };
+  CHECKS.forEach(function (c) { state.checks[c.id] = false; });
+  try {
+    var raw = localStorage.getItem(KEY);
+    if (raw) {
+      var s = JSON.parse(raw);
+      ["name", "problem", "does", "who", "data"].forEach(function (k) { if (typeof s[k] === "string") state[k] = s[k]; });
+      if (s.checks) CHECKS.forEach(function (c) { state.checks[c.id] = !!s.checks[c.id]; });
+      state.saved = !!s.saved;
+    }
+  } catch (e) {}
+  function persist() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+  /* ---------- ACT 0: problem ---------- */
+  var fName = document.getElementById("fName");
+  var fProblem = document.getElementById("fProblem");
+  var a0Next = document.getElementById("a0Next");
+  fName.value = state.name; fProblem.value = state.problem;
+  function checkA0() {
+    var ok = fName.value.trim() && fProblem.value.trim();
+    a0Next.disabled = !ok;
+  }
+  fName.addEventListener("input", function () { state.name = fName.value; persist(); checkA0(); });
+  fProblem.addEventListener("input", function () { state.problem = fProblem.value; persist(); checkA0(); });
+  checkA0();
+
+  var SEEDS = [
+    { n: "Homework Hero", p: "Kids forget which day each subject's homework is due." },
+    { n: "Plant Pal", p: "People forget to water their plants and the plants droop." },
+    { n: "Calm Coach", p: "It is hard to know how to slow down when you feel worried." },
+    { n: "Word Buddy", p: "New readers get stuck on hard words and give up." },
+    { n: "Recycle Sorter", p: "People are not sure which bin a thing goes in." }
+  ];
+  var seedBank = document.getElementById("seedBank");
+  SEEDS.forEach(function (s) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "wordchip"; b.textContent = s.n;
+    b.addEventListener("click", function () {
+      fName.value = s.n; fProblem.value = s.p;
+      state.name = s.n; state.problem = s.p; persist(); checkA0();
+    });
+    seedBank.appendChild(b);
+  });
+
+  /* ---------- ACT 1: what it does ---------- */
+  var fDoes = document.getElementById("fDoes");
+  var fWho = document.getElementById("fWho");
+  var fData = document.getElementById("fData");
+  var a1Next = document.getElementById("a1Next");
+  fDoes.value = state.does; fWho.value = state.who; fData.value = state.data;
+  function checkA1() {
+    a1Next.disabled = !(fDoes.value.trim() && fWho.value.trim() && fData.value.trim());
+  }
+  fDoes.addEventListener("input", function () { state.does = fDoes.value; persist(); checkA1(); });
+  fWho.addEventListener("input", function () { state.who = fWho.value; persist(); checkA1(); });
+  fData.addEventListener("input", function () { state.data = fData.value; persist(); checkA1(); });
+  checkA1();
+
+  /* ---------- ACT 2: checklist ---------- */
+  var checksEl = document.getElementById("checks");
+  var bar = document.getElementById("bar");
+  var progTxt = document.getElementById("progTxt");
+  var a2Next = document.getElementById("a2Next");
+
+  CHECKS.forEach(function (c) {
+    var el = document.createElement("div");
+    el.className = "check" + (state.checks[c.id] ? " on" : "");
+    el.innerHTML =
+      '<div class="check__top">' +
+        '<span class="check__ico" aria-hidden="true">' + c.ico + '</span>' +
+        '<span class="check__body"><h3>' + esc(c.h) + '</h3><p>' + esc(c.p) + '</p></span>' +
+        '<button class="tickbtn" type="button">' + (state.checks[c.id] ? "Checked ✓" : "Tick it") + '</button>' +
+      '</div>';
+    var btn = el.querySelector(".tickbtn");
+    btn.addEventListener("click", function () {
+      state.checks[c.id] = !state.checks[c.id];
+      el.classList.toggle("on", state.checks[c.id]);
+      btn.textContent = state.checks[c.id] ? "Checked ✓" : "Tick it";
+      persist(); updateChecks();
+    });
+    checksEl.appendChild(el);
+  });
+
+  function checkedCount() {
+    var n = 0; CHECKS.forEach(function (c) { if (state.checks[c.id]) n++; }); return n;
+  }
+  function updateChecks() {
+    var n = checkedCount();
+    bar.style.width = (n / CHECKS.length * 100) + "%";
+    progTxt.textContent = n + " of " + CHECKS.length + " checked";
+    var all = n === CHECKS.length;
+    a2Next.disabled = !all;
+    if (all) IdeaLab.award("ai-for-good", 60);
+  }
+  updateChecks();
+
+  /* ---------- ACT 3: mission card ---------- */
+  function fallback(v, def) { return (v && v.trim()) ? esc(v.trim()) : def; }
+  function renderCard() {
+    document.getElementById("cardName").textContent = (state.name.trim() || "My AI Helper");
+    document.getElementById("cardProblem").innerHTML = fallback(state.problem, "A problem worth solving.");
+    document.getElementById("cardDoes").innerHTML = fallback(state.does, "—");
+    document.getElementById("cardWho").innerHTML = fallback(state.who, "—");
+    document.getElementById("cardData").innerHTML = fallback(state.data, "—");
+    var seals = document.getElementById("cardSeals");
+    seals.innerHTML = "";
+    CHECKS.forEach(function (c) {
+      if (!state.checks[c.id]) return;
+      var s = document.createElement("span");
+      s.className = "seal";
+      s.innerHTML = '<span aria-hidden="true">' + c.ico + '</span>' + esc(c.seal);
+      s.title = c.line;
+      seals.appendChild(s);
+    });
+    document.getElementById("savedFlag").classList.toggle("show", state.saved);
+  }
+
+  document.getElementById("saveBtn").addEventListener("click", function () {
+    state.saved = true; persist();
+    document.getElementById("savedFlag").classList.add("show");
+  });
+
+  document.getElementById("resetBtn").addEventListener("click", function () {
+    if (!confirm("Start a new design? This clears the helper saved in this browser.")) return;
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    window.location.reload();
+  });
+})();
+</script>
+</body>
+</html>

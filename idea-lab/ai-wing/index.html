@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Wing — Idea Lab</title>
+<meta name="description" content="What AI really is, and how people tell what is real today. Honest, current, kid-friendly labs. No accounts, no data.">
+<meta name="color-scheme" content="dark">
+<link rel="stylesheet" href="../assets/cosmos.css">
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section">
+  <div id="il-disclose-mount"></div>
+
+  <header class="hero center">
+    <span class="kicker">🤖 AI Wing</span>
+    <h1 style="font-size:clamp(30px,6vw,52px)">Meet the machine.<br><span class="accent">Outsmart the fakes.</span></h1>
+    <p>AI is not magic and it is not alive. It is words and math that learned patterns from huge piles
+       of human work. It is amazing, and it can copy almost anyone. Here is how it works, and how to
+       stay a step ahead of it.</p>
+  </header>
+
+  <section class="section">
+    <div id="track"></div>
+  </section>
+
+  <div class="card" style="margin-top:10px">
+    <h3>🔭 We keep it honest</h3>
+    <p class="muted">We will never tell you that you can always spot a fake by looking. Often you cannot,
+       and good fakes keep getting better. So we teach the habit that works anyway: check another way.</p>
+  </div>
+
+  <footer class="section center muted tiny">
+    <a href="../">← Star Map</a>
+  </footer>
+</main>
+
+<script src="../assets/manifest.js"></script>
+<script src="../assets/shell.js"></script>
+<script>
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("ai-wing", "..");
+  IdeaLab.disclosure("il-disclose-mount");
+  IdeaLab.renderTrack("ai-wing", "#track");
+</script>
+</body>
+</html>

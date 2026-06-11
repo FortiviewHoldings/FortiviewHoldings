@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loops &amp; Patterns — The Foundry — Idea Lab</title>
+<meta name="description" content="Set a repeat count and a turn angle, then watch a loop draw a polygon or a star on a canvas. Change the numbers and the pattern changes live. Free, factual, no accounts.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../../assets/logo.svg">
+<link rel="stylesheet" href="../../assets/cosmos.css">
+<style>
+  .loop{display:grid;grid-template-columns:1fr;gap:18px}
+  @media (min-width:760px){ .loop{grid-template-columns:minmax(0,1fr) minmax(0,1fr)} }
+
+  /* the drawing surface */
+  .stage{border:1px solid var(--border);border-radius:var(--radius);background:#03050c;
+    overflow:hidden;position:relative;display:grid;place-items:center;aspect-ratio:1/1}
+  .stage canvas{width:100%;height:100%;display:block}
+  .stage__tag{position:absolute;top:10px;left:12px;font-size:.78em;font-weight:700;color:var(--muted);
+    background:#070b1699;border:1px solid var(--border);border-radius:999px;padding:3px 11px}
+
+  /* the controls */
+  .controls{display:flex;flex-direction:column;gap:18px}
+  .ctl{border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--glass);padding:14px 16px}
+  .ctl__top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .ctl__name{font-weight:800}
+  .ctl__val{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:800;font-size:1.4em;color:var(--star)}
+  .ctl small{display:block;color:var(--muted);font-size:.82em;margin-top:2px}
+  .ctl .range{margin-top:10px}
+
+  /* the loop, shown as readable code */
+  .codecard{border:1px solid var(--border);border-radius:12px;background:#070b16;overflow:hidden;margin-top:16px}
+  .codecard__bar{padding:8px 14px;background:#0c1326;border-bottom:1px solid var(--border);
+    font-size:.78em;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+  .codecard pre{margin:0;padding:14px 16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-size:1em;line-height:1.7;color:#cdd6f4;white-space:pre-wrap}
+  .codecard .kw{color:var(--rose);font-weight:800}
+  .codecard .num{color:var(--star);font-weight:800}
+  .codecard .cmt{color:var(--muted)}
+
+  .shapebar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:4px}
+  .shapebtn{font:inherit;font-weight:700;font-size:.86em;color:var(--muted);background:var(--glass);
+    border:1px solid var(--border);border-radius:999px;padding:7px 14px;cursor:pointer}
+  .shapebtn.on{background:var(--grad-cosmic);color:#04060d;border-color:transparent}
+
+  .readname{font-family:ui-monospace,monospace;font-weight:800;color:var(--plasma)}
+</style>
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section lab">
+
+  <header class="center">
+    <span class="kicker">The Foundry · Level 3</span>
+    <h1 style="font-size:clamp(28px,5vw,46px);margin:.2em 0">Loops &amp; Patterns</h1>
+    <p class="muted">Do a lot with a little. Tell the computer one move, then say how many times to repeat it.</p>
+  </header>
+
+  <div class="steps" id="dots" aria-hidden="true"></div>
+
+  <!-- ============ ACT 1: THE IDEA ============ -->
+  <section class="act" data-act="0">
+    <h2>One move, said many times</h2>
+    <p class="muted">Imagine you are holding a pen on a big sheet. To draw a square you do the same thing four times: move forward a bit, then turn. A <button class="term" data-term="loop">loop</button> is how you tell a computer to repeat a move without writing it out over and over.</p>
+
+    <div class="codecard">
+      <div class="codecard__bar">The same square, the long way and the loop way</div>
+      <pre><span class="cmt"># the long way: typing every line</span>
+move forward
+turn 90 degrees
+move forward
+turn 90 degrees
+move forward
+turn 90 degrees
+move forward
+turn 90 degrees
+
+<span class="cmt"># the loop way: same picture, way less to write</span>
+<span class="kw">repeat</span> <span class="num">4</span> times:
+    move forward
+    turn <span class="num">90</span> degrees</pre>
+    </div>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">🔁</span>
+      <span><b>A loop repeats instructions.</b> Both versions above draw the exact same square. The loop just says it once and tells the computer how many times to go around.</span>
+    </div>
+
+    <div class="act__nav">
+      <span></span>
+      <button class="btn btn--go" data-next>Next: draw with a loop →</button>
+    </div>
+  </section>
+
+  <!-- ============ ACT 2: THE VISUALIZER ============ -->
+  <section class="act" data-act="1" hidden>
+    <h2>Draw with a loop</h2>
+    <p class="muted">Set how many times to repeat and how far to turn each time. Press Run and the pen draws your loop. Change a number and the shape changes too.</p>
+
+    <div class="loop">
+      <div class="stage">
+        <span class="stage__tag" id="stageTag">Ready</span>
+        <canvas id="pad" width="600" height="600" role="img"
+                aria-label="A canvas where a loop draws a shape from your repeat count and turn angle"></canvas>
+      </div>
+
+      <div class="controls">
+        <div class="ctl">
+          <div class="ctl__top">
+            <span class="ctl__name">Repeat count</span>
+            <span class="ctl__val" id="countVal">5</span>
+          </div>
+          <small>How many times the loop goes around. More turns make more sides.</small>
+          <input class="range" id="countDial" type="range" min="3" max="12" value="5" step="1"
+                 aria-label="Repeat count, from 3 to 12">
+        </div>
+
+        <div class="ctl">
+          <div class="ctl__top">
+            <span class="ctl__name">Turn angle</span>
+            <span class="ctl__val"><span id="angleVal">72</span>°</span>
+          </div>
+          <small>How far the pen turns after each move. A small change here makes a very different pattern.</small>
+          <input class="range" id="angleDial" type="range" min="20" max="170" value="72" step="1"
+                 aria-label="Turn angle in degrees, from 20 to 170">
+        </div>
+
+        <div class="shapebar" aria-label="Quick shapes">
+          <button class="shapebtn" type="button" data-preset="triangle">Triangle</button>
+          <button class="shapebtn on" type="button" data-preset="pentagon">Pentagon</button>
+          <button class="shapebtn" type="button" data-preset="star">Star</button>
+          <button class="shapebtn" type="button" data-preset="spiral">Near-spiral</button>
+        </div>
+
+        <button class="btn btn--cosmic" id="runBtn" type="button" style="justify-content:center">▶ Run the loop</button>
+      </div>
+    </div>
+
+    <div class="codecard">
+      <div class="codecard__bar">Your loop, right now</div>
+      <pre id="codeBlock"></pre>
+    </div>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">✦</span>
+      <span><b>Small change, big difference.</b> Leave the count alone and just nudge the angle. The same short loop can draw a tidy shape, a pointy star, or a tight coil. That is the power of a loop: one rule, endless patterns.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <a class="btn btn--cosmic" href="../">Back to the Foundry →</a>
+    </div>
+  </section>
+
+  <p class="center muted tiny" style="margin-top:26px">
+    <a href="../">← The Foundry</a> · every fact here is real. Tap the
+    <span class="term" style="cursor:default;border:0">underlined words</span> to dig deeper.
+  </p>
+</main>
+
+<script src="../../assets/manifest.js"></script>
+<script src="../../assets/glossary.js"></script>
+<script src="../../assets/shell.js"></script>
+<script>
+(function () {
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("foundry", "../..");
+  IdeaLab.disclosure();
+
+  /* This module needs two words that aren't in the shared glossary.
+     Merge them in locally so the shared file stays untouched. */
+  var gloss = window.IDEA_LAB_GLOSSARY || {};
+  if (!gloss.loop) {
+    gloss.loop = {
+      term: "Loop",
+      short: "An instruction that tells a computer to repeat the same steps a set number of times.",
+      deep: "A loop lets one short piece of code run again and again, so you do not have to copy the same lines over and over. A counting loop repeats a fixed number of times; each pass through is called one iteration. Loops are one of the basic building blocks of every program, used for everything from drawing shapes to scanning a list of names.",
+      source: "https://en.wikipedia.org/wiki/For_loop"
+    };
+  }
+  if (!gloss.angle) {
+    gloss.angle = {
+      term: "Degrees (turning)",
+      short: "A way to measure how far you turn. A full spin all the way around is 360 degrees.",
+      deep: "Degrees measure rotation. A quarter turn is 90 degrees, a half turn is 180, and a full circle back to the start is 360. To draw a closed shape with equal sides, the pen's turns have to add up to one full 360 degree spin: a triangle turns 120 degrees three times, a square turns 90 degrees four times, and so on.",
+      source: "https://en.wikipedia.org/wiki/Degree_(angle)"
+    };
+  }
+  IdeaLab.glossary(gloss);
+
+  /* ---------- stepper (two acts) ---------- */
+  var acts = Array.prototype.slice.call(document.querySelectorAll(".act"));
+  var dots = document.getElementById("dots");
+  var done = [false, false];
+  var current = 0;
+  acts.forEach(function (_, i) {
+    var d = document.createElement("span");
+    d.className = "dot" + (i === 0 ? " is-active" : "");
+    dots.appendChild(d);
+  });
+  function show(i) {
+    current = Math.max(0, Math.min(acts.length - 1, i));
+    acts.forEach(function (a, k) { a.hidden = k !== current; });
+    Array.prototype.forEach.call(dots.children, function (d, k) {
+      d.className = "dot" + (k === current ? " is-active" : (done[k] ? " is-done" : ""));
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (current === 1) { sync(); drawShape(false); }
+  }
+  document.body.addEventListener("click", function (e) {
+    if (e.target.matches("[data-next]")) { done[current] = true; show(current + 1); }
+    if (e.target.matches("[data-prev]")) show(current - 1);
+  });
+
+  /* ---------- the loop visualizer ---------- */
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var pad = document.getElementById("pad");
+  var ctx = pad.getContext("2d");
+  var countDial = document.getElementById("countDial");
+  var angleDial = document.getElementById("angleDial");
+  var countVal = document.getElementById("countVal");
+  var angleVal = document.getElementById("angleVal");
+  var codeBlock = document.getElementById("codeBlock");
+  var stageTag = document.getElementById("stageTag");
+  var runBtn = document.getElementById("runBtn");
+  var shapeBtns = Array.prototype.slice.call(document.querySelectorAll("[data-preset]"));
+
+  /* quick shapes the kid can jump to */
+  var PRESETS = {
+    triangle: { count: 3,  angle: 120 },
+    pentagon: { count: 5,  angle: 72 },
+    star:     { count: 5,  angle: 144 },
+    spiral:   { count: 12, angle: 95 }
+  };
+
+  function count() { return +countDial.value; }
+  function angle() { return +angleDial.value; }
+
+  /* keep the readouts, the code text, and the preset buttons in step */
+  function sync() {
+    var c = count(), a = angle();
+    countVal.textContent = c;
+    angleVal.textContent = a;
+
+    codeBlock.innerHTML =
+      '<span class="kw">repeat</span> <span class="num">' + c + '</span> times:\n' +
+      '    move forward\n' +
+      '    turn <span class="num">' + a + '</span> degrees';
+
+    var match = null;
+    Object.keys(PRESETS).forEach(function (k) {
+      if (PRESETS[k].count === c && PRESETS[k].angle === a) match = k;
+    });
+    shapeBtns.forEach(function (b) { b.classList.toggle("on", b.dataset.preset === match); });
+  }
+
+  /* work out the line the pen would walk, as a list of points.
+     each step: move forward one length, then turn by the angle. */
+  function path() {
+    var c = count(), a = angle();
+    var step = 120;                 /* length of one "move forward" */
+    var heading = -90;              /* start pointing up */
+    var x = 0, y = 0;
+    var pts = [{ x: x, y: y }];
+    var minX = 0, maxX = 0, minY = 0, maxY = 0;
+    for (var i = 0; i < c; i++) {
+      var rad = heading * Math.PI / 180;
+      x += Math.cos(rad) * step;
+      y += Math.sin(rad) * step;
+      pts.push({ x: x, y: y });
+      if (x < minX) minX = x; if (x > maxX) maxX = x;
+      if (y < minY) minY = y; if (y > maxY) maxY = y;
+      heading += a;
+    }
+    return { pts: pts, minX: minX, maxX: maxX, minY: minY, maxY: maxY };
+  }
+
+  /* fit the whole drawing neatly inside the square canvas */
+  function fit(p) {
+    var W = pad.width, H = pad.height, pad0 = 70;
+    var w = (p.maxX - p.minX) || 1, h = (p.maxY - p.minY) || 1;
+    var scale = Math.min((W - pad0 * 2) / w, (H - pad0 * 2) / h);
+    if (!isFinite(scale) || scale <= 0) scale = 1;
+    var cx = (p.minX + p.maxX) / 2, cy = (p.minY + p.maxY) / 2;
+    return {
+      sx: function (vx) { return W / 2 + (vx - cx) * scale; },
+      sy: function (vy) { return H / 2 + (vy - cy) * scale; }
+    };
+  }
+
+  function clearPad() {
+    ctx.clearRect(0, 0, pad.width, pad.height);
+  }
+
+  /* draw the finished shape (used on slider changes and back-nav) */
+  function drawShape(announce) {
+    var p = path();
+    var f = fit(p);
+    clearPad();
+    strokeFrom(p, f, p.pts.length - 1);
+    if (announce) stageTag.textContent = count() + " repeats · " + angle() + "° turns";
+  }
+
+  /* draw the path up to the given number of segments, with the pen dot */
+  function strokeFrom(p, f, upTo) {
+    ctx.lineWidth = 5;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "#3ee0ff";
+    ctx.shadowColor = "#3ee0ff";
+    ctx.shadowBlur = 14;
+    ctx.beginPath();
+    ctx.moveTo(f.sx(p.pts[0].x), f.sy(p.pts[0].y));
+    for (var i = 1; i <= upTo && i < p.pts.length; i++) {
+      ctx.lineTo(f.sx(p.pts[i].x), f.sy(p.pts[i].y));
+    }
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    /* the pen, sitting where it stopped */
+    var last = p.pts[Math.min(upTo, p.pts.length - 1)];
+    ctx.fillStyle = "#ffd76a";
+    ctx.beginPath();
+    ctx.arc(f.sx(last.x), f.sy(last.y), 7, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  /* the Run button: gently animate the pen, or just snap if reduced motion */
+  var running = false;
+  function run() {
+    if (running) return;
+    var c = count();
+
+    /* award the badge for running a real loop of 3 or more */
+    if (c >= 3) IdeaLab.award("loop-master", 50);
+
+    var p = path();
+    var f = fit(p);
+    stageTag.textContent = "Running…";
+
+    if (reduce) {
+      clearPad();
+      strokeFrom(p, f, p.pts.length - 1);
+      stageTag.textContent = c + " repeats · " + angle() + "° turns";
+      return;
+    }
+
+    running = true;
+    runBtn.disabled = true;
+    var seg = 0, total = p.pts.length - 1;
+    var perSeg = 6;            /* animation frames per side */
+    var frame = 0;
+
+    function tick() {
+      clearPad();
+      /* every side finished so far, drawn solid */
+      strokeFrom(p, f, seg);
+      /* the side in progress, so the pen glides instead of jumping */
+      var t = frame / perSeg;
+      var a = p.pts[seg], b = p.pts[seg + 1];
+      var mx = a.x + (b.x - a.x) * t, my = a.y + (b.y - a.y) * t;
+      ctx.lineWidth = 5; ctx.lineCap = "round"; ctx.strokeStyle = "#3ee0ff";
+      ctx.shadowColor = "#3ee0ff"; ctx.shadowBlur = 14;
+      ctx.beginPath();
+      ctx.moveTo(f.sx(a.x), f.sy(a.y));
+      ctx.lineTo(f.sx(mx), f.sy(my));
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = "#ffd76a";
+      ctx.beginPath(); ctx.arc(f.sx(mx), f.sy(my), 7, 0, Math.PI * 2); ctx.fill();
+
+      frame++;
+      if (frame > perSeg) { frame = 0; seg++; }
+
+      if (seg < total) {
+        requestAnimationFrame(tick);
+        return;
+      }
+      /* done: snap to the clean finished shape */
+      clearPad();
+      strokeFrom(p, f, total);
+      running = false;
+      runBtn.disabled = false;
+      stageTag.textContent = c + " repeats · " + angle() + "° turns";
+    }
+    requestAnimationFrame(tick);
+  }
+
+  /* live updates: move a slider, the readout, code, and preview all change */
+  function onSlide() { if (running) return; sync(); drawShape(false); }
+  countDial.addEventListener("input", onSlide);
+  angleDial.addEventListener("input", onSlide);
+
+  shapeBtns.forEach(function (b) {
+    b.addEventListener("click", function () {
+      if (running) return;
+      var pr = PRESETS[b.dataset.preset];
+      countDial.value = pr.count;
+      angleDial.value = pr.angle;
+      sync();
+      drawShape(false);
+    });
+  });
+
+  runBtn.addEventListener("click", run);
+
+  /* first paint */
+  sync();
+})();
+</script>
+</body>
+</html>

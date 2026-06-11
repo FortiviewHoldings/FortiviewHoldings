@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Two Locks — Defense Range — Idea Lab</title>
+<meta name="description" content="A safe pretend login. See a stolen password walk right in, then turn on two-factor and watch the same attacker get stopped at the second lock while you approve the real login.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../../assets/logo.svg">
+<link rel="stylesheet" href="../../assets/cosmos.css">
+<style>
+  /* lab-local styles, built on the cosmos tokens */
+  .stage{display:grid;grid-template-columns:1fr;gap:18px}
+  @media(min-width:760px){ .stage{grid-template-columns:1fr 1fr} }
+
+  /* a fake browser window, same family as the Glass Door */
+  .win{border:1px solid var(--border);border-radius:14px;overflow:hidden;background:#0a1020;
+    box-shadow:0 18px 50px #0008}
+  .win__bar{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#0d1428;
+    border-bottom:1px solid var(--border)}
+  .win__dot{width:11px;height:11px;border-radius:50%;background:#ffffff2a}
+  .win__url{margin-left:8px;font-size:.78em;color:var(--muted);font-family:ui-monospace,monospace}
+  .win__body{padding:22px 18px;display:grid;gap:12px}
+  .who{display:flex;align-items:center;gap:10px;font-weight:800}
+  .who .avatar{font-size:26px;line-height:1}
+  .who--bad{color:var(--bad)}
+  .who--you{color:var(--good)}
+
+  .field{display:grid;gap:5px}
+  .field label{font-size:.78em;color:var(--muted);font-weight:700;text-align:left}
+  .field input{font:inherit;width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);
+    background:#060a16;color:var(--ink);letter-spacing:.08em}
+  .field input[readonly]{opacity:.85}
+
+  .result{min-height:1.5em;font-weight:800;text-align:center}
+  .result.ok{color:var(--good)} .result.no{color:var(--bad)}
+
+  /* the screen the door shows: locked / open */
+  .door{font-size:52px;line-height:1;text-align:center;transition:transform .3s}
+  .door.open{transform:scale(1.08)}
+
+  /* the 2FA prompt that appears on YOUR phone */
+  .phone{border:1px solid var(--border);border-radius:20px;background:#070b16;padding:14px;
+    max-width:300px;margin:0 auto;box-shadow:0 12px 36px #0009}
+  .phone__top{display:flex;align-items:center;justify-content:space-between;color:var(--muted);
+    font-size:.72em;font-weight:700;margin-bottom:10px}
+  .phone__card{border:1px solid var(--border);border-radius:14px;background:#0c1428;padding:14px}
+  .phone__card h4{margin:0 0 4px;font-size:1em}
+  .phone__card p{margin:0 0 12px;color:var(--muted);font-size:.86em}
+  .phone__row{display:flex;gap:8px}
+  .phone__row .btn{flex:1;justify-content:center;padding:10px 12px;min-height:42px}
+
+  .code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:800;letter-spacing:.32em;
+    font-size:1.5em;text-align:center;color:var(--star);padding:8px 0}
+
+  .factor{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--border);border-radius:12px;
+    background:var(--glass);padding:12px 14px}
+  .factor .ico{font-size:24px;line-height:1;flex:0 0 auto}
+  .factor b{color:var(--ink)}
+  .factor small{display:block;color:var(--muted);font-size:.86em;margin-top:2px}
+  .two{display:grid;grid-template-columns:1fr;gap:12px}
+  @media(min-width:560px){ .two{grid-template-columns:1fr 1fr} }
+
+  .switchline{display:flex;align-items:center;gap:12px;justify-content:center;flex-wrap:wrap;
+    border:1px solid var(--border);border-radius:14px;background:var(--glass);padding:14px;margin:6px 0 2px}
+  .switchline.on{border-color:var(--brand-600);box-shadow:0 0 0 1px var(--brand-600)}
+
+  .pick{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:4px 0 2px}
+  .pick .chip small{display:block;font-size:.72em;color:var(--muted);font-weight:600}
+  .pick .chip.is-sel small{color:#04060dcc}
+
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section lab">
+  <header class="center">
+    <span class="kicker">Defense Range · Level 2</span>
+    <h1 style="font-size:clamp(28px,5vw,46px);margin:.2em 0">Two Locks</h1>
+    <p class="muted">A thief stole your password. With one lock, that is the whole game. Watch what a second lock does.</p>
+  </header>
+
+  <div class="steps" id="dots" aria-hidden="true"></div>
+
+  <!-- ACT 0: ONE LOCK -->
+  <section class="act" data-act="0">
+    <h2>One lock is not enough</h2>
+    <p class="muted">A thief got your password. Maybe from a fake message, a trick called
+       <button class="term" data-term="phishing">phishing</button>. Watch them log in with just the
+       password. Press Log in for the thief.</p>
+
+    <div class="stage">
+      <div class="win">
+        <div class="win__bar"><span class="win__dot"></span><span class="win__dot"></span>
+          <span class="win__dot"></span><span class="win__url">your-account.example</span></div>
+        <div class="win__body">
+          <div class="who who--bad"><span class="avatar" aria-hidden="true">🦝</span> The thief</div>
+          <div class="field"><label>Username</label><input value="you@email.example" readonly></div>
+          <div class="field"><label>Password (stolen)</label><input value="••••••••••" readonly></div>
+          <button class="btn btn--go" id="a0Enter">Log in</button>
+          <div class="result" id="a0Result">Waiting.</div>
+        </div>
+      </div>
+
+      <div class="win" aria-hidden="false">
+        <div class="win__bar"><span class="win__dot"></span><span class="win__dot"></span>
+          <span class="win__dot"></span><span class="win__url">your account</span></div>
+        <div class="win__body" style="place-items:center;text-align:center">
+          <div class="door" id="a0Door">🔒</div>
+          <div class="muted tiny" id="a0DoorTxt">Locked. One lock stands between the thief and your stuff.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fact hidden" id="a0Lesson" style="margin-top:16px">
+      <span aria-hidden="true">⚠️</span>
+      <span><b>The thief is in.</b> One lock means the password is the whole secret. Whoever holds it,
+      holds your account. A <button class="term" data-term="password-manager">password manager</button>
+      makes each password long and unique, but if a thief steals that one password, a single lock still opens.</span>
+    </div>
+
+    <div class="act__nav"><span></span>
+      <button class="btn btn--go" id="a0Next" data-next disabled>Next: add a second lock →</button></div>
+  </section>
+
+  <!-- ACT 1: TURN ON 2FA -->
+  <section class="act" data-act="1" hidden>
+    <h2>Turn on the second lock</h2>
+    <p class="muted">Two-factor means two different kinds of proof: something you <b>know</b>, and something
+       you <b>have</b>. The thief stole the thing you know. They cannot steal the thing you keep.</p>
+
+    <div class="two">
+      <div class="factor">
+        <span class="ico" aria-hidden="true">🧠</span>
+        <div><b>Something you know</b><small>Your password. A secret in your head. This is the one the thief copied.</small></div>
+      </div>
+      <div class="factor">
+        <span class="ico" aria-hidden="true">📱</span>
+        <div><b>Something you have</b><small>A code on your phone, or a passkey only your device can use. The thief is not holding it.</small></div>
+      </div>
+    </div>
+
+    <p class="muted" style="margin-top:18px">Pick your second lock, then flip it on.</p>
+
+    <div class="pick" id="a1Pick"></div>
+
+    <label class="switchline" id="a1Line" for="a1Toggle">
+      <input type="checkbox" id="a1Toggle" style="width:0;height:0;opacity:0;position:absolute">
+      <span class="track" aria-hidden="true"></span>
+      <span id="a1ToggleTxt"><b>Two-factor is OFF.</b> Flip it on.</span>
+    </label>
+
+    <div class="fact hidden" id="a1Lesson" style="margin-top:14px">
+      <span aria-hidden="true">🛡️</span>
+      <span id="a1LessonTxt"></span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" id="a1Next" data-next disabled>Next: the thief tries again →</button>
+    </div>
+  </section>
+
+  <!-- ACT 2: SECOND LOCK STOPS THE THIEF -->
+  <section class="act" data-act="2" hidden>
+    <h2>Same thief. Same password. Stopped.</h2>
+    <p class="muted">The thief still has your password. They type it again. This time a second lock is waiting,
+       and the proof it needs is on <b>your</b> phone, not theirs.</p>
+
+    <div class="stage">
+      <div class="win">
+        <div class="win__bar"><span class="win__dot"></span><span class="win__dot"></span>
+          <span class="win__dot"></span><span class="win__url">your-account.example</span></div>
+        <div class="win__body">
+          <div class="who who--bad"><span class="avatar" aria-hidden="true">🦝</span> The thief, again</div>
+          <div class="field"><label>Username</label><input value="you@email.example" readonly></div>
+          <div class="field"><label>Password (still stolen)</label><input value="••••••••••" readonly></div>
+          <div class="field" id="a2CodeField"><label>Second lock: one-time code</label>
+            <input id="a2CodeInput" inputmode="numeric" maxlength="6" placeholder="6-digit code"></div>
+          <button class="btn btn--go" id="a2Enter">Thief tries to log in</button>
+          <div class="result" id="a2Result">Waiting.</div>
+        </div>
+      </div>
+
+      <div class="win">
+        <div class="win__bar"><span class="win__dot"></span><span class="win__dot"></span>
+          <span class="win__dot"></span><span class="win__url">your phone · in your pocket</span></div>
+        <div class="win__body" style="place-items:center">
+          <div class="phone" id="a2Phone">
+            <div class="phone__top"><span>🔐 Authenticator</span><span id="a2Clock">now</span></div>
+            <div class="phone__card" id="a2PhoneCard">
+              <div class="muted tiny" style="text-align:center">Your phone is quiet. No real login yet.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fact hidden" id="a2Lesson" style="margin-top:16px">
+      <span aria-hidden="true">🛡️</span>
+      <span id="a2LessonTxt"></span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" id="a2Next" data-next disabled>Last: log in the real way →</button>
+    </div>
+  </section>
+
+  <!-- ACT 3: YOU APPROVE THE REAL LOGIN -->
+  <section class="act" data-act="3" hidden>
+    <h2>Now you log in</h2>
+    <p class="muted">It is really you this time. You know the password, and you are holding the second lock.
+       Approve your own login and walk right in.</p>
+
+    <div class="stage">
+      <div class="win">
+        <div class="win__bar"><span class="win__dot"></span><span class="win__dot"></span>
+          <span class="win__dot"></span><span class="win__url">your-account.example</span></div>
+        <div class="win__body" style="place-items:center;text-align:center">
+          <div class="who who--you"><span class="avatar" aria-hidden="true">🧑‍🚀</span> You</div>
+          <div class="door" id="a3Door">🔒</div>
+          <div class="muted tiny" id="a3DoorTxt">Password accepted. Waiting for your second lock.</div>
+        </div>
+      </div>
+
+      <div class="win">
+        <div class="win__bar"><span class="win__dot"></span><span class="win__dot"></span>
+          <span class="win__dot"></span><span class="win__url">your phone · in your hand</span></div>
+        <div class="win__body" style="place-items:center">
+          <div class="phone">
+            <div class="phone__top"><span>🔐 Approve sign-in</span><span>now</span></div>
+            <div class="phone__card">
+              <h4 id="a3PromptTitle">Is this you?</h4>
+              <p id="a3PromptBody">A login is waiting on your account. Approve it only if it is you.</p>
+              <div class="phone__row" id="a3Row">
+                <button class="btn btn--ghost" id="a3Deny">Not me</button>
+                <button class="btn btn--go" id="a3Approve">Yes, it's me</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fact hidden" id="a3Lesson" style="margin-top:16px">
+      <span aria-hidden="true">✅</span>
+      <span id="a3LessonTxt"></span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <a class="btn btn--cosmic" href="../">Back to the Defense Range →</a>
+    </div>
+  </section>
+
+  <p class="center muted tiny" style="margin-top:26px">
+    <a href="../">← Defense Range</a> · everything here is a pretend account in a sandbox.
+    Tap the <span class="term" style="cursor:default;border:0">underlined words</span> to dig deeper.
+  </p>
+</main>
+
+<script src="../../assets/manifest.js"></script>
+<script src="../../assets/glossary.js"></script>
+<script src="../../assets/shell.js"></script>
+<script>
+(function () {
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("defense", "../..");
+  IdeaLab.disclosure();
+  IdeaLab.glossary(window.IDEA_LAB_GLOSSARY);
+
+  /* shared state across the acts */
+  var SECOND = "code";          // "code" or "passkey", chosen in act 1
+  var REAL_CODE = "739204";     // the code only your phone would show
+  var twofaOn = false;
+
+  /* ---------- stepper ---------- */
+  var acts = Array.prototype.slice.call(document.querySelectorAll(".act"));
+  var dots = document.getElementById("dots");
+  var done = [false, false, false, false];
+  var current = 0;
+  acts.forEach(function (_, i) {
+    var d = document.createElement("span");
+    d.className = "dot" + (i === 0 ? " is-active" : "");
+    dots.appendChild(d);
+  });
+  function show(i) {
+    current = Math.max(0, Math.min(acts.length - 1, i));
+    acts.forEach(function (a, k) { a.hidden = k !== current; });
+    Array.prototype.forEach.call(dots.children, function (d, k) {
+      d.className = "dot" + (k === current ? " is-active" : (done[k] ? " is-done" : ""));
+    });
+    if (current === 2) enterAct2();
+    if (current === 3) enterAct3();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.body.addEventListener("click", function (e) {
+    if (e.target.matches("[data-next]") && !e.target.disabled) { done[current] = true; show(current + 1); }
+    if (e.target.matches("[data-prev]")) show(current - 1);
+  });
+
+  /* ---------- ACT 0: one lock, the thief walks in ---------- */
+  document.getElementById("a0Enter").addEventListener("click", function () {
+    this.disabled = true;
+    var door = document.getElementById("a0Door");
+    door.textContent = "🔓"; door.classList.add("open");
+    document.getElementById("a0DoorTxt").textContent = "Open. One password was the whole secret.";
+    var r = document.getElementById("a0Result");
+    r.textContent = "Logged in as you. The thief is inside."; r.className = "result no";
+    document.getElementById("a0Lesson").classList.remove("hidden");
+    document.getElementById("a0Next").disabled = false;
+  });
+
+  /* ---------- ACT 1: choose and switch on the second lock ---------- */
+  var PICKS = [
+    { id: "code",    label: "One-time code", sub: "a 6-digit number that changes" },
+    { id: "passkey", label: "Passkey",       sub: "your device proves it is you" }
+  ];
+  var pick = document.getElementById("a1Pick");
+  PICKS.forEach(function (p) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip" + (p.id === SECOND ? " is-sel" : "");
+    b.dataset.id = p.id;
+    b.innerHTML = IdeaLab.esc(p.label) + "<small>" + IdeaLab.esc(p.sub) + "</small>";
+    pick.appendChild(b);
+  });
+  pick.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-id]"); if (!b) return;
+    SECOND = b.dataset.id;
+    Array.prototype.forEach.call(this.children, function (c) { c.classList.remove("is-sel"); });
+    b.classList.add("is-sel");
+    if (twofaOn) updateA1Lesson();
+  });
+
+  function updateA1Lesson() {
+    var txt = (SECOND === "passkey")
+      ? "<b>Two-factor is ON.</b> Your second lock is a passkey. The proof never leaves your device, so there is nothing for a fake page to copy. Passkeys resist <button class=\"term\" data-term=\"phishing\">phishing</button>, even if the password is stolen."
+      : "<b>Two-factor is ON.</b> Your second lock is a one-time code that only your phone shows, and it changes every minute. The thief has your password but not your phone.";
+    document.getElementById("a1LessonTxt").innerHTML = txt;
+  }
+
+  var toggle = document.getElementById("a1Toggle");
+  toggle.addEventListener("change", function () {
+    twofaOn = toggle.checked;
+    document.getElementById("a1Line").classList.toggle("on", twofaOn);
+    document.getElementById("a1ToggleTxt").innerHTML = twofaOn
+      ? "<b>Two-factor is ON.</b> A second lock now guards the door."
+      : "<b>Two-factor is OFF.</b> Flip it on.";
+    var lesson = document.getElementById("a1Lesson");
+    if (twofaOn) { updateA1Lesson(); lesson.classList.remove("hidden"); }
+    else lesson.classList.add("hidden");
+    document.getElementById("a1Next").disabled = !twofaOn;
+  });
+
+  /* ---------- ACT 2: thief blocked at the second lock ---------- */
+  var a2Built = false;
+  function enterAct2() {
+    var field = document.getElementById("a2CodeField");
+    var label = field.querySelector("label");
+    var input = document.getElementById("a2CodeInput");
+    if (SECOND === "passkey") {
+      label.textContent = "Second lock: passkey on your device";
+      input.placeholder = "the thief has no passkey here";
+      input.value = "";
+      input.disabled = true;
+    } else {
+      label.textContent = "Second lock: one-time code";
+      input.placeholder = "6-digit code";
+      input.value = "";
+      input.disabled = false;
+    }
+    if (a2Built) return;
+    a2Built = true;
+
+    document.getElementById("a2Enter").addEventListener("click", function () {
+      var r = document.getElementById("a2Result");
+      var phone = document.getElementById("a2PhoneCard");
+      if (SECOND === "passkey") {
+        r.textContent = "Blocked. The passkey lives on your device, not theirs.";
+        r.className = "result ok";
+        phone.innerHTML = '<div class="muted tiny" style="text-align:center">Your phone stayed quiet. No passkey here means no way in.</div>';
+      } else {
+        var typed = (document.getElementById("a2CodeInput").value || "").trim();
+        r.textContent = typed
+          ? "Blocked. That code is wrong, and the real one is on your phone."
+          : "Blocked. The thief has no code to type.";
+        r.className = "result ok";
+        phone.innerHTML =
+          '<div class="muted tiny" style="text-align:center;margin-bottom:6px">The real code lives here, where the thief cannot see it:</div>' +
+          '<div class="code">' + REAL_CODE + '</div>' +
+          '<div class="muted tiny" style="text-align:center">Changes every minute. The thief never gets to read it.</div>';
+      }
+      this.disabled = true;
+      var lessonTxt = (SECOND === "passkey")
+        ? "<b>The stolen password was not enough.</b> The passkey proof never leaves your device, so the thief had nothing to copy or type. A stolen password alone does not open a door with two locks."
+        : "<b>The stolen password was not enough.</b> The second lock asked for a code only your phone shows, and it changes every minute. A stolen password alone does not open a door with two locks.";
+      document.getElementById("a2LessonTxt").innerHTML = lessonTxt;
+      document.getElementById("a2Lesson").classList.remove("hidden");
+      document.getElementById("a2Next").disabled = false;
+      IdeaLab.award("double-lock", 50);
+    });
+  }
+
+  /* ---------- ACT 3: you approve the real login ---------- */
+  var a3Built = false;
+  function enterAct3() {
+    var body = document.getElementById("a3PromptBody");
+    var title = document.getElementById("a3PromptTitle");
+    if (SECOND === "passkey") {
+      title.textContent = "Use your passkey?";
+      body.textContent = "Your device wants to prove it is you. Approve it only if you are logging in.";
+    } else {
+      title.textContent = "Approve sign-in?";
+      body.textContent = "A login is waiting on your account. Approve it only if it is you.";
+    }
+    if (a3Built) return;
+    a3Built = true;
+
+    function approve() {
+      var door = document.getElementById("a3Door");
+      door.textContent = "🔓"; door.classList.add("open");
+      document.getElementById("a3DoorTxt").textContent = "Open. Both locks, both yours. Welcome in.";
+      document.getElementById("a3Row").innerHTML =
+        '<div class="result ok" style="flex:1">Approved. You are in.</div>';
+      var txt = (SECOND === "passkey")
+        ? "<b>You walked right in.</b> You knew the password and you held the passkey, so both locks opened for you. The thief had one of the two and got neither door. Two different proofs is the whole idea: something you know plus something you have."
+        : "<b>You walked right in.</b> You knew the password and you read the code off your own phone, so both locks opened for you. The thief had one of the two and got neither door. Two different proofs is the whole idea: something you know plus something you have.";
+      document.getElementById("a3LessonTxt").innerHTML = txt;
+      document.getElementById("a3Lesson").classList.remove("hidden");
+      IdeaLab.addXP(10);
+    }
+    function deny() {
+      var d = document.getElementById("a3DoorTxt");
+      d.textContent = "Good instinct. If a login pops up that you did not start, say no. That is how the second lock warns you.";
+    }
+    document.getElementById("a3Approve").addEventListener("click", approve);
+    document.getElementById("a3Deny").addEventListener("click", deny);
+  }
+})();
+</script>
+</body>
+</html>

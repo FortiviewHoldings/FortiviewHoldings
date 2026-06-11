@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How AI Really Guesses — AI Wing — Idea Lab</title>
+<meta name="description" content="Build a sentence one word at a time with a tiny pretend model, then watch the same prompt make a different sentence. Proof that AI guesses by patterns, it does not understand. Free, factual, no accounts.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../../assets/logo.svg">
+<link rel="stylesheet" href="../../assets/cosmos.css">
+<style>
+  .sentence{font-size:1.15em;font-weight:700;min-height:2.4em;background:#0a1020;
+    border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;line-height:1.55}
+  .sentence .blank{color:var(--nebula)}
+  .sentence .pick{color:var(--star)}
+  .panel-label{font-size:.78em;color:var(--muted);margin:14px 0 8px;font-weight:700}
+  .guesses{display:grid;gap:10px}
+  .guess{display:grid;grid-template-columns:96px 1fr 44px;align-items:center;gap:10px;cursor:pointer;
+    background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:9px 12px;
+    font:inherit;color:var(--ink);text-align:left}
+  .guess:hover{border-color:var(--nebula)}
+  .guess:disabled{cursor:default;opacity:.55}
+  .guess .gw{font-weight:800}
+  .gtrk{display:block;height:12px;border-radius:6px;background:#ffffff14;overflow:hidden}
+  .gbar{display:block;height:12px;border-radius:6px;background:var(--grad-cosmic)}
+  .guess .gp{text-align:right;color:var(--muted);font-size:.82em}
+
+  .runrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+  .twin{display:grid;gap:10px;margin-top:8px}
+  .twin .sentence{font-size:1.05em;text-align:left}
+  .twin .tag{font-size:.74em;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section lab">
+
+  <header class="center">
+    <span class="kicker">AI Wing · Level 1</span>
+    <h1 style="font-size:clamp(28px,5vw,46px);margin:.2em 0">How AI Really Guesses</h1>
+    <p class="muted">Build a sentence one word at a time. Then watch the same start make a totally different one.</p>
+  </header>
+
+  <div class="steps" id="dots" aria-hidden="true"></div>
+
+  <!-- ============ ACT 1: BUILD A SENTENCE ============ -->
+  <section class="act" data-act="0">
+    <h2>Pick the next word</h2>
+    <p class="muted">AI does not read like you do. It learned which words tend to follow which, from huge
+       piles of text. Then it picks a likely next word, again and again. Tap a word to add it.</p>
+
+    <div class="sentence" id="sentence"></div>
+
+    <div class="panel-label">🔮 Tiny pretend model · how often each word came next in its examples</div>
+    <div class="guesses" id="guesses"></div>
+
+    <div class="fact hidden" id="a0Lesson" style="margin-top:16px">
+      <span aria-hidden="true">🔮</span>
+      <span><b>You built that, the model just picked likely words.</b> It never knew what milk or a spoon
+      is. It only knew which words usually came next. Real AI does the exact same thing, with billions of
+      patterns instead of a few. The bars are its memory of what it has seen, not understanding.</span>
+    </div>
+
+    <div class="act__nav"><span></span>
+      <button class="btn btn--go" id="a0Next" data-next disabled>Next: run it again →</button></div>
+  </section>
+
+  <!-- ============ ACT 2: SAME PROMPT, DIFFERENT SENTENCE ============ -->
+  <section class="act" data-act="1" hidden>
+    <h2>Same start, different sentence</h2>
+    <p class="muted">If the model truly understood, the same start would mean the same thought every time.
+       It does not. It rolls the odds. Press the button and watch the same prompt go a new way.</p>
+
+    <div class="twin" id="twin"></div>
+
+    <div class="runrow">
+      <button class="btn btn--cosmic" id="runBtn" type="button">🎲 Run the same prompt again</button>
+      <span class="muted tiny" id="runCount">Runs so far: 0</span>
+    </div>
+
+    <div class="fact hidden" id="a1Lesson" style="margin-top:16px">
+      <span aria-hidden="true">🎲</span>
+      <span><b>Same start, new ending, every time.</b> The model did not change its mind, because it never
+      had one. It just picked from the likely words again, and a different roll won. That is the whole
+      trick: clever pattern guessing that sounds like thinking, but is not.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" id="a1Next" data-next disabled>Last: what this means →</button>
+    </div>
+  </section>
+
+  <!-- ============ ACT 3: WRAP ============ -->
+  <section class="act" data-act="2" hidden>
+    <h2>What this means for you</h2>
+    <p class="muted">You just saw the engine behind every chatbot. It is a next-word guesser, trained on
+       mountains of text, picking what tends to fit.</p>
+
+    <div class="card" style="margin:8px 0">
+      <h3>🧠 Carry these three</h3>
+      <p class="muted">1. AI learned which words tend to follow which, from huge amounts of text. <br>
+         2. It predicts what fits. It does not understand meaning the way you do. <br>
+         3. So it can sound sure and still be wrong. Smart answers still need your check.</p>
+    </div>
+
+    <div class="fact">
+      <span aria-hidden="true">✦</span>
+      <span><b>The rule:</b> good words are not the same as true words. The thinking is still your job.</span>
+    </div>
+
+    <p class="muted tiny" style="margin-top:14px">Words to keep: a
+       <button class="term" data-term="machine-learning">model that learns from examples</button>, and the
+       <button class="term" data-term="prediction">prediction</button> it makes from them.</p>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <a class="btn btn--cosmic" href="../">Back to the AI Wing →</a>
+    </div>
+  </section>
+
+  <p class="center muted tiny" style="margin-top:26px">
+    <a href="../">← AI Wing</a> · the bars are a tiny pretend model, the idea behind them is real.
+  </p>
+</main>
+
+<script src="../../assets/manifest.js"></script>
+<script src="../../assets/glossary.js"></script>
+<script src="../../assets/shell.js"></script>
+<script>
+(function () {
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("ai-wing", "../..");
+  IdeaLab.disclosure();
+  IdeaLab.glossary(window.IDEA_LAB_GLOSSARY);
+
+  /* extra glossary terms for this module, merged in without editing the shared file */
+  var extra = {
+    "machine-learning": {
+      term: "Learning from examples (machine learning)",
+      short: "Instead of being given exact rules, the model looks at tons of examples and finds the patterns itself.",
+      deep: "A language model is shown an enormous amount of text and learns which words tend to come after which. Nobody types in a rule like 'after milk comes bowl.' The model measures it from the examples, billions of times over, and stores those tendencies as numbers. When you give it a start, it uses those numbers to guess a likely next word. The bars in this lab are a tiny pretend version of that memory.",
+      source: "https://en.wikipedia.org/wiki/Machine_learning"
+    },
+    "prediction": {
+      term: "Next-word prediction",
+      short: "The model's whole job: look at the words so far and pick a likely next one.",
+      deep: "A language model does not plan a sentence the way you do. It predicts one word, adds it, then predicts the next from everything so far. Each guess comes with odds, and the model usually picks among the likely ones, with a little randomness. That randomness is why the same start can become different sentences. The sentence reads smart because the patterns are good, not because the machine knows what it is saying.",
+      source: "https://en.wikipedia.org/wiki/Language_model"
+    }
+  };
+  for (var k in extra) { if (extra.hasOwnProperty(k)) window.IDEA_LAB_GLOSSARY[k] = extra[k]; }
+
+  /* ---------- stepper ---------- */
+  var acts = Array.prototype.slice.call(document.querySelectorAll(".act"));
+  var dots = document.getElementById("dots");
+  var done = [false, false, false];
+  var current = 0;
+  acts.forEach(function (_, i) {
+    var d = document.createElement("span");
+    d.className = "dot" + (i === 0 ? " is-active" : "");
+    dots.appendChild(d);
+  });
+  function show(i) {
+    current = Math.max(0, Math.min(acts.length - 1, i));
+    acts.forEach(function (a, k) { a.hidden = k !== current; });
+    Array.prototype.forEach.call(dots.children, function (d, k) {
+      d.className = "dot" + (k === current ? " is-active" : (done[k] ? " is-done" : ""));
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.body.addEventListener("click", function (e) {
+    if (e.target.matches("[data-next]") && !e.target.disabled) { done[current] = true; show(current + 1); }
+    if (e.target.matches("[data-prev]")) show(current - 1);
+  });
+
+  /* track the two halves of the badge: built a sentence, and viewed the lesson */
+  var builtSentence = false, sawLesson = false;
+  function maybeAward() {
+    if (builtSentence && sawLesson) IdeaLab.award("pattern-pro", 45);
+  }
+
+  /* ---------- ACT 1: build a sentence, word by word ----------
+     Each round is one prompt with a few candidate next words. The
+     percentages are a tiny pretend model: how often that word came
+     next in its examples. They are made up numbers for a real idea. */
+  var rounds = [
+    { prompt: "The cat sat on the", options: [
+      { w: "mat", p: 52 }, { w: "sofa", p: 31 }, { w: "roof", p: 17 } ] },
+    { prompt: "and watched the", options: [
+      { w: "birds", p: 48 }, { w: "rain", p: 34 }, { w: "fish", p: 18 } ] },
+    { prompt: "outside the", options: [
+      { w: "window", p: 64 }, { w: "door", p: 25 }, { w: "fence", p: 11 } ] }
+  ];
+  var built = [], ri = 0;
+  var sentenceEl = document.getElementById("sentence");
+  var guessesEl = document.getElementById("guesses");
+
+  function renderRound() {
+    var base = built.join(" ");
+    if (ri < rounds.length) {
+      sentenceEl.innerHTML = (base ? '<span class="pick">' + IdeaLab.esc(base) + "</span> " : "") +
+        IdeaLab.esc(rounds[ri].prompt) + ' <span class="blank">____</span>';
+      guessesEl.innerHTML = "";
+      rounds[ri].options.forEach(function (o) {
+        var b = document.createElement("button");
+        b.className = "guess"; b.type = "button";
+        b.innerHTML = '<span class="gw">' + IdeaLab.esc(o.w) + "</span>" +
+          '<span class="gtrk"><span class="gbar" style="width:' + o.p + '%"></span></span>' +
+          '<span class="gp">' + o.p + "%</span>";
+        b.addEventListener("click", function () {
+          built.push(rounds[ri].prompt); built.push(o.w); ri++; renderRound();
+        });
+        guessesEl.appendChild(b);
+      });
+    } else {
+      sentenceEl.innerHTML = '<span class="pick">' + IdeaLab.esc(base) + ".</span>";
+      guessesEl.innerHTML = "";
+      document.getElementById("a0Lesson").classList.remove("hidden");
+      document.getElementById("a0Next").disabled = false;
+      builtSentence = true; maybeAward();
+    }
+  }
+  renderRound();
+
+  /* ---------- ACT 2: same prompt, different sentence ----------
+     One fixed prompt. At each step the model has a few likely next
+     words with weights. We "roll" weighted-random to show that the
+     same start can take a different path each run. No two runs need
+     to match, which is the point: odds, not understanding. */
+  var SAME_PROMPT = "On a rainy day I like to";
+  var chains = [
+    [ { w: "stay", p: 40 }, { w: "read", p: 35 }, { w: "watch", p: 25 } ],
+    { stay:  [ { w: "warm", p: 60 }, { w: "inside", p: 40 } ],
+      read:  [ { w: "a", p: 70 }, { w: "comic", p: 30 } ],
+      watch: [ { w: "the", p: 65 }, { w: "old", p: 35 } ] },
+    { warm:   [ { w: "by the window", p: 100 } ],
+      inside: [ { w: "with a blanket", p: 100 } ],
+      a:      [ { w: "long story", p: 100 } ],
+      comic:  [ { w: "in bed", p: 100 } ],
+      the:    [ { w: "drops race down the glass", p: 100 } ],
+      old:    [ { w: "movies all afternoon", p: 100 } ] }
+  ];
+
+  function pick(options) {
+    var total = 0, i;
+    for (i = 0; i < options.length; i++) total += options[i].p;
+    var roll = Math.random() * total, acc = 0;
+    for (i = 0; i < options.length; i++) {
+      acc += options[i].p;
+      if (roll <= acc) return options[i].w;
+    }
+    return options[options.length - 1].w;
+  }
+  function makeRun() {
+    var w1 = pick(chains[0]);
+    var w2 = pick(chains[1][w1]);
+    var w3 = pick(chains[2][w2]);
+    return SAME_PROMPT + " " + w1 + " " + w2 + " " + w3 + ".";
+  }
+
+  var twin = document.getElementById("twin");
+  var runBtn = document.getElementById("runBtn");
+  var runCount = document.getElementById("runCount");
+  var runs = 0;
+
+  function addRun() {
+    runs++;
+    runCount.textContent = "Runs so far: " + runs;
+    var text = makeRun();
+    var row = document.createElement("div");
+    row.innerHTML = '<div class="tag">Run ' + runs + ' · same prompt</div>' +
+      '<div class="sentence"><span class="pick">' + IdeaLab.esc(text) + "</span></div>";
+    twin.appendChild(row);
+    if (runs >= 2) {
+      document.getElementById("a1Lesson").classList.remove("hidden");
+      document.getElementById("a1Next").disabled = false;
+      sawLesson = true; maybeAward();
+    }
+  }
+  addRun(); /* show the first run on arrival so the prompt is visible */
+  runBtn.addEventListener("click", addRun);
+})();
+</script>
+</body>
+</html>

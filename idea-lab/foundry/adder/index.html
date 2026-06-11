@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Adder — The Foundry — Idea Lab</title>
+<meta name="description" content="Wire two logic gates into a half-adder and watch a circuit do real math: 1 plus 1 rolls over into a carry, exactly like our numbers. Free, factual, no accounts.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../../assets/logo.svg">
+<link rel="stylesheet" href="../../assets/cosmos.css">
+<style>
+  /* the math read-out: the live meaning of the two inputs */
+  .sum{display:grid;grid-template-columns:auto auto auto auto auto;gap:10px 14px;
+    align-items:center;justify-content:center;text-align:center;margin-top:18px}
+  .sum__cell{min-width:54px}
+  .sum__num{font-size:clamp(34px,9vw,58px);font-weight:800;line-height:1;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .sum__op{font-size:clamp(26px,7vw,44px);font-weight:800;color:var(--muted);line-height:1}
+  .sum__lbl{display:block;font-size:.7em;color:var(--muted);font-weight:700;margin-top:6px;
+    text-transform:uppercase;letter-spacing:.08em}
+  .sum__bits{display:inline-flex;gap:6px}
+  .sum__bit{width:clamp(34px,9vw,54px);height:clamp(44px,12vw,72px);border-radius:12px;
+    border:2px solid var(--border);background:#0a0f1f;display:grid;place-items:center;
+    font-size:clamp(26px,7vw,44px);font-weight:800;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;transition:.2s}
+  .sum__bit.is-carry{border-color:var(--star)}
+  .sum__bit.is-on{background:radial-gradient(circle,#fff6c0,#ffd76a 60%,#a9810f);
+    color:#04060d;border-color:#ffd76a;box-shadow:0 0 26px #ffd76a88}
+  /* the "aha": glows gold only on the 1+1 rollover */
+  .rollover{margin-top:16px;border:1px solid var(--border);border-radius:12px;
+    background:#0c142880;padding:12px 16px;text-align:center;transition:.25s;opacity:.55}
+  .rollover.is-live{opacity:1;border-color:var(--star);
+    box-shadow:0 0 0 1px var(--star),0 0 28px #ffd76a44}
+  .rollover b{color:var(--star)}
+  /* two output lamps side by side, each labelled */
+  .outs{display:flex;gap:22px;justify-content:center;flex-wrap:wrap}
+  .out{display:flex;flex-direction:column;align-items:center;gap:8px}
+  .out .lamp{width:78px;height:78px;font-size:32px}
+  .out__name{font-weight:800}
+  .out__form{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82em;
+    color:var(--muted)}
+</style>
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section lab">
+
+  <header class="center">
+    <span class="kicker">The Foundry · Level 1</span>
+    <h1 style="font-size:clamp(28px,5vw,46px);margin:.2em 0">The Adder</h1>
+    <p class="muted">You wired a single gate. Now wire two of them into a circuit that does real math.</p>
+  </header>
+
+  <div class="steps" id="dots" aria-hidden="true"></div>
+
+  <!-- ============ ACT 1: THE IDEA ============ -->
+  <section class="act" data-act="0">
+    <h2>How can a switch do math?</h2>
+    <p class="muted">It already can. Adding two single <button class="term" data-term="bit">bits</button> only
+    has four answers, and a couple of <button class="term" data-term="logic-gate">logic gates</button> know
+    them all by heart.</p>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">➕</span>
+      <span><b>One column at a time.</b> When you add big numbers you do one column, then carry into the
+      next: 7 + 5 is 2, carry 1. A computer adds the same way, one column at a time, in 1s and 0s. The
+      machine that adds a single column is called a <b>half-adder</b>, and you are about to build one.</span>
+    </div>
+
+    <details style="margin-top:12px">
+      <summary class="muted tiny" style="cursor:pointer">🔭 Why only four answers?</summary>
+      <div class="fact" style="margin-top:8px">
+        <span aria-hidden="true">✦</span>
+        <span>Each input is just on or off, so two inputs have only four combinations: 0+0, 0+1, 1+0, and
+        1+1. A circuit that gets four cases right every single time, billions of times a second, is all a
+        computer needs to start counting.</span>
+      </div>
+    </details>
+
+    <div class="act__nav">
+      <span></span>
+      <button class="btn btn--go" data-next>Next: wire the half-adder →</button>
+    </div>
+  </section>
+
+  <!-- ============ ACT 2: BUILD THE HALF-ADDER ============ -->
+  <section class="act" data-act="1" hidden>
+    <h2>Wire the half-adder</h2>
+    <p class="muted">Two inputs, two outputs. Flip A and B and watch the Sum and Carry lamps obey the
+    gates.</p>
+
+    <div class="gate">
+      <div class="gate__inputs">
+        <label class="toggle"><input type="checkbox" id="inA"><span class="track"></span> A</label>
+        <label class="toggle"><input type="checkbox" id="inB"><span class="track"></span> B</label>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="wire" id="wA"></div>
+        <div class="wire" id="wB"></div>
+      </div>
+      <div class="outs">
+        <div class="out">
+          <div class="muted tiny">Sum</div>
+          <div class="lamp" id="sumLamp" aria-hidden="true">0</div>
+          <div class="out__name">Sum</div>
+          <div class="out__form">A XOR B</div>
+        </div>
+        <div class="out">
+          <div class="muted tiny">Carry</div>
+          <div class="lamp" id="carryLamp" aria-hidden="true">0</div>
+          <div class="out__name">Carry</div>
+          <div class="out__form">A AND B</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- live binary-math meaning of the current inputs -->
+    <div class="sum">
+      <div class="sum__cell"><div class="sum__num" id="aNum">0</div><span class="sum__lbl">A</span></div>
+      <div class="sum__op">+</div>
+      <div class="sum__cell"><div class="sum__num" id="bNum">0</div><span class="sum__lbl">B</span></div>
+      <div class="sum__op">=</div>
+      <div class="sum__cell">
+        <div class="sum__bits">
+          <span class="sum__bit is-carry" id="carryBit">0</span>
+          <span class="sum__bit" id="sumBit">0</span>
+        </div>
+        <span class="sum__lbl"><span id="resultDec">0</span> in our numbers</span>
+      </div>
+    </div>
+
+    <div class="rollover" id="rollover">
+      <span id="rollText">Carry stays dark until both inputs are on. Try every pair, then set A and B
+      both to 1.</span>
+    </div>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">💡</span>
+      <span>Two gates, side by side, reading the same two inputs. <b>Sum</b> is a XOR gate (it lights when
+      the inputs differ). <b>Carry</b> is an AND gate (it lights only when both are on). That pair is a
+      <b>half-adder</b>.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" data-next>Next: read the circuit →</button>
+    </div>
+  </section>
+
+  <!-- ============ ACT 3: THE TWO FORMULAS + BIGGER NUMBERS ============ -->
+  <section class="act" data-act="2" hidden>
+    <h2>The whole circuit, in two lines</h2>
+    <p class="muted">That is the entire half-adder. No magic, just two gates with names.</p>
+
+    <div class="gate__core" style="margin-top:6px">
+      <div class="out__form" style="font-size:1.05em;color:var(--ink)">Sum&nbsp;&nbsp;= A <b style="color:var(--plasma)">XOR</b> B</div>
+      <div class="out__form" style="font-size:1.05em;color:var(--ink);margin-top:8px">Carry = A <b style="color:var(--star)">AND</b> B</div>
+    </div>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">🔗</span>
+      <span><b>From one column to many.</b> A half-adder handles a single column. Chain a few together,
+      feeding each carry into the next column, and you get a <b>full adder</b>: the circuit a computer uses
+      to add big numbers. Stacking the same small idea is the whole trick.</span>
+    </div>
+
+    <div class="fact" style="margin-top:12px">
+      <span aria-hidden="true">⚛️</span>
+      <span>You just built arithmetic out of switches. Every total a computer has ever shown you started
+      with a circuit exactly like this one.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <a class="btn btn--cosmic" href="../">Back to the Foundry →</a>
+    </div>
+  </section>
+
+  <p class="center muted tiny" style="margin-top:26px">
+    <a href="../">← The Foundry</a> · every fact here is real science, kept simple. Tap the
+    <span class="term" style="cursor:default;border:0">underlined words</span> to dig deeper.
+  </p>
+</main>
+
+<script src="../../assets/manifest.js"></script>
+<script src="../../assets/glossary.js"></script>
+<script src="../../assets/shell.js"></script>
+<script>
+(function () {
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("foundry", "../..");
+  IdeaLab.disclosure();
+  IdeaLab.glossary(window.IDEA_LAB_GLOSSARY);
+
+  /* ---------- stepper ---------- */
+  var acts = Array.prototype.slice.call(document.querySelectorAll(".act"));
+  var dots = document.getElementById("dots");
+  var done = [false, false, false];
+  var current = 0;
+  acts.forEach(function (_, i) {
+    var d = document.createElement("span");
+    d.className = "dot" + (i === 0 ? " is-active" : "");
+    dots.appendChild(d);
+  });
+  function show(i) {
+    current = Math.max(0, Math.min(acts.length - 1, i));
+    acts.forEach(function (a, k) { a.hidden = k !== current; });
+    Array.prototype.forEach.call(dots.children, function (d, k) {
+      d.className = "dot" + (k === current ? " is-active" : (done[k] ? " is-done" : ""));
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.body.addEventListener("click", function (e) {
+    if (e.target.matches("[data-next]")) { done[current] = true; show(current + 1); }
+    if (e.target.matches("[data-prev]")) show(current - 1);
+  });
+
+  /* ---------- the half-adder, the REAL rules ----------
+     Sum   = A XOR B   (lights when the inputs differ)
+     Carry = A AND B   (lights only when both are on)
+     Truth table this must match exactly:
+       0+0 -> sum 0, carry 0  =  0
+       0+1 -> sum 1, carry 0  =  1
+       1+0 -> sum 1, carry 0  =  1
+       1+1 -> sum 0, carry 1  = 10  (binary for 2) */
+  var inA = document.getElementById("inA"), inB = document.getElementById("inB");
+  var wA = document.getElementById("wA"), wB = document.getElementById("wB");
+  var sumLamp = document.getElementById("sumLamp"), carryLamp = document.getElementById("carryLamp");
+  var aNum = document.getElementById("aNum"), bNum = document.getElementById("bNum");
+  var sumBit = document.getElementById("sumBit"), carryBit = document.getElementById("carryBit");
+  var resultDec = document.getElementById("resultDec");
+  var rollover = document.getElementById("rollover"), rollText = document.getElementById("rollText");
+
+  function compute() {
+    var a = inA.checked, b = inB.checked;
+    var sum = a !== b;       // XOR
+    var carry = a && b;      // AND
+    var aV = a ? 1 : 0, bV = b ? 1 : 0;
+    var sV = sum ? 1 : 0, cV = carry ? 1 : 0;
+    var total = aV + bV;     // 0, 1, or 2 -- read straight off the inputs
+
+    /* live wires */
+    wA.classList.toggle("hot", a);
+    wB.classList.toggle("hot", b);
+
+    /* output lamps, driven by the gate results */
+    sumLamp.classList.toggle("is-on", sum);
+    sumLamp.textContent = sV;
+    carryLamp.classList.toggle("is-on", carry);
+    carryLamp.textContent = cV;
+
+    /* the binary-math read-out */
+    aNum.textContent = aV;
+    bNum.textContent = bV;
+    sumBit.textContent = sV;
+    sumBit.classList.toggle("is-on", sum);
+    carryBit.textContent = cV;
+    carryBit.classList.toggle("is-on", carry);
+    resultDec.textContent = total;
+
+    /* the meaning line for each case */
+    if (total === 0) {
+      rollover.classList.remove("is-live");
+      rollText.innerHTML = "0 + 0 = 0. Both lamps stay dark. Sum is 0, carry is 0.";
+    } else if (total === 1) {
+      rollover.classList.remove("is-live");
+      rollText.innerHTML = aV + " + " + bV + " = 1. The Sum lamp lights, the Carry stays dark. " +
+        "Just a 1, no rollover yet.";
+    } else { /* total === 2, the 1+1 case: the aha */
+      rollover.classList.add("is-live");
+      rollText.innerHTML = "1 + 1 = <b>10</b>. That is binary for <b>2</b>: two ones roll over into a " +
+        "carry, exactly like 9 + 1 rolls over to 10 in our numbers. The Sum lamp goes dark and the " +
+        "<b>Carry</b> lamp lights.";
+      IdeaLab.award("adder-architect", 55);
+    }
+  }
+  inA.addEventListener("change", compute);
+  inB.addEventListener("change", compute);
+  compute();
+})();
+</script>
+</body>
+</html>

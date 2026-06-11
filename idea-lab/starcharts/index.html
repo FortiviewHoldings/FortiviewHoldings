@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Star Charts — Idea Lab</title>
+<meta name="description" content="Future jobs as constellations. What each one is, what to learn, and a lab to taste it right now. Free, no accounts.">
+<meta name="color-scheme" content="dark">
+<link rel="stylesheet" href="../assets/cosmos.css">
+<style>
+  .jobs{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(270px,1fr))}
+  .job{border:1px solid var(--border);border-radius:16px;background:var(--glass);padding:20px;
+    display:flex;flex-direction:column;gap:10px;overflow:hidden;position:relative;transition:.18s}
+  .job:hover{transform:translateY(-4px);border-color:#ffffff33;box-shadow:0 16px 40px #00000066}
+  .job__icon{font-size:30px}
+  .job h3{margin:0;font-size:1.18em}
+  .job .what{color:var(--muted);margin:0}
+  .job .learn{margin:0;padding:0;list-style:none;display:grid;gap:6px}
+  .job .learn li{display:flex;gap:8px;align-items:flex-start;font-size:.9em}
+  .job .learn li::before{content:"✦";color:var(--star);flex:0 0 auto}
+  .job .spacer{flex:1}
+  .job__glow{position:absolute;inset:auto -30% -50% auto;width:160px;height:160px;border-radius:50%;
+    filter:blur(40px);opacity:.4;pointer-events:none}
+</style>
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section">
+  <div id="il-disclose-mount"></div>
+
+  <header class="hero center">
+    <span class="kicker">✨ Star Charts</span>
+    <h1 style="font-size:clamp(30px,6vw,52px)">Jobs written<br><span class="accent">in the stars.</span></h1>
+    <p>Here is the map of where you could aim. Every one is real, every one is growing, and every one
+       has a first step you can take in the next five minutes. Pick a star and go.</p>
+  </header>
+
+  <section class="section">
+    <div class="jobs" id="jobs"></div>
+  </section>
+
+  <div class="card">
+    <h3>🌍 Why this matters</h3>
+    <p class="muted">The world runs on people who can build with technology, and it needs far more of
+       them than it has. Wherever you live, learning this opens doors that stay shut for people who
+       wait. You do not need to pick one today. You just need to start.</p>
+  </div>
+
+  <footer class="section center muted tiny">
+    <a href="../">← Star Map</a>
+  </footer>
+</main>
+
+<script src="../assets/manifest.js"></script>
+<script src="../assets/shell.js"></script>
+<script>
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("starcharts", "..");
+  IdeaLab.disclosure("il-disclose-mount");
+
+  var colors = ["#3ee0ff", "#7c5cff", "#ff6ea9", "#46e0a8", "#ffd76a", "#ffb454"];
+  var host = document.getElementById("jobs");
+  (IdeaLab.data.jobs || []).forEach(function (job, i) {
+    var learn = (job.learn || []).map(function (l) { return "<li>" + IdeaLab.esc(l) + "</li>"; }).join("");
+    var card = document.createElement("article");
+    card.className = "job";
+    card.innerHTML =
+      '<span class="job__glow" style="background:' + colors[i % colors.length] + '"></span>' +
+      '<span class="job__icon">' + (job.icon || "✦") + "</span>" +
+      "<h3>" + IdeaLab.esc(job.name) + "</h3>" +
+      '<p class="what">' + IdeaLab.esc(job.what) + "</p>" +
+      '<div class="tiny muted" style="font-weight:700;margin-top:2px">Learn</div>' +
+      '<ul class="learn">' + learn + "</ul>" +
+      '<div class="spacer"></div>' +
+      '<a class="btn btn--go tiny try" href="../' + job.tryHref + '">' + IdeaLab.esc(job.tryLabel) + " →</a>";
+    card.querySelector(".try").addEventListener("click", function () {
+      IdeaLab.award("stargazer", 20);
+    });
+    host.appendChild(card);
+  });
+</script>
+</body>
+</html>

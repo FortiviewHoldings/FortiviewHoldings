@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Where AI Learns — AI Wing — Idea Lab</title>
+<meta name="description" content="Feed a sorter examples and watch what happens when they are lopsided. See bias appear, then fix it by balancing the examples. Honest, kid-friendly. No accounts.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../../assets/logo.svg">
+<link rel="stylesheet" href="../../assets/cosmos.css">
+<style>
+  /* the two kinds of example the sorter learns from */
+  .kinds{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+  .kind{border:1px solid var(--border);border-radius:12px;background:var(--glass);padding:14px;text-align:center}
+  .kind h4{margin:0 0 4px;font-size:1.02em}
+  .kind p{margin:0;color:var(--muted);font-size:.84em}
+  .kind .ksym{font-size:34px;line-height:1}
+  .kind--cat{border-color:#ffb45455}
+  .kind--dog{border-color:#3ee0ff55}
+
+  /* the basket of examples the sorter has been given */
+  .basket{border:1px solid var(--border);border-radius:12px;background:#0a1020;padding:14px;margin-top:6px}
+  .basket__head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;
+    font-weight:700;font-size:.9em}
+  .basket__head .bcount{color:var(--muted);font-weight:600}
+  .tray{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;min-height:40px}
+  .ex{font-size:24px;line-height:1;width:34px;height:34px;border-radius:8px;display:grid;place-items:center;
+    background:#0e1530;border:1px solid var(--border);animation:pop .18s ease}
+  @keyframes pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+
+  /* the balance bar: how lopsided the basket is */
+  .balance{margin-top:12px}
+  .balance .blbl{display:flex;justify-content:space-between;font-size:.8em;color:var(--muted);font-weight:700;margin-bottom:5px}
+  .bbar{display:flex;height:16px;border-radius:8px;overflow:hidden;background:#ffffff14}
+  .bbar i{display:block;height:100%;transition:width .3s}
+  .bbar .bcat{background:var(--warn)}
+  .bbar .bdog{background:var(--plasma)}
+
+  .feedrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .feedbtn{flex:1;min-width:150px;justify-content:center}
+
+  /* the test bench: new items the sorter has never seen */
+  .bench{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-top:6px}
+  .testcard{border:1px solid var(--border);border-radius:12px;background:var(--glass);padding:14px;text-align:center}
+  .testcard .tsym{font-size:34px;line-height:1}
+  .testcard .ttruth{font-size:.78em;color:var(--muted);margin-top:4px}
+  .testcard .tguess{margin-top:10px;font-weight:800;font-size:.92em;min-height:1.3em}
+  .testcard.right{border-color:var(--good);background:#46e0a814}
+  .testcard.wrong{border-color:var(--bad);background:#ff6b6b18}
+  .testcard .tmark{font-size:.8em;font-weight:700;margin-top:4px}
+  .testcard.right .tmark{color:var(--good)}
+  .testcard.wrong .tmark{color:var(--bad)}
+
+  /* the readout: accuracy overall and per kind */
+  .readout{display:grid;gap:12px;margin-top:16px}
+  .scorebig{font-size:clamp(30px,7vw,46px);font-weight:800;line-height:1}
+  .perkind{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .pk{border:1px solid var(--border);border-radius:10px;background:var(--glass);padding:10px 12px}
+  .pk b{display:block;font-size:.82em;color:var(--muted)}
+  .pk .pkval{font-size:1.4em;font-weight:800}
+  .pk--bad{border-color:var(--bad)}
+  .pk--good{border-color:var(--good)}
+
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section lab">
+
+  <header class="center">
+    <span class="kicker">AI Wing · Level 1</span>
+    <h1 style="font-size:clamp(28px,5vw,46px);margin:.2em 0">Where AI Learns</h1>
+    <p class="muted">An AI only knows what you show it. Feed a sorter examples, then watch what happens
+       when the examples are lopsided.</p>
+  </header>
+
+  <div class="steps" id="dots" aria-hidden="true"></div>
+
+  <!-- ============ ACT 0: MEET THE SORTER ============ -->
+  <section class="act" data-act="0">
+    <h2>Meet the sorter</h2>
+    <p class="muted">This is a tiny sorter. Its only job is to look at a new picture and say one word:
+       cat or dog. It has never seen a single one yet. You are its teacher.</p>
+
+    <div class="kinds">
+      <div class="kind kind--cat"><div class="ksym" aria-hidden="true">🐱</div><h4>Cats</h4><p>pointy ears, whiskers</p></div>
+      <div class="kind kind--dog"><div class="ksym" aria-hidden="true">🐶</div><h4>Dogs</h4><p>floppy ears, big nose</p></div>
+    </div>
+
+    <div class="fact">
+      <span aria-hidden="true">📚</span>
+      <span><b>An AI learns from examples, not rules.</b> Nobody types in "a cat has pointy ears."
+      You show it labeled pictures, and it copies the patterns it sees. That means the examples you
+      pick become the whole world it knows.</span>
+    </div>
+
+    <div class="act__nav"><span></span>
+      <button class="btn btn--go" data-next>Next: teach it →</button>
+    </div>
+  </section>
+
+  <!-- ============ ACT 1: LOPSIDED TRAINING ============ -->
+  <section class="act" data-act="1" hidden>
+    <h2>Teach it (the easy, lazy way)</h2>
+    <p class="muted">In a hurry, you grab whatever pictures are closest. They happen to be mostly cats.
+       Feed the sorter, then test it on new animals it has never seen.</p>
+
+    <div class="basket">
+      <div class="basket__head">
+        <span>🧺 Examples the sorter has seen</span>
+        <span class="bcount" id="count1">0 cats · 0 dogs</span>
+      </div>
+      <div class="tray" id="tray1"></div>
+
+      <div class="balance">
+        <div class="blbl"><span>🐱 cats</span><span>dogs 🐶</span></div>
+        <div class="bbar"><i class="bcat" id="bar1cat" style="width:50%"></i><i class="bdog" id="bar1dog" style="width:50%"></i></div>
+      </div>
+
+      <div class="feedrow">
+        <button class="btn btn--ghost feedbtn" id="feed1cat" type="button">+ Add a cat 🐱</button>
+        <button class="btn btn--ghost feedbtn" id="feed1dog" type="button">+ Add a dog 🐶</button>
+      </div>
+      <p class="muted tiny" id="hint1" style="margin-top:10px">Tip: add a big pile of cats and only one or
+         two dogs, just like a rushed teacher would.</p>
+    </div>
+
+    <button class="btn btn--cosmic" id="test1" type="button" style="margin-top:16px" disabled>
+      Test it on new animals →</button>
+
+    <div id="result1" class="hidden">
+      <h3 style="margin-top:22px">How it did on new animals</h3>
+      <div class="bench" id="bench1"></div>
+
+      <div class="readout">
+        <div>
+          <div class="muted tiny" style="font-weight:700">Overall score</div>
+          <div class="scorebig" id="acc1">—</div>
+        </div>
+        <div class="perkind">
+          <div class="pk" id="pk1cat"><b>On cats 🐱</b><span class="pkval">—</span></div>
+          <div class="pk" id="pk1dog"><b>On dogs 🐶</b><span class="pkval">—</span></div>
+        </div>
+      </div>
+
+      <div class="fact" id="lesson1" style="margin-top:16px">
+        <span aria-hidden="true">⚖️</span>
+        <span><b>Look at the gap.</b> It is great at cats and bad at dogs. It is not broken, and it is not
+        mean. It just saw mostly cats, so "cat" became its safe guess. Lopsided examples make a lopsided
+        sorter. People have a real name for this: <b>bias</b>.</span>
+      </div>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" id="a1Next" data-next disabled>Next: fix it →</button>
+    </div>
+  </section>
+
+  <!-- ============ ACT 2: BALANCE IT ============ -->
+  <section class="act" data-act="2" hidden>
+    <h2>Fix it: balance the examples</h2>
+    <p class="muted">You cannot fix a sorter with a lecture. You fix it with better examples. Add dogs
+       until the basket is even, then test the very same animals again.</p>
+
+    <div class="basket">
+      <div class="basket__head">
+        <span>🧺 Examples the sorter has seen</span>
+        <span class="bcount" id="count2">0 cats · 0 dogs</span>
+      </div>
+      <div class="tray" id="tray2"></div>
+
+      <div class="balance">
+        <div class="blbl"><span>🐱 cats</span><span>dogs 🐶</span></div>
+        <div class="bbar"><i class="bcat" id="bar2cat" style="width:50%"></i><i class="bdog" id="bar2dog" style="width:50%"></i></div>
+      </div>
+
+      <div class="feedrow">
+        <button class="btn btn--ghost feedbtn" id="feed2cat" type="button">+ Add a cat 🐱</button>
+        <button class="btn btn--go feedbtn" id="feed2dog" type="button">+ Add a dog 🐶</button>
+      </div>
+      <p class="muted tiny" id="balanceMsg" style="margin-top:10px">Keep adding dogs until both sides are close to even.</p>
+    </div>
+
+    <button class="btn btn--cosmic" id="test2" type="button" style="margin-top:16px" disabled>
+      Test the same animals again →</button>
+
+    <div id="result2" class="hidden">
+      <h3 style="margin-top:22px">How it does now</h3>
+      <div class="bench" id="bench2"></div>
+
+      <div class="readout">
+        <div>
+          <div class="muted tiny" style="font-weight:700">Overall score</div>
+          <div class="scorebig" id="acc2">—</div>
+        </div>
+        <div class="perkind">
+          <div class="pk" id="pk2cat"><b>On cats 🐱</b><span class="pkval">—</span></div>
+          <div class="pk" id="pk2dog"><b>On dogs 🐶</b><span class="pkval">—</span></div>
+        </div>
+      </div>
+
+      <div class="fact hidden" id="lesson2" style="margin-top:16px">
+        <span aria-hidden="true">✨</span>
+        <span><b>Same sorter. Same animals. Fairer examples.</b> The dog score jumped, and the gap
+        closed. You did not make it smarter. You made its examples fair, and the sorter followed.</span>
+      </div>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" id="a2Next" data-next disabled>Last: the big idea →</button>
+    </div>
+  </section>
+
+  <!-- ============ ACT 3: WRAP ============ -->
+  <section class="act" data-act="3" hidden>
+    <h2>The big idea</h2>
+    <p class="muted">You just saw the most important rule in all of AI, and you saw it for real, not as
+       a slogan.</p>
+
+    <div class="card" style="margin:8px 0">
+      <h3>🧠 Carry these three</h3>
+      <p class="muted">1. An AI only learns what its examples show it. <br>
+         2. If the examples are lopsided or unfair, the AI will be too. That is called bias, and it is real. <br>
+         3. Garbage in, garbage out. Fair examples in, fairer results out.</p>
+    </div>
+
+    <div class="fact">
+      <span aria-hidden="true">⚖️</span>
+      <span><b>This matters in the real world.</b> Real AI sorts job forms, photos, and voices. When its
+      examples leave a group out, it gets that group wrong, the same way your sorter missed dogs. People
+      whose job is to build AI well spend a lot of time checking that the examples are fair.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <a class="btn btn--cosmic" href="../">Back to the AI Wing →</a>
+    </div>
+  </section>
+
+  <p class="center muted tiny" style="margin-top:26px">
+    <a href="../">← AI Wing</a> · the sorter here is a real, tiny model: it just counts which examples a
+    new animal looks most like.
+  </p>
+</main>
+
+<script src="../../assets/manifest.js"></script>
+<script src="../../assets/glossary.js"></script>
+<script src="../../assets/shell.js"></script>
+<script>
+(function () {
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("ai-wing", "../..");
+  IdeaLab.disclosure();
+  IdeaLab.glossary(window.IDEA_LAB_GLOSSARY);
+
+  /* ---------- stepper ---------- */
+  var acts = Array.prototype.slice.call(document.querySelectorAll(".act"));
+  var dots = document.getElementById("dots");
+  var done = [false, false, false, false];
+  var current = 0;
+  acts.forEach(function (_, i) {
+    var d = document.createElement("span");
+    d.className = "dot" + (i === 0 ? " is-active" : "");
+    dots.appendChild(d);
+  });
+  function show(i) {
+    current = Math.max(0, Math.min(acts.length - 1, i));
+    acts.forEach(function (a, k) { a.hidden = k !== current; });
+    Array.prototype.forEach.call(dots.children, function (d, k) {
+      d.className = "dot" + (k === current ? " is-active" : (done[k] ? " is-done" : ""));
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.body.addEventListener("click", function (e) {
+    if (e.target.matches("[data-next]") && !e.target.disabled) { done[current] = true; show(current + 1); }
+    if (e.target.matches("[data-prev]")) show(current - 1);
+  });
+
+  /* ============================================================
+     The honest little model.
+     Every animal is two plain numbers a kid could measure:
+       ears   = how pointy the ears are   (0 floppy ... 1 pointy)
+       size   = how big the nose/face is  (0 small  ... 1 big)
+     Cats lean pointy-ears + small-nose. Dogs lean floppy-ears + big-nose.
+     The sorter is a nearest-examples vote: for a new animal it finds the
+     3 closest examples it was TAUGHT and copies the most common label.
+     With lopsided examples, almost every "closest" example is the kind
+     it saw a lot of, so it guesses that kind. That is the whole bias.
+     No magic, no libraries, no eval. Just distance and counting.
+     ============================================================ */
+
+  // a small bank of training animals to draw from, each with true features
+  var CAT_BANK = [
+    { ears: 0.95, size: 0.20 }, { ears: 0.88, size: 0.28 }, { ears: 0.92, size: 0.18 },
+    { ears: 0.83, size: 0.30 }, { ears: 0.97, size: 0.25 }, { ears: 0.86, size: 0.22 },
+    { ears: 0.90, size: 0.15 }, { ears: 0.80, size: 0.34 }, { ears: 0.94, size: 0.27 },
+    { ears: 0.84, size: 0.19 }
+  ];
+  var DOG_BANK = [
+    { ears: 0.15, size: 0.85 }, { ears: 0.22, size: 0.78 }, { ears: 0.10, size: 0.90 },
+    { ears: 0.28, size: 0.72 }, { ears: 0.18, size: 0.88 }, { ears: 0.25, size: 0.80 },
+    { ears: 0.12, size: 0.92 }, { ears: 0.30, size: 0.70 }, { ears: 0.20, size: 0.83 },
+    { ears: 0.16, size: 0.86 }
+  ];
+
+  // brand new animals to TEST on (never added to training). 3 cats, 3 dogs,
+  // each a little ambiguous so lopsided training really tips the guess.
+  var TESTS = [
+    { sym: "🐱", truth: "cat", ears: 0.72, size: 0.38 },
+    { sym: "🐈", truth: "cat", ears: 0.78, size: 0.30 },
+    { sym: "🐈‍⬛", truth: "cat", ears: 0.66, size: 0.42 },
+    { sym: "🐶", truth: "dog", ears: 0.34, size: 0.64 },
+    { sym: "🐕", truth: "dog", ears: 0.40, size: 0.60 },
+    { sym: "🐩", truth: "dog", ears: 0.30, size: 0.68 }
+  ];
+
+  function dist(a, b) {
+    var de = a.ears - b.ears, ds = a.size - b.size;
+    return Math.sqrt(de * de + ds * ds);
+  }
+  // nearest-3 vote over whatever examples the sorter has been given
+  function classify(item, examples) {
+    if (!examples.length) return "cat"; // knows nothing yet, just shrugs
+    var scored = examples.map(function (ex) { return { label: ex.label, d: dist(item, ex) }; });
+    scored.sort(function (x, y) { return x.d - y.d; });
+    var k = Math.min(3, scored.length), cats = 0, dogs = 0, i;
+    for (i = 0; i < k; i++) { if (scored[i].label === "cat") cats++; else dogs++; }
+    return cats >= dogs ? "cat" : "dog";
+  }
+
+  /* ---------- a reusable trainer for an act ---------- */
+  function buildTrainer(cfg) {
+    var examples = [];            // what the sorter has been taught
+    var nCat = 0, nDog = 0;
+    var tray = document.getElementById(cfg.tray);
+    var count = document.getElementById(cfg.count);
+    var barCat = document.getElementById(cfg.barCat);
+    var barDog = document.getElementById(cfg.barDog);
+    var testBtn = document.getElementById(cfg.testBtn);
+
+    function refresh() {
+      count.textContent = nCat + (nCat === 1 ? " cat · " : " cats · ") + nDog + (nDog === 1 ? " dog" : " dogs");
+      var total = nCat + nDog || 1;
+      barCat.style.width = (nCat / total * 100) + "%";
+      barDog.style.width = (nDog / total * 100) + "%";
+      testBtn.disabled = (nCat + nDog) < 2;
+      if (cfg.onChange) cfg.onChange(nCat, nDog);
+    }
+    function addOne(label) {
+      var bank = label === "cat" ? CAT_BANK : DOG_BANK;
+      var pick = bank[(label === "cat" ? nCat : nDog) % bank.length];
+      examples.push({ label: label, ears: pick.ears, size: pick.size });
+      var chip = document.createElement("span");
+      chip.className = "ex";
+      chip.textContent = label === "cat" ? "🐱" : "🐶";
+      tray.appendChild(chip);
+      if (label === "cat") nCat++; else nDog++;
+      refresh();
+    }
+    document.getElementById(cfg.addCat).addEventListener("click", function () { addOne("cat"); });
+    document.getElementById(cfg.addDog).addEventListener("click", function () { addOne("dog"); });
+    refresh();
+
+    return {
+      examples: function () { return examples; },
+      counts: function () { return { cat: nCat, dog: nDog }; }
+    };
+  }
+
+  /* ---------- run the test bench and fill the readout ---------- */
+  function runTest(examples, benchId, accId, pkCatId, pkDogId) {
+    var bench = document.getElementById(benchId);
+    bench.innerHTML = "";
+    var rightAll = 0, rightCat = 0, totCat = 0, rightDog = 0, totDog = 0;
+
+    TESTS.forEach(function (t) {
+      var guess = classify(t, examples);
+      var ok = guess === t.truth;
+      if (ok) rightAll++;
+      if (t.truth === "cat") { totCat++; if (ok) rightCat++; }
+      else { totDog++; if (ok) rightDog++; }
+
+      var card = document.createElement("div");
+      card.className = "testcard " + (ok ? "right" : "wrong");
+      card.innerHTML =
+        '<div class="tsym" aria-hidden="true">' + t.sym + "</div>" +
+        '<div class="ttruth">really a ' + t.truth + "</div>" +
+        '<div class="tguess">Sorter says: ' + guess + "</div>" +
+        '<div class="tmark">' + (ok ? "✓ right" : "✗ wrong") + "</div>";
+      bench.appendChild(card);
+    });
+
+    var pct = Math.round(rightAll / TESTS.length * 100);
+    document.getElementById(accId).textContent = rightAll + " of " + TESTS.length + " right · " + pct + "%";
+
+    var pkCat = document.getElementById(pkCatId), pkDog = document.getElementById(pkDogId);
+    pkCat.querySelector(".pkval").textContent = rightCat + "/" + totCat;
+    pkDog.querySelector(".pkval").textContent = rightDog + "/" + totDog;
+    pkCat.className = "pk " + (rightCat === totCat ? "pk--good" : "pk--bad");
+    pkDog.className = "pk " + (rightDog === totDog ? "pk--good" : "pk--bad");
+
+    return { pct: pct, rightDog: rightDog, totDog: totDog, rightCat: rightCat };
+  }
+
+  /* ============ ACT 1: lopsided ============ */
+  var hint1 = document.getElementById("hint1");
+  var t1 = buildTrainer({
+    tray: "tray1", count: "count1", barCat: "bar1cat", barDog: "bar1dog",
+    addCat: "feed1cat", addDog: "feed1dog", testBtn: "test1",
+    onChange: function (c, d) {
+      if (c >= 5 && d <= 1) hint1.textContent = "That basket is very lopsided. Now press test and see what the sorter does.";
+      else if (c + d >= 2) hint1.textContent = "Good. You can test now, but a lopsided basket makes the lesson clearer.";
+    }
+  });
+
+  var act1Result = null;
+  document.getElementById("test1").addEventListener("click", function () {
+    document.getElementById("result1").classList.remove("hidden");
+    act1Result = runTest(t1.examples(), "bench1", "acc1", "pk1cat", "pk1dog");
+    document.getElementById("a1Next").disabled = false;
+    document.getElementById("a1Next").scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+
+  /* ============ ACT 2: balance it ============ */
+  var balanceMsg = document.getElementById("balanceMsg");
+  var t2 = buildTrainer({
+    tray: "tray2", count: "count2", barCat: "bar2cat", barDog: "bar2dog",
+    addCat: "feed2cat", addDog: "feed2dog", testBtn: "test2",
+    onChange: function (c, d) {
+      var gap = Math.abs(c - d);
+      if (c + d < 4) balanceMsg.textContent = "Keep adding dogs until both sides are close to even.";
+      else if (gap <= 1) balanceMsg.textContent = "Nicely balanced. Now test the same animals again.";
+      else if (d < c) balanceMsg.textContent = "Getting closer. Add a few more dogs to even it out.";
+      else balanceMsg.textContent = "Plenty of both kinds now. Test when you are ready.";
+    }
+  });
+
+  // seed act 2 so the kid starts from the SAME lopsided basket they made,
+  // then fixes it. We pre-load a lopsided start (5 cats, 1 dog) visually
+  // by simulating clicks, so balancing is the action they take here.
+  (function seedAct2() {
+    var feedCat = document.getElementById("feed2cat"), feedDog = document.getElementById("feed2dog");
+    var i;
+    for (i = 0; i < 5; i++) feedCat.click();
+    feedDog.click();
+    balanceMsg.textContent = "This is the lopsided basket from before: 5 cats, 1 dog. Add dogs to balance it.";
+  })();
+
+  document.getElementById("test2").addEventListener("click", function () {
+    document.getElementById("result2").classList.remove("hidden");
+    var r = runTest(t2.examples(), "bench2", "acc2", "pk2cat", "pk2dog");
+    document.getElementById("a2Next").disabled = false;
+
+    var counts = t2.counts();
+    var balanced = Math.abs(counts.cat - counts.dog) <= 1 && counts.dog >= 3;
+    var improvedDogs = act1Result ? (r.rightDog > act1Result.rightDog) : (r.rightDog >= 2);
+
+    if (balanced && improvedDogs) {
+      document.getElementById("lesson2").classList.remove("hidden");
+      IdeaLab.award("fair-mind", 50);
+    } else if (!balanced) {
+      balanceMsg.textContent = "The basket is still lopsided. Add dogs until both sides are even, then test again.";
+    }
+    document.getElementById("test2").scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+})();
+</script>
+</body>
+</html>

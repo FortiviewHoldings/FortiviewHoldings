@@ -1,0 +1,310 @@
+/* ============================================================
+   Idea Lab :: cosmos.css
+   One theme for the whole subsystem. Built on the Fortiview
+   site tokens so the Idea Lab belongs here, not bolted on.
+   No build step. Plain CSS. Mobile first. Kind to small hands.
+   ============================================================ */
+
+:root{
+  /* inherited from the main site so we match the family */
+  --bg-deep:#04060d;
+  --bg-accent:#101625;
+  --glass:#ffffff10;
+  --glass-strong:#ffffff18;
+  --border:#ffffff1f;
+  --ink:#eaf0ff;
+  --muted:#aeb9e0;
+  --brand:#1ca490;
+  --brand-600:#21bca5;
+
+  /* cosmic accents added for the lab */
+  --nebula:#7c5cff;     /* violet */
+  --plasma:#3ee0ff;     /* cyan */
+  --star:#ffd76a;       /* gold */
+  --rose:#ff6ea9;       /* nebula pink */
+  --good:#46e0a8;
+  --warn:#ffb454;
+  --bad:#ff6b6b;
+
+  --radius:18px;
+  --radius-sm:12px;
+  --maxw:1120px;
+  --aura:0 6px 24px rgba(17,76,67,.45);
+  --grad-deep:radial-gradient(1200px 800px at 70% -10%, #131a36 0%, #070b18 45%, #04060d 100%);
+  --grad-brand:linear-gradient(180deg,#21bca5,#1ca490);
+  --grad-cosmic:linear-gradient(120deg,#3ee0ff 0%,#7c5cff 55%,#ff6ea9 100%);
+
+  --fs-step:clamp(15px,1vw + 13px,18px);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  min-height:100vh;
+  color:var(--ink);
+  background:var(--grad-deep) fixed;
+  font:var(--fs-step)/1.6 ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+
+/* starfield canvas sits behind everything */
+#il-stars{position:fixed;inset:0;z-index:-2;display:block}
+body::before{ /* soft vignette */
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(120% 80% at 50% 0%, transparent 60%, #04060db0 100%);
+}
+
+a{color:var(--plasma);text-decoration:none}
+a:hover{text-decoration:underline}
+img{max-width:100%}
+
+/* ---------- layout ---------- */
+.wrap{width:min(var(--maxw),92vw);margin-inline:auto}
+.section{padding:clamp(28px,5vw,64px) 0}
+.center{text-align:center}
+.stack > * + *{margin-top:14px}
+
+/* ---------- global nav (built once in shell.js) ---------- */
+.il-nav{
+  position:sticky;top:0;z-index:50;
+  backdrop-filter:blur(14px);
+  background:linear-gradient(180deg,#070b18e6,#070b1899);
+  border-bottom:1px solid var(--border);
+}
+.il-nav__inner{display:flex;align-items:center;gap:14px;padding:10px 0}
+.il-nav__brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.3px;color:var(--ink);white-space:nowrap;flex:0 0 auto}
+.il-nav__brand:hover{text-decoration:none}
+.il-nav__spark{width:26px;height:26px;border-radius:50%;
+  background:var(--grad-cosmic);box-shadow:0 0 16px var(--plasma);flex:0 0 auto}
+.il-nav__logo{width:28px;height:28px;display:block;flex:0 0 auto;
+  filter:drop-shadow(0 2px 6px #3ee0ff66)}
+.il-nav__links{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+.il-nav__links a{
+  color:var(--muted);padding:7px 12px;border-radius:999px;font-weight:600;font-size:.92em;
+  border:1px solid transparent;
+}
+.il-nav__links a:hover{color:var(--ink);background:var(--glass);text-decoration:none}
+.il-nav__links a[aria-current="page"]{color:#04060d;background:var(--grad-brand)}
+.il-nav__rank{display:flex;align-items:center;gap:8px;font-size:.85em;color:var(--muted);
+  padding-left:6px;border-left:1px solid var(--border);margin-left:4px}
+.il-nav__rank b{color:var(--star)}
+
+/* ---------- disclosure banner ---------- */
+.il-disclose{
+  border:1px solid var(--border);background:var(--glass);
+  border-radius:var(--radius-sm);padding:10px 14px;display:flex;gap:10px;align-items:center;
+  font-size:.88em;color:var(--muted)
+}
+.il-disclose b{color:var(--ink)}
+.il-disclose button{margin-left:auto;flex:0 0 auto}
+
+/* ---------- hero ---------- */
+.hero{padding:clamp(36px,8vw,90px) 0 clamp(20px,4vw,40px)}
+.hero h1{
+  font-size:clamp(34px,7vw,68px);line-height:1.02;margin:.2em 0;font-weight:800;letter-spacing:-.5px;
+}
+.hero .accent{
+  background:var(--grad-cosmic);-webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.hero p{font-size:clamp(16px,2.4vw,22px);color:var(--muted);max-width:60ch;margin:0 auto}
+.kicker{display:inline-flex;align-items:center;gap:8px;color:var(--plasma);font-weight:700;
+  text-transform:uppercase;letter-spacing:.18em;font-size:.74em}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;gap:9px;cursor:pointer;
+  font:inherit;font-weight:700;padding:13px 22px;border-radius:999px;
+  border:1px solid var(--border);background:var(--glass);color:var(--ink);
+  transition:transform .12s ease, box-shadow .2s ease, background .2s ease;
+  min-height:48px; /* generous tap target */
+}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:translateY(0)}
+.btn:focus-visible{outline:3px solid var(--plasma);outline-offset:2px}
+.btn--go{background:var(--grad-brand);color:#04060d;border-color:transparent;box-shadow:var(--aura)}
+.btn--cosmic{background:var(--grad-cosmic);color:#04060d;border-color:transparent}
+.btn--ghost{background:transparent}
+.btn[disabled]{opacity:.5;cursor:not-allowed;transform:none}
+
+/* ---------- cards / star map ---------- */
+.grid{display:grid;gap:18px}
+.grid--wings{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.card{
+  position:relative;border:1px solid var(--border);border-radius:var(--radius);
+  background:var(--glass);padding:22px;overflow:hidden;
+  transition:transform .15s ease, box-shadow .25s ease, border-color .25s ease;
+}
+.card:hover{transform:translateY(-4px);border-color:#ffffff33;
+  box-shadow:0 0 0 1px #ffffff14, 0 16px 40px #00000066}
+.card__icon{font-size:30px;line-height:1;display:block}
+.card h3{margin:.5em 0 .2em;font-size:1.18em}
+.card p{color:var(--muted);margin:0}
+.card__glow{position:absolute;inset:auto -40% -60% auto;width:200px;height:200px;border-radius:50%;
+  filter:blur(40px);opacity:.5;pointer-events:none}
+.card--wing{cursor:pointer}
+.card--locked{opacity:.72}
+.card--locked:hover{transform:none}
+
+/* status pills */
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:.72em;font-weight:700;
+  padding:4px 10px;border-radius:999px;letter-spacing:.06em;text-transform:uppercase}
+.pill--live{background:#1ca49033;color:var(--brand-600);border:1px solid #21bca555}
+.pill--soon{background:#7c5cff22;color:#b9a8ff;border:1px solid #7c5cff55}
+
+/* ---------- lab stepper ---------- */
+.lab{max-width:860px;margin-inline:auto}
+.steps{display:flex;gap:8px;justify-content:center;margin:18px 0;flex-wrap:wrap}
+.dot{width:11px;height:11px;border-radius:50%;background:#ffffff22;transition:.2s}
+.dot.is-active{background:var(--grad-cosmic);box-shadow:0 0 10px var(--plasma);transform:scale(1.25)}
+.dot.is-done{background:var(--brand-600)}
+.act{
+  border:1px solid var(--border);border-radius:var(--radius);background:var(--glass);
+  padding:clamp(18px,4vw,34px);
+}
+.act h2{margin-top:0;font-size:clamp(22px,4vw,32px)}
+.act__nav{display:flex;justify-content:space-between;gap:12px;margin-top:22px}
+.muted{color:var(--muted)}
+.big{font-size:clamp(20px,3vw,26px)}
+.tiny{font-size:.82em}
+.ok{color:var(--good)}
+.no{color:var(--bad)}
+
+/* fact chip: a one line truth under an interaction */
+.fact{display:flex;gap:10px;align-items:flex-start;border-left:3px solid var(--brand-600);
+  background:#0c142880;padding:10px 14px;border-radius:8px;color:var(--muted)}
+.fact b{color:var(--ink)}
+
+/* badge toast */
+.toast{
+  position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(140%);
+  background:var(--grad-cosmic);color:#04060d;font-weight:800;padding:14px 22px;border-radius:999px;
+  box-shadow:0 12px 40px #000a;z-index:80;transition:transform .4s cubic-bezier(.2,1.4,.3,1);
+  display:flex;align-items:center;gap:10px
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* badge shelf */
+.shelf{display:flex;gap:10px;flex-wrap:wrap}
+.badge{display:flex;align-items:center;gap:8px;border:1px solid var(--border);background:var(--glass);
+  border-radius:999px;padding:7px 14px;font-weight:700;font-size:.86em}
+.badge--locked{opacity:.4;filter:grayscale(1)}
+.badge .b-ico{font-size:1.1em}
+
+/* ---------- track ladder (a wing's progressive modules) ---------- */
+.track-prog{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.track-prog .bar{flex:1;min-width:160px;height:12px;border-radius:8px;background:#ffffff14;overflow:hidden}
+.track-prog .bar > i{display:block;height:100%;background:var(--grad-brand);width:0;transition:width .4s}
+.level{margin-top:26px}
+.level__head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--border);
+  padding-bottom:8px;margin-bottom:14px}
+.level__name{font-weight:800;font-size:1.12em}
+.level__sub{color:var(--muted);font-size:.9em}
+.modlist{display:grid;gap:12px}
+.mod{display:flex;gap:14px;align-items:center;border:1px solid var(--border);border-radius:14px;
+  background:var(--glass);padding:14px 16px;transition:transform .15s ease,border-color .2s ease,box-shadow .2s ease}
+.mod--live{cursor:pointer}
+.mod--live:hover{transform:translateY(-2px);border-color:#ffffff33;box-shadow:0 12px 30px #0005}
+.mod--soon{opacity:.6}
+.mod--done{border-color:#21bca555;background:#1ca4900f}
+.mod--next{border-color:var(--plasma);box-shadow:0 0 0 1px var(--plasma)}
+.mod__ico{font-size:24px;width:46px;height:46px;border-radius:12px;background:#0e1530;border:1px solid var(--border);
+  display:grid;place-items:center;flex:0 0 auto}
+.mod--done .mod__ico{background:#1ca49022;border-color:#21bca555}
+.mod__body{flex:1;min-width:0}
+.mod__body h4{margin:0;font-size:1.04em}
+.mod__body p{margin:.2em 0 0;color:var(--muted);font-size:.88em}
+.mod__status{flex:0 0 auto;font-size:.72em;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+  padding:5px 11px;border-radius:999px}
+.st-done{background:#1ca49033;color:var(--brand-600);border:1px solid #21bca555}
+.st-next{background:var(--grad-cosmic);color:#04060d}
+.st-open{background:#3ee0ff22;color:var(--plasma);border:1px solid #3ee0ff55}
+.st-soon{background:#7c5cff22;color:#b9a8ff;border:1px solid #7c5cff44}
+
+/* ---------- clickable glossary terms + definition card ---------- */
+.term{display:inline;border:0;background:none;padding:0;margin:0;font:inherit;color:var(--plasma);
+  font-weight:700;cursor:pointer;border-bottom:1px dashed var(--plasma)}
+.term:hover{color:var(--ink);border-bottom-color:var(--ink)}
+.wordbank{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.wordbank .lbl{font-size:.8em;color:var(--muted);font-weight:700}
+.wordchip{font:inherit;font-size:.85em;font-weight:700;color:var(--plasma);background:#0c142880;
+  border:1px solid var(--border);border-radius:999px;padding:6px 12px;cursor:pointer}
+.wordchip:hover{color:#04060d;background:var(--plasma);border-color:transparent}
+.il-modal{position:fixed;inset:0;z-index:90;display:none;place-items:center;padding:18px;
+  background:#04060dcc;backdrop-filter:blur(5px)}
+.il-modal.open{display:grid}
+.il-modal__card{max-width:540px;width:100%;border:1px solid var(--border);border-radius:var(--radius);
+  background:#0c1428;padding:24px;box-shadow:0 30px 80px #000b}
+.il-modal__card h3{margin:.1em 0 .45em;font-size:1.35em}
+.il-modal__short{font-weight:700;color:var(--ink);margin:0 0 12px}
+.il-modal__deep{color:var(--muted);margin:0 0 16px;line-height:1.6}
+.il-modal__foot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.il-modal__src{font-size:.8em;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.il-modal__src a{color:var(--plasma)}
+
+/* ---------- the zoom dial (Foundry act 1) ---------- */
+.zoom{position:relative;height:clamp(260px,42vw,360px);border-radius:var(--radius);overflow:hidden;
+  border:1px solid var(--border);background:#03050c;display:grid;place-items:center}
+.zoom__scene{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:12px;opacity:0;transition:opacity .4s;text-align:center;padding:20px 22px 26px}
+.zoom__scene.is-on{opacity:1}
+.zoom__orb{font-size:clamp(64px,13vw,118px);line-height:1;filter:drop-shadow(0 0 30px #3ee0ff66)}
+.zoom__label{color:var(--ink);font-weight:800;font-size:clamp(16px,3vw,22px);line-height:1.2;
+  text-shadow:0 2px 14px #000c}
+.zoom__sub{display:block;color:var(--muted);font-size:.66em;font-weight:600;margin-top:5px;
+  line-height:1.35;text-shadow:0 2px 12px #000c}
+.range{width:100%;accent-color:var(--plasma);height:36px;cursor:pointer}
+.scale-row{display:flex;justify-content:space-between;color:var(--muted);font-size:.78em;margin-top:6px}
+
+/* ---------- refine pipeline (act 2) ---------- */
+.pipe{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px}
+.pipe__step{border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--glass);
+  padding:14px;text-align:center;opacity:.45;transition:.3s;cursor:pointer}
+.pipe__step.is-on{opacity:1;border-color:var(--brand-600);box-shadow:0 0 0 1px var(--brand-600)}
+.pipe__step .ico{font-size:30px;display:block}
+.pipe__step b{display:block;margin-top:6px}
+.pipe__step small{color:var(--muted)}
+
+/* ---------- transistor switch (act 3) ---------- */
+.switchbox{display:grid;grid-template-columns:1fr;gap:18px;align-items:center;text-align:center}
+.lamp{width:96px;height:96px;border-radius:50%;margin:0 auto;border:2px solid var(--border);
+  background:#0a0f1f;display:grid;place-items:center;font-size:40px;transition:.2s}
+.lamp.is-on{background:radial-gradient(circle,#fff6c0,#ffd76a 60%,#a9810f);
+  box-shadow:0 0 40px #ffd76a,0 0 80px #ffd76a88;border-color:#ffd76a}
+.toggle{display:inline-flex;align-items:center;gap:12px;cursor:pointer;user-select:none;font-weight:700}
+.toggle input{width:0;height:0;opacity:0;position:absolute}
+.track{width:64px;height:34px;border-radius:999px;background:#ffffff22;position:relative;transition:.2s}
+.track::after{content:"";position:absolute;top:3px;left:3px;width:28px;height:28px;border-radius:50%;
+  background:#fff;transition:.2s}
+.toggle input:checked + .track{background:var(--grad-brand)}
+.toggle input:checked + .track::after{left:33px}
+.toggle input:focus-visible + .track{outline:3px solid var(--plasma);outline-offset:2px}
+
+/* ---------- logic gate puzzle (act 4) ---------- */
+.gate{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center}
+.gate__inputs{display:flex;flex-direction:column;gap:14px}
+.gate__core{border:1px solid var(--border);border-radius:var(--radius);background:var(--glass);
+  padding:18px;text-align:center}
+.gate__pick{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:10px}
+.chip{padding:8px 14px;border-radius:999px;border:1px solid var(--border);background:var(--glass);
+  cursor:pointer;font-weight:700}
+.chip.is-sel{background:var(--grad-cosmic);color:#04060d;border-color:transparent}
+.wire{height:4px;border-radius:2px;background:#ffffff22;transition:.2s}
+.wire.hot{background:var(--star);box-shadow:0 0 10px var(--star)}
+
+/* ---------- responsive ---------- */
+@media (max-width:640px){
+  .il-nav__rank{display:none}
+  .gate{grid-template-columns:1fr;text-align:center}
+  .act__nav .btn{padding:12px 16px}
+}
+
+/* ---------- motion safety ---------- */
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *{animation:none !important;transition:none !important}
+}
+
+/* focus visibility everywhere */
+:focus-visible{outline:3px solid var(--plasma);outline-offset:2px;border-radius:6px}

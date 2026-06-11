@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Defense Range — Idea Lab</title>
+<meta name="description" content="Safe, sandboxed cybersecurity labs for kids. See how attackers think, then learn the real fix. No accounts, no risk, all pretend targets.">
+<meta name="color-scheme" content="dark">
+<link rel="stylesheet" href="../assets/cosmos.css">
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section">
+  <div id="il-disclose-mount"></div>
+
+  <header class="hero center">
+    <span class="kicker">🛡️ Defense Range</span>
+    <h1 style="font-size:clamp(30px,6vw,52px)">Find the loophole.<br><span class="accent">Close it.</span></h1>
+    <p>Every lab here is a pretend target inside a locked sandbox. You get to think like an attacker
+       for a minute, on purpose, so you learn the one thing that actually stops them. Nothing you do
+       can reach a real website.</p>
+  </header>
+
+  <section class="section">
+    <div id="track"></div>
+  </section>
+
+  <div class="card" style="margin-top:10px">
+    <h3>🔒 The one rule of this range</h3>
+    <p class="muted">We only show tricks that are already well known and already have a fix. You will
+       never learn how to harm a real person or a real site here. You will learn how to protect one.</p>
+  </div>
+
+  <footer class="section center muted tiny">
+    <a href="../">← Star Map</a>
+  </footer>
+</main>
+
+<script src="../assets/manifest.js"></script>
+<script src="../assets/shell.js"></script>
+<script>
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("defense", "..");
+  IdeaLab.disclosure("il-disclose-mount");
+  IdeaLab.renderTrack("defense", "#track");
+</script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Signal Scaling Calculator (4-20 mA ↔ Engineering Units) | Field Pocket Guide</title>
+  <meta name="description" content="Two-way linear signal scaling. Map any input span to any output span, mA to engineering units and back, with percent of span shown live. Plus a 5-point reference table.">
+  <meta name="color-scheme" content="dark" />
+  <link rel="canonical" href="https://fortiviewholdings.com/education/scaling/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Signal Scaling Calculator — Field Pocket Guide">
+  <meta property="og:description" content="4-20 mA to engineering units and back, with percent of span.">
+  <meta property="og:image" content="https://fortiviewholdings.com/images/social-preview.png">
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" href="/images/favicon.png" sizes="192x192">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/fortiview.css">
+  <link rel="stylesheet" href="/education/assets/pocketguide.css">
+</head>
+<body>
+<main class="pg-main">
+  <div class="pg-wrap--wide pg-wrap">
+
+    <header class="pg-head">
+      <a class="pg-back" href="/education/">Field Pocket Guide</a>
+      <h1 class="fv-h2">Signal Scaling</h1>
+      <p class="fv-lead">The straight-line relationship every transmitter lives on. Enter either side and read the other, with percent of span between them. This is the ideal-output side of a calibration: what the loop should do as the input moves.</p>
+    </header>
+
+    <section class="pg-tool">
+      <h2 class="pg-tool__title"><span class="pg-dot"></span> Ranges</h2>
+      <div class="pg-grid pg-grid--4">
+        <div class="pg-field"><label class="pg-field__label" for="inLo">Input LRV</label><div class="pg-inwrap"><input class="pg-num" id="inLo" value="0"><button class="pg-sign" type="button" data-sign="#inLo">±</button></div></div>
+        <div class="pg-field"><label class="pg-field__label" for="inHi">Input URV</label><div class="pg-inwrap"><input class="pg-num" id="inHi" value="100"><button class="pg-sign" type="button" data-sign="#inHi">±</button></div></div>
+        <div class="pg-field"><label class="pg-field__label" for="inUnit">Input units</label><div class="pg-inwrap"><input id="inUnit" value="°C" inputmode="text" style="font-family:var(--mono);color:var(--ink);background:rgba(8,12,22,.6);border:1px solid var(--glass-border);border-radius:var(--radius);padding:.7em .8em;min-height:48px;width:100%"></div></div>
+        <div class="pg-field"><label class="pg-field__label">Direction</label>
+          <div class="pg-seg pg-seg--block" id="dirSeg" role="group">
+            <button type="button" data-d="i2o" class="is-on">In → Out</button>
+            <button type="button" data-d="o2i">Out → In</button>
+          </div>
+        </div>
+        <div class="pg-field"><label class="pg-field__label" for="outLo">Output LRV</label><div class="pg-inwrap"><input class="pg-num" id="outLo" value="4"><button class="pg-sign" type="button" data-sign="#outLo">±</button></div></div>
+        <div class="pg-field"><label class="pg-field__label" for="outHi">Output URV</label><div class="pg-inwrap"><input class="pg-num" id="outHi" value="20"><button class="pg-sign" type="button" data-sign="#outHi">±</button></div></div>
+        <div class="pg-field"><label class="pg-field__label" for="outUnit">Output units</label><div class="pg-inwrap"><input id="outUnit" value="mA" inputmode="text" style="font-family:var(--mono);color:var(--ink);background:rgba(8,12,22,.6);border:1px solid var(--glass-border);border-radius:var(--radius);padding:.7em .8em;min-height:48px;width:100%"></div></div>
+        <div class="pg-field"><label class="pg-field__label" id="valLabel" for="valIn">Value in</label><div class="pg-inwrap"><input class="pg-num" id="valIn" value="50"><button class="pg-sign" type="button" data-sign="#valIn">±</button></div></div>
+      </div>
+
+      <hr class="pg-rule">
+      <div class="pg-readouts">
+        <div class="pg-readout"><div class="pg-readout__k" id="resK">Output</div><div class="pg-out is-good" id="resV"><span>—</span><span class="pg-out__u" id="resU">mA</span></div></div>
+        <div class="pg-readout"><div class="pg-readout__k">Percent of span</div><div class="pg-out" style="font-size:1.5rem" id="resPct"><span>—</span><span class="pg-out__u">%</span></div></div>
+      </div>
+    </section>
+
+    <section class="pg-tool">
+      <h2 class="pg-tool__title"><span class="pg-dot"></span> Five-point reference</h2>
+      <div class="pg-table-wrap">
+        <table class="pg-table">
+          <thead><tr><th>%</th><th id="rfIn">Input</th><th id="rfOut">Output</th></tr></thead>
+          <tbody id="refBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+</main>
+<script src="/education/assets/pocketguide.js"></script>
+<script>
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var dir = "i2o";
+  function cfg() {
+    return {
+      inLo: PG.num($("#inLo").value), inHi: PG.num($("#inHi").value),
+      outLo: PG.num($("#outLo").value), outHi: PG.num($("#outHi").value),
+      inU: $("#inUnit").value || "", outU: $("#outUnit").value || "",
+      val: PG.num($("#valIn").value)
+    };
+  }
+  function compute() {
+    var c = cfg();
+    $("#valLabel").textContent = dir === "i2o" ? "Input value" : "Output value";
+    var res, pct;
+    if (dir === "i2o") { res = PG.scale(c.val, c.inLo, c.inHi, c.outLo, c.outHi); pct = PG.pctSpan(c.val, c.inLo, c.inHi); $("#resK").textContent = "Output"; $("#resU").textContent = c.outU; }
+    else { res = PG.scale(c.val, c.outLo, c.outHi, c.inLo, c.inHi); pct = PG.pctSpan(c.val, c.outLo, c.outHi); $("#resK").textContent = "Input"; $("#resU").textContent = c.inU; }
+    $("#resV").querySelector("span").textContent = PG.ok(res) ? PG.fmt(res, 4) : "—";
+    $("#resPct").querySelector("span").textContent = PG.ok(pct) ? PG.fmt(pct, 2) : "—";
+    $("#rfIn").textContent = "Input" + (c.inU ? " (" + c.inU + ")" : "");
+    $("#rfOut").textContent = "Output" + (c.outU ? " (" + c.outU + ")" : "");
+    var html = "";
+    [0, 25, 50, 75, 100].forEach(function (p) {
+      var ie = PG.fromPct(p, c.inLo, c.inHi), oe = PG.fromPct(p, c.outLo, c.outHi);
+      html += "<tr><td class='is-strong'>" + p + "%</td><td>" + (PG.ok(ie) ? PG.fmtTrim(ie, 4) : "—") + "</td><td>" + (PG.ok(oe) ? PG.fmtTrim(oe, 4) : "—") + "</td></tr>";
+    });
+    $("#refBody").innerHTML = html;
+  }
+  $("#dirSeg").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-d]"); if (!b) return;
+    dir = b.dataset.d;
+    $("#dirSeg").querySelectorAll("button").forEach(function (x) { x.classList.toggle("is-on", x === b); });
+    compute();
+  });
+  document.addEventListener("input", compute);
+  if (document.readyState !== "loading") compute(); else document.addEventListener("DOMContentLoaded", compute);
+})();
+</script>
+<script src="/assets/fortiview.js"></script>
+</body>
+</html>

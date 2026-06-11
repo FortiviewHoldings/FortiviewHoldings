@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Real or Made? — AI Wing — Idea Lab</title>
+<meta name="description" content="See how AI guesses the next word, why fakes fool your eyes, and the one habit that beats them. Honest, current, kid-friendly. No accounts.">
+<meta name="color-scheme" content="dark">
+<link rel="stylesheet" href="../../assets/cosmos.css">
+<style>
+  .sentence{font-size:1.15em;font-weight:700;min-height:2.4em;background:#0a1020;
+    border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;line-height:1.5}
+  .sentence .blank{color:var(--nebula)}
+  .panel-label{font-size:.78em;color:var(--muted);margin:14px 0 8px;font-weight:700}
+  .guesses{display:grid;gap:10px}
+  .guess{display:grid;grid-template-columns:84px 1fr 44px;align-items:center;gap:10px;cursor:pointer;
+    background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:9px 12px;
+    font:inherit;color:var(--ink);text-align:left}
+  .guess:hover{border-color:var(--nebula)}
+  .guess .gw{font-weight:800}
+  .gtrk{display:block;height:12px;border-radius:6px;background:#ffffff14;overflow:hidden}
+  .gbar{display:block;height:12px;border-radius:6px;background:var(--grad-cosmic)}
+  .guess .gp{text-align:right;color:var(--muted);font-size:.82em}
+
+  .cardgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+  .flipcard{border:1px solid var(--border);border-radius:12px;background:var(--glass);padding:16px;
+    text-align:center;cursor:pointer;min-height:128px;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:8px;transition:.2s}
+  .flipcard:hover{border-color:var(--nebula)}
+  .flipcard.done{border-color:var(--nebula);background:#7c5cff18;cursor:default}
+  .flipcard .fi{font-size:30px}
+  .flipcard .fl{font-weight:800}
+  .flipcard .fr{font-size:.86em;color:var(--muted)}
+
+  .scenario{border:1px solid var(--border);border-radius:12px;background:#0a1020;padding:16px;
+    font-weight:700;display:flex;gap:10px;align-items:flex-start}
+  .choices{display:grid;gap:10px;margin-top:14px}
+  .choice{cursor:pointer;background:var(--glass);border:1px solid var(--border);border-radius:10px;
+    padding:12px 14px;font:inherit;color:var(--ink);text-align:left}
+  .choice:hover{border-color:var(--plasma)}
+  .choice.safe-pick{border-color:var(--good);background:#46e0a818}
+  .choice.bad-pick{border-color:var(--warn);background:#ffb45418}
+  .fb{min-height:1.4em;margin-top:12px;font-weight:600}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section lab">
+  <header class="center">
+    <span class="kicker">AI Wing</span>
+    <h1 style="font-size:clamp(28px,5vw,46px);margin:.2em 0">Real or Made?</h1>
+    <p class="muted">Meet the machine. Then learn the trick that beats a perfect fake.</p>
+  </header>
+
+  <div class="steps" id="dots" aria-hidden="true"></div>
+
+  <!-- ACT 0: MEET THE MACHINE -->
+  <section class="act" data-act="0">
+    <h2>How the machine guesses</h2>
+    <p class="muted">AI does not know things the way you do. It learned which words tend to follow which,
+       from huge piles of text. Then it just guesses what fits. Try it. Pick a word and watch.</p>
+
+    <div class="sentence" id="sentence"></div>
+
+    <div class="panel-label">🔮 Tiny pretend model · how often each word came next</div>
+    <div class="guesses" id="guesses"></div>
+
+    <div class="fact hidden" id="a0Lesson" style="margin-top:16px">
+      <span aria-hidden="true">🔮</span>
+      <span><b>It never understood your sentence.</b> It picked likely words from patterns it had seen.
+      Real AI does the same thing, just with billions of patterns. Clever guessing, not knowing.</span>
+    </div>
+
+    <div class="act__nav"><span></span>
+      <button class="btn btn--go" id="a0Next" data-next disabled>Next: the copycat →</button></div>
+  </section>
+
+  <!-- ACT 1: WHAT A COPYCAT CAN FAKE -->
+  <section class="act" data-act="1" hidden>
+    <h2>What a copycat can fake</h2>
+    <p class="muted">Tap each one. Find out what AI can copy today.</p>
+
+    <div class="cardgrid" id="copycats"></div>
+
+    <div class="fact hidden" id="a1Lesson" style="margin-top:16px">
+      <span aria-hidden="true">😮</span>
+      <span><b>It can copy almost anything now,</b> and the fakes keep getting better. So here is the hard
+      truth: you cannot always tell by looking. Good. Now let us learn what actually works.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" id="a1Next" data-next disabled>Next: the real check →</button>
+    </div>
+  </section>
+
+  <!-- ACT 2: THE CHECK -->
+  <section class="act" data-act="2" hidden>
+    <h2>The check that beats a fake</h2>
+    <p class="muted">A message arrives. It sounds exactly right. What do you do?</p>
+
+    <div class="scenario">
+      <span aria-hidden="true">📞</span>
+      <span>"It's Grandma. I'm in trouble. Send money right now. Don't tell anyone."</span>
+    </div>
+
+    <div class="choices" id="choices"></div>
+    <div class="fb muted" id="a2fb"></div>
+
+    <div class="fact hidden" id="a2Lesson" style="margin-top:14px">
+      <span aria-hidden="true">🕵️</span>
+      <span><b>You checked another way.</b> Call back on a number you already know. Ask something only the
+      real person would know. A copy cannot pass that, no matter how good it sounds. And remember: rush
+      and secrecy are the scam's favorite tools.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--cosmic" id="a2Next" data-next disabled>Last: your superpower →</button>
+    </div>
+  </section>
+
+  <!-- ACT 3: WRAP -->
+  <section class="act" data-act="3" hidden>
+    <h2>Your superpower</h2>
+    <p class="muted">You learned what newsrooms, banks, and security teams actually do. When something
+       matters, they do not trust the message. They verify it another way.</p>
+
+    <div class="card" style="margin:8px 0">
+      <h3>🧠 Carry these three</h3>
+      <p class="muted">1. You cannot always spot a fake by looking. <br>
+         2. You can almost always check another way: a known number, a shared secret, the original source. <br>
+         3. Urgency is a red flag. Real emergencies survive a one minute check.</p>
+    </div>
+
+    <div class="fact">
+      <span aria-hidden="true">✅</span>
+      <span><b>The rule:</b> do not trust the message. Trust the check.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <a class="btn btn--cosmic" href="../">Back to the AI Wing →</a>
+    </div>
+  </section>
+
+  <p class="center muted tiny" style="margin-top:26px">
+    <a href="../">← AI Wing</a> · honest about what you can and cannot see
+  </p>
+</main>
+
+<script src="../../assets/manifest.js"></script>
+<script src="../../assets/shell.js"></script>
+<script>
+(function () {
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("ai-wing", "../..");
+  IdeaLab.disclosure();
+
+  /* ---------- stepper ---------- */
+  var acts = Array.prototype.slice.call(document.querySelectorAll(".act"));
+  var dots = document.getElementById("dots");
+  var done = [false, false, false, false];
+  var current = 0;
+  acts.forEach(function (_, i) {
+    var d = document.createElement("span");
+    d.className = "dot" + (i === 0 ? " is-active" : "");
+    dots.appendChild(d);
+  });
+  function show(i) {
+    current = Math.max(0, Math.min(acts.length - 1, i));
+    acts.forEach(function (a, k) { a.hidden = k !== current; });
+    Array.prototype.forEach.call(dots.children, function (d, k) {
+      d.className = "dot" + (k === current ? " is-active" : (done[k] ? " is-done" : ""));
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.body.addEventListener("click", function (e) {
+    if (e.target.matches("[data-next]") && !e.target.disabled) { done[current] = true; show(current + 1); }
+    if (e.target.matches("[data-prev]")) show(current - 1);
+  });
+
+  /* ---------- ACT 0: prediction toy ---------- */
+  var rounds = [
+    { prompt: "I poured milk into my", options: [{ w: "bowl", p: 55 }, { w: "cup", p: 30 }, { w: "cereal", p: 15 }] },
+    { prompt: "and ate it with a",     options: [{ w: "spoon", p: 60 }, { w: "fork", p: 25 }, { w: "hand", p: 15 }] }
+  ];
+  var built = [], ri = 0;
+  var sentenceEl = document.getElementById("sentence");
+  var guessesEl = document.getElementById("guesses");
+  function renderRound() {
+    var base = built.join(" ");
+    if (ri < rounds.length) {
+      sentenceEl.innerHTML = (base ? IdeaLab.esc(base) + " " : "") +
+        IdeaLab.esc(rounds[ri].prompt) + ' <span class="blank">____</span>';
+      guessesEl.innerHTML = "";
+      rounds[ri].options.forEach(function (o) {
+        var b = document.createElement("button");
+        b.className = "guess"; b.type = "button";
+        b.innerHTML = '<span class="gw">' + IdeaLab.esc(o.w) + "</span>" +
+          '<span class="gtrk"><span class="gbar" style="width:' + o.p + '%"></span></span>' +
+          '<span class="gp">' + o.p + "%</span>";
+        b.addEventListener("click", function () {
+          built.push(rounds[ri].prompt); built.push(o.w); ri++; renderRound();
+        });
+        guessesEl.appendChild(b);
+      });
+    } else {
+      sentenceEl.innerHTML = IdeaLab.esc(base) + ".";
+      guessesEl.innerHTML = "";
+      document.getElementById("a0Lesson").classList.remove("hidden");
+      document.getElementById("a0Next").disabled = false;
+      IdeaLab.award("pattern-spotter", 30);
+    }
+  }
+  renderRound();
+
+  /* ---------- ACT 1: copycat reveal cards ---------- */
+  var copycats = [
+    { i: "🎙️", l: "A voice", r: "Yes. A few seconds of someone talking is enough to copy how they sound." },
+    { i: "🙂", l: "A face on video", r: "Yes. A face can be swapped or puppeted, even on a live call." },
+    { i: "✍️", l: "A writing style", r: "Yes. It can copy how a person texts or writes." },
+    { i: "📷", l: "A photo", r: "Yes. Photos of people and places that never existed at all." }
+  ];
+  var grid = document.getElementById("copycats");
+  var revealed = 0;
+  copycats.forEach(function (c) {
+    var card = document.createElement("button");
+    card.className = "flipcard"; card.type = "button";
+    card.innerHTML = '<span class="fi">' + c.i + '</span><span class="fl">' + IdeaLab.esc(c.l) +
+      '</span><span class="fr">Tap to find out</span>';
+    card.addEventListener("click", function () {
+      if (card.classList.contains("done")) return;
+      card.classList.add("done");
+      card.querySelector(".fr").textContent = c.r;
+      revealed++;
+      if (revealed === copycats.length) {
+        document.getElementById("a1Lesson").classList.remove("hidden");
+        document.getElementById("a1Next").disabled = false;
+        IdeaLab.addXP(10);
+      }
+    });
+    grid.appendChild(card);
+  });
+
+  /* ---------- ACT 2: the check ---------- */
+  var choices = [
+    { t: "Send the money fast, she sounds upset.", safe: false, fb: "Rush and secrecy are the scam's tools. A real emergency survives a quick check." },
+    { t: "Call Grandma back on her real number and ask.", safe: true, fb: "Yes. You checked through a channel the faker cannot control." },
+    { t: "Ask something only the real Grandma would know.", safe: true, fb: "Yes. A shared secret a copy would not have." },
+    { t: "It sounds exactly like her, so it must be real.", safe: false, fb: "Voices can be copied from seconds of audio. Sound is not proof." }
+  ];
+  var cEl = document.getElementById("choices");
+  var fbEl = document.getElementById("a2fb");
+  var solved = false;
+  choices.forEach(function (c) {
+    var b = document.createElement("button");
+    b.className = "choice"; b.type = "button"; b.textContent = c.t;
+    b.addEventListener("click", function () {
+      Array.prototype.forEach.call(cEl.children, function (x) { x.classList.remove("safe-pick", "bad-pick"); });
+      b.classList.add(c.safe ? "safe-pick" : "bad-pick");
+      fbEl.textContent = c.fb;
+      fbEl.className = "fb " + (c.safe ? "ok" : "no");
+      if (c.safe && !solved) {
+        solved = true;
+        document.getElementById("a2Lesson").classList.remove("hidden");
+        document.getElementById("a2Next").disabled = false;
+        IdeaLab.award("truth-checker", 50);
+      }
+    });
+    cEl.appendChild(b);
+  });
+})();
+</script>
+</body>
+</html>

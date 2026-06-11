@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Talking to AI — AI Wing — Idea Lab</title>
+<meta name="description" content="A vague ask gets a vague answer. Add who it is for, how long, and the topic, then watch the answer get better. AI cannot read your mind, so always check it. Kid-friendly, no accounts.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../../assets/logo.svg">
+<link rel="stylesheet" href="../../assets/cosmos.css">
+<style>
+  /* the two example asks, side by side */
+  .askrow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:640px){.askrow{grid-template-columns:1fr}}
+  .ask{border:1px solid var(--border);border-radius:12px;background:#0a1020;padding:14px;display:flex;
+    flex-direction:column;gap:8px}
+  .ask--vague{border-color:#ffb45455}
+  .ask--clear{border-color:#46e0a855}
+  .ask__tag{font-size:.72em;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+  .ask--vague .ask__tag{color:var(--warn)}
+  .ask--clear .ask__tag{color:var(--good)}
+  .ask__text{font-weight:700;font-size:1.05em;line-height:1.5;min-height:2.6em}
+  .ask__quiet{color:var(--muted);font-size:.82em;font-weight:600}
+
+  /* the builder chips */
+  .build{display:grid;gap:14px;margin-top:6px}
+  .buildgroup .gl{font-size:.82em;font-weight:800;color:var(--muted);display:block;margin-bottom:7px}
+  .opts{display:flex;gap:8px;flex-wrap:wrap}
+  .opt{font:inherit;font-weight:700;font-size:.9em;color:var(--ink);background:var(--glass);
+    border:1px solid var(--border);border-radius:999px;padding:8px 14px;cursor:pointer}
+  .opt:hover{border-color:var(--nebula)}
+  .opt.on{background:var(--grad-cosmic);color:#04060d;border-color:transparent}
+
+  /* the live prompt being built */
+  .promptbox{border:1px dashed var(--border);border-radius:12px;background:#070b16;padding:14px;
+    font-weight:700;line-height:1.55;min-height:3.2em}
+  .promptbox .slot{color:var(--muted)}
+  .promptbox .filled{color:var(--plasma)}
+
+  /* the simulated result panels */
+  .results{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+  @media (max-width:640px){.results{grid-template-columns:1fr}}
+  .rcard{border:1px solid var(--border);border-radius:12px;background:var(--glass);padding:14px;
+    display:flex;flex-direction:column;gap:8px}
+  .rcard--worse{border-color:#ffb45455}
+  .rcard--better{border-color:#46e0a855}
+  .rcard__head{display:flex;align-items:center;gap:8px;font-weight:800;font-size:.86em}
+  .rcard--worse .rcard__head{color:var(--warn)}
+  .rcard--better .rcard__head{color:var(--good)}
+  .rcard__body{color:var(--ink);font-size:.94em;line-height:1.55;white-space:pre-line}
+  .simtag{display:inline-flex;align-items:center;gap:6px;font-size:.72em;font-weight:800;color:#b9a8ff;
+    background:#7c5cff22;border:1px solid #7c5cff55;border-radius:999px;padding:3px 10px;
+    text-transform:uppercase;letter-spacing:.06em}
+
+  .checklist{list-style:none;padding:0;margin:8px 0 0;display:grid;gap:8px}
+  .checklist li{display:flex;gap:10px;align-items:flex-start;color:var(--muted)}
+  .checklist b{color:var(--ink)}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section lab">
+
+  <header class="center">
+    <span class="kicker">AI Wing · Level 2</span>
+    <h1 style="font-size:clamp(28px,5vw,46px);margin:.2em 0">Talking to AI</h1>
+    <p class="muted">A fuzzy ask gets a fuzzy answer. Learn to ask in a way that gets you what you want.</p>
+  </header>
+
+  <div class="steps" id="dots" aria-hidden="true"></div>
+
+  <!-- ============ ACT 0: SEE THE DIFFERENCE ============ -->
+  <section class="act" data-act="0">
+    <h2>Two ways to ask</h2>
+    <p class="muted">Same robot, same moment. One kid is vague. One kid is clear. Look at what each one gets back.</p>
+
+    <div class="askrow">
+      <div class="ask ask--vague">
+        <span class="ask__tag">Vague ask</span>
+        <span class="ask__text">"Write something."</span>
+        <span class="ask__quiet">No topic. No length. No idea who it is for.</span>
+      </div>
+      <div class="ask ask--clear">
+        <span class="ask__tag">Clear ask</span>
+        <span class="ask__text">"Write 3 sentences about sea otters for a 7 year old, in a fun voice."</span>
+        <span class="ask__quiet">Topic, length, and who it is for. All spelled out.</span>
+      </div>
+    </div>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">💬</span>
+      <span><b>AI cannot read your mind.</b> It only has the words you give it. The more it has to guess,
+      the more it guesses wrong. Clear words in, useful answer out.</span>
+    </div>
+
+    <div class="act__nav">
+      <span></span>
+      <button class="btn btn--go" data-next>Next: fix a fuzzy ask →</button>
+    </div>
+  </section>
+
+  <!-- ============ ACT 1: BUILD A BETTER PROMPT ============ -->
+  <section class="act" data-act="1" hidden>
+    <h2>Upgrade the ask</h2>
+    <p class="muted">Here is the fuzzy one again: <b>"Write something."</b> Add three specifics and watch
+       it turn into a clear request.</p>
+
+    <div class="build">
+      <div class="buildgroup">
+        <span class="gl">1. Pick a topic</span>
+        <div class="opts" data-key="topic" id="optTopic"></div>
+      </div>
+      <div class="buildgroup">
+        <span class="gl">2. Pick a length</span>
+        <div class="opts" data-key="length" id="optLength"></div>
+      </div>
+      <div class="buildgroup">
+        <span class="gl">3. Who is it for?</span>
+        <div class="opts" data-key="who" id="optWho"></div>
+      </div>
+    </div>
+
+    <p class="muted tiny" style="margin:16px 0 6px;font-weight:700">Your ask, right now:</p>
+    <div class="promptbox" id="promptBox"></div>
+
+    <div class="fact hidden" id="a1Lesson" style="margin-top:16px">
+      <span aria-hidden="true">🛠️</span>
+      <span><b>That is a clear ask.</b> It has a topic, a length, and a reader. The robot no longer has to
+      guess what you meant. Now go see the difference it makes.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" id="a1Next" data-next disabled>Next: see both answers →</button>
+    </div>
+  </section>
+
+  <!-- ============ ACT 2: WORSE vs BETTER RESULT ============ -->
+  <section class="act" data-act="2" hidden>
+    <h2>Vague answer vs clear answer</h2>
+    <p class="muted">Same pretend robot, two asks. On the left, "write something." On the right, the ask
+       <b>you</b> just built.</p>
+
+    <span class="simtag">✦ Pretend answers · not a real AI</span>
+
+    <div class="results">
+      <div class="rcard rcard--worse">
+        <div class="rcard__head">😕 From "write something"</div>
+        <div class="rcard__body" id="resWorse"></div>
+      </div>
+      <div class="rcard rcard--better">
+        <div class="rcard__head">😀 From your clear ask</div>
+        <div class="rcard__body" id="resBetter"></div>
+      </div>
+    </div>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">✦</span>
+      <span><b>These answers are made up for this lesson.</b> They are not from a real AI. But the lesson
+      is real: the clear ask gets the answer you actually wanted, and the vague one wanders off.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--cosmic" data-next>Last: the one habit →</button>
+    </div>
+  </section>
+
+  <!-- ============ ACT 3: ALWAYS CHECK ============ -->
+  <section class="act" data-act="3" hidden>
+    <h2>The habit that matters most</h2>
+    <p class="muted">A clear ask gets a better answer. But "better" is not the same as "true." So there is
+       one last step, every single time.</p>
+
+    <div class="card" style="margin:8px 0">
+      <h3>🧠 Three things to carry</h3>
+      <ul class="checklist">
+        <li><span aria-hidden="true">🎯</span><span><b>Be specific.</b> Say the topic, the length, and who
+          it is for. Guessing is the robot's job to avoid, not yours.</span></li>
+        <li><span aria-hidden="true">🧩</span><span><b>Give context.</b> Tell it what you already know and
+          what you want it to do. More clues, fewer wrong turns.</span></li>
+        <li><span aria-hidden="true">🔍</span><span><b>Always check the answer.</b> AI can sound sure and
+          still be wrong. Read it yourself before you trust it or share it.</span></li>
+      </ul>
+    </div>
+
+    <div class="fact">
+      <span aria-hidden="true">✅</span>
+      <span><b>The rule:</b> ask clearly, then check carefully. A good question is half the work, and your
+      own eyes are the other half.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <a class="btn btn--cosmic" href="../">Back to the AI Wing →</a>
+    </div>
+  </section>
+
+  <p class="center muted tiny" style="margin-top:26px">
+    <a href="../">← AI Wing</a> · the answers here are pretend, the habits are real
+  </p>
+</main>
+
+<script src="../../assets/manifest.js"></script>
+<script src="../../assets/glossary.js"></script>
+<script src="../../assets/shell.js"></script>
+<script>
+(function () {
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("ai-wing", "../..");
+  IdeaLab.disclosure();
+  IdeaLab.glossary(window.IDEA_LAB_GLOSSARY);
+
+  /* ---------- stepper ---------- */
+  var acts = Array.prototype.slice.call(document.querySelectorAll(".act"));
+  var dots = document.getElementById("dots");
+  var done = [false, false, false, false];
+  var current = 0;
+  acts.forEach(function (_, i) {
+    var d = document.createElement("span");
+    d.className = "dot" + (i === 0 ? " is-active" : "");
+    dots.appendChild(d);
+  });
+  function show(i) {
+    current = Math.max(0, Math.min(acts.length - 1, i));
+    acts.forEach(function (a, k) { a.hidden = k !== current; });
+    Array.prototype.forEach.call(dots.children, function (d, k) {
+      d.className = "dot" + (k === current ? " is-active" : (done[k] ? " is-done" : ""));
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.body.addEventListener("click", function (e) {
+    if (e.target.matches("[data-next]") && !e.target.disabled) { done[current] = true; show(current + 1); }
+    if (e.target.matches("[data-prev]")) show(current - 1);
+  });
+
+  /* ---------- ACT 1: build a clear prompt from a vague one ---------- */
+  /* every result is a canned preset. nothing is sent anywhere, no model runs. */
+  var TOPICS = [
+    { id: "otters",  label: "Sea otters" },
+    { id: "volcano", label: "Volcanoes" },
+    { id: "space",   label: "Outer space" }
+  ];
+  var LENGTHS = [
+    { id: "short",  label: "3 sentences" },
+    { id: "list",   label: "A short list of 3" },
+    { id: "para",   label: "One paragraph" }
+  ];
+  var WHOS = [
+    { id: "little",  label: "A 7 year old" },
+    { id: "class",   label: "My class" },
+    { id: "grandma", label: "My grandma" }
+  ];
+
+  /* canned "better" answers, keyed by topic + length + who. true and friendly. */
+  var TOPIC_FACTS = {
+    otters:  ["Sea otters float on their backs and hold hands so they do not drift apart while they sleep.",
+              "They crack open shells using a small rock they keep tucked under one arm.",
+              "Their thick fur traps warm air, because they have no blubber to keep heat in."],
+    volcano: ["A volcano is an opening in the ground where hot melted rock can reach the surface.",
+              "That melted rock is called magma underground and lava once it pours out.",
+              "When it cools, the lava hardens into new rock, slowly building the mountain higher."],
+    space:   ["Space is mostly empty, with planets and stars spread very far apart.",
+              "The Sun is a star, and it is so big that a million Earths could fit inside it.",
+              "Sound cannot travel in space, so out there it is completely silent."]
+  };
+  var WHO_VOICE = {
+    little:  "in a fun, simple voice a 7 year old would enjoy",
+    class:   "in a clear voice that works for a whole class",
+    grandma: "in a warm, friendly voice for my grandma"
+  };
+
+  var pick = { topic: null, length: null, who: null };
+  var awarded = false;
+
+  function fillOpts(hostId, list, key) {
+    var host = document.getElementById(hostId);
+    list.forEach(function (o) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "opt"; b.dataset.id = o.id; b.textContent = o.label;
+      b.addEventListener("click", function () {
+        pick[key] = o.id;
+        Array.prototype.forEach.call(host.children, function (c) { c.classList.remove("on"); });
+        b.classList.add("on");
+        renderPrompt();
+      });
+      host.appendChild(b);
+    });
+  }
+  fillOpts("optTopic", TOPICS, "topic");
+  fillOpts("optLength", LENGTHS, "length");
+  fillOpts("optWho", WHOS, "who");
+
+  function labelOf(list, id) {
+    for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i].label;
+    return null;
+  }
+
+  var promptBox = document.getElementById("promptBox");
+  function slot(text, filled) {
+    return '<span class="' + (filled ? "filled" : "slot") + '">' + IdeaLab.esc(text) + "</span>";
+  }
+  function renderPrompt() {
+    var t = labelOf(TOPICS, pick.topic);
+    var l = labelOf(LENGTHS, pick.length);
+    var w = labelOf(WHOS, pick.who);
+    promptBox.innerHTML =
+      "Write " +
+      slot(l || "[a length]", !!l) + " about " +
+      slot(t ? t.toLowerCase() : "[a topic]", !!t) + " for " +
+      slot(w ? w.toLowerCase() : "[who it is for]", !!w) + ".";
+
+    var allSet = pick.topic && pick.length && pick.who;
+    document.getElementById("a1Next").disabled = !allSet;
+    if (allSet) {
+      document.getElementById("a1Lesson").classList.remove("hidden");
+      renderResults();
+      if (!awarded) { awarded = true; IdeaLab.award("prompt-smith", 45); }
+    }
+  }
+  renderPrompt();
+
+  /* ---------- ACT 2: paint the two canned results ---------- */
+  function buildBetter() {
+    var facts = TOPIC_FACTS[pick.topic] || [];
+    var voice = WHO_VOICE[pick.who] || "";
+    if (pick.length === "list") {
+      return "Three things, " + voice + ":\n" +
+        "1. " + facts[0] + "\n2. " + facts[1] + "\n3. " + facts[2];
+    }
+    if (pick.length === "para") {
+      return "Here is a paragraph " + voice + ":\n" + facts[0] + " " + facts[1] + " " + facts[2];
+    }
+    /* short = 3 sentences */
+    return "Three sentences " + voice + ":\n" + facts[0] + " " + facts[1] + " " + facts[2];
+  }
+
+  var resWorse = document.getElementById("resWorse");
+  var resBetter = document.getElementById("resBetter");
+  function renderResults() {
+    resWorse.textContent =
+      "Sure! Here is something:\n" +
+      "\"Things are interesting and there is a lot to say about many topics. " +
+      "I hope this is what you wanted.\"\n\n" +
+      "(It guessed the topic, the length, and the reader, and missed all three.)";
+    resBetter.textContent = buildBetter();
+  }
+})();
+</script>
+</body>
+</html>

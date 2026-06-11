@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Foundry — Idea Lab</title>
+<meta name="description" content="From a grain of sand to writing your own code. A progressive track of modules: logic gates, binary, adders, memory, pixels, CPUs, and real programming. Free, factual, no accounts.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../assets/logo.svg">
+<link rel="stylesheet" href="../assets/cosmos.css">
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section">
+  <div id="il-disclose-mount"></div>
+
+  <header class="hero center">
+    <span class="kicker">🪨 The Foundry</span>
+    <h1 style="font-size:clamp(30px,6vw,52px)">Rock to computer,<br><span class="accent">then you write the code.</span></h1>
+    <p>Start by holding a grain of sand. Climb one rung at a time: build switches, then gates, then
+       numbers, then a whole little computer, until you are writing real programs of your own.</p>
+  </header>
+
+  <section class="section">
+    <div id="track"></div>
+  </section>
+
+  <div class="card" style="margin-top:10px">
+    <h3>🧭 How the track works</h3>
+    <p class="muted">Each module is a hands-on lab that builds on the last. Finish one and the next
+       lights up. You can wander freely, and nothing is locked, but the ladder always shows a clear
+       next step. Your progress is saved only in this browser.</p>
+  </div>
+
+  <footer class="section center muted tiny"><a href="../">← Star Map</a></footer>
+</main>
+
+<script src="../assets/manifest.js"></script>
+<script src="../assets/shell.js"></script>
+<script>
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("foundry", "..");
+  IdeaLab.disclosure("il-disclose-mount");
+  IdeaLab.renderTrack("foundry", "#track");
+</script>
+</body>
+</html>

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Padlock — Defense Range — Idea Lab</title>
+<meta name="description" content="Send a message two ways and watch a snoop on the wifi try to read it. Over HTTP they read every word. Over HTTPS they get scrambled gibberish. Learn what the padlock does, and what it does not.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../../assets/logo.svg">
+<link rel="stylesheet" href="../../assets/cosmos.css">
+<style>
+  /* lab-local styles, built on the cosmos tokens */
+  .wire-stage{display:grid;grid-template-columns:1fr;gap:16px;align-items:stretch}
+  @media(min-width:780px){ .wire-stage{grid-template-columns:1fr auto 1fr} }
+
+  .node{border:1px solid var(--border);border-radius:14px;background:#0a1020;overflow:hidden;
+    box-shadow:0 14px 40px #0007;display:flex;flex-direction:column}
+  .node__bar{display:flex;align-items:center;gap:8px;padding:9px 12px;background:#0d1428;
+    border-bottom:1px solid var(--border);font-size:.8em;font-weight:700;color:var(--muted)}
+  .node__body{padding:16px;display:grid;gap:10px;place-items:center;text-align:center;flex:1}
+  .node__face{font-size:46px;line-height:1}
+  .bubble{width:100%;border:1px solid var(--border);border-radius:10px;background:#060a16;
+    padding:10px 12px;min-height:2.6em;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-size:.86em;word-break:break-word;color:#cdd6f4;display:flex;align-items:center;
+    justify-content:center;text-align:center}
+  .bubble.plain{color:#ff9a9a;border-color:#ff6b6b66}
+  .bubble.locked{color:#7be0a8;border-color:#46e0a866;letter-spacing:.04em}
+  .bubble.empty{color:var(--muted);font-style:italic}
+
+  /* the wire the snoop sits on */
+  .snoop{border:1px solid var(--border);border-radius:14px;background:#070b16;overflow:hidden;
+    display:flex;flex-direction:column}
+  .snoop__bar{display:flex;align-items:center;gap:8px;padding:9px 12px;background:#160d18;
+    border-bottom:1px solid var(--border);font-size:.78em;font-weight:700;color:#e0a8c8}
+  .snoop__body{padding:16px;display:grid;gap:10px;place-items:center;text-align:center;flex:1}
+  .snoop__face{font-size:46px;line-height:1}
+  @media(min-width:780px){
+    .snoop{align-self:center}
+    .snoop__face{font-size:40px}
+  }
+  .verdict{min-height:1.4em;font-weight:800;font-size:.92em}
+  .verdict.read{color:var(--bad)}
+  .verdict.blocked{color:var(--good)}
+
+  .msgline{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;margin-top:4px}
+  .msgline input{flex:1;min-width:180px;font:inherit;padding:12px 14px;border-radius:12px;
+    border:1px solid var(--border);background:#060a16;color:var(--ink)}
+  .msgline input:focus-visible{outline:3px solid var(--plasma);outline-offset:2px}
+
+  .sendrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .btn--http{background:#2a1320;color:#ffd0d0;border-color:#ff6b6b55}
+  .badgepair{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+  .seal{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--border);
+    border-radius:999px;padding:6px 13px;font-weight:700;font-size:.82em;color:var(--muted);
+    background:var(--glass)}
+  .seal.on{border-color:#21bca555;color:var(--brand-600);background:#1ca4900f}
+  .seal .tick{opacity:.35}
+  .seal.on .tick{opacity:1}
+
+  .toy{display:flex;gap:10px;align-items:flex-start;border-left:3px solid var(--warn);
+    background:#1a140980;padding:10px 14px;border-radius:8px;color:var(--muted);margin-top:14px}
+  .toy b{color:var(--ink)}
+
+  .urlbar{display:inline-flex;align-items:center;gap:7px;font-family:ui-monospace,monospace;
+    font-size:.82em;padding:6px 12px;border-radius:999px;border:1px solid var(--border);background:#060a16}
+  .urlbar.safe{color:#7be0a8;border-color:#46e0a855}
+  .urlbar.unsafe{color:#ff9a9a;border-color:#ff6b6b55}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section lab">
+  <header class="center">
+    <span class="kicker">Defense Range · Level 2</span>
+    <h1 style="font-size:clamp(28px,5vw,46px);margin:.2em 0">The Padlock</h1>
+    <p class="muted">Type a message. Send it two ways. Watch the snoop on the wifi try to read it.</p>
+  </header>
+
+  <div class="steps" id="dots" aria-hidden="true"></div>
+
+  <!-- ACT 0: WRITE -->
+  <section class="act" data-act="0">
+    <h2>Write a secret message</h2>
+    <p class="muted">Pretend you are sending this to a friend over the coffee-shop wifi. Someone else is on
+       that same wifi. We will call them the snoop. Type anything you like.</p>
+
+    <div class="msgline">
+      <input id="msg" maxlength="60" placeholder="Meet me at the back gate at 4"
+             aria-label="your message" value="Meet me at the back gate at 4">
+    </div>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">📶</span>
+      <span><b>Wifi is shared air.</b> When you send a message, it travels across the same wifi everyone
+      nearby is using. Whether the snoop can read it depends on one thing: how you sent it.</span>
+    </div>
+
+    <div class="act__nav"><span></span>
+      <button class="btn btn--go" data-next>Next: send it →</button></div>
+  </section>
+
+  <!-- ACT 1: SEND BOTH WAYS -->
+  <section class="act" data-act="1" hidden>
+    <h2>Send it, and watch the snoop</h2>
+    <p class="muted">Same message, two roads. Send it the plain way, then the locked way, and see what
+       the snoop in the middle catches each time.</p>
+
+    <div class="wire-stage">
+      <!-- YOU -->
+      <div class="node">
+        <div class="node__bar">📱 You</div>
+        <div class="node__body">
+          <div class="node__face">🧒</div>
+          <div class="muted tiny">You send:</div>
+          <div class="bubble" id="youBubble">…</div>
+        </div>
+      </div>
+
+      <!-- SNOOP ON THE WIRE -->
+      <div class="snoop">
+        <div class="snoop__bar">👀 Snoop on the wifi</div>
+        <div class="snoop__body">
+          <div class="snoop__face" id="snoopFace">🕵️</div>
+          <div class="muted tiny">What the snoop sees on the wire:</div>
+          <div class="bubble empty" id="wireBubble">nothing sent yet</div>
+          <div class="verdict" id="verdict">Waiting…</div>
+        </div>
+      </div>
+
+      <!-- FRIEND -->
+      <div class="node">
+        <div class="node__bar">📱 Your friend</div>
+        <div class="node__body">
+          <div class="node__face">🧑</div>
+          <div class="muted tiny">Friend reads:</div>
+          <div class="bubble" id="friendBubble">…</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sendrow">
+      <button class="btn btn--http" id="sendHttp">Send over HTTP (no lock)</button>
+      <button class="btn btn--go" id="sendHttps">Send over HTTPS (locked 🔒)</button>
+    </div>
+
+    <div class="badgepair">
+      <span class="seal" id="sealHttp"><span class="tick">●</span> Sent over HTTP</span>
+      <span class="seal" id="sealHttps"><span class="tick">●</span> Sent over HTTPS</span>
+    </div>
+
+    <div class="toy">
+      <span aria-hidden="true">🧸</span>
+      <span><b>This lock is a toy.</b> To keep the demo simple, the locked message is just a
+      letter <button class="term" data-term="hashing">scramble</button> you could undo by hand. Real
+      HTTPS uses math so hard that even the world's fastest computers cannot guess it open. Same idea,
+      far stronger.</span>
+    </div>
+
+    <div class="fact hidden" id="bothLesson" style="margin-top:16px">
+      <span aria-hidden="true">🔒</span>
+      <span><b>You saw both.</b> Over HTTP the snoop read every word. Over HTTPS the snoop got
+      gibberish, but your friend still read it fine. That is what the lock does: it scrambles your
+      data on the way, so people on the same wifi cannot read it.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" id="toWrap" data-next disabled>Next: what the lock really means →</button>
+    </div>
+  </section>
+
+  <!-- ACT 2: WRAP -->
+  <section class="act" data-act="2" hidden>
+    <h2>What the padlock means, and what it does not</h2>
+    <p class="muted">The little padlock by a web address is a real, useful sign. But people get fooled
+       because they think it means more than it does. Here is the honest version.</p>
+
+    <div class="card" style="margin:8px 0">
+      <h3>✅ The padlock means: the road is private</h3>
+      <p class="muted">It means your <button class="term" data-term="hashing">scrambled</button> data
+         travels in a locked tube. Snoops on the wifi, and others along the way, see only gibberish.
+         The address starts with <span class="urlbar safe">🔒 https://</span> instead of
+         <span class="urlbar unsafe">http://</span>.</p>
+    </div>
+
+    <div class="card" style="margin:8px 0">
+      <h3>⚠️ The padlock does NOT mean: this site is honest</h3>
+      <p class="muted">A trickster can put a padlock on a fake site just as easily as a real one. The
+         lock only promises the connection is private. It promises nothing about who is on the other
+         end. A scam site with a padlock is still a scam site.</p>
+    </div>
+
+    <div class="fact">
+      <span aria-hidden="true">🛡️</span>
+      <span><b>The one rule:</b> the padlock keeps your message private on the way there. It does not
+      tell you the person you are talking to is safe. Check the lock, and still check who you trust.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <a class="btn btn--cosmic" href="../">Back to the Defense Range →</a>
+    </div>
+  </section>
+
+  <p class="center muted tiny" style="margin-top:26px">
+    <a href="../">← Defense Range</a> · the lock here is a pretend toy in a sandbox; real HTTPS is far stronger
+  </p>
+</main>
+
+<script src="../../assets/manifest.js"></script>
+<script src="../../assets/glossary.js"></script>
+<script src="../../assets/shell.js"></script>
+<script>
+(function () {
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("defense", "../..");
+  IdeaLab.disclosure();
+  IdeaLab.glossary(window.IDEA_LAB_GLOSSARY);
+
+  /* ---------- stepper ---------- */
+  var acts = Array.prototype.slice.call(document.querySelectorAll(".act"));
+  var dots = document.getElementById("dots");
+  var done = [false, false, false];
+  var current = 0;
+  acts.forEach(function (_, i) {
+    var d = document.createElement("span");
+    d.className = "dot" + (i === 0 ? " is-active" : "");
+    dots.appendChild(d);
+  });
+  function show(i) {
+    current = Math.max(0, Math.min(acts.length - 1, i));
+    acts.forEach(function (a, k) { a.hidden = k !== current; });
+    Array.prototype.forEach.call(dots.children, function (d, k) {
+      d.className = "dot" + (k === current ? " is-active" : (done[k] ? " is-done" : ""));
+    });
+    if (current === 1) paintYou();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.body.addEventListener("click", function (e) {
+    if (e.target.matches("[data-next]") && !e.target.disabled) { done[current] = true; show(current + 1); }
+    if (e.target.matches("[data-prev]")) show(current - 1);
+  });
+
+  /* ---------- the message ---------- */
+  var msgInput = document.getElementById("msg");
+  function currentMsg() {
+    var v = (msgInput.value || "").trim();
+    return v || "Meet me at the back gate at 4";
+  }
+
+  /* ---------- the pretend lock ----------
+     A simple reversible letter scramble, so the kid can SEE that locked
+     data looks like gibberish but still carries the real message inside.
+     This is a TOY. Real HTTPS encryption cannot be guessed open by hand. */
+  function toyScramble(text) {
+    var out = "";
+    for (var i = 0; i < text.length; i++) {
+      var ch = text.charCodeAt(i);
+      if (ch >= 65 && ch <= 90)       out += String.fromCharCode(((ch - 65 + 13) % 26) + 65); // A-Z
+      else if (ch >= 97 && ch <= 122) out += String.fromCharCode(((ch - 97 + 13) % 26) + 97); // a-z
+      else if (ch >= 48 && ch <= 57)  out += String.fromCharCode(((ch - 48 + 5) % 10) + 48);  // 0-9
+      else if (ch === 32)             out += "·"; // space shown as a middle dot
+      else                            out += "#";
+    }
+    return out;
+  }
+
+  /* ---------- act 1 wiring ---------- */
+  var youBubble = document.getElementById("youBubble");
+  var friendBubble = document.getElementById("friendBubble");
+  var wireBubble = document.getElementById("wireBubble");
+  var verdict = document.getElementById("verdict");
+  var snoopFace = document.getElementById("snoopFace");
+  var sealHttp = document.getElementById("sealHttp");
+  var sealHttps = document.getElementById("sealHttps");
+  var toWrap = document.getElementById("toWrap");
+  var bothLesson = document.getElementById("bothLesson");
+
+  var sentHttp = false, sentHttps = false;
+
+  function paintYou() {
+    youBubble.textContent = currentMsg();
+    friendBubble.textContent = currentMsg();
+  }
+
+  function maybeFinish() {
+    if (sentHttp && sentHttps) {
+      toWrap.disabled = false;
+      bothLesson.classList.remove("hidden");
+      IdeaLab.award("locksmith", 50);
+    }
+  }
+
+  document.getElementById("sendHttp").addEventListener("click", function () {
+    var m = currentMsg();
+    youBubble.textContent = m;
+    friendBubble.textContent = m;
+    wireBubble.textContent = m;
+    wireBubble.className = "bubble plain";
+    snoopFace.textContent = "😈";
+    verdict.textContent = "Snoop read it: every word.";
+    verdict.className = "verdict read";
+    sentHttp = true;
+    sealHttp.classList.add("on");
+    maybeFinish();
+  });
+
+  document.getElementById("sendHttps").addEventListener("click", function () {
+    var m = currentMsg();
+    youBubble.textContent = m;
+    friendBubble.textContent = m; // your friend has the key, so they read it fine
+    wireBubble.textContent = toyScramble(m);
+    wireBubble.className = "bubble locked";
+    snoopFace.textContent = "😖";
+    verdict.textContent = "Snoop saw only scrambled gibberish.";
+    verdict.className = "verdict blocked";
+    sentHttps = true;
+    sealHttps.classList.add("on");
+    maybeFinish();
+  });
+
+  /* keep the "you send" bubble in step if they edit after arriving */
+  msgInput.addEventListener("input", function () {
+    if (current === 1) youBubble.textContent = currentMsg();
+  });
+})();
+</script>
+</body>
+</html>

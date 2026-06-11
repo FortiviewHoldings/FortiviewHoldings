@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Instrumentation Formulas (4-20 mA, Span, Square Root, RTD, TC) | Field Pocket Guide</title>
+  <meta name="description" content="The working set of instrumentation formulas with plain examples: percent of span, mA and percent, linear scaling, square-root extraction, calibration error, turndown, RTD and thermocouple basics, Ohm's law.">
+  <meta name="color-scheme" content="dark" />
+  <link rel="canonical" href="https://fortiviewholdings.com/education/formulas/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Instrumentation Formulas — Field Pocket Guide">
+  <meta property="og:description" content="Percent of span, mA, scaling, square root, calibration error, RTD and thermocouple, with examples.">
+  <meta property="og:image" content="https://fortiviewholdings.com/images/social-preview.png">
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" href="/images/favicon.png" sizes="192x192">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/fortiview.css">
+  <link rel="stylesheet" href="/education/assets/pocketguide.css">
+  <style>
+    .fx-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));margin-bottom:30px}
+    .fx{background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+      border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:18px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+    .fx h3{font-size:1.02rem;color:var(--ink);margin-bottom:.55rem}
+    .fx .pg-formula{margin-bottom:.6rem;white-space:normal}
+    .fx p{font-size:.86rem;color:var(--ink-2)}
+    .fx p b{color:var(--accent);font-family:var(--mono)}
+    .fx a{color:var(--accent)}
+    .fx-cat{margin:6px 0 14px}
+  </style>
+</head>
+<body>
+<main class="pg-main">
+  <div class="pg-wrap--wide pg-wrap">
+
+    <header class="pg-head">
+      <a class="pg-back" href="/education/">Field Pocket Guide</a>
+      <h1 class="fv-h2">Field Formulas</h1>
+      <p class="fv-lead">The relationships behind the calculators, each with a worked example. When you want the math itself, not the tool, it lives here.</p>
+    </header>
+
+    <div class="fx-cat"><span class="fv-eyebrow"><span class="n">01</span> Signals &amp; scaling</span></div>
+    <div class="fx-grid">
+      <div class="fx"><h3>Percent of span</h3><div class="pg-formula">% = (X − LRV) ÷ (URV − LRV) × 100</div><p>Where the value sits on the range. <b>75</b> on a 0–100 range is <b>75%</b>.</p></div>
+      <div class="fx"><h3>mA from percent</h3><div class="pg-formula">mA = 4 + (% ÷ 100) × 16</div><p><b>50%</b> of span is <b>12 mA</b>. 0% = 4 mA, 100% = 20 mA. <a href="/education/scaling/">Scaling tool →</a></p></div>
+      <div class="fx"><h3>Percent from mA</h3><div class="pg-formula">% = (mA − 4) ÷ 16 × 100</div><p><b>12 mA</b> reads <b>50%</b>. A live 4 mA is 0%, not a dead loop.</p></div>
+      <div class="fx"><h3>Linear scaling</h3><div class="pg-formula">Out = OutLRV + (In − InLRV) ÷ (InURV − InLRV) × (OutURV − OutLRV)</div><p>Any span to any span. 50 °C on 0–100 °C maps to <b>12 mA</b> on 4–20.</p></div>
+      <div class="fx"><h3>3–15 psi (pneumatic)</h3><div class="pg-formula">psi = 3 + (% ÷ 100) × 12</div><p>The old standard. <b>50%</b> is <b>9 psi</b>; 0% = 3 psi, 100% = 15 psi.</p></div>
+    </div>
+
+    <div class="fx-cat"><span class="fv-eyebrow"><span class="n">02</span> Flow &amp; square root</span></div>
+    <div class="fx-grid">
+      <div class="fx"><h3>Square-root extraction</h3><div class="pg-formula">%Flow = √(%DP)</div><p>Flow follows the root of differential pressure. <b>50%</b> DP is <b>70.7%</b> flow. <a href="/education/square-root/">Extraction tool →</a></p></div>
+      <div class="fx"><h3>Flow signal from DP signal</h3><div class="pg-formula">mA_flow = 4 + √((mA_DP − 4) ÷ 16) × 16</div><p><b>12 mA</b> of linear DP becomes <b>15.31 mA</b> of flow.</p></div>
+      <div class="fx"><h3>Flow vs differential pressure</h3><div class="pg-formula">Q ∝ √(ΔP)</div><p>Double the flow, quadruple the DP. Why a DP cell needs the root taken before it reads flow.</p></div>
+    </div>
+
+    <div class="fx-cat"><span class="fv-eyebrow"><span class="n">03</span> Calibration</span></div>
+    <div class="fx-grid">
+      <div class="fx"><h3>Error, percent of span</h3><div class="pg-formula">Err% = (Measured − Ideal) ÷ (URV − LRV) × 100</div><p>Reads <b>12.1 mA</b> where ideal is 12 on a 4–20 loop: <b>+0.625%</b> of span. <a href="/education/calibration/">Worksheet →</a></p></div>
+      <div class="fx"><h3>Turndown (rangeability)</h3><div class="pg-formula">TD = URV_max ÷ URV_min</div><p>A cell good from 10 to 250 inH2O has a <b>25:1</b> turndown.</p></div>
+      <div class="fx"><h3>Zero &amp; span</h3><div class="pg-formula">Span = URV − LRV</div><p>Zero moves the LRV up or down; span sets how wide the range is. Adjust zero first, then span, then re-check zero.</p></div>
+    </div>
+
+    <div class="fx-cat"><span class="fv-eyebrow"><span class="n">04</span> Temperature</span></div>
+    <div class="fx-grid">
+      <div class="fx"><h3>RTD, Pt100 (IEC 60751)</h3><div class="pg-formula">R = R0 (1 + A·t + B·t²), &nbsp;t ≥ 0</div><p>A = 3.9083×10⁻³, B = −5.775×10⁻⁷, R0 = 100 Ω. At <b>100 °C</b>, <b>138.51 Ω</b>. <a href="/education/rtd/">RTD tool →</a></p></div>
+      <div class="fx"><h3>Thermocouple, cold junction</h3><div class="pg-formula">V_meter = E(hot) − E(reference)</div><p>The meter reads the difference. Type K hot 300 °C, terminals 25 °C ≈ <b>11.2 mV</b>. <a href="/education/thermocouple/">TC tool →</a></p></div>
+      <div class="fx"><h3>Celsius &amp; Fahrenheit</h3><div class="pg-formula">°F = °C × 9⁄5 + 32</div><p><b>100 °C</b> = <b>212 °F</b>. A 1 °C step is a 1.8 °F step.</p></div>
+    </div>
+
+    <div class="fx-cat"><span class="fv-eyebrow"><span class="n">05</span> Electrical</span></div>
+    <div class="fx-grid">
+      <div class="fx"><h3>Ohm's law &amp; power</h3><div class="pg-formula">V = I × R &nbsp;·&nbsp; P = V × I</div><p>Across a 250 Ω HART resistor, <b>12 mA</b> drops <b>3.0 V</b>. Loop powered, two wires, one signal.</p></div>
+      <div class="fx"><h3>Loop burden</h3><div class="pg-formula">V_available ≥ 0.020 A × R_total</div><p>At full 20 mA, every 250 Ω needs 5 V of headroom. Add the wiring and the sense resistors before you trust the supply.</p></div>
+    </div>
+
+    <p class="pg-tablenote">Examples are rounded for reading. The calculators carry full precision. Confirm against your facility's procedure and reference standard.</p>
+
+  </div>
+</main>
+<script src="/education/assets/pocketguide.js"></script>
+<script src="/assets/fortiview.js"></script>
+</body>
+</html>

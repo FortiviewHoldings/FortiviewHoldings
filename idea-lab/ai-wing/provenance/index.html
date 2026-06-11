@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proof It's Real — AI Wing — Idea Lab</title>
+<meta name="description" content="Run real provenance checks on an image: reverse image search, Content Credentials (C2PA), and source quality. Stack the signals, then decide trust or doubt. No accounts.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../../assets/logo.svg">
+<link rel="stylesheet" href="../../assets/cosmos.css">
+<style>
+  /* the image under investigation */
+  .subject{display:flex;gap:14px;align-items:center;border:1px solid var(--border);border-radius:var(--radius);
+    background:#0a1020;padding:16px;flex-wrap:wrap}
+  .subject__pic{width:96px;height:96px;flex:0 0 auto;border-radius:12px;border:1px solid var(--border);
+    display:grid;place-items:center;font-size:46px;background:radial-gradient(circle at 35% 30%,#1a2440,#0a0f1f)}
+  .subject__txt{flex:1;min-width:180px}
+  .subject__txt h3{margin:0 0 .25em;font-size:1.1em}
+  .subject__txt p{margin:0;color:var(--muted);font-size:.92em}
+  .subject__claim{display:block;margin-top:8px;font-weight:700;color:var(--ink)}
+
+  .picker{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .pick{cursor:pointer;border:1px solid var(--border);background:var(--glass);border-radius:999px;
+    padding:8px 14px;font:inherit;color:var(--ink);font-weight:700;display:flex;gap:8px;align-items:center}
+  .pick:hover{border-color:var(--nebula)}
+  .pick.on{background:var(--grad-cosmic);color:#04060d;border-color:transparent}
+
+  /* the three provenance checks */
+  .checks{display:grid;gap:12px;margin-top:16px}
+  .check{border:1px solid var(--border);border-radius:14px;background:var(--glass);padding:14px;
+    transition:.2s}
+  .check__top{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .check__ico{width:46px;height:46px;border-radius:12px;background:#0e1530;border:1px solid var(--border);
+    display:grid;place-items:center;flex:0 0 auto;font-size:24px}
+  .check__name{flex:1;min-width:150px}
+  .check__name h4{margin:0;font-size:1.02em}
+  .check__name p{margin:.2em 0 0;color:var(--muted);font-size:.85em}
+  .check__btn{flex:0 0 auto}
+  .check__result{margin-top:12px;border-top:1px solid var(--border);padding-top:12px;font-size:.92em;
+    display:flex;gap:10px;align-items:flex-start}
+  .check__result .rd{font-size:1.2em;line-height:1.3;flex:0 0 auto}
+  .check.run--clear{border-color:var(--good);background:#46e0a80f}
+  .check.run--flag{border-color:var(--warn);background:#ffb4540f}
+  .check.run--mixed{border-color:var(--plasma);background:#3ee0ff0f}
+  .signal{display:inline-block;font-weight:800;font-size:.78em;text-transform:uppercase;letter-spacing:.05em;
+    padding:3px 9px;border-radius:999px;margin-top:6px}
+  .signal.s-trust{background:#46e0a826;color:var(--good)}
+  .signal.s-doubt{background:#ffb45426;color:var(--warn)}
+  .signal.s-mixed{background:#3ee0ff26;color:var(--plasma)}
+
+  /* the verdict tray */
+  .tray{margin-top:18px;border:1px dashed var(--border);border-radius:14px;padding:16px;background:#0a102080}
+  .tray__head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .tray__count{font-size:.85em;color:var(--muted)}
+  .tray__count b{color:var(--star)}
+  .verdict{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+  .verdict .btn{flex:1;min-width:140px;justify-content:center}
+  .vfb{min-height:1.4em;margin-top:12px;font-weight:600}
+
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section lab">
+  <header class="center">
+    <span class="kicker">AI Wing · Level 2</span>
+    <h1 style="font-size:clamp(28px,5vw,46px);margin:.2em 0">Proof It's Real</h1>
+    <p class="muted">An image is going around with a big claim. Your eyes cannot settle this. Run the
+       real checks, stack what they tell you, then decide.</p>
+  </header>
+
+  <div class="steps" id="dots" aria-hidden="true"></div>
+
+  <!-- ACT 0: WHY EYES ARE NOT ENOUGH -->
+  <section class="act" data-act="0">
+    <h2>Eyes are not the tool</h2>
+    <p class="muted">A modern fake can look perfect. Guessing by eye is a coin flip, and the makers of
+       fakes are counting on it. So we do not guess. We check where the image came from. That is called
+       <button class="term" data-term="provenance">provenance</button>.</p>
+
+    <div class="fact" style="margin-top:8px">
+      <span aria-hidden="true">👁️</span>
+      <span><b>You will not spot it by staring.</b> Real investigators never trust the look of an image.
+      They trust what they can trace about it. You are about to learn the same three checks they use.</span>
+    </div>
+
+    <div class="act__nav"><span></span>
+      <button class="btn btn--go" data-next>Next: pick an image →</button></div>
+  </section>
+
+  <!-- ACT 1: RUN THE CHECKS -->
+  <section class="act" data-act="1" hidden>
+    <h2>Run the checks</h2>
+    <p class="muted">Pick an image, then run every check. Each one gives you a signal: leans trust, leans
+       doubt, or unclear. No single check decides it, so gather them all.</p>
+
+    <div class="picker" id="picker"></div>
+
+    <div class="subject" id="subject">
+      <div class="subject__pic" id="subjPic">🖼️</div>
+      <div class="subject__txt">
+        <h3 id="subjTitle"></h3>
+        <p id="subjWhere"></p>
+        <span class="subject__claim" id="subjClaim"></span>
+      </div>
+    </div>
+
+    <div class="checks" id="checks"></div>
+
+    <div class="tray" id="tray">
+      <div class="tray__head">
+        <b>Your evidence so far</b>
+        <span class="tray__count"><b id="ranCount">0</b> of 3 checks run · need at least 2 to decide</span>
+      </div>
+      <div class="verdict">
+        <button class="btn btn--go" id="trustBtn" type="button" disabled>🟢 Trust it</button>
+        <button class="btn btn--ghost" id="doubtBtn" type="button" disabled>🟠 Doubt it</button>
+      </div>
+      <div class="vfb muted" id="vfb"></div>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" id="a1Next" data-next disabled>Next: the rule →</button>
+    </div>
+  </section>
+
+  <!-- ACT 2: WRAP -->
+  <section class="act" data-act="2" hidden>
+    <h2>Stack the signals</h2>
+    <p class="muted">No one check is proof on its own. A real original can still be reused in a lie, and a
+       missing label does not mean fake. Investigators do what you just did: gather several signals and
+       weigh them together.</p>
+
+    <div class="card" style="margin:8px 0">
+      <h3>🔎 The three checks, for any image</h3>
+      <p class="muted" style="margin:0">
+        <b>1. Reverse image search.</b> Does it show up earlier somewhere else, or in a totally different
+        story? Then this caption is not the real one. <br>
+        <b>2. Content Credentials (<button class="term" data-term="c2pa">C2PA</button>).</b> A tamper-evident
+        label some cameras and AI tools now attach, showing if an image was AI-made or edited. If it is
+        there, read it. <br>
+        <b>3. Source that has to get it right.</b> Did it come from a place that is accountable, or from an
+        account built for clicks?</p>
+    </div>
+
+    <div class="fact">
+      <span aria-hidden="true">✅</span>
+      <span><b>The rule:</b> one signal is a hint, several together are an answer. Check the source, not
+      the surface. And when the checks disagree, stay in doubt until they do not.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <a class="btn btn--cosmic" href="../">Back to the AI Wing →</a>
+    </div>
+  </section>
+
+  <p class="center muted tiny" style="margin-top:26px">
+    <a href="../">← AI Wing</a> · these are the real checks newsrooms run. Tap the
+    <span class="term" style="cursor:default;border:0">underlined words</span> to dig deeper.
+  </p>
+</main>
+
+<script src="../../assets/manifest.js"></script>
+<script src="../../assets/glossary.js"></script>
+<script src="../../assets/shell.js"></script>
+<script>
+(function () {
+  /* Add this module's verified terms to the shared glossary in memory
+     only (we never edit the shared file). Sources are real and current. */
+  var G = window.IDEA_LAB_GLOSSARY || (window.IDEA_LAB_GLOSSARY = {});
+  G.provenance = {
+    term: "Provenance",
+    short: "The traceable history of where a thing came from and what happened to it since.",
+    deep: "Provenance means the record of an item's origin and the chain of changes it went through. For a digital image it answers questions like: which device or tool made it, when, and was it edited along the way. Checking provenance, instead of judging by appearance, is how investigators and newsrooms decide whether a picture can be trusted.",
+    source: "https://en.wikipedia.org/wiki/Provenance"
+  };
+  G.c2pa = {
+    term: "Content Credentials (C2PA)",
+    short: "A tamper-evident label attached to a file that records how it was made or edited, including whether AI was used.",
+    deep: "C2PA is an open technical standard for content provenance. Tools that support it attach a signed 'Content Credentials' label to an image that can record what device or software made it and what edits happened, and it flags whether generative AI was involved. Because the label is cryptographically signed, changing the image after the fact breaks the seal, so you can tell it was tampered with. It is now built into some cameras and AI tools. A missing label does not prove a fake; it just means there is nothing to read.",
+    source: "https://c2pa.org/"
+  };
+  G["reverse-image-search"] = {
+    term: "Reverse image search",
+    short: "Searching with a picture instead of words to find where else that same image appears online.",
+    deep: "A reverse image search takes the picture itself and finds other places it shows up. That can reveal an earlier, original version, or the same photo attached to a completely different story or date. If a 'breaking news' image actually appeared years ago, or belongs to another event, the caption is wrong. It is one of the fastest ways to catch an old or stolen image dressed up as new.",
+    source: "https://support.google.com/websearch/answer/1325808"
+  };
+
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("ai-wing", "../..");
+  IdeaLab.disclosure();
+  IdeaLab.glossary(window.IDEA_LAB_GLOSSARY);
+
+  /* ---------- stepper ---------- */
+  var acts = Array.prototype.slice.call(document.querySelectorAll(".act"));
+  var dots = document.getElementById("dots");
+  var done = [false, false, false];
+  var current = 0;
+  acts.forEach(function (_, i) {
+    var d = document.createElement("span");
+    d.className = "dot" + (i === 0 ? " is-active" : "");
+    dots.appendChild(d);
+  });
+  function show(i) {
+    current = Math.max(0, Math.min(acts.length - 1, i));
+    acts.forEach(function (a, k) { a.hidden = k !== current; });
+    Array.prototype.forEach.call(dots.children, function (d, k) {
+      d.className = "dot" + (k === current ? " is-active" : (done[k] ? " is-done" : ""));
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.body.addEventListener("click", function (e) {
+    if (e.target.matches("[data-next]") && !e.target.disabled) { done[current] = true; show(current + 1); }
+    if (e.target.matches("[data-prev]")) show(current - 1);
+  });
+
+  /* ---------- the cases ----------
+     Each image carries three check outcomes. "verdict" is the honest
+     call once all signals are weighed: trust, doubt, or careful. No
+     single signal decides it, so the kid must stack them. */
+  var SIG = {
+    trust: { cls: "s-trust", run: "run--clear", icon: "🟢", label: "Leans trust" },
+    doubt: { cls: "s-doubt", run: "run--flag",  icon: "🟠", label: "Leans doubt" },
+    mixed: { cls: "s-mixed", run: "run--mixed", icon: "🔵", label: "Unclear" }
+  };
+
+  var CASES = [
+    {
+      pic: "🌪️",
+      title: "\"Giant storm hits our city today\"",
+      where: "Reposted by a meme account with a funny name",
+      claim: "Shared 40,000 times in an hour",
+      checks: {
+        reverse: { sig: "doubt", text: "Reverse image search finds the exact same photo from a different country, three years ago. It is real, but it is old and from somewhere else." },
+        c2pa:    { sig: "mixed", text: "No Content Credentials label is attached, so this tool cannot tell you how it was made. A missing label is not proof of a fake, just nothing to read." },
+        source:  { sig: "doubt", text: "The account exists for laughs and clicks, not for getting facts right. Nobody is accountable for it." }
+      },
+      verdict: "doubt",
+      why: "Two signals lean doubt, and the third is just blank. A real photo, but reused in a false 'today' story. Doubt is right."
+    },
+    {
+      pic: "🚀",
+      title: "\"New rocket launch, live this morning\"",
+      where: "Posted on the space agency's official site",
+      claim: "With a date, a place, and a video",
+      checks: {
+        reverse: { sig: "trust", text: "Reverse image search shows it first appearing today, on the agency's own page. No earlier copies in other stories." },
+        c2pa:    { sig: "trust", text: "It carries a Content Credentials label from the agency's camera. The seal is intact, so it has not been altered since." },
+        source:  { sig: "trust", text: "An official source that has to get it right, and can be held to it." }
+      },
+      verdict: "trust",
+      why: "All three signals line up: newest copy, an unbroken provenance label, and an accountable source. That is what trust looks like."
+    },
+    {
+      pic: "🦸",
+      title: "\"Real photo of a hero saving the parade\"",
+      where: "Forwarded to you with no link",
+      claim: "\"You have to see this, it actually happened!\"",
+      checks: {
+        reverse: { sig: "mixed", text: "Reverse image search finds no earlier copy anywhere. New does not always mean real, so this alone settles nothing." },
+        c2pa:    { sig: "doubt", text: "The Content Credentials label says it was made by an AI image generator. The seal is intact, and it plainly reads: generated, not photographed." },
+        source:  { sig: "doubt", text: "It came as a forward with no source you can trace back to anyone." }
+      },
+      verdict: "doubt",
+      why: "The provenance label said it outright: AI-made. Add an untraceable source and the answer is clear, no matter how real it looked."
+    }
+  ];
+
+  var CHECK_DEFS = [
+    { key: "reverse", ico: "🔁", term: "reverse-image-search", name: "Reverse image search",
+      hint: "Does this show up earlier, or in a different story?", btn: "Search the image" },
+    { key: "c2pa", ico: "🏷️", term: "c2pa", name: "Content Credentials (C2PA)",
+      hint: "A tamper-evident label: AI-made or edited?", btn: "Read the label" },
+    { key: "source", ico: "🏛️", term: "source", name: "Source that has to get it right",
+      hint: "Accountable source, or an account built for clicks?", btn: "Check the source" }
+  ];
+
+  var picker = document.getElementById("picker");
+  var subjPic = document.getElementById("subjPic");
+  var subjTitle = document.getElementById("subjTitle");
+  var subjWhere = document.getElementById("subjWhere");
+  var subjClaim = document.getElementById("subjClaim");
+  var checksEl = document.getElementById("checks");
+  var ranCountEl = document.getElementById("ranCount");
+  var trustBtn = document.getElementById("trustBtn");
+  var doubtBtn = document.getElementById("doubtBtn");
+  var vfb = document.getElementById("vfb");
+  var a1Next = document.getElementById("a1Next");
+
+  var active = 0;     /* index of the case being investigated */
+  var ran = {};       /* per-case set of checks run: ran[caseIndex] = {reverse:true,...} */
+  var decided = {};   /* per-case: did the kid already decide */
+  var awarded = false;
+
+  /* the picker buttons */
+  CASES.forEach(function (c, i) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "pick" + (i === 0 ? " on" : ""); b.dataset.i = i;
+    b.innerHTML = '<span aria-hidden="true">' + c.pic + "</span> Image " + (i + 1);
+    picker.appendChild(b);
+  });
+  picker.addEventListener("click", function (e) {
+    var b = e.target.closest(".pick"); if (!b) return;
+    active = +b.dataset.i;
+    Array.prototype.forEach.call(picker.children, function (x) { x.classList.toggle("on", x === b); });
+    loadCase();
+  });
+
+  function ranSet() { return ran[active] || (ran[active] = {}); }
+
+  function loadCase() {
+    var c = CASES[active];
+    subjPic.textContent = c.pic;
+    subjTitle.textContent = c.title;
+    subjWhere.textContent = "Where you saw it: " + c.where;
+    subjClaim.textContent = c.claim;
+
+    /* (re)build the three checks for this image */
+    checksEl.innerHTML = "";
+    CHECK_DEFS.forEach(function (def) {
+      var card = document.createElement("div");
+      card.className = "check"; card.dataset.k = def.key;
+      card.innerHTML =
+        '<div class="check__top">' +
+          '<span class="check__ico" aria-hidden="true">' + def.ico + "</span>" +
+          '<span class="check__name"><h4>' + IdeaLab.esc(def.name) + "</h4>" +
+            '<p>' + IdeaLab.esc(def.hint) + "</p></span>" +
+          '<span class="check__btn"><button class="btn btn--cosmic tiny" type="button" data-run="' +
+            def.key + '">' + IdeaLab.esc(def.btn) + "</button></span>" +
+        "</div>";
+      checksEl.appendChild(card);
+
+      /* if this check was already run for this image, re-show its result */
+      if (ranSet()[def.key]) renderResult(card, def.key);
+    });
+
+    updateTray();
+  }
+
+  function renderResult(card, key) {
+    var out = CASES[active].checks[key];
+    var meta = SIG[out.sig];
+    card.classList.add(meta.run);
+    var btn = card.querySelector("[data-run]");
+    if (btn) { btn.disabled = true; btn.textContent = "Checked ✓"; }
+    if (card.querySelector(".check__result")) return;
+    var res = document.createElement("div");
+    res.className = "check__result";
+    res.innerHTML = '<span class="rd" aria-hidden="true">' + meta.icon + "</span>" +
+      "<span>" + IdeaLab.esc(out.text) +
+      '<br><span class="signal ' + meta.cls + '">' + meta.icon + " " + meta.label + "</span></span>";
+    card.appendChild(res);
+  }
+
+  checksEl.addEventListener("click", function (e) {
+    var btn = e.target.closest("[data-run]"); if (!btn || btn.disabled) return;
+    var key = btn.dataset.run;
+    ranSet()[key] = true;
+    renderResult(btn.closest(".check"), key);
+    updateTray();
+  });
+
+  function ranTotal() {
+    var s = ranSet(), n = 0, k;
+    for (k in s) if (s[k]) n++;
+    return n;
+  }
+
+  function updateTray() {
+    var n = ranTotal();
+    ranCountEl.textContent = n;
+    var enough = n >= 2;
+    trustBtn.disabled = !enough || decided[active];
+    doubtBtn.disabled = !enough || decided[active];
+
+    /* Award once the kid has checked an image with at least two methods. */
+    if (enough && !awarded) {
+      awarded = true;
+      IdeaLab.award("truth-tracer", 50);
+    }
+
+    if (!decided[active]) {
+      vfb.textContent = enough
+        ? "Two or more signals are in. Weigh them, then make the call."
+        : "Run at least two checks. One signal is never enough to decide.";
+      vfb.className = "vfb muted";
+    }
+  }
+
+  function decide(choice) {
+    if (trustBtn.disabled && choice === "trust") return;
+    if (doubtBtn.disabled && choice === "doubt") return;
+    var c = CASES[active];
+    decided[active] = true;
+    /* "mixed" verdicts are honestly resolved as doubt: when unsure, doubt */
+    var right = (c.verdict === "trust") ? (choice === "trust") : (choice === "doubt");
+    vfb.innerHTML = (right ? "✅ Good call. " : "🤔 Look again. ") + IdeaLab.esc(c.why);
+    vfb.className = "vfb " + (right ? "ok" : "no");
+    trustBtn.disabled = true;
+    doubtBtn.disabled = true;
+    a1Next.disabled = false;
+  }
+  trustBtn.addEventListener("click", function () { decide("trust"); });
+  doubtBtn.addEventListener("click", function () { decide("doubt"); });
+
+  /* term that lives only in this page's copy text, defined inline above */
+  var SRC_TERM = window.IDEA_LAB_GLOSSARY;
+  if (!SRC_TERM.source) {
+    SRC_TERM.source = {
+      term: "A source that has to get it right",
+      short: "A place that is accountable for being accurate, not an account built for clicks or laughs.",
+      deep: "Some sources have a reason and a duty to be correct: an official organization, or a newsroom that has to publish corrections and answer for mistakes. An anonymous repost, a meme page, or a forwarded screenshot has no such accountability. When you cannot tell who is responsible for a claim, treat it as unverified until a source that can be held to account confirms it.",
+      source: "https://www.cisa.gov/news-events/news/how-spot-and-avoid-disinformation"
+    };
+  }
+
+  loadCase();
+})();
+</script>
+</body>
+</html>

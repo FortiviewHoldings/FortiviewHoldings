@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cookies — Defense Range — Idea Lab</title>
+<meta name="description" content="A pretend store leaves little notes in your browser to remember you. Read the notes, change one and watch it update, then clear them so the site forgets who you are. Free, factual, no accounts.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../../assets/logo.svg">
+<link rel="stylesheet" href="../../assets/cosmos.css">
+<style>
+  /* lab-local styles, built on the cosmos tokens */
+  .stage{display:grid;grid-template-columns:1fr;gap:18px}
+  @media(min-width:760px){ .stage{grid-template-columns:1fr 1fr} }
+
+  /* the pretend store window */
+  .win{border:1px solid var(--border);border-radius:14px;overflow:hidden;background:#0a1020;
+    box-shadow:0 18px 50px #0008}
+  .win__bar{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#0d1428;
+    border-bottom:1px solid var(--border)}
+  .win__dot{width:11px;height:11px;border-radius:50%;background:#ffffff2a}
+  .win__url{margin-left:8px;font-size:.78em;color:var(--muted);font-family:ui-monospace,monospace}
+  .win__body{padding:22px 20px;display:grid;gap:14px}
+
+  /* the store changes its skin when the theme cookie changes */
+  .store{border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;
+    transition:background .3s, color .3s, border-color .3s}
+  .store__hi{font-weight:800;font-size:1.1em;min-height:1.3em}
+  .store__cart{font-weight:700;margin-top:4px}
+  .store.theme-night{background:#070b16;color:var(--ink);border-color:var(--border)}
+  .store.theme-day{background:#f4f1e6;color:#1a2230;border-color:#d8d2bf}
+  .store.theme-galaxy{background:linear-gradient(140deg,#1a1140,#3a1d63);color:#ffe7fb;border-color:#7c5cff66}
+  .store__buy{margin-top:12px}
+
+  .themepick{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  .themepick .chip.is-sel{background:var(--grad-cosmic);color:#04060d;border-color:transparent}
+
+  /* the cookie jar: a peek at what the site stored in your browser */
+  .jar{border:1px solid var(--border);border-radius:14px;background:#070b16;overflow:hidden}
+  .jar__bar{display:flex;align-items:center;gap:8px;padding:9px 12px;background:#0c1326;
+    border-bottom:1px solid var(--border);font-size:.8em;color:var(--muted);font-weight:700}
+  .jar__body{padding:14px}
+  .ctable{width:100%;border-collapse:collapse;font-size:.86em}
+  .ctable th,.ctable td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);
+    vertical-align:top}
+  .ctable th{color:var(--muted);font-weight:700;font-size:.82em;text-transform:uppercase;letter-spacing:.05em}
+  .ctable td.key{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--plasma);font-weight:700}
+  .ctable td.val{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#cdd6f4;word-break:break-word}
+  .ctable .note{color:var(--muted);font-size:.92em}
+  .jar__empty{color:var(--muted);text-align:center;padding:18px 10px}
+  .jar__empty b{color:var(--ink)}
+
+  .kindrow{display:grid;grid-template-columns:1fr;gap:14px;margin-top:6px}
+  @media(min-width:620px){ .kindrow{grid-template-columns:1fr 1fr} }
+  .kind{border:1px solid var(--border);border-radius:12px;padding:14px 16px;background:var(--glass)}
+  .kind h4{margin:0 0 .3em;display:flex;align-items:center;gap:8px}
+  .kind p{margin:0;color:var(--muted);font-size:.92em}
+  .kind--help{border-color:#21bca555}
+  .kind--track{border-color:#ff6b6b55}
+
+  .pretend{display:inline-flex;align-items:center;gap:6px;font-size:.72em;font-weight:700;
+    padding:4px 10px;border-radius:999px;letter-spacing:.06em;text-transform:uppercase;
+    background:#7c5cff22;color:#b9a8ff;border:1px solid #7c5cff55}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section lab">
+  <header class="center">
+    <span class="kicker">Defense Range</span>
+    <h1 style="font-size:clamp(28px,5vw,46px);margin:.2em 0">Cookies</h1>
+    <p class="muted">A pretend store leaves little notes in your browser so it can remember you. Read
+       the notes, change one, then clear them and watch the store forget.</p>
+  </header>
+
+  <div class="steps" id="dots" aria-hidden="true"></div>
+
+  <!-- ACT 0: MEET THE STORE -->
+  <section class="act" data-act="0">
+    <h2>The store leaves a note</h2>
+    <p class="muted">This is a make-believe shop. The first time you visit, it writes a few little
+       notes about you and tucks them in your browser. Those notes are called <button class="term" data-term="cookie">cookies</button>.</p>
+
+    <div class="stage">
+      <div class="win">
+        <div class="win__bar"><span class="win__dot"></span><span class="win__dot"></span>
+          <span class="win__dot"></span><span class="win__url">snack-cart.example</span>
+          <span class="pretend" style="margin-left:auto">pretend</span></div>
+        <div class="win__body">
+          <div class="store theme-night" id="store">
+            <div class="store__hi" id="storeHi">Welcome back, friend.</div>
+            <div class="store__cart" id="storeCart">Your cart: 0 snacks</div>
+            <button class="btn btn--go store__buy" id="buyBtn" type="button">Add a snack to cart</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="jar">
+        <div class="jar__bar">🍪 Cookies this site stored in your browser</div>
+        <div class="jar__body">
+          <table class="ctable" id="jarTable">
+            <thead><tr><th>Note</th><th>Value</th><th>What it does</th></tr></thead>
+            <tbody id="jarBody"></tbody>
+          </table>
+          <div class="jar__empty hidden" id="jarEmpty">
+            <b>No cookies.</b> The site has no notes about you right now.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">🍪</span>
+      <span><b>A cookie is a small note a site leaves in your browser to remember you between visits.</b>
+      These pretend ones live only in your browser, on this lab. Nothing is sent anywhere.</span>
+    </div>
+
+    <div class="act__nav"><span></span>
+      <button class="btn btn--go" data-next>Next: change a cookie →</button></div>
+  </section>
+
+  <!-- ACT 1: CHANGE THE THEME -->
+  <section class="act" data-act="1" hidden>
+    <h2>Change a cookie, see it stick</h2>
+    <p class="muted">One of the notes is your <b>theme</b>, the store's look. Pick a new one. The store
+       changes right away, and the cookie updates to match. Leave and come back and it would remember.</p>
+
+    <div class="stage">
+      <div class="win">
+        <div class="win__bar"><span class="win__dot"></span><span class="win__dot"></span>
+          <span class="win__dot"></span><span class="win__url">snack-cart.example</span>
+          <span class="pretend" style="margin-left:auto">pretend</span></div>
+        <div class="win__body">
+          <div class="store theme-night" id="store2">
+            <div class="store__hi" id="store2Hi">Welcome back, friend.</div>
+            <div class="store__cart" id="store2Cart">Your cart: 0 snacks</div>
+          </div>
+          <div class="themepick" id="themePick"></div>
+        </div>
+      </div>
+
+      <div class="jar">
+        <div class="jar__bar">🍪 The same cookies, live</div>
+        <div class="jar__body">
+          <table class="ctable">
+            <thead><tr><th>Note</th><th>Value</th><th>What it does</th></tr></thead>
+            <tbody id="jarBody2"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">⚙️</span>
+      <span><b>This is the helpful kind.</b> The site saved your pick so it does not have to ask every
+      time. Want to see the real thing? Open <button class="term" data-term="inspect-element">dev tools</button>
+      and look under storage. Your notes are sitting right there.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" data-next>Next: clear the cookies →</button>
+    </div>
+  </section>
+
+  <!-- ACT 2: CLEAR THE COOKIES -->
+  <section class="act" data-act="2" hidden>
+    <h2>Clear them, and the site forgets</h2>
+    <p class="muted">You are always allowed to delete cookies. Do it now. Watch the store lose every
+       note: your theme, your cart, even who you are.</p>
+
+    <div class="stage">
+      <div class="win">
+        <div class="win__bar"><span class="win__dot"></span><span class="win__dot"></span>
+          <span class="win__dot"></span><span class="win__url">snack-cart.example</span>
+          <span class="pretend" style="margin-left:auto">pretend</span></div>
+        <div class="win__body">
+          <div class="store theme-night" id="store3">
+            <div class="store__hi" id="store3Hi">Welcome back, friend.</div>
+            <div class="store__cart" id="store3Cart">Your cart: 0 snacks</div>
+          </div>
+          <button class="btn btn--cosmic" id="clearBtn" type="button">Clear cookies</button>
+          <div class="muted tiny" id="clearMsg" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <div class="jar">
+        <div class="jar__bar">🍪 The jar after you clear it</div>
+        <div class="jar__body">
+          <table class="ctable" id="jarTable3">
+            <thead><tr><th>Note</th><th>Value</th><th>What it does</th></tr></thead>
+            <tbody id="jarBody3"></tbody>
+          </table>
+          <div class="jar__empty hidden" id="jarEmpty3">
+            <b>Empty.</b> The site forgot you. Next visit it starts fresh.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fact hidden" id="clearLesson" style="margin-top:16px">
+      <span aria-hidden="true">🧹</span>
+      <span><b>Who are you again?</b> The store lost its notes, so it greets a stranger. That is your
+      power: you can always delete cookies, and the site has to start over.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--cosmic" id="wrapNext" data-next disabled>Last: helpful vs tracking →</button>
+    </div>
+  </section>
+
+  <!-- ACT 3: WRAP -->
+  <section class="act" data-act="3" hidden>
+    <h2>Two kinds of cookies</h2>
+    <p class="muted">Not all cookies are the same. Some make your day easier. Some follow you around.
+       Knowing the difference is the whole point.</p>
+
+    <div class="kindrow">
+      <div class="kind kind--help">
+        <h4>🤝 Helpful cookies</h4>
+        <p>These help <b>you</b>. They keep you logged in so you do not retype your password, and they
+        remember settings like your theme, language, or what is in your cart. One site, helping one visit
+        flow into the next.</p>
+      </div>
+      <div class="kind kind--track">
+        <h4>🛰️ Tracking cookies</h4>
+        <p>These help <b>someone else</b>. The same kind of note can be used to follow you across many
+        sites and build a picture of what you look at, often to aim ads at you. Same tool, different job.</p>
+      </div>
+    </div>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">✅</span>
+      <span><b>The one rule:</b> a cookie is just a note. Some help you, some track you, and you can
+      always delete them. Clearing them logs you out and resets settings, which is the trade.</span>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <h3>🧪 See it for real (safe)</h3>
+      <p class="muted">In your real browser, open <button class="term" data-term="inspect-element">dev tools</button>,
+        find the storage or cookies tab, and you can read every note a site left, and delete them yourself.
+        Settings let you block tracking cookies while keeping the helpful ones.</p>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <a class="btn btn--cosmic" href="../">Back to the Defense Range →</a>
+    </div>
+  </section>
+
+  <p class="center muted tiny" style="margin-top:26px">
+    <a href="../">← Defense Range</a> · the store is pretend and every cookie here lives only in your browser
+  </p>
+</main>
+
+<script src="../../assets/manifest.js"></script>
+<script src="../../assets/glossary.js"></script>
+<script src="../../assets/shell.js"></script>
+<script>
+(function () {
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("defense", "../..");
+  IdeaLab.disclosure();
+  IdeaLab.glossary(window.IDEA_LAB_GLOSSARY);
+
+  /* a cookie this lab does not have a global slug for: define it locally
+     so the underlined word still opens an honest, sourced card */
+  if (window.IDEA_LAB_GLOSSARY && !window.IDEA_LAB_GLOSSARY.cookie) {
+    window.IDEA_LAB_GLOSSARY.cookie = {
+      term: "Cookie (HTTP cookie)",
+      short: "A small note a website stores in your browser so it can remember you between visits.",
+      deep: "A cookie is a little piece of text a site saves in your browser. On your next visit the browser hands it back, so the site can recognize you, keep you logged in, or remember settings. Some cookies are first-party and help the site you are on; third-party cookies can be used to follow you across many sites, often for ads. You can view and delete cookies in your browser at any time.",
+      source: "https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies"
+    };
+  }
+
+  /* this lab keeps its pretend cookies in ITS OWN localStorage key, so it
+     never touches your real browser cookies or the lab's progress store */
+  var STORE_KEY = "ideaLab.cookies.demo";
+
+  function makeFresh() {
+    return {
+      session: "sx-" + Math.random().toString(36).slice(2, 8),
+      theme: "night",
+      cart: 0
+    };
+  }
+  function loadJar() {
+    try {
+      var raw = window.localStorage.getItem(STORE_KEY);
+      if (raw) {
+        var p = JSON.parse(raw);
+        if (p && typeof p === "object") return p;
+      }
+    } catch (e) { /* fall through to fresh */ }
+    return null;
+  }
+  function saveJar(j) {
+    try { window.localStorage.setItem(STORE_KEY, JSON.stringify(j)); } catch (e) { /* ignore */ }
+  }
+  function clearJar() {
+    try { window.localStorage.removeItem(STORE_KEY); } catch (e) { /* ignore */ }
+  }
+
+  /* the store always has a jar to begin with, so the first visit shows notes */
+  var jar = loadJar();
+  if (!jar) { jar = makeFresh(); saveJar(jar); }
+
+  var THEMES = [
+    { key: "night",  name: "Night",  hi: "Welcome back, night owl." },
+    { key: "day",    name: "Day",    hi: "Good day, friend." },
+    { key: "galaxy", name: "Galaxy", hi: "Greetings, space traveler." }
+  ];
+  function themeBy(k) {
+    for (var i = 0; i < THEMES.length; i++) if (THEMES[i].key === k) return THEMES[i];
+    return THEMES[0];
+  }
+
+  var NOTES = [
+    { key: "session", label: "session", note: "Tells the store you are the same visitor as before." },
+    { key: "theme",   label: "theme",   note: "Remembers the look you picked, so it does not have to ask." },
+    { key: "cart",    label: "cart",    note: "Remembers how many snacks you put in your cart." }
+  ];
+
+  /* paint a jar table from the current cookies (or show the empty card) */
+  function renderJar(tbodyId, emptyId) {
+    var tbody = document.getElementById(tbodyId);
+    if (!tbody) return;
+    var empty = emptyId ? document.getElementById(emptyId) : null;
+    tbody.innerHTML = "";
+    if (!jar) {
+      if (empty) empty.classList.remove("hidden");
+      if (tbody.parentNode) tbody.parentNode.classList.add("hidden");
+      return;
+    }
+    if (empty) empty.classList.add("hidden");
+    if (tbody.parentNode) tbody.parentNode.classList.remove("hidden");
+    NOTES.forEach(function (n) {
+      var val = jar[n.key];
+      if (n.key === "cart") val = String(val) + " snacks";
+      var tr = document.createElement("tr");
+      tr.innerHTML =
+        '<td class="key">' + IdeaLab.esc(n.label) + "</td>" +
+        '<td class="val">' + IdeaLab.esc(String(val)) + "</td>" +
+        '<td class="note">' + IdeaLab.esc(n.note) + "</td>";
+      tbody.appendChild(tr);
+    });
+  }
+
+  /* paint a store panel to match the current cookies */
+  function paintStore(prefix) {
+    var box = document.getElementById(prefix);
+    var hi = document.getElementById(prefix + "Hi");
+    var cart = document.getElementById(prefix + "Cart");
+    if (!box) return;
+    if (!jar) {
+      box.className = "store theme-night";
+      if (hi) hi.textContent = "Hello, stranger. Who are you again?";
+      if (cart) cart.textContent = "Your cart: empty";
+      return;
+    }
+    var t = themeBy(jar.theme);
+    box.className = "store theme-" + t.key;
+    if (hi) hi.textContent = t.hi;
+    if (cart) cart.textContent = "Your cart: " + jar.cart + " snack" + (jar.cart === 1 ? "" : "s");
+  }
+
+  function paintAll() {
+    renderJar("jarBody", "jarEmpty");
+    renderJar("jarBody2", null);
+    renderJar("jarBody3", "jarEmpty3");
+    paintStore("store");
+    paintStore("store2");
+    paintStore("store3");
+  }
+
+  /* award rule: the kid must INSPECT (look at the notes) then CLEAR them */
+  var didInspect = false;
+  var didClear = false;
+  function maybeAward() {
+    if (didInspect && didClear) IdeaLab.award("crumb-tracker", 45);
+  }
+
+  /* ---------- stepper ---------- */
+  var acts = Array.prototype.slice.call(document.querySelectorAll(".act"));
+  var dots = document.getElementById("dots");
+  var done = [false, false, false, false];
+  var current = 0;
+  acts.forEach(function (_, i) {
+    var d = document.createElement("span");
+    d.className = "dot" + (i === 0 ? " is-active" : "");
+    dots.appendChild(d);
+  });
+  function show(i) {
+    current = Math.max(0, Math.min(acts.length - 1, i));
+    acts.forEach(function (a, k) { a.hidden = k !== current; });
+    Array.prototype.forEach.call(dots.children, function (d, k) {
+      d.className = "dot" + (k === current ? " is-active" : (done[k] ? " is-done" : ""));
+    });
+    /* reaching act 0 and reading the notes counts as inspecting */
+    if (current === 0) didInspect = true;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.body.addEventListener("click", function (e) {
+    if (e.target.matches("[data-next]") && !e.target.disabled) { done[current] = true; show(current + 1); }
+    if (e.target.matches("[data-prev]")) show(current - 1);
+  });
+
+  /* ---------- ACT 0: meet the store ---------- */
+  /* seeing the jar on the first screen is the inspect step */
+  didInspect = true;
+  document.getElementById("buyBtn").addEventListener("click", function () {
+    if (!jar) jar = makeFresh();
+    jar.cart += 1;
+    saveJar(jar);
+    paintAll();
+    IdeaLab.addXP(2);
+  });
+
+  /* ---------- ACT 1: change the theme ---------- */
+  var themePick = document.getElementById("themePick");
+  function paintThemeButtons() {
+    Array.prototype.forEach.call(themePick.children, function (b) {
+      b.classList.toggle("is-sel", jar && b.dataset.theme === jar.theme);
+    });
+  }
+  THEMES.forEach(function (t) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip";
+    b.dataset.theme = t.key;
+    b.textContent = t.name;
+    themePick.appendChild(b);
+  });
+  themePick.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-theme]");
+    if (!b) return;
+    if (!jar) jar = makeFresh();
+    jar.theme = b.dataset.theme;
+    saveJar(jar);
+    paintAll();
+    paintThemeButtons();
+  });
+
+  /* ---------- ACT 2: clear the cookies ---------- */
+  document.getElementById("clearBtn").addEventListener("click", function () {
+    clearJar();
+    jar = null;
+    didClear = true;
+    paintAll();
+    paintThemeButtons();
+    var msg = document.getElementById("clearMsg");
+    if (msg) msg.textContent = "Cleared. The store has no notes about you now.";
+    document.getElementById("clearLesson").classList.remove("hidden");
+    document.getElementById("wrapNext").disabled = false;
+    maybeAward();
+  });
+
+  /* first paint */
+  paintAll();
+  paintThemeButtons();
+})();
+</script>
+</body>
+</html>

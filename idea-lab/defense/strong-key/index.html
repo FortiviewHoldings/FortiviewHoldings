@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Key That Holds — Defense Range — Idea Lab</title>
+<meta name="description" content="Watch a guesser race a password and learn why length beats squiggles, and why common words fall instantly. Honest, kid-friendly, no accounts.">
+<meta name="color-scheme" content="dark">
+<link rel="stylesheet" href="../../assets/cosmos.css">
+<style>
+  .cracklist{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px}
+  .crackcard{border:1px solid var(--border);border-radius:12px;background:var(--glass);padding:14px;
+    text-align:center;transition:.2s}
+  .crackcard.cracked{border-color:var(--bad);background:#ff6b6b18}
+  .crackcard .pw{font-family:ui-monospace,monospace;font-weight:800;font-size:1.05em}
+  .crackcard .st{font-size:.78em;color:var(--muted);margin-top:8px;min-height:1.2em}
+  .crackcard.cracked .st{color:var(--bad);font-weight:700}
+
+  .pwbox{display:grid;gap:14px}
+  .pwbox input{font:inherit;font-family:ui-monospace,monospace;font-size:1.15em;background:#060a16;
+    color:var(--ink);border:1px solid var(--border);border-radius:10px;padding:13px 14px;width:100%}
+  .pwbox input:focus-visible{outline:3px solid var(--brand-600);outline-offset:1px}
+  .meter{height:16px;border-radius:8px;background:#ffffff14;overflow:hidden}
+  .meter > i{display:block;height:100%;width:0;transition:width .35s, background .35s;background:var(--bad)}
+  .rowline{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+  .verdict{font-weight:800;font-size:1.1em}
+  .timeval{font-family:ui-monospace,monospace;font-weight:700}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip2{cursor:pointer;border:1px solid var(--border);background:var(--glass);border-radius:999px;
+    padding:7px 12px;font:inherit;color:var(--ink);font-family:ui-monospace,monospace;font-size:.84em}
+  .chip2:hover{border-color:var(--plasma)}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section lab">
+  <header class="center">
+    <span class="kicker">Defense Range</span>
+    <h1 style="font-size:clamp(28px,5vw,46px);margin:.2em 0">A Key That Holds</h1>
+    <p class="muted">A password is a key. Some keys take seconds to copy. Some take longer than the
+       universe. Learn the difference.</p>
+  </header>
+
+  <div class="steps" id="dots" aria-hidden="true"></div>
+
+  <!-- ACT 0: THE GUESS LIST -->
+  <section class="act" data-act="0">
+    <h2>The guess list</h2>
+    <p class="muted">A guesser does not start random. It starts with the most common passwords ever
+       leaked, millions of them, and tries those first. Press the button.</p>
+
+    <div class="cracklist" id="cracklist"></div>
+
+    <p class="center" style="margin-top:16px">
+      <button class="btn btn--cosmic" id="runGuesser">Run the guesser</button></p>
+
+    <div class="fact hidden" id="a0Lesson" style="margin-top:8px">
+      <span aria-hidden="true">⚠️</span>
+      <span><b>If your password is a common word or a simple pattern, its length does not save it.</b>
+      It is already on the list. Swapping letters for look-alikes (like p@ssw0rd) does not fool the
+      guesser either. It checks those too.</span>
+    </div>
+
+    <div class="act__nav"><span></span>
+      <button class="btn btn--go" id="a0Next" data-next disabled>Next: build a real key →</button></div>
+  </section>
+
+  <!-- ACT 1: BUILD ONE -->
+  <section class="act" data-act="1" hidden>
+    <h2>Build a key that holds</h2>
+    <p class="muted">Type a password and watch the guesser's clock. Try the examples too.</p>
+
+    <div class="pwbox">
+      <input id="pw" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="type here...">
+      <div class="meter"><i id="meterBar"></i></div>
+      <div class="rowline">
+        <span class="verdict" id="verdict">Type something</span>
+        <span class="muted">guesser needs: <span class="timeval" id="timeval">—</span></span>
+      </div>
+      <div class="muted tiny" id="why"></div>
+      <div>
+        <div class="muted tiny" style="margin-bottom:6px">Try one:</div>
+        <div class="chips" id="chips"></div>
+      </div>
+    </div>
+
+    <div class="fact hidden" id="a1Lesson" style="margin-top:16px">
+      <span aria-hidden="true">🔐</span>
+      <span><b>Long and unpredictable wins.</b> Each extra letter multiplies the guesser's work. A few
+      random words stuck together is long, easy to remember, and very hard to guess.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--cosmic" id="a1Next" data-next disabled>Last: the real rules →</button>
+    </div>
+  </section>
+
+  <!-- ACT 2: WRAP -->
+  <section class="act" data-act="2" hidden>
+    <h2>The four rules pros use</h2>
+    <div class="card" style="margin:8px 0">
+      <p class="muted" style="margin:0">
+        <b>1. Long.</b> Aim for a passphrase: a few random words, like <code>river-purple-engine-cloud</code>.<br>
+        <b>2. Unpredictable.</b> No real names, birthdays, or common words. The guesser knows those.<br>
+        <b>3. Different everywhere.</b> One password per site. If one leaks, the rest stay safe.<br>
+        <b>4. Let a tool remember.</b> A password manager makes and stores long ones, so you do not have to.</p>
+    </div>
+    <div class="fact">
+      <span aria-hidden="true">✅</span>
+      <span><b>This is what security teams actually recommend now:</b> length over squiggles, and never
+      a password that has shown up in a leak.</span>
+    </div>
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <a class="btn btn--cosmic" href="../">Back to the Defense Range →</a>
+    </div>
+  </section>
+
+  <p class="center muted tiny" style="margin-top:26px">
+    <a href="../">← Defense Range</a> · the clock assumes a fast thief guessing a billion tries a second
+  </p>
+</main>
+
+<script src="../../assets/manifest.js"></script>
+<script src="../../assets/shell.js"></script>
+<script>
+(function () {
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("defense", "../..");
+  IdeaLab.disclosure();
+
+  /* ---------- stepper ---------- */
+  var acts = Array.prototype.slice.call(document.querySelectorAll(".act"));
+  var dots = document.getElementById("dots");
+  var done = [false, false, false];
+  var current = 0;
+  acts.forEach(function (_, i) {
+    var d = document.createElement("span"); d.className = "dot" + (i === 0 ? " is-active" : ""); dots.appendChild(d);
+  });
+  function show(i) {
+    current = Math.max(0, Math.min(acts.length - 1, i));
+    acts.forEach(function (a, k) { a.hidden = k !== current; });
+    Array.prototype.forEach.call(dots.children, function (d, k) {
+      d.className = "dot" + (k === current ? " is-active" : (done[k] ? " is-done" : ""));
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.body.addEventListener("click", function (e) {
+    if (e.target.matches("[data-next]") && !e.target.disabled) { done[current] = true; show(current + 1); }
+    if (e.target.matches("[data-prev]")) show(current - 1);
+  });
+
+  /* ---------- honest password analysis ---------- */
+  var COMMON = ["password","123456","12345678","qwerty","abc123","letmein","monkey","dragon",
+    "sunshine","princess","football","baseball","iloveyou","admin","welcome","login","master",
+    "superman","batman","trustno1","000000","111111","123123","qwerty123","password1"];
+  var WORDS = ["password","welcome","monkey","dragon","sunshine","princess","football","baseball",
+    "iloveyou","admin","master","superman","batman","love","hello","summer","winter","ninja"];
+
+  function leet(s){
+    return s.toLowerCase().replace(/@/g,"a").replace(/0/g,"o").replace(/1/g,"i")
+      .replace(/3/g,"e").replace(/4/g,"a").replace(/5/g,"s").replace(/7/g,"t").replace(/\$/g,"s");
+  }
+  function isSequence(s){
+    var seqs = ["0123456789","abcdefghijklmnopqrstuvwxyz","qwertyuiop","asdfghjkl","zxcvbnm"];
+    var t = s.toLowerCase(), r = t.split("").reverse().join("");
+    if (t.length < 4) return false;
+    return seqs.some(function(q){ return q.indexOf(t) !== -1 || q.indexOf(r) !== -1; });
+  }
+  function predictable(pw){
+    if (!pw) return false;
+    var low = pw.toLowerCase();
+    if (COMMON.indexOf(low) !== -1) return true;
+    if (/^(.)\1+$/.test(pw)) return true;               /* all one character */
+    if (isSequence(pw)) return true;
+    var base = leet(pw).replace(/[^a-z]/g, "");          /* strip digits/symbols, undo leet */
+    if (WORDS.indexOf(base) !== -1) return true;         /* a common word dressed up */
+    return false;
+  }
+  function pool(pw){
+    var p = 0;
+    if (/[a-z]/.test(pw)) p += 26;
+    if (/[A-Z]/.test(pw)) p += 26;
+    if (/[0-9]/.test(pw)) p += 10;
+    if (/[^A-Za-z0-9]/.test(pw)) p += 33;
+    return p;
+  }
+  function humanTime(log10sec){
+    if (log10sec < 0)    return "less than a second";
+    if (log10sec < 1.78) return "a few seconds";
+    if (log10sec < 3.56) return "a few minutes";
+    if (log10sec < 4.94) return "a few hours";
+    if (log10sec < 6.5)  return "a few days";
+    if (log10sec < 7.6)  return "about a year";
+    if (log10sec < 9.6)  return "many years";
+    if (log10sec < 11.6) return "centuries";
+    if (log10sec < 14.5) return "millions of years";
+    if (log10sec < 17.6) return "billions of years";
+    return "longer than the universe has existed";
+  }
+  function analyze(pw){
+    if (!pw) return { pct:0, color:"var(--bad)", verdict:"Type something", time:"—", why:"", strong:false };
+    if (predictable(pw)) {
+      return { pct:8, color:"var(--bad)", verdict:"Weak — on the guess list",
+        time:"instantly", why:"This is a common word or pattern. A guesser tries these first.", strong:false };
+    }
+    var p = pool(pw);
+    var bits = pw.length * (Math.log(p) / Math.log(2));
+    var log10sec = bits * Math.log10(2) - 9;             /* a billion guesses per second */
+    var verdict, color, strong = false;
+    if (bits < 28)      { verdict = "Weak";        color = "var(--bad)"; }
+    else if (bits < 40) { verdict = "Okay";        color = "var(--warn)"; }
+    else if (bits < 60) { verdict = "Strong";      color = "var(--good)"; strong = true; }
+    else                { verdict = "Very strong"; color = "var(--plasma)"; strong = true; }
+    var pct = Math.max(6, Math.min(100, Math.round(bits / 72 * 100)));
+    var why = pw.length < 12 ? "Good start. Longer is stronger: try a few random words."
+                             : "Long and unpredictable. This is the good stuff.";
+    /* one word plus a few digits is a pattern crackers try fast, even if the math looks okay */
+    if (/^[A-Za-z]{3,}[0-9!@#$%^&*]{0,4}$/.test(pw) && pw.length < 14) {
+      verdict = "Okay"; color = "var(--warn)"; strong = false; pct = Math.min(pct, 52);
+      why = "A word plus a few numbers is a pattern guessers try fast. Add more random words.";
+    }
+    return { pct:pct, color:color, verdict:verdict, time:humanTime(log10sec), why:why, strong:strong };
+  }
+
+  /* ---------- ACT 0: guess list ---------- */
+  var weakOnes = [
+    { pw: "123456", st: "the most leaked password on Earth" },
+    { pw: "password", st: "second on the list" },
+    { pw: "p@ssw0rd", st: "the swaps fool nobody" },
+    { pw: "qwerty", st: "just a keyboard row" }
+  ];
+  var cl = document.getElementById("cracklist");
+  weakOnes.forEach(function(w){
+    var c = document.createElement("div");
+    c.className = "crackcard";
+    c.innerHTML = '<div class="pw">\u{1F510} ' + IdeaLab.esc(w.pw) + '</div><div class="st">' + IdeaLab.esc(w.st) + '</div>';
+    cl.appendChild(c);
+  });
+  document.getElementById("runGuesser").addEventListener("click", function(){
+    this.disabled = true; this.textContent = "Cracked them all";
+    Array.prototype.forEach.call(cl.children, function(c, i){
+      setTimeout(function(){
+        c.classList.add("cracked");
+        c.querySelector(".pw").innerHTML = c.querySelector(".pw").innerHTML.replace("\u{1F510}","\u{1F513}");
+        c.querySelector(".st").textContent = "cracked instantly";
+      }, i * 350);
+    });
+    document.getElementById("a0Lesson").classList.remove("hidden");
+    document.getElementById("a0Next").disabled = false;
+    IdeaLab.addXP(10);
+  });
+
+  /* ---------- ACT 1: build ---------- */
+  var pw = document.getElementById("pw");
+  var bar = document.getElementById("meterBar");
+  var verdictEl = document.getElementById("verdict");
+  var timeEl = document.getElementById("timeval");
+  var whyEl = document.getElementById("why");
+  function render(){
+    var a = analyze(pw.value);
+    bar.style.width = a.pct + "%"; bar.style.background = a.color;
+    verdictEl.textContent = a.verdict; verdictEl.style.color = a.color;
+    timeEl.textContent = a.time; whyEl.textContent = a.why;
+    if (a.strong){
+      document.getElementById("a1Lesson").classList.remove("hidden");
+      document.getElementById("a1Next").disabled = false;
+      IdeaLab.award("keymaster", 50);
+    }
+  }
+  pw.addEventListener("input", render);
+  var examples = ["cat", "kitten12", "p@ssw0rd", "river purple engine cloud"];
+  var chips = document.getElementById("chips");
+  examples.forEach(function(ex){
+    var b = document.createElement("button");
+    b.className = "chip2"; b.type = "button"; b.textContent = ex;
+    b.addEventListener("click", function(){ pw.value = ex; render(); pw.focus(); });
+    chips.appendChild(b);
+  });
+})();
+</script>
+</body>
+</html>

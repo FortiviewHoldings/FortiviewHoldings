@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calibration Error Worksheet (As-Found / As-Left, % of Span) | Field Pocket Guide</title>
+  <meta name="description" content="Multi-point calibration worksheet. Enter As-Found and As-Left readings and get error as percent of span, with pass / fail against your tolerance. 4-20 mA or any range.">
+  <meta name="color-scheme" content="dark" />
+  <link rel="canonical" href="https://fortiviewholdings.com/education/calibration/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Calibration Error Worksheet — Field Pocket Guide">
+  <meta property="og:description" content="As-Found / As-Left error as percent of span, with pass / fail against tolerance.">
+  <meta property="og:image" content="https://fortiviewholdings.com/images/social-preview.png">
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" href="/images/favicon.png" sizes="192x192">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/fortiview.css">
+  <link rel="stylesheet" href="/education/assets/pocketguide.css">
+</head>
+<body>
+<main class="pg-main">
+  <div class="pg-wrap--wide pg-wrap">
+
+    <header class="pg-head">
+      <a class="pg-back" href="/education/">Field Pocket Guide</a>
+      <h1 class="fv-h2">Calibration Error</h1>
+      <p class="fv-lead">Apply your standard, record the output. The worksheet returns error as <b>percent of span</b>, not percent of reading, with the sign handled for you. You only ever key in the magnitude you read.</p>
+    </header>
+
+    <!-- LOOP SETUP -->
+    <section class="pg-tool">
+      <h2 class="pg-tool__title"><span class="pg-dot"></span> Loop setup</h2>
+      <p class="pg-tool__sub">Define the input you apply and the output you measure. Use the <span style="color:var(--amber)">±</span> toggle for compound or below-zero ranges.</p>
+
+      <div class="pg-grid pg-grid--4">
+        <div class="pg-field">
+          <label class="pg-field__label" for="inLo">Input LRV</label>
+          <div class="pg-inwrap"><input class="pg-num" id="inLo" value="0"><button class="pg-sign" type="button" data-sign="#inLo">±</button></div>
+        </div>
+        <div class="pg-field">
+          <label class="pg-field__label" for="inHi">Input URV</label>
+          <div class="pg-inwrap"><input class="pg-num" id="inHi" value="100"><button class="pg-sign" type="button" data-sign="#inHi">±</button></div>
+        </div>
+        <div class="pg-field">
+          <label class="pg-field__label" for="inUnit">Input units</label>
+          <div class="pg-inwrap"><input class="pg-txt pg-num--ghost" id="inUnit" value="inH2O" inputmode="text" style="font-family:var(--mono);color:var(--ink);background:rgba(8,12,22,.6);border:1px solid var(--glass-border);border-radius:var(--radius);padding:.7em .8em;min-height:48px;width:100%"></div>
+        </div>
+        <div class="pg-field">
+          <label class="pg-field__label" for="tol">Tolerance <span class="u">(% span)</span></label>
+          <div class="pg-inwrap"><input class="pg-num" id="tol" value="0.5"></div>
+        </div>
+
+        <div class="pg-field">
+          <label class="pg-field__label" for="outLo">Output LRV</label>
+          <div class="pg-inwrap"><input class="pg-num" id="outLo" value="4"><button class="pg-sign" type="button" data-sign="#outLo">±</button></div>
+        </div>
+        <div class="pg-field">
+          <label class="pg-field__label" for="outHi">Output URV</label>
+          <div class="pg-inwrap"><input class="pg-num" id="outHi" value="20"><button class="pg-sign" type="button" data-sign="#outHi">±</button></div>
+        </div>
+        <div class="pg-field">
+          <label class="pg-field__label" for="outUnit">Output units</label>
+          <div class="pg-inwrap"><input class="pg-txt pg-num--ghost" id="outUnit" value="mA" inputmode="text" style="font-family:var(--mono);color:var(--ink);background:rgba(8,12,22,.6);border:1px solid var(--glass-border);border-radius:var(--radius);padding:.7em .8em;min-height:48px;width:100%"></div>
+        </div>
+        <div class="pg-field">
+          <label class="pg-field__label">Test points</label>
+          <div class="pg-seg" id="ptsSeg" role="group" aria-label="Test points">
+            <button type="button" data-p="3">3</button>
+            <button type="button" data-p="5" class="is-on">5</button>
+            <button type="button" data-p="11">11</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WORKSHEET -->
+    <section class="pg-tool">
+      <h2 class="pg-tool__title"><span class="pg-dot"></span> Worksheet</h2>
+      <p class="pg-tool__sub">Enter the <b>applied input</b> you actually put in and the worksheet computes that row's <b>expected output</b>, then grades the <b>As-Found</b> (before adjustment) and <b>As-Left</b> (after) readings. The point buttons seed the set points; your <b>tolerance caps how far an applied input can stray</b> from its set point, so a reading can't be hidden by fudging the input. Stray past it and the value snaps back to the band edge.</p>
+
+      <div class="pg-table-wrap">
+        <table class="pg-table pg-table--stack">
+          <thead>
+            <tr>
+              <th id="hIn">Applied input</th>
+              <th>%</th>
+              <th id="hExp">Expected</th>
+              <th id="hAF">As-Found</th>
+              <th>Found err</th>
+              <th id="hAL">As-Left</th>
+              <th>Left err</th>
+            </tr>
+          </thead>
+          <tbody id="wsBody"></tbody>
+        </table>
+      </div>
+      <p class="pg-tablenote">Expected output = your applied input mapped across the ranges, held at the output limits so it never runs past the origin or full scale (marked <span style="color:var(--amber)">sat</span>). Error = (measured − expected) ÷ output span × 100. A negative result reads low.</p>
+
+      <hr class="pg-rule">
+
+      <div class="pg-readouts">
+        <div class="pg-readout">
+          <div class="pg-readout__k">As-Found · max error</div>
+          <div class="pg-out" id="sumAF"><span>—</span><span class="pg-out__u">% span</span></div>
+        </div>
+        <div class="pg-readout">
+          <div class="pg-readout__k">As-Left · max error</div>
+          <div class="pg-out" id="sumAL"><span>—</span><span class="pg-out__u">% span</span></div>
+        </div>
+        <div class="pg-readout">
+          <div class="pg-readout__k">Verdict</div>
+          <div class="pg-out" id="sumVerdict" style="font-size:1.1rem"><span>Enter readings</span></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="pg-note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" style="flex:0 0 auto;color:var(--accent)"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+      <span><b>Percent of span, by design.</b> Span error treats a 0.1 mA miss the same at 4 mA and at 20 mA, which is how a loop is judged. Percent of reading would flatter the high end and punish the low end. Set your tolerance once; every point is graded against it.</span></div>
+
+  </div>
+</main>
+<script src="/education/assets/pocketguide.js"></script>
+<script>
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var wsBody = $("#wsBody");
+  var pts = 5;
+
+  function cfg() {
+    return {
+      inLo: PG.num($("#inLo").value), inHi: PG.num($("#inHi").value),
+      outLo: PG.num($("#outLo").value), outHi: PG.num($("#outHi").value),
+      tol: PG.num($("#tol").value),
+      inU: $("#inUnit").value || "", outU: $("#outUnit").value || ""
+    };
+  }
+  function pointList(n) { var a = [], i; for (i = 0; i < n; i++) a.push(i * 100 / (n - 1)); return a; }
+
+  // how far an applied input may stray from its set point: tolerance, in input units
+  function band(c) { return (PG.ok(c.tol) && c.tol > 0 && PG.ok(c.inLo, c.inHi)) ? (c.tol / 100) * Math.abs(c.inHi - c.inLo) : Infinity; }
+  // on commit, hold the applied input inside the tolerance band of its set point — no fudging the input to hide a reading
+  function clampApplied(el) {
+    var c = cfg(), tr = el.closest("tr"), nom = parseFloat(tr.dataset.nom), applied = PG.num(el.value), b = band(c);
+    if (!PG.ok(applied, nom) || !isFinite(b)) return;
+    if (Math.abs(applied - nom) > b + 1e-9) {
+      el.value = PG.fmtTrim(nom + (applied > nom ? b : -b), 6);
+      el.classList.toggle("is-neg", el.value.charAt(0) === "-");
+      el.classList.remove("pg-oob");
+      compute();
+    }
+  }
+
+  function build() {
+    var c = cfg(), ps = pointList(pts), html = "";
+    ps.forEach(function (p) {
+      var nom = PG.ok(c.inLo, c.inHi) ? PG.fromPct(p, c.inLo, c.inHi) : 0;
+      var seed = PG.ok(c.inLo, c.inHi) ? PG.fmtTrim(nom, 6) : "";
+      html +=
+        '<tr data-nom="' + nom + '">' +
+          '<td data-label="Applied input"><input class="pg-num inIn" value="' + seed + '"></td>' +
+          '<td class="pctCell" data-label="%">—</td>' +
+          '<td class="expOut is-strong" data-label="Expected">—</td>' +
+          '<td data-label="As-Found"><input class="pg-num afIn" placeholder="—"></td>' +
+          '<td class="afErr" data-label="Found err">—</td>' +
+          '<td data-label="As-Left"><input class="pg-num alIn" placeholder="—"></td>' +
+          '<td class="alErr" data-label="Left err">—</td>' +
+        '</tr>';
+    });
+    wsBody.innerHTML = html;
+    wsBody.querySelectorAll(".inIn").forEach(function (el) {
+      if (el.value.charAt(0) === "-") el.classList.add("is-neg");
+      el.addEventListener("blur", function () { clampApplied(el); });
+    });
+    PG.pad.init(wsBody);
+    compute();
+  }
+
+  function setErr(el, err, tol) {
+    el.classList.remove("err-ok", "err-warn", "err-bad");
+    if (!PG.ok(err)) { el.textContent = "—"; return; }
+    el.textContent = (err >= 0 ? "+" : "") + PG.fmt(err, 3) + "%";
+    if (PG.ok(tol) && tol > 0) {
+      var a = Math.abs(err);
+      el.classList.add(a <= tol ? "err-ok" : a <= tol * 2 ? "err-warn" : "err-bad");
+    }
+  }
+
+  function compute() {
+    var c = cfg();
+    $("#hIn").textContent = "Applied input" + (c.inU ? " (" + c.inU + ")" : "");
+    $("#hExp").textContent = "Expected" + (c.outU ? " (" + c.outU + ")" : "");
+    $("#hAF").textContent = "As-Found" + (c.outU ? " (" + c.outU + ")" : "");
+    $("#hAL").textContent = "As-Left" + (c.outU ? " (" + c.outU + ")" : "");
+
+    var maxAF = 0, maxAL = 0, hAF = false, hAL = false, bnd = band(c);
+    wsBody.querySelectorAll("tr").forEach(function (tr) {
+      var inEl = tr.querySelector(".inIn");
+      var applied = PG.num(inEl.value);
+      var nom = parseFloat(tr.dataset.nom);
+      inEl.classList.toggle("pg-oob", PG.ok(applied, nom) && isFinite(bnd) && Math.abs(applied - nom) > bnd + 1e-9);
+      var pct = PG.pctSpan(applied, c.inLo, c.inHi);
+      var rawExp = PG.scale(applied, c.inLo, c.inHi, c.outLo, c.outHi);
+      var exp = PG.ok(rawExp) ? PG.clamp(rawExp, c.outLo, c.outHi) : rawExp; // a real signal saturates, it never runs past its origin or full scale
+      tr.querySelector(".pctCell").textContent = PG.ok(pct) ? PG.fmt(pct, 2) + "%" : "—";
+      var expCell = tr.querySelector(".expOut");
+      expCell.textContent = PG.ok(exp) ? PG.fmtTrim(exp, 4) : "—";
+      expCell.classList.toggle("is-sat", PG.ok(rawExp) && Math.abs(rawExp - exp) > 1e-9);
+      var af = PG.num(tr.querySelector(".afIn").value);
+      var al = PG.num(tr.querySelector(".alIn").value);
+      var afErr = PG.errSpan(af, exp, c.outLo, c.outHi);
+      var alErr = PG.errSpan(al, exp, c.outLo, c.outHi);
+      setErr(tr.querySelector(".afErr"), afErr, c.tol);
+      setErr(tr.querySelector(".alErr"), alErr, c.tol);
+      if (PG.ok(afErr)) { hAF = true; if (Math.abs(afErr) > Math.abs(maxAF)) maxAF = afErr; }
+      if (PG.ok(alErr)) { hAL = true; if (Math.abs(alErr) > Math.abs(maxAL)) maxAL = alErr; }
+    });
+    summary("#sumAF", maxAF, hAF, c.tol);
+    summary("#sumAL", maxAL, hAL, c.tol);
+    verdict(c.tol, maxAL, hAL, maxAF, hAF);
+  }
+
+  function summary(sel, v, have, tol) {
+    var el = $(sel); el.classList.remove("is-good", "is-bad", "is-warn");
+    var num = el.querySelector("span");
+    if (!have) { num.textContent = "—"; return; }
+    num.textContent = (v >= 0 ? "+" : "") + PG.fmt(v, 3);
+    if (PG.ok(tol) && tol > 0) {
+      var a = Math.abs(v);
+      el.classList.add(a <= tol ? "is-good" : a <= tol * 2 ? "is-warn" : "is-bad");
+    }
+  }
+  function verdict(tol, maxAL, hAL, maxAF, hAF) {
+    var el = $("#sumVerdict"), s = el.querySelector("span");
+    el.classList.remove("is-good", "is-bad", "is-warn");
+    if (!PG.ok(tol) || tol <= 0) { s.textContent = "Set a tolerance"; return; }
+    if (hAL) {
+      if (Math.abs(maxAL) <= tol) { s.textContent = "PASS · left in tolerance"; el.classList.add("is-good"); }
+      else { s.textContent = "FAIL · out of tolerance"; el.classList.add("is-bad"); }
+    } else if (hAF) {
+      s.textContent = Math.abs(maxAF) <= tol ? "Found in tolerance" : "Found out · needs adjust";
+      el.classList.add(Math.abs(maxAF) <= tol ? "is-good" : "is-warn");
+    } else { s.textContent = "Enter readings"; }
+  }
+
+  // point-count selector
+  $("#ptsSeg").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-p]"); if (!b) return;
+    pts = parseInt(b.dataset.p, 10);
+    $("#ptsSeg").querySelectorAll("button").forEach(function (x) { x.classList.toggle("is-on", x === b); });
+    build();
+  });
+
+  document.addEventListener("input", compute);
+  if (document.readyState !== "loading") build(); else document.addEventListener("DOMContentLoaded", build);
+})();
+</script>
+<script src="/assets/fortiview.js"></script>
+</body>
+</html>

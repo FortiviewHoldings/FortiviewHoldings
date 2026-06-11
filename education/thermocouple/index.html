@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Thermocouple Tables &amp; Calculator (Types J K T E N R S B, ITS-90) | Field Pocket Guide</title>
+  <meta name="description" content="Thermocouple millivolt tables and a temperature/mV converter with cold-junction compensation. Types J, K, T, E, N, R, S, B, ITS-90, reference junction 0 °C. Verified against NIST.">
+  <meta name="color-scheme" content="dark" />
+  <link rel="canonical" href="https://fortiviewholdings.com/education/thermocouple/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Thermocouple Tables &amp; Calculator — Field Pocket Guide">
+  <meta property="og:description" content="Types J K T E N R S B, ITS-90 mV tables, with cold-junction compensation.">
+  <meta property="og:image" content="https://fortiviewholdings.com/images/social-preview.png">
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" href="/images/favicon.png" sizes="192x192">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/fortiview.css">
+  <link rel="stylesheet" href="/education/assets/pocketguide.css">
+</head>
+<body>
+<main class="pg-main">
+  <div class="pg-wrap--wide pg-wrap">
+
+    <header class="pg-head">
+      <a class="pg-back" href="/education/">Field Pocket Guide</a>
+      <h1 class="fv-h2">Thermocouple Tables</h1>
+      <p class="fv-lead">Eight letter types, ITS-90, reference junction at 0 °C. Convert temperature to millivolts and back with cold-junction compensation, or generate a reference table at any interval. Built straight from the NIST reference functions.</p>
+    </header>
+
+    <!-- TYPE PICKER -->
+    <section class="pg-tool">
+      <h2 class="pg-tool__title"><span class="pg-dot"></span> Thermocouple type</h2>
+      <div class="pg-seg" id="typeSeg" role="group" aria-label="Type" style="flex-wrap:wrap">
+        <button type="button" data-t="J">J</button>
+        <button type="button" data-t="K" class="is-on">K</button>
+        <button type="button" data-t="T">T</button>
+        <button type="button" data-t="E">E</button>
+        <button type="button" data-t="N">N</button>
+        <button type="button" data-t="R">R</button>
+        <button type="button" data-t="S">S</button>
+        <button type="button" data-t="B">B</button>
+      </div>
+      <p class="pg-tool__sub" id="typeInfo" style="margin-top:14px;margin-bottom:0"></p>
+      <div class="pg-verify" id="selfTest" aria-label="Self test against NIST anchors"></div>
+    </section>
+
+    <!-- CONVERTER -->
+    <section class="pg-tool">
+      <h2 class="pg-tool__title"><span class="pg-dot"></span> Convert</h2>
+      <div class="pg-seg pg-seg--block" id="modeSeg" role="group" aria-label="Direction" style="margin-bottom:16px">
+        <button type="button" data-m="c2mv" class="is-on">Temperature → mV</button>
+        <button type="button" data-m="mv2c">mV → Temperature</button>
+      </div>
+
+      <div class="pg-grid pg-grid--2">
+        <div class="pg-field">
+          <label class="pg-field__label" id="inLabel" for="hotIn">Hot junction <span class="u">(°C)</span></label>
+          <div class="pg-inwrap"><input class="pg-num" id="hotIn" value="300"><button class="pg-sign" type="button" data-sign="#hotIn">±</button></div>
+        </div>
+        <div class="pg-field">
+          <label class="pg-field__label" for="cjcIn">Cold junction / reference <span class="u">(°C)</span></label>
+          <div class="pg-inwrap"><input class="pg-num" id="cjcIn" value="25"><button class="pg-sign" type="button" data-sign="#cjcIn">±</button></div>
+        </div>
+      </div>
+
+      <hr class="pg-rule">
+      <div class="pg-readouts">
+        <div class="pg-readout">
+          <div class="pg-readout__k" id="outK">Meter reads</div>
+          <div class="pg-out is-good" id="outMain"><span>—</span><span class="pg-out__u" id="outU">mV</span></div>
+        </div>
+        <div class="pg-readout">
+          <div class="pg-readout__k">E(hot), ref 0 °C</div>
+          <div class="pg-out" style="font-size:1.3rem" id="outEhot"><span>—</span><span class="pg-out__u">mV</span></div>
+        </div>
+        <div class="pg-readout">
+          <div class="pg-readout__k">E(cold junction)</div>
+          <div class="pg-out" style="font-size:1.3rem" id="outEcjc"><span>—</span><span class="pg-out__u">mV</span></div>
+        </div>
+      </div>
+      <p class="pg-tablenote" id="convNote"></p>
+    </section>
+
+    <!-- TABLE -->
+    <section class="pg-tool">
+      <h2 class="pg-tool__title"><span class="pg-dot"></span> Reference table <span style="font-weight:400;color:var(--muted);font-size:.85rem">· absolute, ref 0 °C</span></h2>
+      <div class="pg-ctl">
+        <div class="pg-field"><label class="pg-field__label" for="tFrom">From (°C)</label><div class="pg-inwrap"><input class="pg-num" id="tFrom" value="0"><button class="pg-sign" type="button" data-sign="#tFrom">±</button></div></div>
+        <div class="pg-field"><label class="pg-field__label" for="tTo">To (°C)</label><div class="pg-inwrap"><input class="pg-num" id="tTo" value="1000"></div></div>
+        <div class="pg-field"><label class="pg-field__label" for="tStep">Step (°C)</label><div class="pg-inwrap"><input class="pg-num" id="tStep" value="10"></div></div>
+      </div>
+      <div class="pg-table-wrap" style="max-height:460px;overflow:auto">
+        <table class="pg-table">
+          <thead><tr><th>°C</th><th>mV</th><th>°C</th><th>mV</th></tr></thead>
+          <tbody id="tcTable"></tbody>
+        </table>
+      </div>
+      <p class="pg-tablenote" id="tableNote"></p>
+    </section>
+
+    <div class="pg-note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" style="flex:0 0 auto;color:var(--accent)"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+      <span><b>Cold-junction compensation.</b> The tables are absolute, referenced to 0 °C. A real meter sees only the difference between the hot junction and its own terminals, so the millivolts at the meter equal E(hot) − E(cold junction). Set the reference to your terminal block temperature and the converter does it for you.</span></div>
+
+  </div>
+</main>
+<script src="/education/assets/pocketguide.js"></script>
+<script src="/education/assets/tc-data.js"></script>
+<script>
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var type = "K", mode = "c2mv";
+
+  function info() {
+    var d = PG.TC_DATA[type];
+    $("#typeInfo").innerHTML = "<b style='color:var(--ink)'>" + d.name + "</b> — " + d.alloy + " · range " + d.range + " · ITS-90.";
+    // self-test chips
+    var html = "";
+    d.checks.forEach(function (c) {
+      var e = PG.TC.emf(type, c.t), good = isFinite(e) && Math.abs(e - c.mv) <= 0.01;
+      html += '<span class="pg-chip ' + (good ? "ok" : "") + '">' + c.t + "°C = " + PG.fmt(e, 3) + " mV</span>";
+    });
+    $("#selfTest").innerHTML = html;
+  }
+
+  function convert() {
+    var d = PG.TC_DATA[type];
+    var cjc = PG.num($("#cjcIn").value);
+    var eCjc = PG.TC.emf(type, cjc);
+    var ehot, main, mainU, outK;
+    if (mode === "c2mv") {
+      var hot = PG.num($("#hotIn").value);
+      ehot = PG.TC.emf(type, hot);
+      main = PG.ok(ehot, eCjc) ? ehot - eCjc : NaN;
+      mainU = "mV"; outK = "Meter reads (CJC applied)";
+      $("#convNote").textContent = PG.ok(main)
+        ? "A " + d.name + " meter with its terminals at " + PG.fmtTrim(cjc, 1) + " °C reads " + PG.fmt(main, 3) + " mV for a hot junction at " + PG.fmtTrim(hot, 1) + " °C."
+        : "Enter a hot-junction temperature within " + d.range + ".";
+    } else {
+      var meas = PG.num($("#hotIn").value);
+      var eAbs = PG.ok(meas, eCjc) ? meas + eCjc : NaN; // add back the reference EMF
+      main = PG.ok(eAbs) ? PG.TC.temp(type, eAbs) : NaN;
+      ehot = eAbs;
+      mainU = "°C"; outK = "Hot junction (CJC applied)";
+      $("#convNote").textContent = PG.ok(main)
+        ? "A reading of " + PG.fmtTrim(meas, 3) + " mV with the reference at " + PG.fmtTrim(cjc, 1) + " °C corresponds to a hot junction of " + PG.fmt(main, 1) + " °C."
+        : "That reading is outside the " + d.name + " range with this reference.";
+    }
+    setOut("#outMain", main, 3, mainU); $("#outU").textContent = mainU; $("#outK").textContent = outK;
+    setOut("#outEhot", ehot, 3); setOut("#outEcjc", eCjc, 3);
+  }
+  function setOut(sel, v, dp, u) {
+    var el = $(sel), span = el.querySelector("span");
+    span.textContent = isFinite(v) ? PG.fmt(v, dp) : "—";
+  }
+
+  function table() {
+    var d = PG.TC_DATA[type];
+    var from = PG.num($("#tFrom").value), to = PG.num($("#tTo").value), step = PG.num($("#tStep").value);
+    var tb = $("#tcTable");
+    if (!PG.ok(from, to, step) || step <= 0) { tb.innerHTML = ""; $("#tableNote").textContent = "Enter a from, to, and positive step."; return; }
+    from = Math.max(from, d.tMin); to = Math.min(to, d.tMax);
+    var rows = [], t, n = 0;
+    for (t = from; t <= to + 1e-9 && n < 1200; t += step, n++) rows.push(t);
+    // two columns of rows for compactness
+    var half = Math.ceil(rows.length / 2), html = "";
+    for (var i = 0; i < half; i++) {
+      var a = rows[i], b = rows[i + half];
+      html += "<tr><td class='is-strong'>" + PG.fmtTrim(a, 2) + "</td><td>" + PG.fmt(PG.TC.emf(type, a), 3) + "</td>" +
+        (b != null ? "<td class='is-strong'>" + PG.fmtTrim(b, 2) + "</td><td>" + PG.fmt(PG.TC.emf(type, b), 3) + "</td>" : "<td></td><td></td>") + "</tr>";
+    }
+    tb.innerHTML = html;
+    $("#tableNote").textContent = "Clamped to the valid " + d.name + " range (" + d.range + "). " + rows.length + " points, millivolts referenced to 0 °C.";
+  }
+
+  function refresh() { info(); convert(); table(); }
+
+  $("#typeSeg").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-t]"); if (!b) return;
+    type = b.dataset.t;
+    $("#typeSeg").querySelectorAll("button").forEach(function (x) { x.classList.toggle("is-on", x === b); });
+    refresh();
+  });
+  $("#modeSeg").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-m]"); if (!b) return;
+    mode = b.dataset.m;
+    $("#modeSeg").querySelectorAll("button").forEach(function (x) { x.classList.toggle("is-on", x === b); });
+    $("#inLabel").innerHTML = mode === "c2mv" ? "Hot junction <span class='u'>(°C)</span>" : "Measured signal <span class='u'>(mV)</span>";
+    convert();
+  });
+
+  document.addEventListener("input", function () { convert(); table(); });
+  if (document.readyState !== "loading") refresh(); else document.addEventListener("DOMContentLoaded", refresh);
+})();
+</script>
+<script src="/assets/fortiview.js"></script>
+</body>
+</html>

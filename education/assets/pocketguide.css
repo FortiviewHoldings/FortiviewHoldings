@@ -1,0 +1,164 @@
+/* ============================================================
+   Field Pocket Guide — instrumentation toolkit styles
+   Rides on fortiview.css tokens (galactic glass). Field-first:
+   big mono readouts, a no-negative numpad, tables that survive
+   a phone screen and gloved hands.
+   ============================================================ */
+
+.pg-main{padding:clamp(26px,5vw,52px) 0 140px}
+.pg-wrap{width:min(960px,100% - 2*var(--pad));margin-inline:auto}
+.pg-wrap--wide{width:min(1180px,100% - 2*var(--pad))}
+
+/* ---------- hero / page head ---------- */
+.pg-head{margin-bottom:clamp(22px,4vw,38px)}
+.pg-head .fv-h2{font-size:clamp(1.55rem,3.2vw,2.3rem);margin:.45rem 0 .55rem}
+.pg-back{font-family:var(--mono);font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.pg-back:hover{color:var(--accent)}
+.pg-back::before{content:"\2190";margin-right:.5em}
+
+/* ---------- tool panel ---------- */
+.pg-tool{background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  border:1px solid var(--glass-border);border-radius:var(--radius-lg);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07),var(--shadow);
+  padding:clamp(18px,3.4vw,30px);margin-bottom:22px}
+.pg-tool__title{font-family:var(--display);color:var(--ink);font-weight:700;font-size:1.18rem;margin:0 0 .3rem;
+  display:flex;align-items:center;gap:.6em}
+.pg-tool__title .pg-dot{width:9px;height:9px;border-radius:50%;background:var(--cosmic);box-shadow:0 0 12px rgba(62,224,255,.7);flex:0 0 auto}
+.pg-tool__sub{color:var(--ink-2);font-size:.95rem;margin-bottom:1.1rem;max-width:64ch}
+
+/* ---------- field grid ---------- */
+.pg-grid{display:grid;gap:14px}
+.pg-grid--2{grid-template-columns:1fr 1fr}
+.pg-grid--3{grid-template-columns:repeat(3,1fr)}
+.pg-grid--4{grid-template-columns:repeat(4,1fr)}
+
+.pg-field{display:flex;flex-direction:column;gap:7px}
+.pg-field__label{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.pg-field__label .u{color:var(--ink-2);text-transform:none;letter-spacing:0}
+
+.pg-inwrap{position:relative;display:flex;align-items:stretch}
+.pg-num{flex:1;width:100%;font-family:var(--mono);font-size:1.12rem;color:var(--ink);
+  background:rgba(8,12,22,.6);border:1px solid var(--glass-border);border-radius:var(--radius);
+  padding:.7em .8em;outline:none;min-height:48px;caret-color:transparent;cursor:pointer;
+  transition:border-color .15s ease,box-shadow .15s ease}
+.pg-num:hover{border-color:var(--glass-border-2)}
+.pg-num--active{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.pg-num.is-neg{color:var(--amber)}
+.pg-num.pg-oob{border-color:var(--bad);color:var(--bad);box-shadow:0 0 0 3px rgba(255,107,107,.18)}
+.pg-num::placeholder{color:var(--muted)}
+.pg-num--ghost{background:transparent;border-style:dashed}
+
+/* sign toggle chip on range fields */
+.pg-sign{flex:0 0 auto;margin-left:8px;min-width:46px;font-family:var(--mono);font-weight:600;font-size:1rem;
+  background:var(--glass);border:1px solid var(--glass-border-2);border-radius:var(--radius);color:var(--ink-2);cursor:pointer}
+.pg-sign:hover{border-color:var(--accent);color:var(--accent)}
+.pg-sign.is-neg{color:var(--amber);border-color:var(--amber)}
+
+/* readout values */
+.pg-out{display:flex;align-items:baseline;gap:.4em;font-family:var(--mono);color:var(--ink);
+  font-size:clamp(1.4rem,4vw,2rem);font-weight:600;line-height:1}
+.pg-out__u{font-size:.78rem;color:var(--muted);font-weight:500;letter-spacing:.06em}
+.pg-out.is-good{color:var(--accent)}
+.pg-out.is-bad{color:var(--bad)}
+.pg-out.is-warn{color:var(--amber)}
+
+.pg-readouts{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-top:6px}
+.pg-readout{background:rgba(8,12,22,.5);border:1px solid var(--glass-border);border-radius:var(--radius);padding:.85em 1em}
+.pg-readout__k{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.35em}
+
+/* ---------- segmented toggle ---------- */
+.pg-seg{display:inline-flex;background:rgba(8,12,22,.6);border:1px solid var(--glass-border);border-radius:var(--radius);padding:4px;gap:4px;flex-wrap:wrap}
+.pg-seg button{font-family:var(--body);font-weight:600;font-size:.9rem;color:var(--ink-2);background:transparent;border:0;
+  padding:.6em 1.1em;border-radius:var(--radius-sm);cursor:pointer;min-height:40px;transition:.15s}
+.pg-seg button:hover{color:var(--ink)}
+.pg-seg button.is-on{background:var(--accent);color:var(--accent-ink)}
+.pg-seg--block{display:flex}
+.pg-seg--block button{flex:1}
+
+/* ---------- divider / note ---------- */
+.pg-rule{height:1px;background:var(--glass-border);margin:18px 0;border:0}
+.pg-note{font-size:.86rem;color:var(--ink-2);background:var(--accent-soft);border:1px solid rgba(47,212,194,.25);
+  border-radius:var(--radius);padding:.7em .9em;display:flex;gap:.6em}
+.pg-note--warn{background:rgba(242,178,76,.1);border-color:rgba(242,178,76,.3)}
+.pg-note b{color:var(--ink)}
+.pg-formula{font-family:var(--mono);font-size:.92rem;color:var(--accent);background:rgba(8,12,22,.5);
+  border:1px solid var(--glass-border);border-radius:var(--radius);padding:.7em .9em;overflow-x:auto;white-space:nowrap}
+
+/* ---------- tables ---------- */
+.pg-table-wrap{overflow-x:auto;border:1px solid var(--glass-border);border-radius:var(--radius);background:rgba(8,12,22,.4)}
+table.pg-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:.92rem;min-width:520px}
+.pg-table th,.pg-table td{padding:.62em .8em;text-align:right;white-space:nowrap;border-bottom:1px solid var(--glass-border)}
+.pg-table th:first-child,.pg-table td:first-child{text-align:left}
+.pg-table thead th{position:sticky;top:0;background:rgba(12,17,28,.96);color:var(--ink-2);font-weight:600;
+  font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;z-index:1}
+.pg-table tbody tr:nth-child(even){background:rgba(255,255,255,.022)}
+.pg-table tbody tr:hover{background:var(--accent-soft)}
+.pg-table td.is-strong{color:var(--ink)}
+.pg-table td .pg-num{min-height:40px;font-size:1rem;padding:.45em .6em;text-align:right}
+.pg-table .err-ok{color:var(--accent)}
+.pg-table .err-bad{color:var(--bad)}
+.pg-table .err-warn{color:var(--amber)}
+.pg-table td.is-sat{color:var(--amber)}
+.pg-table td.is-sat::after{content:" \00B7 sat";font-size:.66rem;color:var(--muted);letter-spacing:.04em}
+.pg-tablenote{font-family:var(--mono);font-size:.72rem;color:var(--muted);margin-top:.6em}
+
+/* reference-table controls */
+.pg-ctl{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:16px}
+.pg-ctl .pg-field{min-width:120px}
+
+/* ---------- hub cards ---------- */
+.pg-cards{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));margin-top:8px}
+.pg-card{display:flex;flex-direction:column;gap:.55rem;padding:20px;border-radius:var(--radius-lg);
+  background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  border:1px solid var(--glass-border);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+  transition:transform .18s ease,border-color .18s ease,background .18s ease}
+.pg-card:hover{transform:translateY(-3px);border-color:var(--glass-border-2);background:var(--glass-2)}
+.pg-card__ic{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;
+  background:var(--accent-soft);border:1px solid rgba(47,212,194,.25);color:var(--accent)}
+.pg-card__ic svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6}
+.pg-card h3{font-size:1.08rem;color:var(--ink)}
+.pg-card p{font-size:.9rem;color:var(--ink-2);flex:1}
+.pg-card__go{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.pg-card__go::after{content:"\2192";margin-left:.5em;transition:margin .18s ease}
+.pg-card:hover .pg-card__go::after{margin-left:.85em}
+
+/* self-test trust strip */
+.pg-verify{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.pg-chip{font-family:var(--mono);font-size:.72rem;padding:.4em .7em;border-radius:999px;border:1px solid var(--glass-border-2);color:var(--ink-2)}
+.pg-chip.ok{color:var(--accent);border-color:rgba(47,212,194,.4)}
+.pg-chip.ok::before{content:"\2713 ";}
+
+/* ---------- the numpad (bottom sheet, no negative key) ---------- */
+.pg-pad{position:fixed;left:50%;bottom:0;transform:translate(-50%,110%);
+  width:min(440px,100%);background:var(--panel);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  border:1px solid var(--glass-border-2);border-bottom:0;border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+  box-shadow:0 -20px 60px -20px #000d;padding:14px;z-index:80;transition:transform .22s cubic-bezier(.2,.8,.2,1)}
+.pg-pad.is-open{transform:translate(-50%,0)}
+.pg-pad__grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pg-pad__row{display:flex;gap:8px;margin-top:8px}
+.pg-key{font-family:var(--mono);font-size:1.3rem;color:var(--ink);background:var(--glass-2);
+  border:1px solid var(--glass-border);border-radius:var(--radius);min-height:54px;cursor:pointer;
+  display:grid;place-items:center;user-select:none;transition:.1s}
+.pg-key:hover{border-color:var(--accent);color:var(--accent)}
+.pg-key:active{background:var(--accent-soft);transform:scale(.97)}
+.pg-key--wide{flex:1;font-size:.95rem}
+.pg-key--done{flex:1;font-size:.95rem;background:var(--accent);color:var(--accent-ink);border-color:transparent;font-weight:700}
+.pg-key--done:hover{color:var(--accent-ink);background:#3ee6d4}
+body.pg-pad-open .pg-main{padding-bottom:320px}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  .pg-grid--2,.pg-grid--3,.pg-grid--4{grid-template-columns:1fr 1fr}
+}
+@media (max-width:520px){
+  .pg-grid--3,.pg-grid--4{grid-template-columns:1fr}
+  /* responsive calibration table: rows become stacked cards */
+  table.pg-table.pg-table--stack{min-width:0}
+  .pg-table--stack thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .pg-table--stack tbody tr{display:block;border:1px solid var(--glass-border);border-radius:var(--radius);
+    margin:10px;padding:6px}
+  .pg-table--stack td{display:flex;justify-content:space-between;align-items:center;border:0;
+    padding:.45em .4em;text-align:right}
+  .pg-table--stack td::before{content:attr(data-label);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--muted);text-align:left;margin-right:1em}
+}

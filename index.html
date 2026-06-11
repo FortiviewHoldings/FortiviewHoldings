@@ -30,6 +30,12 @@
   <link rel="apple-touch-icon" href="https://fortiviewholdings.com/images/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.webmanifest">
 
+  <!-- Fonts + design system -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/fortiview.css">
+
   <!-- Structured Data -->
   <script type="application/ld+json">
   {
@@ -227,956 +233,568 @@
 </script>
 
   <style>
-    :root{
-      --bg-deep:#000000cc;
-      --bg-accent:#101625cc;
-      --glass:#ffffff12;
-      --glass-2:#dcffbb12;
-      --glass-blur:#000000d0;
-      --border:#ffffff1a;
-      --ink:#e7ecff;
-      --muted:#c6d0f0a6;
-      --brand:#1ca490da;
-      --brand-600:#21bca5;
-      --aura:0 4px 8px rgba(17, 76, 67, 0.678);
-      --radius:16px;
-      --radius-sm:12px;
-      --maxw:1200px;
-      --grad:linear-gradient(135deg,#121b2d 0%,#060e1e 40%,#0f1824 100%);
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0;font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg-deep);color:var(--ink);scroll-behavior:smooth}
-    a{color:inherit;text-decoration:none}
-    img{display:block;max-width:100%}
+    /* Scroll lock when the review modal is open */
+    .body-lock{overflow:hidden}
 
-    /* Background: gradient + optional image + starfield canvas behind */
-    .bg{
-      position:fixed; inset:0; z-index:-2;
+    /* ===========================
+       FAQ SECTION (galactic glass)
+       =========================== */
+    .fv-faq details {
       background: var(--glass);
-      filter:blur(6px) brightness(.9) saturate(1.05);
-      transform:scale(1.03);
+      border: 1px solid var(--glass-border);
+      color: var(--ink-2);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      margin-bottom: 12px;
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+      transition: background 0.2s ease, border-color 0.2s ease;
     }
-    .bg::after{
-      content:""; position:absolute; inset:0;
+
+    .fv-faq details h4 {
+      font-family: var(--display);
+      margin-top: 10px;
+      margin-bottom: 6px;
+      color: var(--ink);
+    }
+
+    .fv-faq details:hover {
+      background: var(--glass-2);
+      border-color: var(--glass-border-2);
+    }
+
+    /* Remove default arrow completely */
+    .fv-faq summary::-webkit-details-marker { display: none; }
+    .fv-faq summary::marker { content: ""; }
+
+    /* Summary text */
+    .fv-faq summary {
+      cursor: pointer;
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 1.02rem;
+      color: var(--ink);
+      outline: none;
+      list-style: none;
+      position: relative;
+      padding-right: 28px; /* space for + icon */
+    }
+
+    /* Custom + icon (accent) */
+    .fv-faq summary::after {
+      content: "+";
+      position: absolute;
+      right: 0;
+      top: 0;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent);
+      transition: transform 0.2s ease, opacity 0.2s ease;
+      opacity: 0.9;
+    }
+
+    /* When open, switch to – */
+    .fv-faq details[open] summary::after {
+      content: "–";
+      transform: rotate(180deg);
+    }
+
+    /* FAQ body text */
+    .fv-faq details p {
+      margin: 10px 0 0;
+      color: var(--ink-2);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    .fv-faq details ul {
+      margin: 10px 0 0;
+      padding-left: 20px;
+      color: var(--ink-2);
+      font-size: 0.94rem;
+      line-height: 1.55;
+    }
+    .fv-faq details li { margin: 3px 0; }
+
+    /* ===========================
+       REVIEW GALLERY (HORIZONTAL CARDS)
+       =========================== */
+
+    /* Horizontal review rail */
+    .review-rail {
+      width: 100%;
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 14px;
+
+      overflow-x: auto;
+      overflow-y: hidden;
+
+      scroll-snap-type: x mandatory;
+      padding: 10px 4px;
+
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .review-rail::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Review card */
+    .review-item {
+      flex: 0 0 260px;
+      min-width: 260px;
+      scroll-snap-align: start;
+
       background: var(--glass);
-    }
-    #bg-stars{
-      position:fixed; inset:0; width:100vw; height:100vh; z-index:-1; pointer-events:none;
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06), var(--shadow);
+
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+
+      transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease,
+        background 0.25s ease;
     }
 
-    /* Sticky glass header */
-    header{
-      position:sticky; top:0; z-index:50;
-      backdrop-filter:saturate(140%) blur(10px);
-      background:var(--glass);
-      border-bottom:1px solid var(--border);
-    }
-    .nav{
-      max-width:var(--maxw); margin:0 auto; padding:14px 20px;
-      display:flex; align-items:center; text-align: center; justify-content:space-between; gap:16px;
-    }
-    .brand{display:flex; align-items:center; gap:10px; letter-spacing:.4px; flex-wrap: wrap;}
-    .site-label { color: var(--muted); font-size: .95rem; white-space: nowrap;}
-    .logo{
-      width:34px; height:34px; border-radius:10px;
-      background-image: url('https://fortiviewholdings.com/images/Logo.png');
-      background-size: cover;
-      background-position: center;
-      box-shadow: 0 0 0 2px rgba(92,140,69,.25), 0 10px 20px rgba(92,140,69,.18);
-    }
-    .brand strong{font-weight:800}
-    nav ul{display:flex; gap:14px; list-style:none; align-items:center; margin:0; padding:0}
-    .link{
-      padding:9px 14px; border-radius:999px; color:var(--muted);
-      border:1px solid transparent; transition:.2s ease;
-    }
-    .link:hover{color:#fff; border-color:#ffffff22; background:#ffffff12}
-    .cta{
-      background: linear-gradient(180deg, var(--brand), var(--brand-600));
-      color:#0c120a; font-weight:800; letter-spacing:.2px;
-      padding:10px 16px; border-radius:999px; box-shadow: var(--aura);
-    }
-    .cta:hover{filter:brightness(.95)}
-
-    /* Sections */
-    .section{max-width:var(--maxw); margin:36px auto; padding:0 20px}
-    .glass{
-      background:var(--glass); border:1px solid var(--border); border-radius:var(--radius);
-      box-shadow:var(--aura);
+    /* Wiggle animation */
+    @keyframes review-wiggle {
+      0%   { transform: translateY(0px); }
+      20%  { transform: translateY(-6px); }
+      40%  { transform: translateY(0px); }
+      60%  { transform: translateY(-6px); }
+      80%  { transform: translateY(-1px); }
+      100% { transform: translateY(-0px); }
     }
 
-    /* Hero */
-    .hero{
-      display:grid; grid-template-columns:1.2fr .8fr; gap:28px;
-      max-width:var(--maxw); margin:40px auto; padding:24px 20px;
-    }
-    .hero-card{padding:32px}
-    .kicker{color: var(--brand); font-weight:800; letter-spacing:.12em; text-transform:uppercase; font-size:.8rem}
-    h1{color: var(--ink);font-size:clamp(2rem, 3.2vw, 3rem); line-height:1.08; margin:.45rem 0 .8rem 0}
-    .sub{color:var(--muted); font-size:1.05rem}
-    .hero-side{display:grid; gap:16px}
-    .stat{
-      display:flex; gap:14px; align-items:flex-start;
-      padding:18px 20px; background:var(--glass-2); border-top:1px solid rgba(255,255,255,.06);
-      border-radius:var(--radius); border:1px solid var(--border);
-    }
-    .pill{
-        padding:6px 10px; 
-        border-radius:999px; 
-        font-weight:800; 
-        font-size:.78rem; 
-        color:#071008;
-        background:linear-gradient(180deg, var(--brand), var(--brand-600)); border:1px solid rgb(33, 188, 165); 
-        white-space: nowrap;
-        overflow: visible;
-        text-overflow: ellipsis;
+    .review-item:hover {
+      animation: review-wiggle 1.2s ease;
+      box-shadow: 0 0 14px var(--accent), 0 0 28px rgba(0, 0, 0, 0.6);
+      border-color: var(--accent);
+      background: var(--glass-2);
     }
 
-    /* Services grid */
-.grid {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 1.25rem;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding: 1rem 0;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; /* Firefox */
-}
+    /* Rating (first line) */
+    .review-rating {
+      display: flex;
+      gap: 2px;
+      align-items: center;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
 
-.grid::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
-}
+    /* Name (second line) */
+    .review-name {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--ink);
+    }
+    /* Review date (third line) */
+    .review-date {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: -2px;
+      margin-bottom: 6px;
+    }
 
-.grid .card {
-  min-width: 280px;
-  flex: 0 0 auto;
-  scroll-snap-align: center;
-  border-radius: 12px;
-  padding: 1.25rem;
-  background: rgba(255,255,255,0.15);
-  backdrop-filter: blur(10px);
-  cursor: pointer;
-  transition: transform 0.3s ease;
-}
+    /* Review text (fourth line) */
+    .review-text {
+      font-size: 0.95rem;
+      color: var(--ink-2);
+      line-height: 1.45;
+    }
 
-.grid .card:hover {
-  transform: translateY(-6px);
-}
+    /* Leave a Review button — GALLERY VERSION */
+    .reviews .review-actions {
+      margin-top: 20px;
+      text-align: center;
+    }
 
-@media (max-width: 640px) {
-  .grid {
-    width: 100%;
-    max-width: 100vw;
-    overflow-x: auto;
-    overflow-y: visible;        /* ensures nothing gets clipped vertically */
-    flex-wrap: nowrap;          /* prevents wrapping on small screens */
-    padding-left: 1rem;
-    scroll-padding-left: 1rem;  /* centers first card */
-  }
+    /* ===========================
+       REVIEW MODAL
+       =========================== */
 
-  .grid .card {
-    max-width: 85vw;            /* keeps each card inside the viewport */
-  }
-}
-    .card{
-      position:relative; overflow:hidden;
-      padding:18px; border-radius:var(--radius);
-      background:var(--glass); border:1px solid var(--border);
+    .review-popup {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .review-hidden {
+      display: none;
+    }
+
+    .review-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(4px);
+    }
+
+    .review-card {
+      position: relative;
+      z-index: 2;
+      width: min(420px, 90%);
+      background: var(--panel);
+      border: 1px solid var(--glass-border-2);
+      border-radius: var(--radius-lg);
+      padding: 20px 22px;
+      box-shadow: var(--shadow);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .review-card h2 { font-family: var(--display); color: var(--ink); margin: 0; }
+
+    .review-label {
+      display: flex;
+      flex-direction: column;
+      font-size: 0.9rem;
+      color: var(--ink-2);
+      gap: 6px;
+    }
+
+    .review-input {
+      background: var(--glass-2);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      color: var(--ink);
+      font-family: var(--body);
+      font-size: 0.95rem;
+      backdrop-filter: blur(12px);
+    }
+
+    .review-input:focus {
+      outline: 2px solid var(--accent);
+    }
+
+    /* Modal action buttons — MODAL VERSION ONLY */
+    .review-card .review-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+
+    .review-close-x {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      background: none;
+      border: none;
+      color: var(--ink);
+      font-size: 1.4rem;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s ease;
+    }
+
+    .review-close-x:hover {
+      opacity: 1;
+    }
+
+    .review-slider-wrapper {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .review-slider {
+      position: relative;
+      height: 48px;
+      background: var(--glass-2);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      backdrop-filter: blur(12px);
+      overflow: hidden;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    /* the colored fill that grows under the handle */
+    .review-slider .slider-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 48px;
+      background: linear-gradient(90deg, var(--accent-2), var(--accent));
+      border-radius: var(--radius);
+      box-shadow: 0 6px 18px rgba(47,212,194,0.12);
+      transition: width 120ms ease, border-radius 160ms ease;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* label sits above the fill */
+    .review-slider .slider-label {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--ink);
+      font-weight: 600;
+      pointer-events: none;
+      z-index: 3;
+      transition: color 160ms ease;
+    }
+
+    /* handle sits above the fill and label */
+    .slider-handle {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 48px;
+      height: 48px;
+      background: var(--accent);
+      border-radius: var(--radius);
+      box-shadow: 0 0 12px var(--accent);
+      transition: transform 120ms ease, width 160ms ease, left 160ms ease, border-radius 160ms ease;
+      z-index: 4;
+      touch-action: none;
+    }
+
+    /* when fully filled */
+    .review-slider.filled .slider-fill {
+      width: 100%;
+      border-radius: var(--radius);
+    }
+
+    .review-slider.filled .slider-label {
+      color: #fff;
+    }
+
+    .review-slider.filled .slider-handle {
+      left: 0;
+      transform: translateX(0);
+      width: 100%;
+      border-radius: var(--radius);
       box-shadow: none;
-      cursor:pointer;
-      transform-style:preserve-3d;
-      transition:transform .18s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
-    }
-    .card:hover{transform:translateY(-4px); box-shadow: var(--aura)}
-    .card h3{color:var(--brand); font-size:1.1rem; margin:2px 0 6px 0}
-    .card p{color:var(--ink); opacity:.85; font-size:.94rem; line-height:1.4}
-    .card::after{
-      content:""; position:absolute; inset:auto -20% -20% auto; width:180px; height:180px;
-    }
-    .card.featured{
-      grid-column: span 2; background:linear-gradient(18deg, rgba(72,76,9,.65), rgba(4,3,74,.7));
-      border-color:rgba(159,249,81,.35);
-    }
-    .badge{
-      position:absolute; top:10px; right:10px; font-size:.8rem; padding:6px 10px; border-radius:999px;
-      background:linear-gradient(180deg,var(--brand), var(--brand-600)); color:#0a1205; font-weight:800; border:1px solid rgba(159,249,81,.35)
+      background: linear-gradient(90deg, var(--accent-2), var(--accent));
+      z-index: 5;
     }
 
-    .dropdown {
-  position: relative;
-}
-
-.dropdown-toggle {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font: inherit;
-  color: var(--muted);
-  padding: 9px 14px;
-  border-radius: 999px;
-  transition: .2s ease;
-}
-
-.dropdown-toggle:hover {
-  color: var(--muted);
-  background: #ffffff12;
-  border: 1px solid #ffffff22;
-}
-
-.dropdown-menu {
-  display: none;
-  position: absolute;
-  top: 110%;
-  left: 0;
-  background: var(--glass-blur);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  box-shadow: var(--aura);
-  list-style: none;
-  margin: 0;
-  padding: 8px 0;
-  min-width: 240px;
-  z-index: 100;
-}
-
-.dropdown-menu li {
-  padding: 0;
-}
-
-.dropdown-menu a {
-  display: block;
-  padding: 10px 16px;
-  color: var(--muted);
-  transition: background .2s ease;
-}
-
-.dropdown-menu a:hover {
-  background: #ffffff12;
-  color: var(--ink);
-}
-
-    /* Footer */
-    footer{margin:50px 0 30px 0; color:var(--muted); text-align:center; font-size:.9rem}
-
-    /* Responsive */
-    @media (max-width: 1000px){
-      .hero{grid-template-columns:1fr}
-      .card.featured{grid-column:span 1}
-    }
-@media (max-width: 640px) {
-  .nav {
-    flex-direction: column;
-    align-items: stretch; /* full width */
-    text-align: center;
-  }
-  .brand {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 6px;
-    margin-bottom: 8px;
-  }
-  .site-label {
-  flex-basis: 100%;
-  text-align: center;
-  margin-top: 2px;
-}
-  nav ul {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-    padding: 0;
-    margin: 0;
-  }
-  nav ul li {
-    flex: 1 1 auto;
-    display: flex;
-    justify-content: center;
-  }
-  nav ul a {
-    width: 100%;
-    text-align: center;
-  }
-}
-
-    /* Motion preferences */
-    @media (prefers-reduced-motion: reduce){
-      *{animation:none!important; transition:none!important}
+    .review-slider .slider-handle,
+    .review-slider .slider-fill {
+      transition: transform 0.25s ease, width 0.25s ease;
     }
 
-    /* FAQ Section */
-.faq details {
-  background: rgba(31, 34, 29, 0.541);
-  border: 1px solid var(--muted);
-  color: var(--muted);
-  border-radius: 12px;
-  padding: 14px 16px;
-  margin-bottom: 10px;
-  backdrop-filter: blur(14px) saturate(150%);
-  box-shadow: 0 10px 24px rgba(0,0,0,0.55);
-  transition: background 0.2s ease, border-color 0.2s ease;
-}
-
-.faq details h4 {
-  margin-top: 8px;
-  margin-bottom: 6px;
-  color: var(--ink);
-}
-
-.faq details:hover {
-  background: rgba(39, 42, 39, 0.685);
-  border-color: rgba(15, 83, 79, 0.85);
-}
-
-/* Remove default arrow completely */
-.faq summary::-webkit-details-marker {
-  display: none;
-}
-.faq summary::marker {
-  content: "";
-}
-
-/* Summary text */
-.faq summary {
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 1rem;
-  color: var(--muted);
-  outline: none;
-  list-style: none;
-  position: relative;
-  padding-right: 28px; /* space for + icon */
-}
-
-/* Custom + icon (brand) */
-.faq summary::after {
-  content: "+";
-  position: absolute;
-  right: 0;
-  top: 0;
-  font-size: 1.2rem;
-  font-weight: 900;
-  color: var(--brand-600);
-  transition: transform 0.2s ease, opacity 0.2s ease;
-  opacity: 0.9;
-}
-
-/* When open, switch to – */
-.faq details[open] summary::after {
-  content: "–";
-  transform: rotate(180deg);
-}
-
-/* FAQ body text */
-.faq details p {
-  margin: 10px 0 0;
-  color: var(--brand-600);
-  font-size: 0.95rem;
-  line-height: 1.45;
-}
-
-
-/* ===========================
-   REVIEW GALLERY (HORIZONTAL CARDS)
-   =========================== */
-
-/* Allow the section itself to scroll horizontally */
-.section.reviews {
-  overflow: visible;
-}
-  
-.reviews .card {
-  overflow: hidden; /* keeps scrollbar inside */
-  position: relative;
-}
-/* Horizontal review rail */
-.review-rail {
-  width: 100%;              /* instead of max-content */
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 14px;
-
-  overflow-x: auto;
-  overflow-y: hidden;
-
-  scroll-snap-type: x mandatory;
-  padding: 10px 4px
-
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.review-rail::-webkit-scrollbar {
-  display: none;
-}
-
-
-/* Review card */
-.review-item {
-  flex: 0 0 260px; /* card width */
-  min-width: 260px;
-  scroll-snap-align: start;
-
-
-  background: rgba(45, 46, 46, 0.267);
-  border: 1px solid rgba(99, 100, 100, 0.267);
-  border-radius: 16px;
-  padding: 14px 16px;
-  backdrop-filter: blur(18px) saturate(160%);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55);
-
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-
-  /* smooth transitions */
-  transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease,
-    border-color 0.25s ease,
-    background 0.25s ease;
-}
-
-/* Wiggle animation */
-@keyframes review-wiggle {
-  0%   { transform: translateY(0px); }
-  20%  { transform: translateY(-6px); }  /* first bounce */
-  40%  { transform: translateY(0px); }   /* settle */
-  60%  { transform: translateY(-6px); }  /* second bounce */
-  80%  { transform: translateY(-1px); }   /* settle again */
-  100% { transform: translateY(-0px); }   /* return to hover position */
-}
-
-.review-item:hover {
-  animation: review-wiggle 1.2s ease;
-  box-shadow: 0 0 14px var(--brand-600), 0 0 28px rgba(0, 0, 0, 0.6);
-  border-color: var(--brand-600);
-  background: rgba(10, 30, 30, 0.55); /* warm tint on hover */
-}
-
-/* Rating (first line) */
-.review-rating {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--brand-600);
-}
-
-/* Name (second line) */
-.review-name {
-  font-weight: 700;
-  font-size: 1rem;
-  color: var(--ink);
-}
-/* Review date (third line) */
-.review-date {
-  font-size: 0.8rem;
-  color: var(--muted);
-  margin-top: -2px;
-  margin-bottom: 6px;
-}
-
-/* Review text (fourth line) */
-.review-text {
-  font-size: 0.95rem;
-  color: var(--muted);
-  line-height: 1.45;
-}
-
-/* Leave a Review button — GALLERY VERSION */
-.reviews .review-actions {
-  margin-top: 20px;
-  text-align: center;
-}
-
-/* ===========================
-   REVIEW MODAL
-   =========================== */
-
-.review-popup {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-
-.review-hidden {
-  display: none;
-}
-
-.review-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(4px);
-}
-
-.review-card {
-  position: relative;
-  z-index: 2;
-  width: min(420px, 90%);
-  background: rgba(20, 29, 30, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 16px;
-  padding: 20px 22px;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(18px) saturate(160%);
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.review-label {
-  display: flex;
-  flex-direction: column;
-  font-size: 0.9rem;
-  color: var(--ink);
-  gap: 6px;
-}
-
-.review-input {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 10px;
-  padding: 10px 12px;
-  color: var(--ink);
-  font-size: 0.95rem;
-  backdrop-filter: blur(12px);
-}
-
-.review-input:focus {
-  outline: 2px solid var(--brand-600);
-}
-
-/* Modal action buttons — MODAL VERSION ONLY */
-.review-card .review-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
-}
-
-.review-close-x {
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  background: none;
-  border: none;
-  color: var(--ink);
-  font-size: 1.4rem;
-  cursor: pointer;
-  opacity: 0.7;
-  transition: opacity 0.2s ease;
-}
-
-.review-close-x:hover {
-  opacity: 1;
-}
-
-.review-slider-wrapper {
-  width: 100%;
-  margin-top: 10px;
-}
-
-.review-slider {
-  position: relative;
-  height: 48px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 12px;
-  backdrop-filter: blur(12px);
-  overflow: hidden;
-  cursor: pointer;
-  user-select: none;
-}
-
-/* the colored fill that grows under the handle */
-.review-slider .slider-fill {
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 48px; /* start same as handle width */
-  background: linear-gradient(90deg, var(--brand-600), #3cfff5);
-  border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(255,106,0,0.12);
-  transition: width 120ms ease, border-radius 160ms ease;
-  z-index: 1;
-  pointer-events: none;
-}
-
-/* label sits above the fill */
-.review-slider .slider-label {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  color: var(--ink);
-  font-weight: 600;
-  pointer-events: none;
-  z-index: 3;
-  transition: color 160ms ease;
-}
-
-/* handle sits above the fill and label */
-.slider-handle {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 48px;
-  height: 48px;
-  background: var(--brand-600);
-  border-radius: 12px;
-  box-shadow: 0 0 12px var(--brand-600);
-  transition: transform 120ms ease, width 160ms ease, left 160ms ease, border-radius 160ms ease;
-  z-index: 4;
-  touch-action: none;
-}
-
-/* when fully filled */
-.review-slider.filled .slider-fill {
-  width: 100%;
-  border-radius: 12px;
-}
-
-.review-slider.filled .slider-label {
-  color: #fff;
-}
-
-.review-slider.filled .slider-handle {
-  left: 0;
-  transform: translateX(0);
-  width: 100%;
-  border-radius: 12px;
-  box-shadow: none;
-  background: linear-gradient(90deg, var(--brand-600), #3cfff5);
-  z-index: 5;
-}
-
-.review-slider .slider-handle,
-.review-slider .slider-fill {
-  transition: transform 0.25s ease, width 0.25s ease;
-}
-
-.slider-disabled {
-  opacity: 0.45;
-  pointer-events: none;
-  filter: grayscale(0.6);
-}
-
-/* Toast container (glass style) */
-.review-toast {
-  position: absolute;
-  left: 50%;
-  bottom: calc(50% + 20px);
-  transform: translateX(-50%) translateY(8px) scale(0.98);
-  opacity: 0;
-
-  z-index: 10010;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-
-  transition: opacity 220ms ease, transform 220ms ease;
-}
-
-.review-toast-hidden { display: none; }
-
-/* Card */
-.review-toast-card {
-  pointer-events: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-
-  background: rgba(20, 30, 30, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 16px 18px;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(12px) saturate(140%);
-  color: var(--ink);
-  min-width: 240px;
-}
-
-.toast-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--ink);
-  text-align: center;
-}
-
-/* ICON WRAPPER — FIXES YOUR ISSUE */
-.toast-icon {
-  position: relative;
-  width: 24px;
-  height: 24px;
-}
-
-/* Stack spinner + checkmark */
-.toast-icon .toast-spinner,
-.toast-icon .toast-checkmark {
-  position: absolute;
-  top: 0;
-  left: 0;
-  transition: opacity 120ms ease;
-}
-
-/* Spinner */
-.toast-spinner {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.12);
-  border-top-color: var(--brand-600);
-  animation: toast-spin 900ms linear infinite;
-}
-
-@keyframes toast-spin {
-  to { transform: rotate(360deg); }
-}
-
-/* Checkmark */
-.toast-checkmark {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: none;
-  position: absolute;
-  opacity: 0;
-}
-  .toast-checkmark.animate {
-  animation: toast-check-spin 0.6s ease forwards;
-}
-
-@keyframes toast-check-spin {
-  0%   { transform: rotate(0deg) scale(0.6); opacity: 0; }
-  50%  { transform: rotate(180deg) scale(1.05); opacity: 1; }
-  100% { transform: rotate(360deg) scale(1); opacity: 1; }
-}
-
-/* Checkmark stroke */
-.toast-checkmark::after {
-  content: "";
-  position: absolute;
-  left: 6px;
-  top: 2px;
-  width: 10px;
-  height: 18px;
-  border-right: 3px solid #c2fdff;
-  border-bottom: 3px solid #c2fbff;
-  transform: rotate(45deg) scale(0);
-  transform-origin: center;
-  animation: toast-check-draw 0.35s ease 0.45s forwards;
-}
-
-@keyframes toast-check-draw {
-  to { transform: rotate(45deg) scale(1); }
-}
-
-/* Toast visible state */
-.review-toast.show {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0) scale(1);
-}
-
-/* Success / error variants */
-.review-toast-card.success {
-  border-color: rgba(0,200,120,0.18);
-  background: rgba(10,30,10,0.55);
-  color: #eafff0;
-}
-
-.review-toast-card.error {
-  border-color: rgba(255,80,80,0.18);
-  background: rgba(40,10,10,0.55);
-  color: #ffecec;
-}
-
-/* small label color change while submitting */
-.review-slider.filling .slider-label { color: #fff; }
-
-/* ensure handle z-index while expanding */
-.review-slider .slider-handle { z-index: 6; }
-  
-/* ===========================
-   FIRE RATING WIDGET
-   =========================== */
-
-.fire-rating {
-  display: flex;
-  gap: 6px;
-  font-size: 1.8rem;
-  cursor: pointer;
-  user-select: none;
-}
-
-.fire-rating span {
-  opacity: 0.35;
-  transition:
-    opacity 0.2s ease,
-    transform 0.15s ease,
-    text-shadow 0.2s ease;
-}
-.fire-rating span svg {
-  color: var(--muted); /* default unfilled color */
-  transition: color 0.2s ease;
-}
-.fire-rating span:hover {
-  transform: translateY(-2px) rotate(-6deg) scale(1.18);
-  text-shadow: 0 0 8px var(--brand-600), 0 0 14px var(--brand-600);
-  opacity: 1;
-}
-.fire-rating span:hover svg,
-.fire-rating span:hover ~ span svg {
-  color: var(--brand-600);
-}
-
-/* Filled state */
-.fire-rating span.filled {
-  opacity: 1;
-  text-shadow: 0 0 6px var(--brand-600);
-}
-.fire-rating span.filled svg {
-  color: var(--brand-600);
-}
-
-
- .btn.secondary {
-    background: linear-gradient(135deg, var(--brand-600), var(--brand));
-    color: #081b18;
-    font-weight: 700;
-    padding: 8px 16px;
-    border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    box-shadow: 0 14px 30px rgb(0, 0, 0);
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 120px;
-    backdrop-filter: blur(16px);
-    transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease, border-color 0.15s ease;
-  }
-
-  .btn.secondary:hover {
-    background: linear-gradient(185deg, var(--brand), var(--brand-600));
-    transform: translateY(-1px);
-    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.9);
-    border-color: rgba(255, 255, 255, 0.35);
-  }
-
-@media (max-width: 900px) and (orientation: landscape) {
-  .nav {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    padding: 10px 14px;
-  }
-
-  nav ul {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-  }
-
-  nav ul li {
-    flex: 0 1 auto;
-  }
-
-  nav ul a,
-  .dropdown-toggle {
-    padding: 6px 10px;
-    font-size: 0.85rem;
-    white-space: nowrap;
-  }
-
-  .cta {
-    padding: 8px 12px;
-    font-size: 0.9rem;
-    white-space: nowrap;
-  }
-
-  .brand {
-    flex-basis: 100%;
-    justify-content: center;
-    margin-bottom: 4px;
-  }
-
-  .site-label {
-    flex-basis: 100%;
-    text-align: center;
-    font-size: 0.8rem;
-  }
-}
-
-    @media (min-width: 641px) and (max-width: 1024px) {
-  .nav {
-    padding: 12px 16px;
-  }
-
-  .hero {
-    grid-template-columns: 1.1fr 0.9fr;
-    gap: 20px;
-  }
-
-  .grid .card {
-    min-width: 260px;
-  }
-}
+    .slider-disabled {
+      opacity: 0.45;
+      pointer-events: none;
+      filter: grayscale(0.6);
+    }
+
+    /* Toast container (glass style) */
+    .review-toast {
+      position: absolute;
+      left: 50%;
+      bottom: calc(50% + 20px);
+      transform: translateX(-50%) translateY(8px) scale(0.98);
+      opacity: 0;
+
+      z-index: 10010;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+
+      transition: opacity 220ms ease, transform 220ms ease;
+    }
+
+    .review-toast-hidden { display: none; }
+
+    /* Card */
+    .review-toast-card {
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+
+      background: var(--panel);
+      border: 1px solid var(--glass-border);
+      padding: 16px 18px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      color: var(--ink);
+      min-width: 240px;
+    }
+
+    .toast-title {
+      font-family: var(--display);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--ink);
+      text-align: center;
+    }
+
+    /* ICON WRAPPER */
+    .toast-icon {
+      position: relative;
+      width: 24px;
+      height: 24px;
+    }
+
+    /* Stack spinner + checkmark */
+    .toast-icon .toast-spinner,
+    .toast-icon .toast-checkmark {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transition: opacity 120ms ease;
+    }
+
+    /* Spinner */
+    .toast-spinner {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      border-top-color: var(--accent);
+      animation: toast-spin 900ms linear infinite;
+    }
+
+    @keyframes toast-spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Checkmark */
+    .toast-checkmark {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: none;
+      position: absolute;
+      opacity: 0;
+    }
+    .toast-checkmark.animate {
+      animation: toast-check-spin 0.6s ease forwards;
+    }
+
+    @keyframes toast-check-spin {
+      0%   { transform: rotate(0deg) scale(0.6); opacity: 0; }
+      50%  { transform: rotate(180deg) scale(1.05); opacity: 1; }
+      100% { transform: rotate(360deg) scale(1); opacity: 1; }
+    }
+
+    /* Checkmark stroke */
+    .toast-checkmark::after {
+      content: "";
+      position: absolute;
+      left: 6px;
+      top: 2px;
+      width: 10px;
+      height: 18px;
+      border-right: 3px solid #c2fdff;
+      border-bottom: 3px solid #c2fbff;
+      transform: rotate(45deg) scale(0);
+      transform-origin: center;
+      animation: toast-check-draw 0.35s ease 0.45s forwards;
+    }
+
+    @keyframes toast-check-draw {
+      to { transform: rotate(45deg) scale(1); }
+    }
+
+    /* Toast visible state */
+    .review-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+
+    /* Success / error variants */
+    .review-toast-card.success {
+      border-color: rgba(0,200,120,0.18);
+      background: rgba(10,30,10,0.55);
+      color: #eafff0;
+    }
+
+    .review-toast-card.error {
+      border-color: rgba(255,80,80,0.18);
+      background: rgba(40,10,10,0.55);
+      color: #ffecec;
+    }
+
+    /* small label color change while submitting */
+    .review-slider.filling .slider-label { color: #fff; }
+
+    /* ensure handle z-index while expanding */
+    .review-slider .slider-handle { z-index: 6; }
+
+    /* ===========================
+       FIRE RATING WIDGET
+       =========================== */
+
+    .fire-rating {
+      display: flex;
+      gap: 6px;
+      font-size: 1.8rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .fire-rating span {
+      opacity: 0.35;
+      transition:
+        opacity 0.2s ease,
+        transform 0.15s ease,
+        text-shadow 0.2s ease;
+    }
+    .fire-rating span svg {
+      color: var(--muted); /* default unfilled color */
+      transition: color 0.2s ease;
+    }
+    .fire-rating span:hover {
+      transform: translateY(-2px) rotate(-6deg) scale(1.18);
+      text-shadow: 0 0 8px var(--accent), 0 0 14px var(--accent);
+      opacity: 1;
+    }
+    .fire-rating span:hover svg,
+    .fire-rating span:hover ~ span svg {
+      color: var(--accent);
+    }
+
+    /* Filled state */
+    .fire-rating span.filled {
+      opacity: 1;
+      text-shadow: 0 0 6px var(--accent);
+    }
+    .fire-rating span.filled svg {
+      color: var(--accent);
+    }
   </style>
 </head>
 <body>
-  <div class="bg" aria-hidden="true"></div>
-  <canvas id="bg-stars" aria-hidden="true"></canvas>
-
-  <header>
-    <div class="nav">
-      <a class="brand" href="https://fortiviewholdings.com">
-        <div class="logo" aria-hidden="true"></div>
-        <strong style="color: var(--ink);">Fortiview</strong>
-        <span style="color:var(--brand-600)">Holdings</span>
-        <span class="site-label">Business Services & Automation</span>
-      </a>
-      <nav aria-label="Primary">
-        <ul>
-          <li class="dropdown">
-  <button class="link dropdown-toggle" onclick="toggleDropdown()">Services ▾</button>
-  <ul id="servicesDropdown" class="dropdown-menu">
-    <li><a href="/leadership">Leadership & Business Strategy</a></li>
-    <li><a href="/operations">Project & Operations Management</a></li>
-    <li><a href="/finance">Financial Coordination</a></li>
-    <li><a href="/marketing">Marketing, Sales & Client Relations</a></li>
-    <li><a href="/governance">Governance & Regulatory Support</a></li>
-    <li><a href="/cx">Customer Experience Optimization</a></li>
-    <li><a href="/partnerships">Networking & Partnerships</a></li>
-    <li><a href="/industrial">Industrial Automation</a></li>
-    <li><a href="/integration">PragOptics™ System Integration</a></li>
-    <li><a href="/YouthBusinessEducationSandbox">Youth Entrepreneur Education</a></li>
-  </ul>
-</li>
-          <li><a class="link" href="#about">About</a></li>
-          <li><a class="cta" href="mailto:support@fortiviewholdings.com?subject=Fortiview%20Inquiry">Work with us</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
-
   <main>
-    
 
-        <!-- LEAVE A REVIEW MODAL -->
+    <!-- LEAVE A REVIEW MODAL -->
 <div id="reviewPopup" class="review-popup review-hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="reviewTitle">
   <div class="review-overlay" data-close="true"></div>
 
   <div class="review-card" role="document">
     <button id="closeReviewX" class="review-close-x">✕</button>
-    <h2 id="reviewTitle">Leave <span style="color: var(--brand);">a Review</span></h2>
+    <h2 id="reviewTitle">Leave <span style="color: var(--accent);">a Review</span></h2>
 
     <!-- Name -->
     <label class="review-label">
@@ -1265,8 +883,8 @@
   <div class="slider-fill" aria-hidden="true"></div>
   <span class="slider-label">Slide to Submit</span>
   <div class="slider-handle" aria-hidden="true"></div>
-      
-   
+
+
     </div>
     </div>
     </div>
@@ -1285,121 +903,110 @@
     </div>
 
     <!-- HERO -->
-    <section class="hero">
-      <div class="glass hero-card">
-        <div class="kicker">Focused. Practical. Accountable.</div>
-        <h1>Business Strategy, Engineered for Clarity</h1>
-        <p class="sub">We build more than systems - We Build Resilience. Every solution is designed to withstand change, eliminate waste, and deliver clarity where it matters most. 
-            From leadership architecture to automation and customer experience, we engineer pathways that scale with strength and foresight. 
-            Our approach integrates seamlessly with your existing tools or stands alone as a tailored framework, ensuring accountability at every step. 
-            The outcome is simple: durable businesses, smarter processes, and measurable results.</p>
+    <section class="fv-hero">
+      <div class="fv-wrap fv-hero__grid">
+        <div class="fv-reveal">
+          <span class="fv-eyebrow"><span class="n">00</span> Fortiview Holdings</span>
+          <h1>The parent company behind the work.</h1>
+          <p class="fv-lead">Fortiview is the parent behind industrial automation and technical training, PragOptics technology, and the Idea Lab. One company, several arms, pointed at the same thing: durable systems, real clarity, and an audit trail that holds up.</p>
+          <div class="fv-actions">
+            <a class="btn btn--primary" href="mailto:support@fortiviewholdings.com?subject=Fortiview%20Inquiry">Work with us</a>
+            <a class="btn btn--ghost" href="/integration">Explore PragOptics</a>
+          </div>
+        </div>
+        <aside class="fv-spec fv-reveal" aria-label="At a glance">
+          <div class="fv-spec__bar"><i></i> Company profile</div>
+          <div class="fv-spec__row"><span class="k">Founded</span><span class="v">TX<small> USA</small></span></div>
+          <div class="fv-spec__row"><span class="k">Focus</span><span class="v">Automation<small> &amp; OT</small></span></div>
+          <div class="fv-spec__row"><span class="k">Tech arm</span><span class="v">PragOptics<small> STACK</small></span></div>
+          <div class="fv-spec__row"><span class="k">For kids</span><span class="v">Idea<small> LAB</small></span></div>
+        </aside>
       </div>
-      <div class="hero-side">
-        <div class="stat">
-          <span class="pill">Smart Systems</span>
+    </section>
+
+    <!-- IDEA LAB LAUNCH -->
+    <section class="fv-section--tight">
+      <div class="fv-wrap">
+        <div class="fv-cta-band fv-reveal" style="display:grid;grid-template-columns:auto 1fr;gap:clamp(20px,4vw,36px);align-items:center">
+          <img src="/idea-lab/assets/logo.svg" width="84" height="84" alt="Idea Lab" style="filter:drop-shadow(0 8px 28px rgba(62,224,255,.4))">
           <div>
-            <strong style="color: var(--ink)">Microsoft Agents & Intelligent Workflows</strong>
-            <div style="color:var(--muted)">Harness AI to streamline processes, enhance customer experience and connect your existing tools without costly overhead.
+            <span class="fv-eyebrow">New launch</span>
+            <h2>Idea Lab</h2>
+            <p>A free cosmic coding and cyber academy for kids. No accounts, no cost, all in the browser, from how a rock becomes a computer to staying safe online and launching a first idea.</p>
+            <div class="fv-actions">
+              <a class="btn btn--primary" href="/idea-lab/">Enter the Idea Lab</a>
             </div>
           </div>
         </div>
-        <div class="stat">
-          <span class="pill">Operator Proven</span>
-          <div>
-            <strong style="color: var(--ink)">From plan to playbook</strong>
-            <div style="color:var(--muted)">We turn strategy into dashboards, procedures, and accountable routines - at the lowest cost to your business</div>
-          </div>
+      </div>
+    </section>
+
+    <!-- WHAT WE DO -->
+    <section class="fv-section" id="about">
+      <div class="fv-wrap">
+        <div class="fv-head fv-reveal">
+          <span class="fv-eyebrow"><span class="n">01</span> What we do</span>
+          <h2 class="fv-h2">Four arms, one standard</h2>
+          <p class="fv-lead">Every part of Fortiview is built the same way: practical, accountable, and engineered to outlast the change around it.</p>
+        </div>
+        <div class="fv-grid fv-grid--2">
+
+          <a class="fv-card fv-reveal" href="/industrial"><span class="fv-card__no">/ 01</span>
+            <div class="fv-card__ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 13l3.5-3.5"/><path d="M12 5V3.5"/></svg></div>
+            <h3>Industrial Automation &amp; Technical Training</h3>
+            <p>Instrumentation, controls, PLC and DCS, calibration, and safety functions. We design the systems, then teach your team to own them.</p>
+          </a>
+
+          <a class="fv-card fv-reveal" href="/partnerships"><span class="fv-card__no">/ 02</span>
+            <div class="fv-card__ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5"/><path d="M15 20c0-2 1-3.5 3-3.5s3 1.5 3 3.5"/></svg></div>
+            <h3>Partnerships</h3>
+            <p>A vetted network of vendors, integrators, and specialists, with bulk procurement and co-selling so clients get the right team for the job.</p>
+          </a>
+
+          <a class="fv-card fv-reveal" href="/integration"><span class="fv-card__no">/ 03</span>
+            <div class="fv-card__ico"><svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg></div>
+            <h3>PragOptics</h3>
+            <p>The technology arm: OmniBus field hardware, business and industrial automation, and visual dashboards that turn raw data into decisions.</p>
+          </a>
+
+          <a class="fv-card fv-reveal" href="/idea-lab/"><span class="fv-card__no">/ 04</span>
+            <div class="fv-card__ico"><svg viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 00-4 10.5c.7.7 1 1.3 1 2.5h6c0-1.2.3-1.8 1-2.5A6 6 0 0012 3z"/></svg></div>
+            <h3>Idea Lab</h3>
+            <p>A free cosmic coding and cyber academy for kids. How a rock becomes a computer, how AI really works, and how to launch a first idea.</p>
+          </a>
+
         </div>
       </div>
     </section>
 
-    <!-- SERVICES GRID -->
-    <section id="about" class="section">
-              <div class="glass hero-card">
-        <div class="kicker">Affordable. Scalable. Real-World Solutions.</div>
-        <h1>Bridging Pathways For Success...</h1>
-        <p class="sub">At Fortiview, we don’t believe in one‑size‑fits‑all solutions or hidden costs. 
-            We deliver foresight and discipline by engineering systems that remove waste, control expenses, and adapt to the way your business truly operates. 
-            Whether it’s streamlining digital workflows, optimizing operations on the ground, or modernizing data and automation, our approach is built on strength and vision. 
-            We integrate seamlessly with your existing tools or design stand‑alone solutions that scale with accountability. The result is simple: durable businesses, smarter processes, and measurable outcomes - Never shortcuts that cost you more.
-        </p>
-      </div><br>
-      <div class="grid">
-        <article class="card" data-path="/leadership" tabindex="0" role="button" aria-label="Leadership & Business Strategy">
-          <h3>Leadership & Business Strategy</h3>
-          <p>Team building, organizational development, and growth planning</p>
-        </article>
+    <!-- REVIEWS -->
+    <section class="fv-section fv-section--tight reviews" id="reviews">
+      <div class="fv-wrap">
+        <div class="fv-head fv-reveal">
+          <span class="fv-eyebrow"><span class="n">02</span> Reviews</span>
+          <h2 class="fv-h2">Client Reviews</h2>
+          <p class="fv-lead">What people say after we have run the work. Real names, real projects, no filler.</p>
+        </div>
 
-        <article class="card" data-path="/operations" tabindex="0" role="button" aria-label="Project & Operations Management">
-          <h3>Project & Operations Management</h3>
-          <p>Asset management, logistics, and workflow optimization</p>
-        </article>
+        <!-- Horizontal scroll gallery -->
+        <div class="review-rail" id="reviewRail">
+          <!-- JS will inject review cards here -->
+        </div>
 
-        <article class="card" data-path="/finance" tabindex="0" role="button" aria-label="Financial Coordination">
-          <h3>Financial Coordination</h3>
-          <p>Budgeting strategies, cost analysis, and funding pathways</p>
-        </article>
-
-        <article class="card" data-path="/marketing" tabindex="0" role="button" aria-label="Marketing, Sales & Client Relations">
-          <h3>Marketing, Sales & Client Relations</h3>
-          <p>Brand development, engagement, and prospecting</p>
-        </article>
-
-        <article class="card" data-path="/governance" tabindex="0" role="button" aria-label="Governance & Regulatory Support">
-          <h3>Governance & Regulatory Support</h3>
-          <p>Business structuring, compliance strategies, and audit trails</p>
-        </article>
-
-        <article class="card" data-path="/cx" tabindex="0" role="button" aria-label="Customer Experience Optimization">
-          <h3>Customer Experience Optimization</h3>
-          <p>Quality assurance, service strategy, and user engagement</p>
-        </article>
-
-        <article class="card" data-path="/partnerships" tabindex="0" role="button" aria-label="Networking & Partnerships">
-          <h3>Networking & Partnerships</h3>
-          <p>Strategic alliances, vendor management, and bulk discounts</p>
-        </article>
-
-        <article class="card" data-path="/industrial" tabindex="0" role="button" aria-label="Additional Services">
-          <h3>Industrial Automation</h3>
-          <p>Manufacturing, Instrumentation, Logic Controls, OT/IT Integration, and Regulatory Compliance Workflows: Operationally Intuitive Systems</p>
-        </article>
-
-        <article class="card" data-path="/integration" tabindex="0" role="button" aria-label="PragOptics™ System Integration">
-          <h3>PragOptics™ System Integration</h3>
-          <p>Business Automation, eCommerce Development, Point-of-Sale Integration, Software architecture, and Visual Dashboards (UX Development)</p>
-        </article>
-
-        <article class="card" data-path="/YouthBusinessEducationSandbox" tabindex="0" role="button" aria-label="Youth Entrepreneur Education">
-          <h3>Youth Entrepreneur Education</h3>
-          <p>Modular legal, financial & UX training tracks - empowering minors with guardian‑backed business licenses.</p>
-        </article>
+        <!-- Leave a Review Button -->
+        <div class="review-actions">
+          <button id="leaveReviewBtn" class="btn btn--primary">Leave a Review</button>
+        </div>
       </div>
     </section>
 
-      <!-- REVIEW SECTION -->
-<section class="section reviews" id="reviews">
-  <div class="card">
-    <h2>Client <span style="color: var(--brand);">Reviews</span></h2>
-
-    <!-- Horizontal scroll gallery -->
-    <div class="review-rail" id="reviewRail">
-      <!-- JS will inject review cards here -->
-    </div>
-
-    <!-- Leave a Review Button -->
-    <div class="review-actions">
-      <button id="leaveReviewBtn" class="btn secondary">Leave a Review</button>
-    </div>
-  </div>
-</section>
-
-
-    
      <!-- FAQ SECTION -->
-    <section class="section faq">
-      <div class="card">
-        <h2>Frequently Asked <span style="color: var(--brand);">Questions?</span></h2>
+    <section class="fv-section fv-section--tight fv-faq">
+      <div class="fv-wrap">
+        <div class="fv-head fv-reveal">
+          <span class="fv-eyebrow"><span class="n">03</span> FAQ</span>
+          <h2 class="fv-h2">Frequently asked questions</h2>
+        </div>
 
 <details>
   <summary>I need a website — can Fortiview build it?</summary>
@@ -1511,111 +1118,8 @@
 
  </main>
 
-  <footer>
-    © <span id="y"></span> Fortiview Holdings. All rights reserved.
-  </footer>
-
 
 <script>
-
-// GRID AUTOSCROLL (card-by-card, desktop + mobile)
-const grid = document.querySelector('.grid');
-let gridIndex = 0;
-
-function autoScrollGrid() {
-  if (!grid) return;
-
-  const cards = grid.children;
-  if (!cards.length) return;
-
-  gridIndex = (gridIndex + 1) % cards.length;
-  const card = cards[gridIndex];
-
-  grid.scrollTo({
-    left: card.offsetLeft - grid.offsetLeft,
-    behavior: 'smooth'
-  });
-}
-
-setInterval(autoScrollGrid, 5000); // tune interval
-
-
-    // Year
-    document.getElementById('y').textContent = new Date().getFullYear();
-
-    function toggleDropdown() {
-  const menu = document.getElementById('servicesDropdown');
-  menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
-}
-
-// Optional: close dropdown if clicking outside
-document.addEventListener('click', function(e) {
-  const dropdown = document.querySelector('.dropdown');
-  if (!dropdown.contains(e.target)) {
-    document.getElementById('servicesDropdown').style.display = 'none';
-  }
-});
-    // Card click navigation + keyboard activation
-    function go(path){ if(path) window.location.href = path; }
-    document.querySelectorAll('.card').forEach(card=>{
-      const path = card.dataset.path;
-      if(!path) return;
-      card.addEventListener('click', ()=>go(path));
-      card.addEventListener('keydown', (e)=>{
-        if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(path); }
-      });
-    });
-
-    // 3D hover tilt for cards
-    document.querySelectorAll('.card').forEach(card=>{
-      let rAF;
-      function onMove(e){
-        const rect = card.getBoundingClientRect();
-        const x = (e.clientX - rect.left)/rect.width - .5;
-        const y = (e.clientY - rect.top)/rect.height - .5;
-        cancelAnimationFrame(rAF);
-        rAF = requestAnimationFrame(()=>{
-          card.style.transform = `rotateX(${(-y*6).toFixed(2)}deg) rotateY(${(x*6).toFixed(2)}deg) translateY(-4px)`;
-        });
-      }
-      function reset(){ card.style.transform = ''; }
-      card.addEventListener('mousemove', onMove);
-      card.addEventListener('mouseleave', reset);
-      card.addEventListener('blur', reset);
-    });
-
-    // Fullscreen star-field background
-    function initStarField() {
-      const canvas = document.getElementById('bg-stars');
-      const ctx = canvas.getContext('2d');
-      function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-      resize(); window.addEventListener('resize', resize);
-
-      const stars = Array.from({ length: 120 }, () => ({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        r: Math.random() * 1.6 + 0.4,
-        a: Math.random()
-      }));
-      let frame = 0, reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-      function animate() {
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        for (const s of stars) {
-          ctx.beginPath();
-          ctx.fillStyle = `rgba(255,255,255,${s.a})`;
-          ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
-          ctx.fill();
-          if(!reduce){
-            s.a = 0.25 + Math.abs(Math.sin((frame/60) + s.x*0.001 + s.y*0.001)) * 0.75;
-          }
-        }
-        frame++;
-        requestAnimationFrame(animate);
-      }
-      animate();
-    }
-    window.addEventListener('load', initStarField);
 
      /* ===========================
    REVIEW SCROLLER
@@ -1786,7 +1290,7 @@ loadReviews();
   }
 })();
 /* ===========================
-   call to open in url 
+   call to open in url
    =========================== */
   document.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
@@ -2082,7 +1586,7 @@ function showSpinner() {
       resetSliderVisual();
 
       setTimeout(() => {
-        unlockInputs();        
+        unlockInputs();
         hideToast();
       }, 1600);
     }
@@ -2177,5 +1681,6 @@ function showSpinner() {
   fillFires(lockedRating);
 })();
   </script>
+  <script src="/assets/fortiview.js"></script>
 </body>
 </html>

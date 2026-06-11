@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hacking People — Defense Range — Idea Lab</title>
+<meta name="description" content="The con, the urgency, the trust. Four real tricks that target people, not computers, and the calm move that beats each one. Free, factual, no accounts.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../../assets/logo.svg">
+<link rel="stylesheet" href="../../assets/cosmos.css">
+<style>
+  .scenario{border:1px solid var(--border);border-radius:12px;background:#0a1020;padding:16px;
+    font-weight:700;display:flex;gap:10px;align-items:flex-start;font-size:1.05em}
+  .scenario .who{display:block;font-size:.78em;color:var(--muted);font-weight:700;margin-bottom:4px;
+    text-transform:uppercase;letter-spacing:.08em}
+  .choices{display:grid;gap:10px;margin-top:14px}
+  .choice{cursor:pointer;background:var(--glass);border:1px solid var(--border);border-radius:10px;
+    padding:12px 14px;font:inherit;color:var(--ink);text-align:left}
+  .choice:hover{border-color:var(--plasma)}
+  .choice.safe-pick{border-color:var(--good);background:#46e0a818}
+  .choice.bad-pick{border-color:var(--warn);background:#ffb45418}
+  .choices.graded .choice{cursor:default}
+  .fb{min-height:1.4em;margin-top:12px;font-weight:600}
+  .reveal{margin-top:12px}
+  .hidden{display:none}
+  .flags{display:grid;gap:8px;margin-top:14px}
+  .flag{display:flex;gap:10px;align-items:flex-start;font-size:.92em;color:var(--muted)}
+  .flag b{color:var(--ink)}
+</style>
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section lab">
+  <header class="center">
+    <span class="kicker">🛡️ Defense Range · Level 2 · Guardian</span>
+    <h1 style="font-size:clamp(28px,5vw,46px);margin:.2em 0">Hacking People</h1>
+    <p class="muted">Some attacks never touch a computer. They aim at you. Each one rushes you, scares
+       you, or pretends to be a friend. Stay calm and you win every time.</p>
+  </header>
+
+  <div class="steps" id="dots" aria-hidden="true"></div>
+
+  <!-- ACT 0: THE PLAYBOOK -->
+  <section class="act" data-act="0">
+    <h2>The whole trick, in one line</h2>
+    <div class="card" style="margin:8px 0">
+      <p style="margin:0">This is called
+        <button class="term" data-term="phishing">phishing</button> when it comes by message, but the
+        family name is <b>social engineering</b>. It does not break a lock. It talks you into opening
+        the door. The tools are always the same two: <b>trust</b> ("I am someone you know") and
+        <b>urgency</b> ("do it right now, do not stop to think").</p>
+    </div>
+    <div class="fact">
+      <span aria-hidden="true">🧠</span>
+      <span><b>Here is the secret weakness of the trick:</b> it needs you to act fast. The moment you
+      slow down and check on a channel you already trust, it falls apart. You are about to face four
+      of these. Beat all four and you earn the badge.</span>
+    </div>
+    <div class="act__nav"><span></span>
+      <button class="btn btn--go" data-next>Start: the phone rings →</button></div>
+  </section>
+
+  <!-- ACT 1: FAKE TECH SUPPORT CALL -->
+  <section class="act" data-act="1" hidden>
+    <h2>Trick 1 of 4 · The "tech support" call</h2>
+    <p class="muted">Your phone rings. The person sounds official and a little bit worried for you.</p>
+
+    <div class="scenario">
+      <span aria-hidden="true">📞</span>
+      <span><span class="who">Caller</span>"Hi, this is support. We found a virus on your computer
+        right now. I am going to send you a link. Click it fast so we can clean it before it spreads."</span>
+    </div>
+
+    <div class="choices" id="c1"></div>
+    <div class="fb muted" id="fb1"></div>
+
+    <div class="fact reveal hidden" id="r1">
+      <span aria-hidden="true">💡</span>
+      <span><b>Real support does not call you out of the blue and rush you to click.</b> The fear and the
+      hurry are the trick. Hang up. If you want to be sure, look up the company's real number yourself
+      and call that. A scammer cannot answer a number you found on your own.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" id="n1" data-next disabled>Next trick →</button>
+    </div>
+  </section>
+
+  <!-- ACT 2: FRIEND ASKING FOR PASSWORD -->
+  <section class="act" data-act="2" hidden>
+    <h2>Trick 2 of 4 · The "friend" who needs your password</h2>
+    <p class="muted">A message pops up from an account with your friend's name and picture.</p>
+
+    <div class="scenario">
+      <span aria-hidden="true">💬</span>
+      <span><span class="who">"Maya"</span>"Hey it's Maya! I got locked out of my game and support says
+        a friend can reset it. Can you send me your password real quick? I'll fix it and send it
+        right back, promise!"</span>
+    </div>
+
+    <div class="choices" id="c2"></div>
+    <div class="fb muted" id="fb2"></div>
+
+    <div class="fact reveal hidden" id="r2">
+      <span aria-hidden="true">💡</span>
+      <span><b>A real friend never needs your password, and no real reset works that way.</b> The
+      account might be your friend's that someone else took over. Do not send the secret. Reach the real
+      Maya on a channel you already trust, like calling her or talking in person, and ask if it was
+      really her. Verify the person, not just the name on the screen.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" id="n2" data-next disabled>Next trick →</button>
+    </div>
+  </section>
+
+  <!-- ACT 3: PRIZE / PAY SHIPPING -->
+  <section class="act" data-act="3" hidden>
+    <h2>Trick 3 of 4 · "You won! Just pay shipping"</h2>
+    <p class="muted">A bright message says you won something you never entered to win.</p>
+
+    <div class="scenario">
+      <span aria-hidden="true">🎁</span>
+      <span><span class="who">Message</span>"CONGRATULATIONS! You won a brand new phone! 🎉 To claim it,
+        just pay $4.99 shipping and enter your card details on this link in the next 10 minutes!"</span>
+    </div>
+
+    <div class="choices" id="c3"></div>
+    <div class="fb muted" id="fb3"></div>
+
+    <div class="fact reveal hidden" id="r3">
+      <span aria-hidden="true">💡</span>
+      <span><b>You cannot win a prize you never entered, and a real prize never asks for your card.</b>
+      The tiny "shipping" fee is bait to get your card number and the countdown is there to stop you
+      thinking. Do not enter anything. Close it and, if you are curious, check the real company's
+      official site yourself. A free prize that needs your card is not free.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" id="n3" data-next disabled>Last trick →</button>
+    </div>
+  </section>
+
+  <!-- ACT 4: SCARY URGENCY / ACCOUNT LOCKED -->
+  <section class="act" data-act="4" hidden>
+    <h2>Trick 4 of 4 · "Your account will be deleted"</h2>
+    <p class="muted">An email arrives looking like it is from a service you use.</p>
+
+    <div class="scenario">
+      <span aria-hidden="true">⚠️</span>
+      <span><span class="who">Email</span>"URGENT: Your account broke a rule and will be deleted in 1
+        hour. Click here now and sign in to stop it. Do not tell anyone, this is confidential."</span>
+    </div>
+
+    <div class="choices" id="c4"></div>
+    <div class="fb muted" id="fb4"></div>
+
+    <div class="fact reveal hidden" id="r4">
+      <span aria-hidden="true">💡</span>
+      <span><b>"Right now" and "tell no one" are the two biggest warning signs there are.</b> A real
+      service gives you time and never tells you to keep it a secret from your family. Do not click the
+      link in the message. Open the app or website the way you normally do, by typing it in yourself,
+      and check there. And tell a trusted adult. Secrecy is the scammer's friend, not yours.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" id="n4" data-next disabled>See the one rule →</button>
+    </div>
+  </section>
+
+  <!-- ACT 5: WRAP -->
+  <section class="act" data-act="5" hidden>
+    <h2>You read the people, not just the screen</h2>
+    <div class="card" style="margin:8px 0">
+      <p class="muted" style="margin:0">Every trick you just beat used the same playbook. So does your
+        defense:<br>
+        <b>1. Notice the rush.</b> Fear and "do it now" are the trick trying to skip your thinking.<br>
+        <b>2. Never hand over a secret.</b> No real person or company needs your password.<br>
+        <b>3. Verify on a channel you already trust.</b> Hang up and call back, ask the real friend,
+        type the website in yourself.</p>
+    </div>
+
+    <div class="flags">
+      <div class="flag"><span aria-hidden="true">🚩</span><span><b>It rushes you.</b> "Right now, in
+        10 minutes, before it is too late."</span></div>
+      <div class="flag"><span aria-hidden="true">🚩</span><span><b>It wants a secret.</b> Your
+        password, your card, a code.</span></div>
+      <div class="flag"><span aria-hidden="true">🚩</span><span><b>It says keep it quiet.</b> Real help
+        never asks you to hide it from a trusted adult.</span></div>
+    </div>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">🔒</span>
+      <span><b>The last lock is you.</b> No firewall and no password can stop you from giving a secret
+      away if someone talks you into it. That is why the calm human who slows down and checks is the
+      strongest defense there is. You just became that human.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <a class="btn btn--cosmic" href="../">Back to the Defense Range →</a>
+    </div>
+  </section>
+
+  <p class="center muted tiny" style="margin-top:26px">
+    <a href="../">← Defense Range</a> · these are real, well-known tricks. Spotting them is a skill you
+    keep for life. Tap the <span class="term" style="cursor:default;border:0">underlined words</span>
+    to dig deeper.
+  </p>
+</main>
+
+<script src="../../assets/manifest.js"></script>
+<script src="../../assets/glossary.js"></script>
+<script src="../../assets/shell.js"></script>
+<script>
+(function () {
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("defense", "../..");
+  IdeaLab.disclosure();
+  IdeaLab.glossary(window.IDEA_LAB_GLOSSARY);
+
+  /* ---------- stepper ---------- */
+  var acts = Array.prototype.slice.call(document.querySelectorAll(".act"));
+  var dots = document.getElementById("dots");
+  var done = [false, false, false, false, false, false];
+  var current = 0;
+  acts.forEach(function (_, i) {
+    var d = document.createElement("span");
+    d.className = "dot" + (i === 0 ? " is-active" : "");
+    dots.appendChild(d);
+  });
+  function show(i) {
+    current = Math.max(0, Math.min(acts.length - 1, i));
+    acts.forEach(function (a, k) { a.hidden = k !== current; });
+    Array.prototype.forEach.call(dots.children, function (d, k) {
+      d.className = "dot" + (k === current ? " is-active" : (done[k] ? " is-done" : ""));
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.body.addEventListener("click", function (e) {
+    if (e.target.matches("[data-next]") && !e.target.disabled) { done[current] = true; show(current + 1); }
+    if (e.target.matches("[data-prev]")) show(current - 1);
+  });
+
+  /* ---------- four trick scenarios ----------
+     Each has two or three responses. Safe responses are: do not share,
+     verify on a trusted channel, hang up. Unsafe responses comply.
+     The kid must pick a safe one to unlock the next trick. ---------- */
+  var TRICKS = [
+    {
+      cEl: "c1", fbEl: "fb1", revealEl: "r1", nextEl: "n1",
+      choices: [
+        { t: "Click the link fast so they can fix the virus.", safe: false,
+          fb: "That is the whole trick working. The link is the danger, and the hurry is there to stop you thinking." },
+        { t: "Hang up. They called me and rushed me, so I do not trust it.", safe: true,
+          fb: "Right. You do not owe a surprise caller anything. Hanging up costs you nothing." },
+        { t: "Hang up, then look up the company's real number and call that myself.", safe: true,
+          fb: "Even better. You verified on a channel you chose, not the one they handed you." }
+      ]
+    },
+    {
+      cEl: "c2", fbEl: "fb2", revealEl: "r2", nextEl: "n2",
+      choices: [
+        { t: "Send the password. It is just Maya, and she promised to send it back.", safe: false,
+          fb: "Never send a password, even to a friend. The account might not even be the real Maya anymore." },
+        { t: "Do not send it. No real friend needs my password.", safe: true,
+          fb: "Correct. A secret you give away willingly is gone. The strongest password cannot protect you from that." },
+        { t: "Do not send it. Call the real Maya first and ask if this was actually her.", safe: true,
+          fb: "Perfect. You checked the person on a channel you already trust, instead of trusting the name on screen." }
+      ]
+    },
+    {
+      cEl: "c3", fbEl: "fb3", revealEl: "r3", nextEl: "n3",
+      choices: [
+        { t: "Enter my card. It is only $4.99 and I do not want to lose the phone.", safe: false,
+          fb: "That tiny fee is the bait. The real prize they want is your card number, and the timer is there to rush you." },
+        { t: "Ignore it. I never entered any contest, so I did not win anything.", safe: true,
+          fb: "Right. You cannot win a prize you never entered, and a real prize never asks for your card." },
+        { t: "Close it and check the real company's official site myself if I am curious.", safe: true,
+          fb: "Smart. You went to a source you trust instead of the link that came to you." }
+      ]
+    },
+    {
+      cEl: "c4", fbEl: "fb4", revealEl: "r4", nextEl: "n4",
+      choices: [
+        { t: "Click the link and sign in now before my account is deleted.", safe: false,
+          fb: "Signing in on their link hands your password straight to them. The countdown and the panic are the trick." },
+        { t: "Do not click. Open the app the normal way and check, and tell a trusted adult.", safe: true,
+          fb: "Right. You used your own trusted path and broke the secrecy the scammer needed." },
+        { t: "Slow down. 'Right now' and 'tell no one' are the warning signs, so I will not rush.", safe: true,
+          fb: "Exactly. Naming the pressure out loud takes its power away." }
+      ]
+    }
+  ];
+
+  var solvedCount = 0;
+
+  TRICKS.forEach(function (trick) {
+    var cEl = document.getElementById(trick.cEl);
+    var fbEl = document.getElementById(trick.fbEl);
+    var solved = false;
+
+    trick.choices.forEach(function (c) {
+      var b = document.createElement("button");
+      b.className = "choice"; b.type = "button"; b.textContent = c.t;
+      b.addEventListener("click", function () {
+        Array.prototype.forEach.call(cEl.children, function (x) { x.classList.remove("safe-pick", "bad-pick"); });
+        b.classList.add(c.safe ? "safe-pick" : "bad-pick");
+        fbEl.textContent = c.fb;
+        fbEl.className = "fb " + (c.safe ? "ok" : "no");
+
+        if (c.safe && !solved) {
+          solved = true;
+          cEl.classList.add("graded");
+          document.getElementById(trick.revealEl).classList.remove("hidden");
+          document.getElementById(trick.nextEl).disabled = false;
+          IdeaLab.addXP(10);
+          solvedCount++;
+          if (solvedCount === TRICKS.length) {
+            IdeaLab.award("people-reader", 50);
+          }
+        }
+      });
+      cEl.appendChild(b);
+    });
+  });
+})();
+</script>
+</body>
+</html>

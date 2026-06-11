@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Think Like a Defender — Defense Range — Idea Lab</title>
+<meta name="description" content="A pretend lemonade-stand website with real weaknesses. List what could go wrong, spot each risk, and fix the most important things first. A safe, factual intro to threat modeling for kids.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../../assets/logo.svg">
+<link rel="stylesheet" href="../../assets/cosmos.css">
+<style>
+  /* lab-local styles, built on the cosmos tokens */
+  .stage{display:grid;grid-template-columns:1fr;gap:18px}
+  @media(min-width:780px){ .stage{grid-template-columns:1fr 1fr} }
+
+  /* the pretend website window */
+  .win{border:1px solid var(--border);border-radius:14px;overflow:hidden;background:#0a1020;
+    box-shadow:0 18px 50px #0008}
+  .win__bar{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#0d1428;
+    border-bottom:1px solid var(--border)}
+  .win__dot{width:11px;height:11px;border-radius:50%;background:#ffffff2a}
+  .win__url{margin-left:8px;display:inline-flex;align-items:center;gap:6px;font-size:.78em;
+    color:var(--muted);font-family:ui-monospace,monospace;word-break:break-all}
+  .win__lock{font-size:.95em}
+  .win__lock.no{color:var(--bad)} .win__lock.ok{color:var(--good)}
+  .win__body{padding:22px 18px;text-align:center;display:grid;gap:10px;place-items:center}
+  .stand{font-size:48px;line-height:1}
+  .win__body h3{margin:.1em 0;font-size:1.2em}
+  .win__body .menu{color:var(--muted);font-size:.9em;line-height:1.5}
+  .win__note{font-size:.74em;color:var(--muted);border-top:1px dashed var(--border);
+    width:100%;padding-top:10px;margin-top:4px;text-align:left;line-height:1.5}
+  .win__note b{color:var(--ink)}
+  .win__note .tag{color:var(--warn)}
+  .win__note .tag.fixed{color:var(--good)}
+
+  /* the score meter */
+  .score{border:1px solid var(--border);border-radius:14px;background:#070b16;padding:16px 18px}
+  .score__top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+  .score__num{font-weight:800;font-size:1.5em}
+  .score__num.lo{color:var(--bad)} .score__num.mid{color:var(--warn)} .score__num.hi{color:var(--good)}
+  .score__grade{font-size:.82em;color:var(--muted);font-weight:700}
+  .score__bar{height:14px;border-radius:8px;background:#ffffff14;overflow:hidden;margin-top:10px}
+  .score__bar > i{display:block;height:100%;width:0;transition:width .5s ease,background .5s ease;
+    background:var(--bad)}
+  .score__bar > i.mid{background:var(--warn)} .score__bar > i.hi{background:var(--good)}
+  .score__hint{font-size:.82em;color:var(--muted);margin-top:10px}
+
+  /* the threat-model checklist */
+  .risks{display:grid;gap:12px;margin-top:4px}
+  .risk{border:1px solid var(--border);border-radius:14px;background:var(--glass);padding:14px 16px;
+    transition:border-color .2s ease,background .2s ease}
+  .risk.is-fixed{border-color:#21bca555;background:#1ca4900f}
+  .risk__head{display:flex;gap:12px;align-items:flex-start}
+  .risk__ico{font-size:22px;width:44px;height:44px;border-radius:12px;background:#0e1530;
+    border:1px solid var(--border);display:grid;place-items:center;flex:0 0 auto}
+  .risk.is-fixed .risk__ico{background:#1ca49022;border-color:#21bca555}
+  .risk__body{flex:1;min-width:0}
+  .risk__body h4{margin:0;font-size:1.04em;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .risk__impact{font-size:.66em;font-weight:800;text-transform:uppercase;letter-spacing:.05em;
+    padding:3px 8px;border-radius:999px}
+  .imp-high{background:#ff6b6b22;color:#ff9a9a;border:1px solid #ff6b6b55}
+  .imp-med{background:#ffb45422;color:#ffce8a;border:1px solid #ffb45455}
+  .imp-low{background:#3ee0ff1f;color:#9be7ff;border:1px solid #3ee0ff44}
+  .risk__body p{margin:.35em 0 0;color:var(--muted);font-size:.9em}
+  .risk__fix{margin-top:12px;padding-top:12px;border-top:1px dashed var(--border);display:none}
+  .risk.is-open .risk__fix{display:block}
+  .risk__fix p{margin:0 0 10px;font-size:.9em;color:var(--muted)}
+  .risk__fix .good{color:var(--good)}
+  .risk__row{display:flex;gap:8px;flex-wrap:wrap}
+  .risk__status{margin-left:auto;flex:0 0 auto;font-size:.72em;font-weight:700;text-transform:uppercase;
+    letter-spacing:.05em;padding:5px 11px;border-radius:999px;align-self:center}
+  .st-open{background:#ff6b6b22;color:#ff9a9a;border:1px solid #ff6b6b55}
+  .st-fixed{background:#1ca49033;color:var(--brand-600);border:1px solid #21bca555}
+
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.8em;color:var(--muted);margin-top:6px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section lab">
+  <header class="center">
+    <span class="kicker">Defense Range · Level 3</span>
+    <h1 style="font-size:clamp(28px,5vw,46px);margin:.2em 0">Think Like a Defender</h1>
+    <p class="muted">A lemonade-stand website that is wide open. You are the defender. List what
+      could go wrong, then lock the most important things first.</p>
+  </header>
+
+  <div class="steps" id="dots" aria-hidden="true"></div>
+
+  <!-- ACT 0: WHAT IS THREAT MODELING -->
+  <section class="act" data-act="0">
+    <h2>What does a defender do first?</h2>
+    <p class="muted">Before fixing anything, a defender makes a short list. Three questions, every time.</p>
+
+    <div class="risks" style="margin-top:6px">
+      <div class="risk is-fixed">
+        <div class="risk__head">
+          <span class="risk__ico">📦</span>
+          <div class="risk__body"><h4>1. What am I protecting?</h4>
+            <p>The valuable stuff. Your customers' names, your order list, your money, your password.
+              These are your <b>assets</b>.</p></div>
+        </div>
+      </div>
+      <div class="risk is-fixed">
+        <div class="risk__head">
+          <span class="risk__ico">⚠️</span>
+          <div class="risk__body"><h4>2. What could go wrong?</h4>
+            <p>The ways someone could steal, break, or peek at those assets. These are the
+              <b>threats</b>.</p></div>
+        </div>
+      </div>
+      <div class="risk is-fixed">
+        <div class="risk__head">
+          <span class="risk__ico">🛡️</span>
+          <div class="risk__body"><h4>3. What will I do about it?</h4>
+            <p>The fixes that close each threat. These are your <b>defenses</b>. You cannot fix
+              everything at once, so you start with the worst.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">✦</span>
+      <span><b>That is threat modeling.</b> List your assets, the threats to them, and the defenses.
+        Real security teams do exactly this before they build anything. Now you try it on a real site.</span>
+    </div>
+
+    <div class="act__nav"><span></span>
+      <button class="btn btn--go" data-next>Next: meet the site →</button></div>
+  </section>
+
+  <!-- ACT 1: MEET THE SITE -->
+  <section class="act" data-act="1" hidden>
+    <h2>Meet the wide-open site</h2>
+    <p class="muted">Here is Mia's lemonade-stand website. It works, but a defender sees five
+      problems right away. Look at the little notes under the page.</p>
+
+    <div class="stage">
+      <div class="win">
+        <div class="win__bar"><span class="win__dot"></span><span class="win__dot"></span>
+          <span class="win__dot"></span>
+          <span class="win__url"><span class="win__lock no" id="urlLock">⚠️ not secure</span>
+            <span id="urlText">http://mias-lemonade.example</span></span></div>
+        <div class="win__body">
+          <div class="stand">🍋</div>
+          <h3>Mia's Lemonade Stand</h3>
+          <div class="menu">Fresh lemonade · 50 cents a cup<br>Order online, pick up at the corner</div>
+          <div class="win__note" id="siteNotes"></div>
+        </div>
+      </div>
+
+      <div class="card" style="align-self:start">
+        <h3 style="margin-top:0">🔎 The defender's first look</h3>
+        <p class="muted" style="margin:.2em 0">Five weaknesses, each tagged on the page. On the next
+          screen you will fix them, worst first.</p>
+        <ul class="muted" style="margin:.6em 0 0;padding-left:1.1em;line-height:1.7;font-size:.92em">
+          <li>The password is <b>1234</b></li>
+          <li>The connection is plain, not scrambled</li>
+          <li>A secret is hidden in the browser</li>
+          <li>There is no backup of the order list</li>
+          <li>The page shares a home address</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">🔎</span>
+      <span>Mia's site uses a normal <button class="term" data-term="client-server">client and server</button>
+        setup: your browser asks, her server answers. Every one of these problems is common on real
+        sites, and every one has a known fix.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" data-next>Next: harden it →</button>
+    </div>
+  </section>
+
+  <!-- ACT 2: THE FIX BENCH -->
+  <section class="act" data-act="2" hidden>
+    <h2>Lock the worst things first</h2>
+    <p class="muted">Each risk is rated by impact. Open the high-impact ones first, read the fix,
+      and apply it. Watch the security score climb as the site gets harder to break.</p>
+
+    <div class="score" id="scoreCard">
+      <div class="score__top">
+        <span class="score__num lo" id="scoreNum">20</span>
+        <span class="score__grade" id="scoreGrade">Wide open</span>
+      </div>
+      <div class="score__bar"><i id="scoreFill"></i></div>
+      <div class="score__hint" id="scoreHint">Five risks open. Start with the red ones.</div>
+    </div>
+
+    <div class="legend">
+      <span><i style="background:#ff6b6b"></i> High impact (fix first)</span>
+      <span><i style="background:#ffb454"></i> Medium</span>
+      <span><i style="background:#3ee0ff"></i> Lower</span>
+    </div>
+
+    <div class="risks" id="riskList"></div>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">🛡️</span>
+      <span><b>Order matters.</b> A defender spends their time where it counts most. A weak password
+        and a plain connection are bigger holes than an oversharing menu, so those get fixed first.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--cosmic" id="toWrap" data-next disabled>Last: you hardened it →</button>
+    </div>
+  </section>
+
+  <!-- ACT 3: WRAP -->
+  <section class="act" data-act="3" hidden>
+    <h2>You just thought like a defender</h2>
+    <p class="muted">You did the real job: you listed the assets, named the threats, and applied a
+      defense for each one, worst first. The site that started wide open is now hard to break.</p>
+
+    <div class="card" style="margin:8px 0">
+      <h3 style="margin-top:0">🧠 The five fixes you made</h3>
+      <ul class="muted" style="margin:.4em 0 0;padding-left:1.1em;line-height:1.8;font-size:.94em">
+        <li>Traded <b>1234</b> for a long, unpredictable password that beats
+          <button class="term" data-term="brute-force">brute-force</button> guessing.</li>
+        <li>Turned on HTTPS so snoops on the network see only scrambled gibberish.</li>
+        <li>Moved the secret off the browser and onto the server, out of a visitor's reach.</li>
+        <li>Turned on backups, so a crash or a mistake does not erase the order list.</li>
+        <li>Stopped posting a home address, which also makes a
+          <button class="term" data-term="phishing">phishing</button> trick harder to pull off.</li>
+      </ul>
+    </div>
+
+    <div class="fact">
+      <span aria-hidden="true">✅</span>
+      <span><b>The one habit:</b> list what could go wrong, then fix the highest-impact problems
+        first. You will never fix everything, and a good defender does not try to. They protect what
+        matters most.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <a class="btn btn--cosmic" href="../">Back to the Defense Range →</a>
+    </div>
+  </section>
+
+  <p class="center muted tiny" style="margin-top:26px">
+    <a href="../">← Defense Range</a> · everything here is a pretend site in a sandbox. Tap the
+    <span class="term" style="cursor:default;border:0">underlined words</span> to dig deeper.
+  </p>
+</main>
+
+<script src="../../assets/manifest.js"></script>
+<script src="../../assets/glossary.js"></script>
+<script src="../../assets/shell.js"></script>
+<script>
+(function () {
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("defense", "../..");
+  IdeaLab.disclosure();
+  IdeaLab.glossary(window.IDEA_LAB_GLOSSARY);
+
+  /* ---------- stepper ---------- */
+  var acts = Array.prototype.slice.call(document.querySelectorAll(".act"));
+  var dots = document.getElementById("dots");
+  var done = [false, false, false, false];
+  var current = 0;
+  acts.forEach(function (_, i) {
+    var d = document.createElement("span");
+    d.className = "dot" + (i === 0 ? " is-active" : "");
+    dots.appendChild(d);
+  });
+  function show(i) {
+    current = Math.max(0, Math.min(acts.length - 1, i));
+    acts.forEach(function (a, k) { a.hidden = k !== current; });
+    Array.prototype.forEach.call(dots.children, function (d, k) {
+      d.className = "dot" + (k === current ? " is-active" : (done[k] ? " is-done" : ""));
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.body.addEventListener("click", function (e) {
+    if (e.target.matches("[data-next]") && !e.target.disabled) { done[current] = true; show(current + 1); }
+    if (e.target.matches("[data-prev]")) show(current - 1);
+  });
+
+  /* ---------- the threat model: five risks, rated by impact ----------
+     points add up to a 100 score. The site starts at 20 (it does work,
+     just badly). Higher-impact fixes are worth more, so the score
+     rewards fixing the worst things first. ---------- */
+  var RISKS = [
+    {
+      id: "password", ico: "🔑", impact: "high", points: 25,
+      title: "The password is 1234",
+      asset: "Mia's whole account: orders, money, settings.",
+      threat: "A guesser tries 1234, then 1111, then password. It is in within seconds.",
+      fix: "Set a long, unpredictable password like river-purple-engine-cloud. Length and surprise are what beat a guesser, not squiggly symbols.",
+      siteOpen: 'Login password: <b>1234</b> <span class="tag">[easy to guess]</span>',
+      siteFixed: 'Login password: <b>river-purple-engine-cloud</b> <span class="tag fixed">[strong]</span>',
+      btn: "Set a strong password",
+      done: "Strong password set."
+    },
+    {
+      id: "https", ico: "🔓", impact: "high", points: 25,
+      title: "No HTTPS, so the connection is plain",
+      asset: "Every order and password as it travels across the network.",
+      threat: "On plain http, anyone sharing the wifi can read what is sent, in the clear.",
+      fix: "Turn on HTTPS. It scrambles the data between browser and server, so a snoop on the network sees only gibberish.",
+      siteOpen: "Connection: <b>http</b> (plain) " + '<span class="tag">[snoopable]</span>',
+      siteFixed: "Connection: <b>https</b> (scrambled) " + '<span class="tag fixed">[private]</span>',
+      btn: "Turn on HTTPS",
+      done: "HTTPS on. Traffic is scrambled."
+    },
+    {
+      id: "secret", ico: "🕵️", impact: "high", points: 20,
+      title: "A secret is stored in the browser",
+      asset: "The admin key that lets Mia change prices and read orders.",
+      threat: "The key is saved in the visitor's browser, where anyone can open the page tools and read it.",
+      fix: "Never trust the browser to hold a secret. Move the admin key to the server, where visitors cannot reach it. The browser only asks; the server decides.",
+      siteOpen: "Admin key: stored in <b>your browser</b> " + '<span class="tag">[anyone can read it]</span>',
+      siteFixed: "Admin key: kept on the <b>server</b> " + '<span class="tag fixed">[out of reach]</span>',
+      btn: "Move the secret to the server",
+      done: "Secret moved off the browser."
+    },
+    {
+      id: "backup", ico: "💾", impact: "medium", points: 15,
+      title: "No backup of the order list",
+      asset: "The list of who ordered what. Mia's whole business runs on it.",
+      threat: "One crash, one wrong tap, and the list is gone for good. No copy means no recovery.",
+      fix: "Turn on automatic backups. A spare copy somewhere safe means a bad day does not become a disaster.",
+      siteOpen: "Order list backup: <b>none</b> " + '<span class="tag">[one crash and it is gone]</span>',
+      siteFixed: "Order list backup: <b>daily</b> " + '<span class="tag fixed">[recoverable]</span>',
+      btn: "Turn on daily backups",
+      done: "Daily backups on."
+    },
+    {
+      id: "oversharing", ico: "📢", impact: "low", points: 15,
+      title: "The page shares too much",
+      asset: "Mia's privacy and safety.",
+      threat: "The page posts her full home address and phone number for anyone to copy. That helps a stranger or a phishing trick.",
+      fix: "Share only what a customer needs: a pickup corner and an order form. Keep the home address and phone off the public page.",
+      siteOpen: "Public info: <b>full home address + phone</b> " + '<span class="tag">[oversharing]</span>',
+      siteFixed: "Public info: <b>pickup corner only</b> " + '<span class="tag fixed">[need-to-know]</span>',
+      btn: "Share only what is needed",
+      done: "Now shares only what is needed."
+    }
+  ];
+
+  var BASE = 20;           // a working but wide-open site
+  var TOP = BASE;
+  RISKS.forEach(function (r) { TOP += r.points; });   // 20 + 100 = 120, capped at 100 below
+  var fixedCount = 0;
+
+  /* ---------- ACT 1: the site notes (live, reflect fixes) ---------- */
+  var siteNotes = document.getElementById("siteNotes");
+  function renderNotes() {
+    siteNotes.innerHTML = RISKS.map(function (r) {
+      return "<div>" + (r.fixedNow ? r.siteFixed : r.siteOpen) + "</div>";
+    }).join("");
+  }
+  renderNotes();
+
+  /* the URL bar lock flips when HTTPS is fixed */
+  function renderUrl() {
+    var https = RISKS.filter(function (r) { return r.id === "https"; })[0].fixedNow;
+    var lock = document.getElementById("urlLock");
+    var txt = document.getElementById("urlText");
+    if (https) {
+      lock.textContent = "🔒 secure"; lock.className = "win__lock ok";
+      txt.textContent = "https://mias-lemonade.example";
+    } else {
+      lock.textContent = "⚠️ not secure"; lock.className = "win__lock no";
+      txt.textContent = "http://mias-lemonade.example";
+    }
+  }
+  renderUrl();
+
+  /* ---------- the score meter ---------- */
+  function scoreNow() {
+    var s = BASE;
+    RISKS.forEach(function (r) { if (r.fixedNow) s += r.points; });
+    return Math.min(100, s);
+  }
+  function renderScore() {
+    var s = scoreNow();
+    var num = document.getElementById("scoreNum");
+    var fill = document.getElementById("scoreFill");
+    var grade = document.getElementById("scoreGrade");
+    var hint = document.getElementById("scoreHint");
+    num.textContent = s;
+    fill.style.width = s + "%";
+    var band = s >= 90 ? "hi" : (s >= 55 ? "mid" : "lo");
+    num.className = "score__num " + band;
+    fill.className = band;
+    var open = RISKS.length - fixedCount;
+    if (s >= 90) {
+      grade.textContent = "Hardened";
+      hint.textContent = "All five risks closed. This is a site a defender can stand behind.";
+    } else if (s >= 55) {
+      grade.textContent = "Getting solid";
+      hint.textContent = open + " risk" + (open === 1 ? "" : "s") + " left. Keep going, worst first.";
+    } else {
+      grade.textContent = "Wide open";
+      hint.textContent = open + " risks open. Start with the red ones.";
+    }
+  }
+
+  /* ---------- ACT 2: build the risk list ---------- */
+  var riskList = document.getElementById("riskList");
+  var impLabel = { high: "High impact", medium: "Medium", low: "Lower" };
+  var impClass = { high: "imp-high", medium: "imp-med", low: "imp-low" };
+
+  RISKS.forEach(function (r) {
+    var el = document.createElement("div");
+    el.className = "risk";
+    el.dataset.id = r.id;
+    el.innerHTML =
+      '<div class="risk__head">' +
+        '<span class="risk__ico">' + r.ico + "</span>" +
+        '<div class="risk__body">' +
+          "<h4>" + IdeaLab.esc(r.title) +
+            '<span class="risk__impact ' + impClass[r.impact] + '">' + impLabel[r.impact] + "</span></h4>" +
+          "<p><b>What is at risk:</b> " + IdeaLab.esc(r.asset) + "</p>" +
+          "<p><b>What could go wrong:</b> " + IdeaLab.esc(r.threat) + "</p>" +
+        "</div>" +
+        '<span class="risk__status st-open">Open</span>' +
+      "</div>" +
+      '<div class="risk__fix">' +
+        "<p><b>The defense:</b> " + IdeaLab.esc(r.fix) + "</p>" +
+        '<div class="risk__row">' +
+          '<button class="btn btn--go tiny" data-fix="' + r.id + '">' + IdeaLab.esc(r.btn) + "</button>" +
+        "</div>" +
+      "</div>";
+    riskList.appendChild(el);
+
+    /* clicking the head toggles the fix open (until it is fixed) */
+    el.querySelector(".risk__head").addEventListener("click", function () {
+      if (!r.fixedNow) el.classList.toggle("is-open");
+    });
+  });
+
+  riskList.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-fix]");
+    if (!b) return;
+    var id = b.getAttribute("data-fix");
+    var r = RISKS.filter(function (x) { return x.id === id; })[0];
+    if (!r || r.fixedNow) return;
+    r.fixedNow = true;
+    fixedCount++;
+
+    var el = riskList.querySelector('.risk[data-id="' + id + '"]');
+    el.classList.add("is-fixed");
+    el.classList.remove("is-open");
+    el.querySelector(".risk__status").className = "risk__status st-fixed";
+    el.querySelector(".risk__status").textContent = "Fixed ✓";
+    var row = el.querySelector(".risk__row");
+    row.innerHTML = '<span class="good" style="font-weight:700">✓ ' + IdeaLab.esc(r.done) + "</span>";
+
+    IdeaLab.addXP(5);
+    renderScore();
+    renderNotes();
+    renderUrl();
+
+    if (fixedCount === RISKS.length) {
+      document.getElementById("toWrap").disabled = false;
+      /* fully hardened: high score, award the badge */
+      IdeaLab.award("blue-team", 55);
+    }
+  });
+
+  renderScore();
+})();
+</script>
+</body>
+</html>

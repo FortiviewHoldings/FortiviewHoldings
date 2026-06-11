@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secret Codes — Defense Range — Idea Lab</title>
+<meta name="description" content="Spin a Caesar cipher wheel to hide a message, then crack one by trying all 25 shifts. See why real encryption uses keys too huge to ever guess. Kid-friendly, no accounts.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../../assets/logo.svg">
+<link rel="stylesheet" href="../../assets/cosmos.css">
+<style>
+  .wheel{display:grid;place-items:center;margin:6px 0 4px}
+  .wheel svg{max-width:300px;width:72vw;height:auto;filter:drop-shadow(0 0 26px #3ee0ff44)}
+  .wheel .ring-outer text{fill:var(--muted);font-weight:700}
+  .wheel .ring-inner text{fill:var(--star);font-weight:800}
+  .wheel .hand{stroke:var(--plasma);stroke-width:3;stroke-linecap:round}
+  .wheel .hub{fill:var(--plasma)}
+
+  .shiftrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center;margin:8px 0}
+  .shiftrow .range{flex:1;min-width:180px}
+  .shiftval{font-family:ui-monospace,monospace;font-weight:800;font-size:1.15em;color:var(--star);
+    min-width:2.4em;text-align:center}
+
+  .crypto-io{display:grid;gap:14px;margin-top:10px}
+  .crypto-io label{font-weight:700;font-size:.9em;color:var(--muted);display:block;margin-bottom:5px}
+  .crypto-io input,.crypto-io textarea{font:inherit;font-family:ui-monospace,monospace;font-size:1.05em;
+    background:#060a16;color:var(--ink);border:1px solid var(--border);border-radius:10px;
+    padding:12px 13px;width:100%;resize:vertical}
+  .crypto-io input:focus-visible,.crypto-io textarea:focus-visible{outline:3px solid var(--plasma);outline-offset:1px}
+  .outbox{font-family:ui-monospace,monospace;font-size:1.1em;background:#0c142880;
+    border:1px solid var(--border);border-radius:10px;padding:12px 13px;min-height:1.3em;
+    word-break:break-word;letter-spacing:.04em}
+  .outbox b{color:var(--star)}
+
+  .swap{display:flex;gap:8px;justify-content:center;margin:2px 0 4px;flex-wrap:wrap}
+  .modebtn{font:inherit;font-weight:700;font-size:.86em;border:1px solid var(--border);
+    background:var(--glass);color:var(--muted);border-radius:999px;padding:7px 14px;cursor:pointer}
+  .modebtn.on{background:var(--grad-cosmic);color:#04060d;border-color:transparent}
+
+  .tries{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:12px}
+  .try{border:1px solid var(--border);border-radius:10px;background:#0c142880;padding:9px 11px;
+    font-family:ui-monospace,monospace;font-size:.86em;cursor:pointer;transition:.15s;text-align:left}
+  .try:hover{border-color:var(--plasma)}
+  .try.is-pick{border-color:var(--star);box-shadow:0 0 0 1px var(--star);background:#1c160880}
+  .try .k{color:var(--muted);font-size:.82em}
+  .try .v{color:var(--ink);display:block;margin-top:2px;word-break:break-word}
+
+  .galaxy-num{font-family:ui-monospace,monospace;color:var(--plasma);font-weight:800;word-break:break-all}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section lab">
+  <header class="center">
+    <span class="kicker">Defense Range · Level 3</span>
+    <h1 style="font-size:clamp(28px,5vw,46px);margin:.2em 0">Secret Codes</h1>
+    <p class="muted">Hide a message with a spinning code wheel. Then crack one yourself, and see why
+       real encryption can never be guessed open.</p>
+  </header>
+
+  <div class="steps" id="dots" aria-hidden="true"></div>
+
+  <!-- ACT 0: ENCRYPT WITH THE WHEEL -->
+  <section class="act" data-act="0">
+    <h2>The code wheel</h2>
+    <p class="muted">A Caesar cipher slides every letter along the alphabet by the same amount. Pick a
+       shift, type a message, and watch it turn into a secret.</p>
+
+    <div class="wheel" id="wheel" aria-hidden="true"></div>
+
+    <div class="shiftrow">
+      <span class="muted">Shift</span>
+      <input class="range" id="shift" type="range" min="1" max="25" value="3"
+             aria-label="Caesar cipher shift, 1 to 25">
+      <span class="shiftval" id="shiftVal">3</span>
+    </div>
+
+    <div class="crypto-io">
+      <div>
+        <label for="plain">Your message</label>
+        <input id="plain" autocomplete="off" spellcheck="false" value="MEET AT NOON" placeholder="type a message...">
+      </div>
+      <div>
+        <label>Secret (shifted forward)</label>
+        <div class="outbox" id="cipherOut"></div>
+      </div>
+      <div>
+        <label>Decrypted again (shifted back the same amount)</label>
+        <div class="outbox" id="backOut"></div>
+      </div>
+    </div>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">🧩</span>
+      <span>Shift forward to lock it, shift back the same amount to unlock it. The shift number is the
+      <b>key</b>. Here the only <button class="term" data-term="entropy">key</button> is a number from
+      1 to 25, so there are just 25 to try.</span>
+    </div>
+
+    <div class="act__nav"><span></span>
+      <button class="btn btn--go" id="a0Next" data-next disabled>Next: crack a code →</button></div>
+  </section>
+
+  <!-- ACT 1: CRACK IT -->
+  <section class="act" data-act="1" hidden>
+    <h2>Crack it</h2>
+    <p class="muted">Here is an intercepted secret. You do not know the shift. No problem: a Caesar
+       cipher only has 25 keys, so just try them all until one reads like English.</p>
+
+    <div class="outbox" id="puzzle" style="text-align:center;font-size:1.25em;margin-bottom:6px"></div>
+    <p class="center muted tiny">Tap a row when you can read it.</p>
+
+    <div class="tries" id="tries"></div>
+
+    <div class="fact hidden" id="crackFact" style="margin-top:16px">
+      <span aria-hidden="true">🔓</span>
+      <span><b>You broke it by hand.</b> Trying every key until one works is called
+      <button class="term" data-term="brute-force">brute force</button>. With only 25 keys it takes a
+      few seconds, which is exactly why a Caesar cipher is weak.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" id="a1Next" data-next disabled>Last: why real codes hold →</button>
+    </div>
+  </section>
+
+  <!-- ACT 2: WHY REAL CRYPTO HOLDS -->
+  <section class="act" data-act="2" hidden>
+    <h2>Why real codes hold</h2>
+    <p class="muted">A Caesar cipher fell because it had 25 keys. Real encryption does the same trick,
+       just with a key so enormous that trying them all is hopeless.</p>
+
+    <div class="card" style="margin:8px 0">
+      <p class="muted" style="margin:0 0 8px">Number of keys to try:</p>
+      <p style="margin:0 0 4px"><b>Caesar cipher:</b> <span class="galaxy-num">25</span> · a few seconds by hand</p>
+      <p style="margin:0"><b>Modern key (AES-256):</b> <span class="galaxy-num" id="bigKey"></span></p>
+      <p class="muted tiny" style="margin:10px 0 0">That is more keys than there are atoms in the
+        whole visible universe.</p>
+    </div>
+
+    <div class="fact">
+      <span aria-hidden="true">🌌</span>
+      <span><b>Brute force gives up here.</b> Even if every computer on Earth guessed billions of keys
+      a second, working together, they would not finish trying them all before the Sun burns out, or
+      even before the universe gets old. So a strong key cannot be guessed open. It has to be given.</span>
+    </div>
+
+    <div class="fact" style="margin-top:12px">
+      <span aria-hidden="true">🔑</span>
+      <span>That is the whole idea: keep the key secret and unpredictable, and make it long enough that
+      the number of guesses is bigger than time itself.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <a class="btn btn--cosmic" href="../">Back to the Defense Range →</a>
+    </div>
+  </section>
+
+  <p class="center muted tiny" style="margin-top:26px">
+    <a href="../">← Defense Range</a> · a Caesar cipher is a real cipher Julius Caesar used, and yes,
+    it really is this easy to break
+  </p>
+</main>
+
+<script src="../../assets/manifest.js"></script>
+<script src="../../assets/glossary.js"></script>
+<script src="../../assets/shell.js"></script>
+<script>
+(function () {
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("defense", "../..");
+  IdeaLab.disclosure();
+  IdeaLab.glossary(window.IDEA_LAB_GLOSSARY);
+
+  /* ---------- stepper ---------- */
+  var acts = Array.prototype.slice.call(document.querySelectorAll(".act"));
+  var dots = document.getElementById("dots");
+  var done = [false, false, false];
+  var current = 0;
+  acts.forEach(function (_, i) {
+    var d = document.createElement("span");
+    d.className = "dot" + (i === 0 ? " is-active" : "");
+    dots.appendChild(d);
+  });
+  function show(i) {
+    current = Math.max(0, Math.min(acts.length - 1, i));
+    acts.forEach(function (a, k) { a.hidden = k !== current; });
+    Array.prototype.forEach.call(dots.children, function (d, k) {
+      d.className = "dot" + (k === current ? " is-active" : (done[k] ? " is-done" : ""));
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.body.addEventListener("click", function (e) {
+    if (e.target.matches("[data-next]") && !e.target.disabled) { done[current] = true; show(current + 1); }
+    if (e.target.matches("[data-prev]")) show(current - 1);
+  });
+
+  /* ---------- the cipher itself: shift only A-Z, leave everything else ---------- */
+  var A = 65;
+  function shiftText(text, by) {
+    by = ((by % 26) + 26) % 26;
+    var out = "";
+    for (var i = 0; i < text.length; i++) {
+      var ch = text.charCodeAt(i);
+      if (ch >= 65 && ch <= 90)       out += String.fromCharCode((ch - A + by) % 26 + A);
+      else if (ch >= 97 && ch <= 122) out += String.fromCharCode((ch - 97 + by) % 26 + 97);
+      else                            out += text.charAt(i);
+    }
+    return out;
+  }
+
+  /* progress gates for the badge */
+  var hasEncrypted = false, hasCracked = false;
+  function tryAward() {
+    if (hasEncrypted && hasCracked) IdeaLab.award("codebreaker", 55);
+  }
+
+  /* ---------- the code wheel (two rings, inner ring rotates by the shift) ---------- */
+  var ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+  var wheel = document.getElementById("wheel");
+  var SVGNS = "http://www.w3.org/2000/svg";
+  var cx = 110, cy = 110, rOuter = 96, rInner = 70;
+  function ringText(letters, radius, cls, rotate) {
+    var g = document.createElementNS(SVGNS, "g");
+    g.setAttribute("class", cls);
+    g.setAttribute("transform", "rotate(" + rotate + " " + cx + " " + cy + ")");
+    for (var i = 0; i < 26; i++) {
+      var ang = (i / 26) * 2 * Math.PI - Math.PI / 2;
+      var tx = cx + Math.cos(ang) * radius;
+      var ty = cy + Math.sin(ang) * radius;
+      var t = document.createElementNS(SVGNS, "text");
+      t.setAttribute("x", tx.toFixed(1));
+      t.setAttribute("y", (ty + 4).toFixed(1));
+      t.setAttribute("text-anchor", "middle");
+      t.setAttribute("font-size", "11");
+      t.setAttribute("font-family", "ui-monospace, monospace");
+      t.setAttribute("transform", "rotate(" + (i / 26 * 360) + " " + tx.toFixed(1) + " " + ty.toFixed(1) + ")");
+      t.textContent = letters[i];
+      g.appendChild(t);
+    }
+    return g;
+  }
+  var svg = document.createElementNS(SVGNS, "svg");
+  svg.setAttribute("viewBox", "0 0 220 220");
+  var c1 = document.createElementNS(SVGNS, "circle");
+  c1.setAttribute("cx", cx); c1.setAttribute("cy", cy); c1.setAttribute("r", rOuter + 12);
+  c1.setAttribute("fill", "none"); c1.setAttribute("stroke", "#ffffff1f");
+  var c2 = document.createElementNS(SVGNS, "circle");
+  c2.setAttribute("cx", cx); c2.setAttribute("cy", cy); c2.setAttribute("r", rInner + 12);
+  c2.setAttribute("fill", "none"); c2.setAttribute("stroke", "#ffffff1f");
+  svg.appendChild(c1); svg.appendChild(c2);
+  var outerRing = ringText(ALPHA, rOuter, "ring-outer", 0);
+  svg.appendChild(outerRing);
+  var innerRing = ringText(ALPHA, rInner, "ring-inner", 0);
+  svg.appendChild(innerRing);
+  var hand = document.createElementNS(SVGNS, "line");
+  hand.setAttribute("class", "hand");
+  hand.setAttribute("x1", cx); hand.setAttribute("y1", cy);
+  hand.setAttribute("x2", cx); hand.setAttribute("y2", cy - rOuter - 4);
+  svg.appendChild(hand);
+  var hub = document.createElementNS(SVGNS, "circle");
+  hub.setAttribute("class", "hub"); hub.setAttribute("cx", cx); hub.setAttribute("cy", cy); hub.setAttribute("r", 5);
+  svg.appendChild(hub);
+  wheel.appendChild(svg);
+
+  /* ---------- ACT 0: encrypt ---------- */
+  var shift = document.getElementById("shift");
+  var shiftVal = document.getElementById("shiftVal");
+  var plain = document.getElementById("plain");
+  var cipherOut = document.getElementById("cipherOut");
+  var backOut = document.getElementById("backOut");
+
+  function renderEncrypt() {
+    var by = +shift.value;
+    shiftVal.textContent = by;
+    innerRing.setAttribute("transform", "rotate(" + (by / 26 * 360) + " " + cx + " " + cy + ")");
+    var msg = plain.value;
+    var secret = shiftText(msg, by);
+    cipherOut.textContent = secret || " ";
+    backOut.textContent = shiftText(secret, -by) || " ";
+    /* count it as encrypted once they have a real letter in a real secret */
+    if (!hasEncrypted && /[A-Za-z]/.test(msg)) {
+      hasEncrypted = true;
+      document.getElementById("a0Next").disabled = false;
+      IdeaLab.addXP(10);
+      tryAward();
+    }
+  }
+  shift.addEventListener("input", renderEncrypt);
+  plain.addEventListener("input", renderEncrypt);
+  renderEncrypt();
+
+  /* ---------- ACT 1: crack ---------- */
+  /* a fixed intercepted message, encrypted with a shift the kid does not know */
+  var SECRET_SHIFT = 7;
+  var ANSWER = "THE GOLD IS IN THE OLD CLOCK TOWER";
+  var puzzleText = shiftText(ANSWER, SECRET_SHIFT);
+  document.getElementById("puzzle").textContent = puzzleText;
+
+  var triesHost = document.getElementById("tries");
+  var picked = false;
+  for (var s = 1; s <= 25; s++) {
+    (function (by) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "try";
+      btn.innerHTML = '<span class="k">shift back ' + by + '</span>' +
+        '<span class="v">' + IdeaLab.esc(shiftText(puzzleText, -by)) + '</span>';
+      btn.addEventListener("click", function () {
+        Array.prototype.forEach.call(triesHost.children, function (c) { c.classList.remove("is-pick"); });
+        btn.classList.add("is-pick");
+        if (!picked) {
+          picked = true;
+          hasCracked = true;
+          document.getElementById("crackFact").classList.remove("hidden");
+          document.getElementById("a1Next").disabled = false;
+          IdeaLab.addXP(10);
+          tryAward();
+        }
+      });
+      triesHost.appendChild(btn);
+    })(s);
+  }
+
+  /* ---------- ACT 2: the enormous key ---------- */
+  /* 2^256, written out in full so the size is felt, not just named */
+  var big = "115792089237316195423570985008687907853269984665640564039457584007913129639936";
+  document.getElementById("bigKey").textContent = big + " keys";
+})();
+</script>
+</body>
+</html>

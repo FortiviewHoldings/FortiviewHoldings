@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Data Footprint — Defense Range — Idea Lab</title>
+<meta name="description" content="A pretend app asks for everything: your location, contacts, photos, microphone, even what you type. Toggle what you share, watch your data footprint grow and shrink, and learn the one question that keeps you safe.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../../assets/logo.svg">
+<link rel="stylesheet" href="../../assets/cosmos.css">
+<style>
+  /* lab-local styles, built on the cosmos tokens */
+  .stage{display:grid;grid-template-columns:1fr;gap:18px}
+  @media(min-width:780px){ .stage{grid-template-columns:1.05fr .95fr} }
+
+  /* pretend phone */
+  .phone{border:1px solid var(--border);border-radius:26px;overflow:hidden;background:#0a1020;
+    box-shadow:0 18px 50px #0008;max-width:380px;margin-inline:auto;width:100%}
+  .phone__bar{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#0d1428;
+    border-bottom:1px solid var(--border);font-size:.74em;color:var(--muted);font-family:ui-monospace,monospace}
+  .phone__dot{width:9px;height:9px;border-radius:50%;background:#ffffff2a}
+  .phone__body{padding:18px 16px 20px}
+  .appicon{font-size:40px;text-align:center;line-height:1;margin:6px 0 2px}
+  .appname{text-align:center;font-weight:800;font-size:1.12em}
+  .apptag{text-align:center;color:var(--muted);font-size:.82em;margin:2px 0 14px}
+
+  /* permission rows */
+  .perm{display:flex;align-items:flex-start;gap:12px;border:1px solid var(--border);border-radius:12px;
+    background:#0c142880;padding:11px 13px;margin-bottom:10px;transition:.2s}
+  .perm.is-on{border-color:var(--warn);box-shadow:0 0 0 1px #ffb45433}
+  .perm__ico{font-size:22px;line-height:1;flex:0 0 auto;width:30px;text-align:center}
+  .perm__txt{flex:1;min-width:0}
+  .perm__name{font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .perm__why{color:var(--muted);font-size:.82em;margin-top:2px}
+  .tag{font-size:.66em;font-weight:800;letter-spacing:.04em;text-transform:uppercase;
+    padding:2px 8px;border-radius:999px;flex:0 0 auto}
+  .tag--need{background:#1ca49033;color:var(--brand-600);border:1px solid #21bca555}
+  .tag--extra{background:#ffb45422;color:var(--warn);border:1px solid #ffb45455}
+
+  /* the toggle (reuses cosmos .toggle/.track sizing, scaled down) */
+  .pswitch{flex:0 0 auto;cursor:pointer;display:inline-flex;align-items:center;user-select:none}
+  .pswitch input{position:absolute;opacity:0;width:0;height:0}
+  .pswitch .ptrack{width:48px;height:26px;border-radius:999px;background:#ffffff22;position:relative;transition:.2s}
+  .pswitch .ptrack::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;
+    background:#fff;transition:.2s}
+  .pswitch input:checked + .ptrack{background:var(--grad-brand)}
+  .pswitch input:checked + .ptrack::after{left:25px}
+  .pswitch input:focus-visible + .ptrack{outline:3px solid var(--plasma);outline-offset:2px}
+
+  /* footprint meter */
+  .meter{border:1px solid var(--border);border-radius:14px;background:#070b16;padding:16px}
+  .meter__top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .meter__big{font-weight:800;font-size:1.05em}
+  .meter__pct{font-weight:800;font-size:1.4em}
+  .meter__bar{height:18px;border-radius:999px;background:#ffffff14;overflow:hidden;margin:12px 0 4px;
+    position:relative}
+  .meter__fill{height:100%;width:0;border-radius:999px;transition:width .35s ease, background .35s ease;
+    background:var(--grad-brand)}
+  .meter__fill.warn{background:linear-gradient(90deg,#ffb454,#ff6ea9)}
+  .meter__fill.bad{background:linear-gradient(90deg,#ff6ea9,#ff6b6b)}
+  .meter__mark{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink);opacity:.55}
+  .meter__marklbl{font-size:.72em;color:var(--muted);text-align:right;margin-top:2px}
+  .meter__read{margin-top:10px;font-weight:700;min-height:1.4em}
+  .footrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;font-size:1.5em;line-height:1}
+  .footrow span{filter:grayscale(.1);transition:.25s;transform-origin:center}
+  .footrow span.off{opacity:.18;filter:grayscale(1)}
+
+  .you{font-weight:700}
+  .hidden{display:none}
+  .ask{border:1px dashed var(--plasma);border-radius:12px;background:#0c142866;padding:12px 14px;
+    margin-top:14px;font-weight:700}
+  .ask b{color:var(--star)}
+</style>
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section lab">
+  <header class="center">
+    <span class="kicker">Defense Range</span>
+    <h1 style="font-size:clamp(28px,5vw,46px);margin:.2em 0">Your Data Footprint</h1>
+    <p class="muted">A new app wants to be your friend. It also wants your location, your photos, your
+       contacts, and to hear you. Let us see how much it truly needs.</p>
+  </header>
+
+  <div class="steps" id="dots" aria-hidden="true"></div>
+
+  <!-- ACT 0: MEET THE APP -->
+  <section class="act" data-act="0">
+    <h2>Meet the friendly app</h2>
+    <p class="muted">This is <b>DoodlePet</b>, a pretend app where you draw a little pet. Drawing a pet
+       is the whole job. So watch what it asks for the moment you open it.</p>
+
+    <div class="phone" aria-hidden="false">
+      <div class="phone__bar"><span class="phone__dot"></span><span class="phone__dot"></span>
+        <span class="phone__dot"></span>&nbsp;doodlepet.example</div>
+      <div class="phone__body">
+        <div class="appicon">🐾</div>
+        <div class="appname">DoodlePet</div>
+        <div class="apptag">Draw a pet. That is it.</div>
+        <div class="ask">
+          DoodlePet would like to use: your <b>location</b>, <b>contacts</b>, <b>photos</b>,
+          <b>microphone</b>, and to see <b>everything you type</b>.
+        </div>
+      </div>
+    </div>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">🐾</span>
+      <span><b>This is normal, and that is the problem.</b> Lots of real apps ask for far more than they
+      need. Every "Allow" you tap is a piece of you handed over. The pile you leave behind is your
+      <button class="term" data-term="data-footprint">data footprint</button>.</span>
+    </div>
+
+    <div class="act__nav"><span></span>
+      <button class="btn btn--go" data-next>Next: decide what to share →</button></div>
+  </section>
+
+  <!-- ACT 1: THE TOGGLER (core) -->
+  <section class="act" data-act="1" hidden>
+    <h2>You decide. Every switch is yours.</h2>
+    <p class="muted">Flip a switch to share that with DoodlePet. Watch your footprint grow and shrink.
+       Try to get it as small as you can and still let the app do its one job.</p>
+
+    <div class="stage">
+      <!-- the app, with its permission list -->
+      <div class="phone">
+        <div class="phone__bar"><span class="phone__dot"></span><span class="phone__dot"></span>
+          <span class="phone__dot"></span>&nbsp;doodlepet.example · settings</div>
+        <div class="phone__body">
+          <div class="appicon" style="font-size:30px">🐾</div>
+          <div class="appname" style="font-size:1em">DoodlePet wants:</div>
+          <div id="permList" style="margin-top:14px"></div>
+        </div>
+      </div>
+
+      <!-- the footprint meter -->
+      <div>
+        <div class="meter">
+          <div class="meter__top">
+            <span class="meter__big">Your data footprint</span>
+            <span class="meter__pct" id="fpPct">0%</span>
+          </div>
+          <div class="meter__bar">
+            <div class="meter__fill" id="fpFill"></div>
+            <div class="meter__mark" id="fpMark"></div>
+          </div>
+          <div class="meter__marklbl">↑ safe line</div>
+          <div class="meter__read" id="fpRead">Nothing shared yet. The app still has not earned a thing.</div>
+          <div class="footrow" id="fpFeet" aria-hidden="true"></div>
+        </div>
+
+        <div class="fact" style="margin-top:14px">
+          <span aria-hidden="true">👣</span>
+          <span><b>Green tag means the app truly needs it.</b> Orange means it is extra: nice for the
+          company, not needed for you. Share less and your footprint shrinks.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fact hidden" id="winLesson" style="margin-top:16px">
+      <span aria-hidden="true">✅</span>
+      <span><b>Small footprint, app still works.</b> You turned off the extras and DoodlePet can still
+      draw your pet. That is the goal every time: keep what the job needs, drop the rest.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" id="toNext" data-next>Next: the one question →</button>
+    </div>
+  </section>
+
+  <!-- ACT 2: THE QUESTION -->
+  <section class="act" data-act="2" hidden>
+    <h2>The one question to ask</h2>
+    <p class="muted">You do not need to know how any app works inside. You only need one question, every
+       single time something asks for your stuff.</p>
+
+    <div class="card" style="margin:8px 0;text-align:center">
+      <div style="font-size:1.5em;font-weight:800;line-height:1.3">
+        "Does it <span style="color:var(--star)">actually need this</span><br>to do its job?"
+      </div>
+    </div>
+
+    <p class="muted">Try it on real things. Tap your guess, then see.</p>
+    <div id="quiz"></div>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">🧭</span>
+      <span><b>If the answer is no, you are allowed to say no.</b> Saying no to one permission almost
+      never breaks an app. And you can change your mind later in your settings.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" data-next>Last: why it matters →</button>
+    </div>
+  </section>
+
+  <!-- ACT 3: WRAP -->
+  <section class="act" data-act="3" hidden>
+    <h2>Why a small footprint is safer</h2>
+    <p class="muted">This is not about being scared. It is about being in charge. Here is what shrinking
+       your footprint actually buys you.</p>
+
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:8px 0">
+      <div class="card">
+        <span class="card__icon">🔓</span>
+        <h3>Less to leak</h3>
+        <p class="muted">If a company gets hacked, it can only lose what it collected. Share less and
+        there is less of you to lose.</p>
+      </div>
+      <div class="card">
+        <span class="card__icon">🛒</span>
+        <h3>Less to sell</h3>
+        <p class="muted">Some apps make money by selling clues about you to strangers. Your data is the
+        product. Less data, less of you on sale.</p>
+      </div>
+      <div class="card">
+        <span class="card__icon">📍</span>
+        <h3>Less to track</h3>
+        <p class="muted">Location and what you type can map your whole day. That is powerful, and not
+        every app should hold it.</p>
+      </div>
+    </div>
+
+    <div class="fact">
+      <span aria-hidden="true">👣</span>
+      <span><b>The one rule:</b> before you tap Allow, ask if the app needs it to work. If it does not,
+      say no. Your footprint is yours to keep small.</span>
+    </div>
+
+    <p class="muted" style="margin-top:14px">Want to see your own real footprint? On a grown-up's
+       device you can open the phone or browser settings and look at <b>App permissions</b>. Every
+       app there shows what it can reach. You are allowed to turn off anything that does not need to be on.</p>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <a class="btn btn--cosmic" href="../">Back to the Defense Range →</a>
+    </div>
+  </section>
+
+  <p class="center muted tiny" style="margin-top:26px">
+    <a href="../">← Defense Range</a> · DoodlePet is a pretend app in a sandbox. Tap the
+    <span class="term" style="cursor:default;border:0">underlined words</span> to dig deeper.
+  </p>
+</main>
+
+<script src="../../assets/manifest.js"></script>
+<script src="../../assets/glossary.js"></script>
+<script src="../../assets/shell.js"></script>
+<script>
+(function () {
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("defense", "../..");
+  IdeaLab.disclosure();
+
+  /* page-local glossary terms, merged onto the shared map without
+     touching the shared file. Existing terms keep working. */
+  var GLOSS = {};
+  var shared = window.IDEA_LAB_GLOSSARY || {};
+  for (var k in shared) { if (Object.prototype.hasOwnProperty.call(shared, k)) GLOSS[k] = shared[k]; }
+  GLOSS["data-footprint"] = {
+    term: "Data footprint",
+    short: "All the bits of information you leave behind when you use apps and websites.",
+    deep: "Your data footprint is everything an app or site collects about you: where you are, who your contacts are, your photos, what you type, how long you stay. Some of it is needed for the app to work, but a lot is extra. The more you share, the bigger the footprint, and the more there is to leak, sell, or track. You can shrink it by only allowing what an app truly needs.",
+    source: "https://www.consumer.ftc.gov/articles/how-protect-your-privacy-apps"
+  };
+  GLOSS["app-permission"] = {
+    term: "App permission",
+    short: "A yes or no switch that decides what a single app is allowed to reach on your device.",
+    deep: "When an app wants your camera, location, microphone, photos, or contacts, your phone or browser asks you first. That is a permission. You can say yes or no, and you can change it later in your settings. Saying no to a permission an app does not really need almost never stops it from working, it just keeps that part of you private.",
+    source: "https://www.consumer.ftc.gov/articles/how-protect-your-privacy-apps"
+  };
+  IdeaLab.glossary(GLOSS);
+
+  /* ---------- stepper ---------- */
+  var acts = Array.prototype.slice.call(document.querySelectorAll(".act"));
+  var dots = document.getElementById("dots");
+  var done = [false, false, false, false];
+  var current = 0;
+  acts.forEach(function (_, i) {
+    var d = document.createElement("span");
+    d.className = "dot" + (i === 0 ? " is-active" : "");
+    dots.appendChild(d);
+  });
+  function show(i) {
+    current = Math.max(0, Math.min(acts.length - 1, i));
+    acts.forEach(function (a, k) { a.hidden = k !== current; });
+    Array.prototype.forEach.call(dots.children, function (d, k) {
+      d.className = "dot" + (k === current ? " is-active" : (done[k] ? " is-done" : ""));
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.body.addEventListener("click", function (e) {
+    if (e.target.matches("[data-next]") && !e.target.disabled) { done[current] = true; show(current + 1); }
+    if (e.target.matches("[data-prev]")) show(current - 1);
+  });
+
+  /* ---------- ACT 1: the footprint toggler ----------
+     Each permission has a weight (how much of you it exposes) and a
+     flag for whether the app truly needs it. DoodlePet needs almost
+     nothing. The safe line is a threshold the kid drops below. */
+  var PERMS = [
+    { id: "draw",     ico: "✏️", name: "Save your drawing",     why: "Holds the pet you made. The app cannot work without this.",      weight: 8,  need: true,  start: true },
+    { id: "location", ico: "📍", name: "Your location",         why: "Where you are, all day. A drawing app does not need this.",      weight: 24, need: false, start: true },
+    { id: "contacts", ico: "👥", name: "Your contacts",         why: "Everyone in your phone. Not needed to draw a pet.",              weight: 22, need: false, start: true },
+    { id: "photos",   ico: "🖼️", name: "All your photos",       why: "Every picture you own. The app only needs the one you draw.",    weight: 20, need: false, start: true },
+    { id: "mic",      ico: "🎤", name: "Your microphone",       why: "Can hear you any time it is open. A drawing has no sound.",      weight: 18, need: false, start: true },
+    { id: "typing",   ico: "⌨️", name: "Everything you type",   why: "Reads what you write, even elsewhere. Never needed for this.",   weight: 16, need: false, start: true }
+  ];
+  var MAX = 0; PERMS.forEach(function (p) { MAX += p.weight; });
+  var SAFE = 25;            /* footprint percent that counts as "small" */
+  var state = {};
+  PERMS.forEach(function (p) { state[p.id] = p.start; });
+
+  var listEl = document.getElementById("permList");
+  PERMS.forEach(function (p) {
+    var row = document.createElement("label");
+    row.className = "perm" + (p.start ? " is-on" : "");
+    row.setAttribute("for", "pm-" + p.id);
+    row.innerHTML =
+      '<span class="perm__ico" aria-hidden="true">' + p.ico + '</span>' +
+      '<span class="perm__txt">' +
+        '<span class="perm__name">' + IdeaLab.esc(p.name) +
+          '<span class="tag ' + (p.need ? "tag--need" : "tag--extra") + '">' +
+          (p.need ? "needed" : "extra") + '</span></span>' +
+        '<span class="perm__why">' + IdeaLab.esc(p.why) + '</span>' +
+      '</span>' +
+      '<span class="pswitch"><input type="checkbox" id="pm-' + p.id + '"' + (p.start ? " checked" : "") +
+        ' aria-label="Share ' + IdeaLab.esc(p.name) + ' with DoodlePet">' +
+        '<span class="ptrack" aria-hidden="true"></span></span>';
+    listEl.appendChild(row);
+    row.querySelector("input").addEventListener("change", function () {
+      state[p.id] = this.checked;
+      row.classList.toggle("is-on", this.checked);
+      recompute();
+    });
+  });
+
+  var fpFill = document.getElementById("fpFill");
+  var fpPct = document.getElementById("fpPct");
+  var fpRead = document.getElementById("fpRead");
+  var fpMark = document.getElementById("fpMark");
+  var fpFeet = document.getElementById("fpFeet");
+  var winLesson = document.getElementById("winLesson");
+
+  /* footprints, one per permission, dim when that share is off */
+  PERMS.forEach(function (p) {
+    var s = document.createElement("span");
+    s.textContent = "👣";
+    s.dataset.id = p.id;
+    fpFeet.appendChild(s);
+  });
+  fpMark.style.left = SAFE + "%";
+
+  function recompute() {
+    var sum = 0, extrasOn = 0;
+    PERMS.forEach(function (p) {
+      if (state[p.id]) { sum += p.weight; if (!p.need) extrasOn++; }
+    });
+    var pct = Math.round(sum / MAX * 100);
+    fpFill.style.width = pct + "%";
+    fpPct.textContent = pct + "%";
+    fpFill.className = "meter__fill" + (pct >= 70 ? " bad" : (pct >= SAFE ? " warn" : ""));
+
+    Array.prototype.forEach.call(fpFeet.children, function (s) {
+      s.classList.toggle("off", !state[s.dataset.id]);
+    });
+
+    if (pct === 0) {
+      fpRead.textContent = "Tiny footprint, but the app needs the drawing switch to work. Turn that one on.";
+      fpRead.className = "meter__read warn";
+    } else if (pct < SAFE) {
+      fpRead.innerHTML = '<span class="ok">Small footprint. ' + extrasOn +
+        ' extras shared.</span> The app still draws your pet. Nicely done.';
+    } else if (pct < 70) {
+      fpRead.innerHTML = '<span class="warn">Getting heavy.</span> ' + extrasOn +
+        ' extras shared that the app does not need. Turn some off.';
+    } else {
+      fpRead.innerHTML = '<span class="no">Huge footprint.</span> You are giving away almost everything ' +
+        'for a drawing app. Try sharing less.';
+    }
+
+    /* award: footprint pushed below the safe line, app still usable */
+    if (pct > 0 && pct < SAFE && state.draw) {
+      winLesson.classList.remove("hidden");
+      IdeaLab.award("footprint-keeper", 45);
+    }
+  }
+  recompute();
+
+  /* ---------- ACT 2: the one-question quiz ---------- */
+  var Q = [
+    { app: "🗺️ A maps app", perm: "your location", need: true,
+      yes: "Right. A map needs to know where you are to guide you. This one truly needs it.",
+      no:  "Think again. A map cannot guide you without knowing where you are, so here it is fair." },
+    { app: "🔦 A flashlight app", perm: "your contacts", need: false,
+      yes: "Look closer. A flashlight turns on a light. It has no reason to read who you know.",
+      no:  "Exactly. A flashlight does not need your contacts. That ask is a red flag." },
+    { app: "📷 A camera app", perm: "your camera", need: true,
+      yes: "Yes. A camera app needs the camera to take a photo. That one makes sense.",
+      no:  "Not this time. Taking a photo is the job, so the camera really is needed." },
+    { app: "🎮 A simple game", perm: "your microphone", need: false,
+      yes: "Be careful. A simple game does not need to hear you. Ask why it wants the mic.",
+      no:  "Right call. A basic game has no need to listen. You can say no." }
+  ];
+  var quiz = document.getElementById("quiz");
+  Q.forEach(function (q, i) {
+    var card = document.createElement("div");
+    card.className = "card";
+    card.style.margin = "10px 0";
+    card.innerHTML =
+      '<div class="you" style="font-size:1.05em">' + q.app + ' wants <b>' + IdeaLab.esc(q.perm) + '</b>.</div>' +
+      '<div class="muted tiny" style="margin:2px 0 10px">Does it actually need this to work?</div>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+        '<button class="btn btn--ghost tiny" data-ans="yes">It needs it</button>' +
+        '<button class="btn btn--ghost tiny" data-ans="no">It does not</button>' +
+      '</div>' +
+      '<div class="fact hidden" data-out style="margin-top:12px"><span aria-hidden="true">' +
+        (q.need ? "✅" : "🚩") + '</span><span></span></div>';
+    quiz.appendChild(card);
+    var out = card.querySelector("[data-out]");
+    var outTxt = out.querySelector("span:last-child");
+    card.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-ans]"); if (!b) return;
+      var picked = b.getAttribute("data-ans");
+      var right = q.need ? "yes" : "no";
+      outTxt.innerHTML = (picked === right ? "<b>Correct. </b>" : "<b>Not quite. </b>") +
+        IdeaLab.esc(q[picked]);
+      out.classList.remove("hidden");
+      Array.prototype.forEach.call(card.querySelectorAll("[data-ans]"), function (btn) {
+        btn.classList.toggle("btn--go", btn.getAttribute("data-ans") === right && picked === right);
+      });
+    });
+  });
+})();
+</script>
+</body>
+</html>

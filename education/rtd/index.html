@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RTD Table &amp; Calculator (Pt100 / Pt1000, IEC 60751) | Field Pocket Guide</title>
+  <meta name="description" content="RTD resistance against temperature for Pt100, Pt500 and Pt1000 per IEC 60751 (alpha 0.00385). Convert a reading either way or generate a reference table at any interval. Callendar-Van Dusen.">
+  <meta name="color-scheme" content="dark" />
+  <link rel="canonical" href="https://fortiviewholdings.com/education/rtd/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="RTD Table &amp; Calculator — Field Pocket Guide">
+  <meta property="og:description" content="Pt100 / Pt1000 resistance vs temperature, IEC 60751, Callendar-Van Dusen.">
+  <meta property="og:image" content="https://fortiviewholdings.com/images/social-preview.png">
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" href="/images/favicon.png" sizes="192x192">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/fortiview.css">
+  <link rel="stylesheet" href="/education/assets/pocketguide.css">
+</head>
+<body>
+<main class="pg-main">
+  <div class="pg-wrap--wide pg-wrap">
+
+    <header class="pg-head">
+      <a class="pg-back" href="/education/">Field Pocket Guide</a>
+      <h1 class="fv-h2">RTD Tables</h1>
+      <p class="fv-lead">Platinum RTDs to IEC 60751, the 0.00385 curve. Resistance against temperature by the Callendar-Van Dusen equation, so the table is generated, not looked up and rounded. Convert a single reading either way, or build a table at any interval.</p>
+    </header>
+
+    <section class="pg-tool">
+      <h2 class="pg-tool__title"><span class="pg-dot"></span> Sensor</h2>
+      <div class="pg-seg" id="senSeg" role="group" aria-label="Sensor">
+        <button type="button" data-r0="100" class="is-on">Pt100</button>
+        <button type="button" data-r0="500">Pt500</button>
+        <button type="button" data-r0="1000">Pt1000</button>
+      </div>
+      <p class="pg-tool__sub" id="senInfo" style="margin-top:14px;margin-bottom:0"></p>
+      <div class="pg-verify" id="selfTest"></div>
+    </section>
+
+    <section class="pg-tool">
+      <h2 class="pg-tool__title"><span class="pg-dot"></span> Convert</h2>
+      <div class="pg-seg pg-seg--block" id="modeSeg" role="group" style="margin-bottom:16px">
+        <button type="button" data-m="t2r" class="is-on">Temperature → Ω</button>
+        <button type="button" data-m="r2t">Ω → Temperature</button>
+      </div>
+      <div class="pg-grid pg-grid--2">
+        <div class="pg-field"><label class="pg-field__label" id="valLabel" for="valIn">Temperature <span class="u">(°C)</span></label><div class="pg-inwrap"><input class="pg-num" id="valIn" value="100"><button class="pg-sign" type="button" data-sign="#valIn">±</button></div></div>
+        <div class="pg-field"><label class="pg-field__label" id="resLabel">Resistance</label><div class="pg-out is-good" id="resV" style="min-height:48px;align-items:center"><span>—</span><span class="pg-out__u" id="resU">Ω</span></div></div>
+      </div>
+    </section>
+
+    <section class="pg-tool">
+      <h2 class="pg-tool__title"><span class="pg-dot"></span> Reference table</h2>
+      <div class="pg-ctl">
+        <div class="pg-field"><label class="pg-field__label" for="tFrom">From (°C)</label><div class="pg-inwrap"><input class="pg-num" id="tFrom" value="-50"><button class="pg-sign" type="button" data-sign="#tFrom">±</button></div></div>
+        <div class="pg-field"><label class="pg-field__label" for="tTo">To (°C)</label><div class="pg-inwrap"><input class="pg-num" id="tTo" value="400"><button class="pg-sign" type="button" data-sign="#tTo">±</button></div></div>
+        <div class="pg-field"><label class="pg-field__label" for="tStep">Step (°C)</label><div class="pg-inwrap"><input class="pg-num" id="tStep" value="10"></div></div>
+      </div>
+      <div class="pg-table-wrap" style="max-height:460px;overflow:auto">
+        <table class="pg-table">
+          <thead><tr><th>°C</th><th id="hR1">Ω</th><th>°C</th><th id="hR2">Ω</th></tr></thead>
+          <tbody id="rtdTable"></tbody>
+        </table>
+      </div>
+      <p class="pg-tablenote">Valid −200 to 850 °C (IEC 60751). Below 0 °C the equation adds the C·(t−100)·t³ term.</p>
+    </section>
+
+  </div>
+</main>
+<script src="/education/assets/pocketguide.js"></script>
+<script>
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var R0 = 100, mode = "t2r";
+  var TMIN = -200, TMAX = 850;
+  function info() {
+    $("#senInfo").innerHTML = "<b style='color:var(--ink)'>Pt" + R0 + "</b> — " + R0 + " Ω at 0 °C, IEC 60751 α = 0.00385. R(t) = R0(1 + A·t + B·t²), with C·(t−100)·t³ added below 0 °C.";
+    var anchors = [{ t: 0, r: R0 }, { t: 100, r: PG.RTD.res(100, R0) }, { t: -100, r: PG.RTD.res(-100, R0) }, { t: 850, r: PG.RTD.res(850, R0) }];
+    var html = "";
+    anchors.forEach(function (a) { html += '<span class="pg-chip ok">' + a.t + "°C = " + PG.fmt(a.r, 2) + " Ω</span>"; });
+    $("#selfTest").innerHTML = html;
+  }
+  function compute() {
+    var v = PG.num($("#valIn").value), res, u;
+    if (mode === "t2r") { res = PG.RTD.res(v, R0); $("#resLabel").textContent = "Resistance"; u = "Ω"; }
+    else { res = PG.RTD.temp(v, R0); $("#resLabel").textContent = "Temperature"; u = "°C"; }
+    $("#resV").querySelector("span").textContent = isFinite(res) ? PG.fmt(res, mode === "t2r" ? 3 : 2) : "—";
+    $("#resU").textContent = u;
+  }
+  function table() {
+    var from = PG.num($("#tFrom").value), to = PG.num($("#tTo").value), step = PG.num($("#tStep").value);
+    var tb = $("#rtdTable");
+    $("#hR1").textContent = "Ω (Pt" + R0 + ")"; $("#hR2").textContent = "Ω (Pt" + R0 + ")";
+    if (!PG.ok(from, to, step) || step <= 0) { tb.innerHTML = ""; return; }
+    from = Math.max(from, TMIN); to = Math.min(to, TMAX);
+    var rows = [], t, n = 0;
+    for (t = from; t <= to + 1e-9 && n < 1200; t += step, n++) rows.push(t);
+    var half = Math.ceil(rows.length / 2), html = "";
+    for (var i = 0; i < half; i++) {
+      var a = rows[i], b = rows[i + half];
+      html += "<tr><td class='is-strong'>" + PG.fmtTrim(a, 2) + "</td><td>" + PG.fmt(PG.RTD.res(a, R0), 3) + "</td>" +
+        (b != null ? "<td class='is-strong'>" + PG.fmtTrim(b, 2) + "</td><td>" + PG.fmt(PG.RTD.res(b, R0), 3) + "</td>" : "<td></td><td></td>") + "</tr>";
+    }
+    tb.innerHTML = html;
+  }
+  function refresh() { info(); compute(); table(); }
+  $("#senSeg").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-r0]"); if (!b) return;
+    R0 = parseInt(b.dataset.r0, 10);
+    $("#senSeg").querySelectorAll("button").forEach(function (x) { x.classList.toggle("is-on", x === b); });
+    refresh();
+  });
+  $("#modeSeg").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-m]"); if (!b) return;
+    mode = b.dataset.m;
+    $("#modeSeg").querySelectorAll("button").forEach(function (x) { x.classList.toggle("is-on", x === b); });
+    $("#valLabel").innerHTML = mode === "t2r" ? "Temperature <span class='u'>(°C)</span>" : "Resistance <span class='u'>(Ω)</span>";
+    compute();
+  });
+  document.addEventListener("input", function () { compute(); table(); });
+  if (document.readyState !== "loading") refresh(); else document.addEventListener("DOMContentLoaded", refresh);
+})();
+</script>
+<script src="/assets/fortiview.js"></script>
+</body>
+</html>

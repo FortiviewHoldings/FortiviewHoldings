@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spot the Phish — Defense Range — Idea Lab</title>
+<meta name="description" content="A safe, pretend inbox of about five messages. Some are real, some are fakes. Tap each one to read the tells, sort it Safe or Phish, then learn the one rule that beats every fake.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../../assets/logo.svg">
+<link rel="stylesheet" href="../../assets/cosmos.css">
+<style>
+  /* lab-local styles, built on the cosmos tokens */
+  .inbox{display:grid;gap:12px}
+  .msg{border:1px solid var(--border);border-radius:14px;background:#0a1020;overflow:hidden;
+    transition:border-color .2s ease,box-shadow .2s ease}
+  .msg.is-open{border-color:#ffffff33;box-shadow:0 12px 30px #0006}
+  .msg.is-sorted{opacity:.82}
+  .msg.is-right{border-color:#21bca555}
+  .msg__row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;
+    font:inherit;color:var(--ink);background:none;border:0;padding:13px 15px}
+  .msg__ico{font-size:22px;width:42px;height:42px;border-radius:11px;background:#0e1530;
+    border:1px solid var(--border);display:grid;place-items:center;flex:0 0 auto}
+  .msg__head{flex:1;min-width:0}
+  .msg__from{font-weight:700;font-size:.92em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .msg__addr{color:var(--muted);font-size:.74em;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .msg__subj{color:var(--muted);font-size:.86em;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .msg__tag{flex:0 0 auto;font-size:.7em;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+    padding:4px 9px;border-radius:999px;background:#ffffff14;color:var(--muted)}
+  .msg__tag.ok{background:#1ca49033;color:var(--brand-600);border:1px solid #21bca555}
+  .msg__tag.no{background:#ff6b6b22;color:var(--bad);border:1px solid #ff6b6b55}
+  .msg__body{padding:0 15px 15px;border-top:1px solid var(--border)}
+  .msg__paper{background:#060a16;border:1px solid var(--border);border-radius:10px;padding:13px 14px;
+    margin-top:13px;font-size:.9em;line-height:1.6}
+  .msg__paper p{margin:.4em 0}
+  .fakelink{color:var(--plasma);font-weight:700;border-bottom:1px dashed var(--plasma);cursor:help;
+    position:relative}
+  .fakelink:hover .fakelink__real,.fakelink:focus .fakelink__real{opacity:1;transform:translateY(0)}
+  .fakelink__real{position:absolute;left:0;top:115%;white-space:nowrap;background:#04060d;color:var(--star);
+    border:1px solid var(--border);border-radius:7px;padding:4px 8px;font-size:.78em;font-weight:700;
+    font-family:ui-monospace,monospace;opacity:0;transform:translateY(-4px);transition:.18s;
+    pointer-events:none;z-index:5;box-shadow:0 8px 22px #000a}
+  .pwfield{display:inline-block;border:1px dashed var(--bad);border-radius:7px;padding:2px 9px;
+    color:var(--bad);font-weight:700;font-size:.86em;background:#ff6b6b14}
+  .tells{margin:12px 0 0;padding:0;list-style:none;display:grid;gap:7px}
+  .tells li{display:flex;gap:8px;align-items:flex-start;font-size:.86em;color:var(--muted)}
+  .tells .dotmark{flex:0 0 auto;color:var(--star)}
+  .sortbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .sortbar .btn{flex:1;min-width:130px;justify-content:center}
+  .verdict{margin-top:13px;border-radius:10px;padding:11px 14px;font-size:.9em;display:none;
+    border-left:3px solid var(--brand-600);background:#0c142880}
+  .verdict.show{display:block}
+  .verdict.bad{border-left-color:var(--bad)}
+  .verdict b{color:var(--ink)}
+  .scorebar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:4px 0 16px}
+  .scorebar .bar{flex:1;min-width:150px;height:12px;border-radius:8px;background:#ffffff14;overflow:hidden}
+  .scorebar .bar > i{display:block;height:100%;background:var(--grad-brand);width:0;transition:width .4s}
+  .rulecard{display:grid;gap:10px;border:1px solid var(--border);border-radius:14px;background:var(--glass);
+    padding:18px;margin:8px 0}
+  .rulecard ol{margin:.2em 0;padding-left:1.3em}
+  .rulecard li{margin:.35em 0}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section lab">
+  <header class="center">
+    <span class="kicker">Defense Range</span>
+    <h1 style="font-size:clamp(28px,5vw,46px);margin:.2em 0">Spot the Phish</h1>
+    <p class="muted">A pretend inbox. Some messages are real. Some are fakes trying to steal a password.
+      Tap each one, read the tells, then sort it.</p>
+  </header>
+
+  <div class="steps" id="dots" aria-hidden="true"></div>
+
+  <!-- ACT 0: WHAT IS A PHISH -->
+  <section class="act" data-act="0">
+    <h2>What is a phish?</h2>
+    <p class="muted">A <button class="term" data-term="phishing">phishing</button> message pretends to be
+      someone you trust so you click a bad link or type your password into a fake page. It is a trick on
+      the person, not the computer.</p>
+
+    <div class="fact" style="margin-top:14px">
+      <span aria-hidden="true">🎣</span>
+      <span><b>A strong password does not help here.</b> If you type it into a fake page, you handed the
+        secret away yourself. The only defense is spotting the fake before you act.</span>
+    </div>
+
+    <div class="card" style="margin:14px 0">
+      <h3>🔎 The four tells to hunt for</h3>
+      <ul class="tells" style="margin-top:10px">
+        <li><span class="dotmark">✦</span><span><b>Lookalike sender.</b> The name looks right, but the
+          address is off by a letter or a fake ending.</span></li>
+        <li><span class="dotmark">✦</span><span><b>Urgent threat.</b> "Act now or lose your account." Fear
+          makes people click without thinking.</span></li>
+        <li><span class="dotmark">✦</span><span><b>Mismatched link.</b> The words say one site, but the
+          real address it points to is somewhere else. Hover to check.</span></li>
+        <li><span class="dotmark">✦</span><span><b>Asks for your password.</b> A real company never emails
+          you to ask for your password.</span></li>
+      </ul>
+    </div>
+
+    <div class="act__nav"><span></span>
+      <button class="btn btn--go" data-next>Open the inbox →</button></div>
+  </section>
+
+  <!-- ACT 1: THE INBOX -->
+  <section class="act" data-act="1" hidden>
+    <h2>Sort the inbox</h2>
+    <p class="muted">Tap a message to open it. Hover any link to see where it really goes. Then mark it
+      Safe or Phish. Everything here is pretend and nothing actually opens.</p>
+
+    <div class="scorebar">
+      <span class="tiny" id="scoreText"><b>0 of 5</b> sorted</span>
+      <div class="bar"><i id="scoreFill"></i></div>
+    </div>
+
+    <div class="inbox" id="inbox"></div>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">🛟</span>
+      <span>Wrong guesses are fine. The point is learning the tell, not a perfect score. Sort all five to
+        move on.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" id="toRule" data-next disabled>Next: the one rule →</button>
+    </div>
+  </section>
+
+  <!-- ACT 2: THE RULE -->
+  <section class="act" data-act="2" hidden>
+    <h2>The one rule that beats every fake</h2>
+    <p class="muted">You cannot always tell a perfect fake from the real thing. So do not try to.
+      Use the rule instead.</p>
+
+    <div class="rulecard">
+      <h3 style="margin:0">🚫 Never click the link. Open the real site yourself.</h3>
+      <ol>
+        <li>Got a message about your account? <b>Stop.</b> Do not tap its link or button.</li>
+        <li>Open a new tab and go to the real site the way you always do, by typing the address you know
+          or using your own saved bookmark.</li>
+        <li>Log in there and check. If something real needs your attention, it will be waiting.</li>
+        <li>If you are unsure, ask a trusted adult. Calm checking always beats fast clicking.</li>
+      </ol>
+    </div>
+
+    <div class="fact">
+      <span aria-hidden="true">🛡️</span>
+      <span><b>This works even on a fake you could not spot.</b> The fake link goes to the fake page. The
+        address you type yourself goes to the real one. So the trap never gets your password.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <a class="btn btn--cosmic" href="../">Back to the Defense Range →</a>
+    </div>
+  </section>
+
+  <p class="center muted tiny" style="margin-top:26px">
+    <a href="../">← Defense Range</a> · every message here is a pretend example in a sandbox. No link works.
+    Tap the <span class="term" style="cursor:default;border:0">underlined word</span> to dig deeper.
+  </p>
+</main>
+
+<script src="../../assets/manifest.js"></script>
+<script src="../../assets/glossary.js"></script>
+<script src="../../assets/shell.js"></script>
+<script>
+(function () {
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("defense", "../..");
+  IdeaLab.disclosure();
+  IdeaLab.glossary(window.IDEA_LAB_GLOSSARY);
+
+  var esc = IdeaLab.esc;
+
+  /* ---------- stepper ---------- */
+  var acts = Array.prototype.slice.call(document.querySelectorAll(".act"));
+  var dots = document.getElementById("dots");
+  var done = [false, false, false];
+  var current = 0;
+  acts.forEach(function (_, i) {
+    var d = document.createElement("span");
+    d.className = "dot" + (i === 0 ? " is-active" : "");
+    dots.appendChild(d);
+  });
+  function show(i) {
+    current = Math.max(0, Math.min(acts.length - 1, i));
+    acts.forEach(function (a, k) { a.hidden = k !== current; });
+    Array.prototype.forEach.call(dots.children, function (d, k) {
+      d.className = "dot" + (k === current ? " is-active" : (done[k] ? " is-done" : ""));
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.body.addEventListener("click", function (e) {
+    if (e.target.matches("[data-next]") && !e.target.disabled) { done[current] = true; show(current + 1); }
+    if (e.target.matches("[data-prev]")) show(current - 1);
+  });
+
+  /* ---------- the pretend inbox ----------
+     Every address, link, and name below is invented and non-functional.
+     phish === true means the message is a fake. Each carries the tells
+     a kid should learn to name. ---------- */
+  var MESSAGES = [
+    {
+      icon: "\u{1F3AB}",
+      from: "GameVault Team",
+      addr: "no-reply@gamevault.com",
+      subject: "Your reward is ready to claim",
+      phish: false,
+      body:
+        '<p>Hi! Your free monthly skin is waiting in your locker.</p>' +
+        '<p>Open the game whenever you like and grab it from the Rewards tab. ' +
+        'No rush, it stays there all month.</p>' +
+        '<p>Have fun,<br>The GameVault Team</p>',
+      link: { text: "the Rewards tab", real: "(no link, opens inside the game)" },
+      tells: [
+        "The address matches the real company name, gamevault.com.",
+        "No threat and no countdown. It is calm and in no hurry.",
+        "It never asks for your password. It just points you to the app."
+      ],
+      why: "Real notices stay calm, match their real address, and never ask for your password."
+    },
+    {
+      icon: "\u{26A0}️",
+      from: "GameVault Security",
+      addr: "support@game-vault-secure.com",
+      subject: "URGENT: account locked in 24 hours",
+      phish: true,
+      body:
+        '<p>We saw a strange login. Your account will be <b>deleted in 24 hours</b> unless you verify now.</p>' +
+        '<p>Click here to keep your account: ' +
+        '<span class="fakelink" tabindex="0">gamevault.com/verify' +
+        '<span class="fakelink__real">really goes to: g4mevault-login.ru/steal</span></span></p>' +
+        '<p>Enter your password to confirm it is you.</p>',
+      link: { text: "gamevault.com/verify", real: "g4mevault-login.ru/steal" },
+      tells: [
+        "Lookalike address: game-vault-secure.com is not the real gamevault.com.",
+        "Urgent threat with a 24 hour countdown, made to scare you into clicking.",
+        "Hover the link: the words say gamevault.com but it really goes to g4mevault-login.ru.",
+        "It asks you to enter your password. Real companies never do that by email."
+      ],
+      why: "Every tell at once: a lookalike sender, a scary deadline, a link that lies about where it goes, and a request for your password."
+    },
+    {
+      icon: "\u{1F4DA}",
+      from: "Ms. Rivera",
+      addr: "rivera@school.edu",
+      subject: "Reminder: science project Friday",
+      phish: false,
+      body:
+        '<p>Hi class, a quick reminder that your volcano write-ups are due Friday.</p>' +
+        '<p>Bring your notes. If you have questions, just reply to this email or ask me in class.</p>' +
+        '<p>See you tomorrow,<br>Ms. Rivera</p>',
+      link: null,
+      tells: [
+        "The address is your school, school.edu, and the name matches your teacher.",
+        "No link to click and nothing urgent or scary.",
+        "It never asks for a password or any secret."
+      ],
+      why: "A plain note from a real address, with no link and no secret to hand over, is exactly what a safe message looks like."
+    },
+    {
+      icon: "\u{1F4E6}",
+      from: "Package Delivery",
+      addr: "delivery@track-your-parcel-now.com",
+      subject: "Your package is held. Pay a small fee.",
+      phish: true,
+      body:
+        '<p>Your parcel could not be delivered. Pay a small fee in the next hour or it goes back.</p>' +
+        '<p>Confirm and pay here: ' +
+        '<span class="fakelink" tabindex="0">track-parcel.com/pay' +
+        '<span class="fakelink__real">really goes to: pay-now-fast.click/card</span></span></p>' +
+        '<p>You will need your account password and card number.</p>',
+      link: { text: "track-parcel.com/pay", real: "pay-now-fast.click/card" },
+      tells: [
+        "Lookalike sender: track-your-parcel-now.com is a made-up address, not a real carrier.",
+        "Urgent threat: pay in the next hour or lose your package.",
+        "Hover the link: it really goes to pay-now-fast.click, not the parcel site it claims.",
+        "It asks for your password and card number. A real carrier would not."
+      ],
+      why: "If you were not expecting a package, a sudden fee with a one hour clock is bait. The link and the password request seal it."
+    },
+    {
+      icon: "\u{1F4F1}",
+      from: "App Store",
+      addr: "receipts@apple-billing-alert.com",
+      subject: "Payment problem: confirm your password",
+      phish: true,
+      body:
+        '<p>There was a problem with your last payment. To avoid losing your apps, confirm your details now.</p>' +
+        '<p>Reply to this email with your <span class="pwfield">password</span> so we can fix it.</p>' +
+        '<p>Thank you for staying secure.</p>',
+      link: null,
+      tells: [
+        "Lookalike sender: apple-billing-alert.com is not the real apple.com.",
+        "Urgent threat: confirm now or lose your apps.",
+        "It asks you to reply with your password. A real store never asks for that, ever."
+      ],
+      why: "No link needed. The trick is simply asking for the password directly, dressed up as a billing problem. The answer is always no."
+    }
+  ];
+
+  var inbox = document.getElementById("inbox");
+  var scoreText = document.getElementById("scoreText");
+  var scoreFill = document.getElementById("scoreFill");
+  var toRule = document.getElementById("toRule");
+  var sortedCount = 0;
+  var sortedFlags = MESSAGES.map(function () { return false; });
+
+  MESSAGES.forEach(function (m, i) {
+    var card = document.createElement("div");
+    card.className = "msg";
+
+    var linkHtml = m.link
+      ? '<p>Click here: <span class="fakelink" tabindex="0">' + esc(m.link.text) +
+          '<span class="fakelink__real">really goes to: ' + esc(m.link.real) + '</span></span></p>'
+      : "";
+
+    var tellList = m.tells.map(function (t) {
+      return '<li><span class="dotmark">✦</span><span>' + esc(t) + "</span></li>";
+    }).join("");
+
+    card.innerHTML =
+      '<button class="msg__row" type="button" aria-expanded="false">' +
+        '<span class="msg__ico">' + m.icon + "</span>" +
+        '<span class="msg__head">' +
+          '<span class="msg__from">' + esc(m.from) + "</span>" +
+          '<span class="msg__addr">' + esc(m.addr) + "</span>" +
+          '<span class="msg__subj">' + esc(m.subject) + "</span>" +
+        "</span>" +
+        '<span class="msg__tag" data-tag>Unsorted</span>' +
+      "</button>" +
+      '<div class="msg__body hidden">' +
+        '<div class="msg__paper">' + m.body + "</div>" +
+        '<p class="tiny muted" style="margin:10px 0 2px">What to notice (hover any link first):</p>' +
+        '<ul class="tells">' + tellList + "</ul>" +
+        '<div class="sortbar">' +
+          '<button class="btn btn--ghost" type="button" data-sort="safe">✅ Safe</button>' +
+          '<button class="btn btn--ghost" type="button" data-sort="phish">🎣 Phish</button>' +
+        "</div>" +
+        '<div class="verdict" data-verdict></div>' +
+      "</div>";
+
+    var row = card.querySelector(".msg__row");
+    var bodyEl = card.querySelector(".msg__body");
+    var tagEl = card.querySelector("[data-tag]");
+    var verdictEl = card.querySelector("[data-verdict]");
+    var sortBtns = card.querySelectorAll("[data-sort]");
+
+    row.addEventListener("click", function () {
+      var open = card.classList.toggle("is-open");
+      bodyEl.classList.toggle("hidden", !open);
+      row.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+
+    Array.prototype.forEach.call(sortBtns, function (btn) {
+      btn.addEventListener("click", function () {
+        var guessPhish = btn.getAttribute("data-sort") === "phish";
+        var correct = guessPhish === m.phish;
+
+        if (!sortedFlags[i]) {
+          sortedFlags[i] = true;
+          sortedCount++;
+          updateScore();
+        }
+
+        card.classList.add("is-sorted");
+        card.classList.toggle("is-right", correct);
+
+        tagEl.textContent = m.phish ? "Phish" : "Safe";
+        tagEl.className = "msg__tag " + (m.phish ? "no" : "ok");
+
+        var lead = correct
+          ? "<b>Correct.</b> "
+          : "<b>Good try.</b> This one was actually " + (m.phish ? "a phish. " : "safe. ");
+        verdictEl.innerHTML = lead + esc(m.why);
+        verdictEl.className = "verdict show" + (m.phish ? " bad" : "");
+      });
+    });
+
+    inbox.appendChild(card);
+  });
+
+  function updateScore() {
+    scoreText.innerHTML = "<b>" + sortedCount + " of " + MESSAGES.length + "</b> sorted";
+    scoreFill.style.width = Math.round(sortedCount / MESSAGES.length * 100) + "%";
+    if (sortedCount >= MESSAGES.length) {
+      toRule.disabled = false;
+      IdeaLab.award("phish-spotter", 50);
+    }
+  }
+})();
+</script>
+</body>
+</html>

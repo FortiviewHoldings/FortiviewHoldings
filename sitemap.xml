@@ -3,23 +3,85 @@
 
   <url>
     <loc>https://fortiviewholdings.com/</loc>
-    <lastmod>2025-12-07</lastmod>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
-  <url><loc>https://fortiviewholdings.com/cx/</loc></url>
-  <url><loc>https://fortiviewholdings.com/finance/</loc></url>
-  <url><loc>https://fortiviewholdings.com/governance/</loc></url>
-  <url><loc>https://fortiviewholdings.com/industrial/</loc></url>
-  <url><loc>https://fortiviewholdings.com/integration/</loc></url>
-  <url><loc>https://fortiviewholdings.com/integration/terms/</loc></url>
-  <url><loc>https://fortiviewholdings.com/leadership/</loc></url>
-  <url><loc>https://fortiviewholdings.com/marketing/</loc></url>
-  <url><loc>https://fortiviewholdings.com/operations/</loc></url>
-  <url><loc>https://fortiviewholdings.com/partnerships/</loc></url>
-  <url><loc>https://fortiviewholdings.com/YouthBusinessEducationSandbox/</loc></url>
-  <url><loc>https://fortiviewholdings.com/ParentLegalGuide/</loc></url>
-  <url><loc>https://fortiviewholdings.com/TierBreakdown/</loc></url>
+  <url>
+    <loc>https://fortiviewholdings.com/industrial/</loc>
+    <lastmod>2026-06-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://fortiviewholdings.com/integration/</loc>
+    <lastmod>2026-06-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://fortiviewholdings.com/partnerships/</loc>
+    <lastmod>2026-06-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fortiviewholdings.com/idea-lab/</loc>
+    <lastmod>2026-06-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://fortiviewholdings.com/idea-lab/foundry/</loc>
+    <lastmod>2026-06-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://fortiviewholdings.com/idea-lab/defense/</loc>
+    <lastmod>2026-06-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://fortiviewholdings.com/idea-lab/ai-wing/</loc>
+    <lastmod>2026-06-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://fortiviewholdings.com/idea-lab/mission/</loc>
+    <lastmod>2026-06-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://fortiviewholdings.com/idea-lab/starcharts/</loc>
+    <lastmod>2026-06-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://fortiviewholdings.com/education/</loc>
+    <lastmod>2026-06-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url><loc>https://fortiviewholdings.com/education/calibration/</loc><lastmod>2026-06-10</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://fortiviewholdings.com/education/scaling/</loc><lastmod>2026-06-10</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://fortiviewholdings.com/education/square-root/</loc><lastmod>2026-06-10</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://fortiviewholdings.com/education/rtd/</loc><lastmod>2026-06-10</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://fortiviewholdings.com/education/thermocouple/</loc><lastmod>2026-06-10</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://fortiviewholdings.com/education/formulas/</loc><lastmod>2026-06-10</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+
+  <url>
+    <loc>https://fortiviewholdings.com/integration/terms/</loc>
+    <lastmod>2026-06-10</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
 
 </urlset>

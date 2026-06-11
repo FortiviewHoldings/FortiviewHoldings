@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How a Chatbot Is Built — AI Wing — Idea Lab</title>
+<meta name="description" content="See the pieces behind a chatbot: your message, a prediction, a safety check, the reply. Then build a tiny keyword bot of your own and watch it match patterns, not understand. No accounts.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../../assets/logo.svg">
+<link rel="stylesheet" href="../../assets/cosmos.css">
+<style>
+  /* ---- ACT 0: the pipeline of pieces ---- */
+  .pieces{display:grid;gap:12px}
+  .piece{display:grid;grid-template-columns:52px 1fr;gap:14px;align-items:center;
+    border:1px solid var(--border);border-radius:14px;background:var(--glass);padding:14px 16px;
+    opacity:.45;transition:.3s}
+  .piece.is-on{opacity:1;border-color:var(--nebula);box-shadow:0 0 0 1px var(--nebula)}
+  .piece__num{width:46px;height:46px;border-radius:12px;background:#0e1530;border:1px solid var(--border);
+    display:grid;place-items:center;font-size:24px;flex:0 0 auto}
+  .piece.is-on .piece__num{background:#7c5cff22;border-color:var(--nebula)}
+  .piece h4{margin:0;font-size:1.04em}
+  .piece p{margin:.2em 0 0;color:var(--muted);font-size:.9em}
+  .pipearrow{text-align:center;color:var(--muted);font-size:1.1em;line-height:.4}
+
+  /* ---- ACT 1: rule builder ---- */
+  .rulemaker{display:grid;gap:10px;border:1px solid var(--border);border-radius:14px;
+    background:#0a1020;padding:16px;margin-top:6px}
+  .rulerow{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end}
+  .field{display:grid;gap:5px}
+  .field label{font-size:.78em;color:var(--muted);font-weight:700}
+  .field input{font:inherit;color:var(--ink);background:var(--glass);border:1px solid var(--border);
+    border-radius:10px;padding:11px 12px;min-height:46px}
+  .field input:focus-visible{outline:3px solid var(--plasma);outline-offset:2px}
+  .rulehint{font-size:.8em;color:var(--muted);min-height:1.2em}
+  .rulelist{display:grid;gap:8px;margin-top:4px}
+  .ruleitem{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;
+    border:1px solid var(--border);border-radius:10px;background:var(--glass);padding:9px 12px}
+  .ruleitem .rk{font-weight:800;color:var(--star)}
+  .ruleitem .ra{color:var(--muted)}
+  .ruleitem .rx{font:inherit;font-weight:800;color:var(--muted);background:none;border:0;
+    cursor:pointer;padding:4px 8px;border-radius:8px;line-height:1}
+  .ruleitem .rx:hover{color:var(--bad);background:#ff6b6b18}
+  .emptyrules{color:var(--muted);font-size:.9em;text-align:center;padding:8px}
+
+  /* ---- ACT 2: chat window ---- */
+  .chat{border:1px solid var(--border);border-radius:14px;background:#0a1020;overflow:hidden}
+  .chat__log{height:clamp(220px,40vh,320px);overflow-y:auto;padding:16px;display:flex;
+    flex-direction:column;gap:10px}
+  .msg{max-width:80%;padding:10px 13px;border-radius:14px;line-height:1.45;font-size:.96em}
+  .msg.you{align-self:flex-end;background:var(--grad-brand);color:#04060d;border-bottom-right-radius:5px;
+    font-weight:600}
+  .msg.bot{align-self:flex-start;background:var(--glass-strong);border:1px solid var(--border);
+    border-bottom-left-radius:5px}
+  .msg.bot .why{display:block;margin-top:5px;font-size:.76em;color:var(--muted)}
+  .chat__bar{display:flex;gap:8px;padding:10px;border-top:1px solid var(--border);background:#0c1326}
+  .chat__bar input{flex:1;font:inherit;color:var(--ink);background:var(--glass);border:1px solid var(--border);
+    border-radius:999px;padding:11px 16px;min-height:46px}
+  .chat__bar input:focus-visible{outline:3px solid var(--plasma);outline-offset:2px}
+  .chat__send{flex:0 0 auto}
+</style>
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section lab">
+
+  <header class="center">
+    <span class="kicker">AI Wing · Level 3</span>
+    <h1 style="font-size:clamp(28px,5vw,46px);margin:.2em 0">How a Chatbot Is Built</h1>
+    <p class="muted">Look behind the magic. Four simple pieces, then build a tiny one yourself.</p>
+  </header>
+
+  <div class="steps" id="dots" aria-hidden="true"></div>
+
+  <!-- ============ ACT 0: THE PIECES ============ -->
+  <section class="act" data-act="0">
+    <h2>The four pieces</h2>
+    <p class="muted">A chatbot is not alive and it does not understand you. It is a chain of steps. Tap each
+       one to light it up.</p>
+
+    <div class="pieces" id="pieces"></div>
+
+    <div class="fact" id="piecesFact" style="margin-top:16px">
+      <span aria-hidden="true">🤖</span>
+      <span>Start at the top. Each tap shows the next piece in the chain.</span>
+    </div>
+
+    <div class="act__nav">
+      <span></span>
+      <button class="btn btn--go" id="a0Next" data-next disabled>Next: build your own →</button>
+    </div>
+  </section>
+
+  <!-- ============ ACT 1: BUILD THE RULES ============ -->
+  <section class="act" data-act="1" hidden>
+    <h2>Teach it some rules</h2>
+    <p class="muted">A real chatbot learns patterns from huge piles of text. Yours will be simpler: you
+       write the rules by hand. Pick a keyword to watch for, and the reply it should give.</p>
+
+    <div class="rulemaker">
+      <div class="rulerow">
+        <div class="field">
+          <label for="kwIn">If the message contains</label>
+          <input id="kwIn" type="text" placeholder="hello" maxlength="40" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="repIn">reply with</label>
+          <input id="repIn" type="text" placeholder="Hi there, friend!" maxlength="120" autocomplete="off">
+        </div>
+        <button class="btn btn--go" id="addRule" type="button">Add rule</button>
+      </div>
+      <div class="rulehint" id="ruleHint"></div>
+    </div>
+
+    <p class="panel-label muted tiny" style="margin:16px 0 6px;font-weight:700">YOUR RULES</p>
+    <div class="rulelist" id="ruleList"></div>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">📝</span>
+      <span>Try a few. A greeting, a question, your favorite animal. Each rule is just a keyword to look
+         for and the words to say back. Add one, then go chat with it.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <button class="btn btn--go" id="a1Next" data-next disabled>Next: chat with your bot →</button>
+    </div>
+  </section>
+
+  <!-- ============ ACT 2: CHAT ============ -->
+  <section class="act" data-act="2" hidden>
+    <h2>Chat with your bot</h2>
+    <p class="muted">Type a message. The bot looks for one of your keywords inside it. Watch the small grey
+       line under each reply to see exactly why it answered.</p>
+
+    <div class="chat">
+      <div class="chat__log" id="chatLog" aria-live="polite"></div>
+      <form class="chat__bar" id="chatForm">
+        <input id="chatIn" type="text" placeholder="Say something to your bot..." maxlength="160"
+               autocomplete="off" aria-label="Message your bot">
+        <button class="btn btn--go chat__send" type="submit">Send</button>
+      </form>
+    </div>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">🔍</span>
+      <span><b>It is just matching, not understanding.</b> Your bot does not know what your words mean. It
+         scans for a keyword it was given and says the matching reply. Real chatbots are far bigger and
+         smoother, but underneath they are still guessing replies from patterns, not thinking.</span>
+    </div>
+
+    <details style="margin-top:12px">
+      <summary class="muted tiny" style="cursor:pointer">🧠 So why does a real one feel so smart?</summary>
+      <div class="fact" style="margin-top:8px">
+        <span aria-hidden="true">✨</span>
+        <span>A big chatbot was trained on billions of sentences, so it can match almost anything you say
+           and predict a reply that fits. That is millions of "rules" it learned on its own, not by hand.
+           More patterns, smoother replies. Still no understanding underneath.</span>
+      </div>
+    </details>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Back</button>
+      <a class="btn btn--cosmic" href="../">Back to the AI Wing →</a>
+    </div>
+  </section>
+
+  <p class="center muted tiny" style="margin-top:26px">
+    <a href="../">← AI Wing</a> · honest about what a chatbot really does
+  </p>
+</main>
+
+<script src="../../assets/manifest.js"></script>
+<script src="../../assets/glossary.js"></script>
+<script src="../../assets/shell.js"></script>
+<script>
+(function () {
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("ai-wing", "../..");
+  IdeaLab.disclosure();
+  IdeaLab.glossary(window.IDEA_LAB_GLOSSARY);
+
+  /* ---------- stepper ---------- */
+  var acts = Array.prototype.slice.call(document.querySelectorAll(".act"));
+  var dots = document.getElementById("dots");
+  var done = [false, false, false];
+  var current = 0;
+  acts.forEach(function (_, i) {
+    var d = document.createElement("span");
+    d.className = "dot" + (i === 0 ? " is-active" : "");
+    dots.appendChild(d);
+  });
+  function show(i) {
+    current = Math.max(0, Math.min(acts.length - 1, i));
+    acts.forEach(function (a, k) { a.hidden = k !== current; });
+    Array.prototype.forEach.call(dots.children, function (d, k) {
+      d.className = "dot" + (k === current ? " is-active" : (done[k] ? " is-done" : ""));
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.body.addEventListener("click", function (e) {
+    if (e.target.matches("[data-next]") && !e.target.disabled) { done[current] = true; show(current + 1); }
+    if (e.target.matches("[data-prev]")) show(current - 1);
+  });
+
+  /* ---------- ACT 0: the four pieces ---------- */
+  var PIECES = [
+    { ico: "💬", h: "1. Your message",  p: "You type something. To the bot this is just text to scan, not a thought it can feel." },
+    { ico: "🔮", h: "2. It predicts a reply", p: "From patterns it has seen, it picks words that usually fit. Clever guessing, not knowing." },
+    { ico: "🛡️", h: "3. A safety check", p: "Before you see it, the reply is checked for mean or unsafe content and blocked if needed." },
+    { ico: "📨", h: "4. The reply appears", p: "The words show up in the chat. It looks like talking, but no one in there understood you." }
+  ];
+  var piecesEl = document.getElementById("pieces");
+  var piecesFact = document.getElementById("piecesFact").querySelector("span:last-child");
+  var reached = 0;
+  PIECES.forEach(function (pc, i) {
+    if (i > 0) {
+      var arr = document.createElement("div");
+      arr.className = "pipearrow"; arr.setAttribute("aria-hidden", "true");
+      arr.textContent = "↓";
+      piecesEl.appendChild(arr);
+    }
+    var el = document.createElement("button");
+    el.type = "button";
+    el.className = "piece" + (i === 0 ? " is-on" : "");
+    el.innerHTML = '<span class="piece__num" aria-hidden="true">' + pc.ico + "</span>" +
+      '<span><h4>' + IdeaLab.esc(pc.h) + "</h4><p>" + IdeaLab.esc(pc.p) + "</p></span>";
+    el.addEventListener("click", function () {
+      if (i > reached + 1) return;
+      reached = Math.max(reached, i);
+      var k = 0;
+      Array.prototype.forEach.call(piecesEl.children, function (c) {
+        if (c.classList.contains("piece")) { c.classList.toggle("is-on", k <= reached); k++; }
+      });
+      piecesFact.innerHTML = "<b>" + IdeaLab.esc(PIECES[reached].h) + "</b> " + IdeaLab.esc(PIECES[reached].p);
+      if (reached === PIECES.length - 1) document.getElementById("a0Next").disabled = false;
+    });
+    piecesEl.appendChild(el);
+  });
+
+  /* ---------- ACT 1 + 2: the tiny keyword bot ---------- */
+  /* rules are plain data: { keyword: "<lowercase>", reply: "<text>" }.
+     a message MATCHES a rule when message.toLowerCase() contains the
+     keyword, checked with String.indexOf. never eval, never run input. */
+  var rules = [];
+  var kwIn = document.getElementById("kwIn");
+  var repIn = document.getElementById("repIn");
+  var addBtn = document.getElementById("addRule");
+  var ruleHint = document.getElementById("ruleHint");
+  var ruleList = document.getElementById("ruleList");
+  var a1Next = document.getElementById("a1Next");
+
+  function renderRules() {
+    if (!rules.length) {
+      ruleList.innerHTML = '<div class="emptyrules">No rules yet. Add your first one above.</div>';
+      return;
+    }
+    ruleList.innerHTML = "";
+    rules.forEach(function (r, i) {
+      var item = document.createElement("div");
+      item.className = "ruleitem";
+      item.innerHTML =
+        '<span>contains <span class="rk">' + IdeaLab.esc(r.keyword) + '</span> ' +
+        '<span class="ra">→ "' + IdeaLab.esc(r.reply) + '"</span></span>' +
+        '<button class="rx" type="button" title="Remove this rule" aria-label="Remove rule">✕</button>';
+      item.querySelector(".rx").addEventListener("click", function () {
+        rules.splice(i, 1);
+        renderRules();
+        a1Next.disabled = rules.length === 0;
+      });
+      ruleList.appendChild(item);
+    });
+  }
+  renderRules();
+
+  function addRule() {
+    var kw = (kwIn.value || "").trim().toLowerCase();
+    var rep = (repIn.value || "").trim();
+    if (!kw) { ruleHint.textContent = "Type a keyword to watch for."; kwIn.focus(); return; }
+    if (!rep) { ruleHint.textContent = "Type the reply your bot should give."; repIn.focus(); return; }
+    var dupe = rules.some(function (r) { return r.keyword === kw; });
+    if (dupe) { ruleHint.textContent = "You already have a rule for that keyword."; return; }
+    rules.push({ keyword: kw, reply: rep });
+    ruleHint.textContent = "Added. The bot now watches for \"" + kw + "\".";
+    kwIn.value = ""; repIn.value = ""; kwIn.focus();
+    renderRules();
+    a1Next.disabled = false;
+  }
+  addBtn.addEventListener("click", addRule);
+  repIn.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); addRule(); } });
+  kwIn.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); repIn.focus(); } });
+
+  /* find the first rule whose keyword appears in the message. plain
+     string search only: lower-cased indexOf, no patterns run, no eval. */
+  function findReply(message) {
+    var text = String(message).toLowerCase();
+    for (var i = 0; i < rules.length; i++) {
+      if (text.indexOf(rules[i].keyword) !== -1) return rules[i];
+    }
+    return null;
+  }
+
+  var chatLog = document.getElementById("chatLog");
+  var chatForm = document.getElementById("chatForm");
+  var chatIn = document.getElementById("chatIn");
+  var greeted = false;
+
+  function bubble(who, text, why) {
+    var b = document.createElement("div");
+    b.className = "msg " + who;
+    b.textContent = text;
+    if (why) {
+      var w = document.createElement("span");
+      w.className = "why";
+      w.textContent = why;
+      b.appendChild(w);
+    }
+    chatLog.appendChild(b);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  chatForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var text = (chatIn.value || "").trim();
+    if (!text) return;
+    if (!greeted) {
+      greeted = true;
+      chatLog.innerHTML = "";
+    }
+    bubble("you", text, "");
+    chatIn.value = "";
+
+    var hit = findReply(text);
+    if (hit) {
+      bubble("bot", hit.reply, "Matched your keyword \"" + hit.keyword + "\".");
+      /* one rule exists AND a sent message matched it */
+      if (rules.length >= 1) IdeaLab.award("bot-builder", 50);
+    } else {
+      bubble("bot", "I do not have a rule for that yet.",
+        "No keyword of yours was found in that message.");
+    }
+  });
+
+  /* friendly seed line in the empty log */
+  bubble("bot", "Hi! Say something with one of your keywords in it.", "");
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Train a Tiny AI — AI Wing — Idea Lab</title>
+<meta name="description" content="Give a tiny model your own examples of two shapes, then watch it learn to tell them apart. A real, honest classifier you train in the browser. No accounts.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../../assets/logo.svg">
+<link rel="stylesheet" href="../../assets/cosmos.css">
+<style>
+  /* the drawing grid */
+  .grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;width:min(280px,80vw);
+    margin:0 auto;background:#070b16;border:1px solid var(--border);border-radius:14px;padding:10px}
+  .cell{aspect-ratio:1;border-radius:8px;border:1px solid var(--border);background:#0c1326;
+    cursor:pointer;transition:background .08s,transform .08s}
+  .cell:hover{border-color:var(--nebula)}
+  .cell.on{background:var(--grad-cosmic);border-color:transparent}
+  .cell:active{transform:scale(.94)}
+  .cell.read{cursor:default}
+  .grid5.read .cell:hover{border-color:var(--border)}
+
+  /* small read-only thumbnail of a saved example */
+  .thumb{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;width:62px;height:62px;
+    background:#070b16;border-radius:8px;padding:3px;flex:0 0 auto}
+  .thumb i{border-radius:2px;background:#162038}
+  .thumb i.on{background:var(--grad-cosmic)}
+
+  .labelrow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:16px 0 4px}
+  .lblbtn{font:inherit;font-weight:800;font-size:1.05em;border-radius:12px;cursor:pointer;
+    padding:12px 24px;border:1px solid var(--border);background:var(--glass);color:var(--ink);min-height:48px}
+  .lblbtn[data-k="X"]:hover{border-color:var(--plasma);background:#3ee0ff18}
+  .lblbtn[data-k="O"]:hover{border-color:var(--rose);background:#ff6ea918}
+
+  .tallies{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+  .tally{border:1px solid var(--border);border-radius:14px;background:var(--glass);padding:14px}
+  .tally h4{margin:0 0 4px;font-size:.92em;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+  .tally .big{font-weight:800;line-height:1}
+  .tally--x{border-color:#3ee0ff55}
+  .tally--o{border-color:#ff6ea955}
+  .tally .gallery{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;min-height:62px}
+  .tally .empty{color:var(--muted);font-size:.82em;align-self:center}
+
+  .balance{margin-top:14px;font-size:.9em;font-weight:700}
+  .balance.warn{color:var(--warn)}
+  .balance.good{color:var(--good)}
+
+  /* the verdict card */
+  .verdict{border:1px solid var(--border);border-radius:16px;background:#0a1020;padding:18px;margin-top:16px}
+  .verdict__head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .verdict__guess{font-size:1.6em;font-weight:800}
+  .verdict__guess.X{color:var(--plasma)}
+  .verdict__guess.O{color:var(--rose)}
+  .verdict__match{display:flex;align-items:center;gap:12px;margin-top:14px;
+    border-top:1px solid var(--border);padding-top:14px}
+  .verdict__match .lbl{font-size:.86em;color:var(--muted)}
+  .conf{display:block;height:10px;border-radius:6px;background:#ffffff14;overflow:hidden;margin-top:8px}
+  .conf > i{display:block;height:10px;border-radius:6px;background:var(--grad-cosmic);width:0;transition:width .4s}
+
+  .toolbar{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<canvas id="il-stars" aria-hidden="true"></canvas>
+
+<main class="wrap section lab">
+
+  <header class="center">
+    <span class="kicker">AI Wing · Builder</span>
+    <h1 style="font-size:clamp(28px,5vw,46px);margin:.2em 0">Train a Tiny AI</h1>
+    <p class="muted">You give the examples. The machine learns the rest. This is a real model, kept small enough to see every part of it.</p>
+  </header>
+
+  <div class="steps" id="dots" aria-hidden="true"></div>
+
+  <!-- ============ ACT 0: TEACH ============ -->
+  <section class="act" data-act="0">
+    <h2>Teach it two shapes</h2>
+    <p class="muted">Draw an <b>X</b> shape or an <b>O</b> shape on the grid. Click cells to fill them.
+       Then tell the model which one it is. Give it a few of each.</p>
+
+    <div class="grid5" id="teachGrid" aria-label="Drawing grid, click cells to fill them"></div>
+
+    <div class="toolbar">
+      <button class="btn btn--ghost tiny" type="button" id="clearTeach">Clear grid</button>
+    </div>
+
+    <div class="labelrow">
+      <button class="lblbtn" type="button" data-k="X">Save as X</button>
+      <button class="lblbtn" type="button" data-k="O">Save as O</button>
+    </div>
+    <p class="center muted tiny" id="teachHint" style="min-height:1.4em">Fill in a shape first, then pick a label.</p>
+
+    <div class="tallies">
+      <div class="tally tally--x">
+        <h4>X examples</h4>
+        <div class="big" id="countX">0</div>
+        <div class="gallery" id="galX"><span class="empty">none yet</span></div>
+      </div>
+      <div class="tally tally--o">
+        <h4>O examples</h4>
+        <div class="big" id="countO">0</div>
+        <div class="gallery" id="galO"><span class="empty">none yet</span></div>
+      </div>
+    </div>
+
+    <p class="balance warn" id="balance">Give it at least one X and one O to start.</p>
+
+    <div class="fact" style="margin-top:16px">
+      <span aria-hidden="true">🧠</span>
+      <span><b>AI learns from labeled examples.</b> You are not writing a rule like "an X has corners."
+      You are just showing it pictures and saying what each one is. The model figures out the pattern from your examples.</span>
+    </div>
+
+    <div class="act__nav">
+      <span></span>
+      <button class="btn btn--go" id="toTest" data-next disabled>Next: let it guess →</button>
+    </div>
+  </section>
+
+  <!-- ============ ACT 1: CLASSIFY ============ -->
+  <section class="act" data-act="1" hidden>
+    <h2>Now let it guess</h2>
+    <p class="muted">Draw a <b>new</b> shape it has never seen. The model compares it to every example
+       you saved and picks the closest match. Then it tells you its guess.</p>
+
+    <div class="grid5" id="testGrid" aria-label="Drawing grid for a new shape"></div>
+
+    <div class="toolbar">
+      <button class="btn btn--ghost tiny" type="button" id="clearTest">Clear grid</button>
+      <button class="btn btn--cosmic" type="button" id="classifyBtn">Classify this →</button>
+    </div>
+
+    <div class="verdict hidden" id="verdict">
+      <div class="verdict__head">
+        <span class="muted">My guess:</span>
+        <span class="verdict__guess" id="vGuess">?</span>
+        <span class="muted tiny" id="vConfText"></span>
+      </div>
+      <span class="conf"><i id="vConfBar"></i></span>
+
+      <div class="verdict__match">
+        <div class="thumb" id="vThumb" aria-hidden="true"></div>
+        <div>
+          <div class="lbl">Closest example I saved</div>
+          <div id="vMatchText" style="font-weight:700"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fact hidden" id="lessonBalance" style="margin-top:16px">
+      <span aria-hidden="true">⚖️</span>
+      <span><b>More and more-balanced examples make it better.</b> Right now one side has far more
+      examples than the other. Go back and even them out, then classify again and watch the guesses get steadier.</span>
+    </div>
+
+    <div class="fact" style="margin-top:14px">
+      <span aria-hidden="true">🔍</span>
+      <span><b>No magic here.</b> The model counts how many of the 25 cells match each saved example,
+      keeps the one that matches best, and copies its label. That is the honest core of how a real model
+      is trained: learn from examples, then compare. Real ones just use far more examples and far cleverer comparing.</span>
+    </div>
+
+    <div class="act__nav">
+      <button class="btn btn--ghost" data-prev>← Add more examples</button>
+      <a class="btn btn--cosmic" href="../">Back to the AI Wing →</a>
+    </div>
+  </section>
+
+  <p class="center muted tiny" style="margin-top:26px">
+    <a href="../">← AI Wing</a> · a real model, small enough to see every moving part
+  </p>
+</main>
+
+<script src="../../assets/manifest.js"></script>
+<script src="../../assets/glossary.js"></script>
+<script src="../../assets/shell.js"></script>
+<script>
+(function () {
+  IdeaLab.starfield("il-stars");
+  IdeaLab.nav("ai-wing", "../..");
+  IdeaLab.disclosure();
+  IdeaLab.glossary(window.IDEA_LAB_GLOSSARY);
+
+  var N = 5, CELLS = N * N;
+
+  /* ---------- stepper ---------- */
+  var acts = Array.prototype.slice.call(document.querySelectorAll(".act"));
+  var dots = document.getElementById("dots");
+  var done = [false, false];
+  var current = 0;
+  acts.forEach(function (_, i) {
+    var d = document.createElement("span");
+    d.className = "dot" + (i === 0 ? " is-active" : "");
+    dots.appendChild(d);
+  });
+  function show(i) {
+    current = Math.max(0, Math.min(acts.length - 1, i));
+    acts.forEach(function (a, k) { a.hidden = k !== current; });
+    Array.prototype.forEach.call(dots.children, function (d, k) {
+      d.className = "dot" + (k === current ? " is-active" : (done[k] ? " is-done" : ""));
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.body.addEventListener("click", function (e) {
+    if (e.target.matches("[data-next]") && !e.target.disabled) { done[current] = true; show(current + 1); }
+    if (e.target.matches("[data-prev]")) show(current - 1);
+  });
+
+  /* ---------- the saved training set ---------- */
+  /* each example is { grid: [0/1 x25], label: "X" | "O" } */
+  var examples = [];
+  var classified = false;
+
+  function countLabel(k) {
+    var n = 0;
+    for (var i = 0; i < examples.length; i++) if (examples[i].label === k) n++;
+    return n;
+  }
+
+  /* ---------- a reusable click grid ---------- */
+  function makeGrid(host) {
+    var state = new Array(CELLS).fill(0);
+    var cells = [];
+    for (var i = 0; i < CELLS; i++) {
+      (function (idx) {
+        var c = document.createElement("button");
+        c.type = "button";
+        c.className = "cell";
+        c.setAttribute("aria-label", "cell " + (idx + 1));
+        c.addEventListener("click", function () {
+          state[idx] = state[idx] ? 0 : 1;
+          c.classList.toggle("on", !!state[idx]);
+          if (host._onchange) host._onchange();
+        });
+        host.appendChild(c);
+        cells.push(c);
+      })(i);
+    }
+    return {
+      state: state,
+      filled: function () { var n = 0; for (var i = 0; i < CELLS; i++) n += state[i]; return n; },
+      clear: function () {
+        for (var i = 0; i < CELLS; i++) { state[i] = 0; cells[i].classList.remove("on"); }
+        if (host._onchange) host._onchange();
+      },
+      snapshot: function () { return state.slice(); }
+    };
+  }
+
+  /* ---------- a small read-only thumbnail ---------- */
+  function thumbInto(el, grid) {
+    el.innerHTML = "";
+    for (var i = 0; i < CELLS; i++) {
+      var b = document.createElement("i");
+      if (grid[i]) b.className = "on";
+      el.appendChild(b);
+    }
+  }
+
+  /* ============ ACT 0: TEACH ============ */
+  var teachHost = document.getElementById("teachGrid");
+  var teach = makeGrid(teachHost);
+  var teachHint = document.getElementById("teachHint");
+  var balanceEl = document.getElementById("balance");
+  var toTestBtn = document.getElementById("toTest");
+
+  teachHost._onchange = function () {
+    if (teach.filled() === 0) teachHint.textContent = "Fill in a shape first, then pick a label.";
+    else teachHint.textContent = "Looks good. Save it as an X or an O.";
+  };
+
+  document.getElementById("clearTeach").addEventListener("click", teach.clear);
+
+  function refreshTallies() {
+    var nx = countLabel("X"), no = countLabel("O");
+    document.getElementById("countX").textContent = nx;
+    document.getElementById("countO").textContent = no;
+
+    var galX = document.getElementById("galX"), galO = document.getElementById("galO");
+    galX.innerHTML = ""; galO.innerHTML = "";
+    examples.forEach(function (ex) {
+      var t = document.createElement("div");
+      t.className = "thumb";
+      thumbInto(t, ex.grid);
+      (ex.label === "X" ? galX : galO).appendChild(t);
+    });
+    if (!nx) galX.innerHTML = '<span class="empty">none yet</span>';
+    if (!no) galO.innerHTML = '<span class="empty">none yet</span>';
+
+    /* balance message: honest about why it matters */
+    if (!nx || !no) {
+      balanceEl.className = "balance warn";
+      balanceEl.textContent = "Give it at least one X and one O to start.";
+    } else {
+      var hi = Math.max(nx, no), lo = Math.min(nx, no);
+      if (hi >= lo * 2 && hi - lo >= 2) {
+        balanceEl.className = "balance warn";
+        balanceEl.textContent = "Lopsided: " + nx + " X and " + no + " O. Add a few to the smaller side to make it fairer.";
+      } else {
+        balanceEl.className = "balance good";
+        balanceEl.textContent = "Nicely balanced: " + nx + " X and " + no + " O. The fairer the examples, the better it learns.";
+      }
+    }
+
+    /* unlock the next step once both sides have an example */
+    toTestBtn.disabled = !(nx && no);
+  }
+
+  function saveExample(label) {
+    if (teach.filled() === 0) {
+      teachHint.textContent = "Draw a shape on the grid first, then save it.";
+      return;
+    }
+    examples.push({ grid: teach.snapshot(), label: label });
+    teach.clear();
+    teachHint.textContent = "Saved as " + label + ". Draw another, or move on when you have some of each.";
+    refreshTallies();
+  }
+  Array.prototype.forEach.call(document.querySelectorAll(".lblbtn"), function (b) {
+    b.addEventListener("click", function () { saveExample(b.dataset.k); });
+  });
+
+  refreshTallies();
+
+  /* ============ ACT 1: CLASSIFY ============ */
+  var testHost = document.getElementById("testGrid");
+  var test = makeGrid(testHost);
+  document.getElementById("clearTest").addEventListener("click", function () {
+    test.clear();
+    document.getElementById("verdict").classList.add("hidden");
+  });
+
+  /* the model: nearest example by matching cells */
+  function classify(grid) {
+    var best = null, bestMatch = -1;
+    for (var i = 0; i < examples.length; i++) {
+      var ex = examples[i], match = 0;
+      for (var c = 0; c < CELLS; c++) if (ex.grid[c] === grid[c]) match++;
+      if (match > bestMatch) { bestMatch = match; best = ex; }
+    }
+    return { example: best, match: bestMatch, pct: Math.round(bestMatch / CELLS * 100) };
+  }
+
+  document.getElementById("classifyBtn").addEventListener("click", function () {
+    if (test.filled() === 0) {
+      document.getElementById("verdict").classList.remove("hidden");
+      document.getElementById("vGuess").textContent = "?";
+      document.getElementById("vGuess").className = "verdict__guess";
+      document.getElementById("vConfText").textContent = "";
+      document.getElementById("vMatchText").textContent = "Draw a shape first, then classify it.";
+      thumbInto(document.getElementById("vThumb"), new Array(CELLS).fill(0));
+      document.getElementById("vConfBar").style.width = "0%";
+      return;
+    }
+
+    var grid = test.snapshot();
+    var res = classify(grid);
+
+    document.getElementById("verdict").classList.remove("hidden");
+    var g = document.getElementById("vGuess");
+    g.textContent = res.example.label;
+    g.className = "verdict__guess " + res.example.label;
+
+    document.getElementById("vConfText").textContent =
+      res.match + " of " + CELLS + " cells matched";
+    document.getElementById("vConfBar").style.width = res.pct + "%";
+
+    thumbInto(document.getElementById("vThumb"), res.example.grid);
+    document.getElementById("vMatchText").textContent =
+      "One of your " + res.example.label + " examples, the most similar one. It copied that label.";
+
+    /* show the balance lesson when the set is lopsided */
+    var nx = countLabel("X"), no = countLabel("O");
+    var hi = Math.max(nx, no), lo = Math.min(nx, no);
+    document.getElementById("lessonBalance").classList.toggle("hidden", !(hi >= lo * 2 && hi - lo >= 2));
+
+    /* award once: examples on both sides AND a real classification done */
+    if (!classified && nx && no) {
+      classified = true;
+      IdeaLab.award("ai-trainer", 60);
+    }
+  });
+})();
+</script>
+</body>
+</html>
