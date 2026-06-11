@@ -55,26 +55,28 @@
     .cta-split{display:grid;grid-template-columns:1.18fr .82fr;gap:clamp(22px,4vw,52px);align-items:center}
     .cta-split__text{min-width:0}
     .cta-split__media{display:flex;align-items:center;justify-content:center}
-    /* a black hole: the logo is the event horizon, ringed by a glowing accretion disk */
-    .cta-bh{position:relative;width:min(300px,86%);aspect-ratio:1;display:grid;place-items:center;isolation:isolate;
-      animation:ctaFloat 7s ease-in-out infinite}
-    .cta-bh::after{content:"";position:absolute;inset:-16%;border-radius:50%;z-index:-1;
-      background:radial-gradient(circle, rgba(47,212,194,.30), rgba(124,92,255,.14) 46%, transparent 70%);filter:blur(12px)}
-    .cta-bh::before{content:"";position:absolute;inset:0;border-radius:50%;z-index:2;
-      background:conic-gradient(from 0deg,#3ee0ff,#ffffff,#2fd4c2,#7c5cff,#ff6ea9,#3ee0ff);
-      -webkit-mask:radial-gradient(circle closest-side, transparent 62%, #000 68%, #000 90%, transparent 100%);
-              mask:radial-gradient(circle closest-side, transparent 62%, #000 68%, #000 90%, transparent 100%);
-      filter:blur(2.5px) saturate(165%) brightness(1.12);animation:bhSpin 12s linear infinite}
-    .cta-logo{position:relative;z-index:1;width:62%;height:auto;border-radius:50%;background:#02040a;
-      box-shadow:0 0 0 7px #02040a,0 0 30px 14px #02040a,0 0 70px 34px rgba(2,4,10,.9)}
+    /* a black hole: a dark orb (the logo) with a soft glowing edge and a thin FLAT
+       light streak passing BEHIND it — never across its face */
+    .cta-bh{position:relative;width:min(420px,100%);aspect-ratio:1.4/1;display:grid;place-items:center;
+      isolation:isolate;animation:ctaFloat 8s ease-in-out infinite}
+    .cta-bh>*{grid-area:1/1}
+    /* the orb's edge: a soft thin ring, SAME width/colour as the streak, that the streak flows into */
+    .cta-bh::before{content:"";grid-area:1/1;justify-self:center;align-self:center;width:39.5%;aspect-ratio:1;border-radius:50%;z-index:3;
+      background:radial-gradient(circle closest-side, transparent 88%, rgba(190,248,255,.88) 94%, rgba(62,224,255,.93) 98%, rgba(124,92,255,.5) 100%);
+      filter:blur(2.2px) drop-shadow(0 0 10px rgba(62,224,255,.62))}
+    /* the accretion streak: thin, flat, passing behind the orb */
+    .cta-bh__streak{justify-self:stretch;align-self:center;height:6px;z-index:1;border-radius:50%;
+      background:linear-gradient(90deg, transparent 0%, rgba(124,92,255,.5) 9%, rgba(62,224,255,.9) 22%, rgba(190,248,255,1) 30%, #ffffff 35%, rgba(255,255,255,.5) 50%, #ffffff 65%, rgba(190,248,255,1) 70%, rgba(62,224,255,.9) 78%, rgba(124,92,255,.5) 91%, transparent 100%);
+      filter:blur(1.6px) drop-shadow(0 0 10px rgba(62,224,255,.65))}
+    /* the orb = the logo, an OPAQUE dark circle so the streak is fully hidden behind it (only wings show) */
+    .cta-logo{justify-self:center;align-self:center;width:38%;height:auto;z-index:2;border-radius:50%}
     @keyframes ctaFloat{0%,100%{transform:translateY(-7px)}50%{transform:translateY(7px)}}
-    @keyframes bhSpin{to{transform:rotate(360deg)}}
     @media(max-width:760px){
       .cta-split{grid-template-columns:1fr}
       .cta-split__media{order:-1}
-      .cta-bh{width:168px}
+      .cta-bh{width:min(340px,94%)}
     }
-    @media(prefers-reduced-motion:reduce){.cta-bh,.cta-bh::before{animation:none}}
+    @media(prefers-reduced-motion:reduce){.cta-bh{animation:none}}
   </style>
 </head>
 <body>
@@ -218,6 +220,7 @@
         </div>
         <div class="cta-split__media">
           <div class="cta-bh">
+            <span class="cta-bh__streak" aria-hidden="true"></span>
             <img src="/images/pragoptics.png" alt="PragOptics" class="cta-logo" width="300" height="300" loading="lazy">
           </div>
         </div>

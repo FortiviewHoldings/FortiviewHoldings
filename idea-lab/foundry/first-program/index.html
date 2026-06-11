@@ -21,8 +21,12 @@
     font-size:clamp(34px,8vw,52px);line-height:1;min-width:2.2ch;text-align:center;
     background:var(--grad-cosmic);-webkit-background-clip:text;background-clip:text;color:transparent}
   .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-  select{font:inherit;font-weight:700;color:var(--ink);background:#0a0f1f;border:1px solid var(--border);
-    border-radius:10px;padding:10px 12px;cursor:pointer;min-height:46px}
+  select{font:inherit;font-weight:700;color:var(--ink);background-color:#0a0f1f;border:1px solid var(--border);
+    border-radius:10px;padding:10px 40px 10px 12px;cursor:pointer;min-height:46px;
+    appearance:none;-webkit-appearance:none;-moz-appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%233ee0ff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
+    background-repeat:no-repeat;background-position:right 14px center}
+  select option{background:#101625;color:var(--ink)}
   select:focus-visible{outline:3px solid var(--plasma);outline-offset:2px}
   .opbox{font-family:ui-monospace,monospace;font-size:1.3em;min-width:3.4ch;text-align:center}
 

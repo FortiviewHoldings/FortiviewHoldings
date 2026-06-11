@@ -122,11 +122,11 @@ p{margin:0}
 .fv-burger{display:none;margin-left:auto;width:44px;height:44px;border:1px solid var(--glass-border-2);border-radius:var(--radius-sm);
   background:var(--glass);cursor:pointer;flex-direction:column;gap:5px;align-items:center;justify-content:center}
 .fv-burger span{width:18px;height:2px;background:var(--ink);transition:.2s}
-.fv-mobile{display:none;border-top:1px solid var(--glass-border);background:var(--panel);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur)}
-.fv-mobile a,.fv-mobile .fv-mob-h{display:block;padding:14px 0;border-bottom:1px solid var(--glass-border);color:var(--ink-2);font-size:1rem}
-.fv-mobile .fv-mob-h{color:var(--muted);font-family:var(--mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase}
-.fv-mobile a:hover{color:var(--accent)}
-.fv-mobile .btn{width:100%;margin:14px 0}
+.fv-mobile{display:none;width:100%;padding:4px var(--pad) 20px;border-top:1px solid var(--glass-border);background:var(--panel);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur)}
+.fv-mobile a:not(.btn),.fv-mobile .fv-mob-h{display:block;padding:15px 4px;border-bottom:1px solid var(--glass-border);color:var(--ink-2);font-size:1.06rem;font-weight:500;transition:color .15s ease,padding-left .15s ease}
+.fv-mobile .fv-mob-h{color:var(--muted);font-family:var(--mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;font-weight:500}
+.fv-mobile a:not(.btn):hover,.fv-mobile a:not(.btn):active{color:var(--accent);padding-left:9px}
+.fv-mobile .btn{width:100%;margin-top:18px}
 
 /* ---------- hero ---------- */
 .fv-hero{padding:clamp(52px,9vw,104px) 0 clamp(36px,6vw,64px)}

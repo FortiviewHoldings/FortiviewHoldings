@@ -41,6 +41,13 @@
   .colorRow input[type=color]{width:46px;height:46px;border:1px solid var(--border);border-radius:12px;background:#060a16;cursor:pointer;padding:2px}
   .palette{display:flex;gap:6px}
   .palette span{width:26px;height:26px;border-radius:7px;border:1px solid #ffffff22}
+  .picker .slabel{display:block;font-size:.74em;font-weight:700;color:var(--muted);margin:9px 0 3px}
+  #hexInput{font-family:ui-monospace,monospace;text-transform:lowercase;letter-spacing:.04em}
+  .cslider{-webkit-appearance:none;appearance:none;width:100%;height:13px;border-radius:9px;outline:none;border:1px solid var(--border);cursor:pointer;margin:0}
+  .cslider::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid #0a1020;box-shadow:0 1px 5px #000a;cursor:pointer}
+  .cslider::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid #0a1020;cursor:pointer}
+  .cslider:focus-visible{box-shadow:0 0 0 3px #3ee0ff66}
+  .cslider.hue{background:linear-gradient(90deg,#ff0000,#ffff00 17%,#00ff00 33%,#00ffff 50%,#0000ff 67%,#ff00ff 83%,#ff0000)}
   .seg{display:inline-flex;gap:4px;background:var(--glass);border-radius:999px;padding:4px}
   .seg button{border:0;background:transparent;color:var(--muted);font:inherit;font-weight:700;font-size:.84em;padding:6px 12px;border-radius:999px;cursor:pointer}
   .seg button.on{background:var(--grad-brand);color:#04060d}
@@ -137,6 +144,18 @@
               <button data-h="quad" type="button">Quad</button>
             </div>
             <div class="palette" id="paletteRow" aria-hidden="true"></div>
+          </div>
+          <div class="picker">
+            <div class="field" style="margin-bottom:6px">
+              <label for="hexInput">Hex code</label>
+              <input id="hexInput" type="text" spellcheck="false" maxlength="7" value="#7c5cff" aria-label="hex colour">
+            </div>
+            <label class="slabel" for="hueR">Hue</label>
+            <input type="range" id="hueR" class="cslider hue" min="0" max="360" value="258" aria-label="hue">
+            <label class="slabel" for="satR">Saturation</label>
+            <input type="range" id="satR" class="cslider sat" min="0" max="100" value="60" aria-label="saturation">
+            <label class="slabel" for="litR">Lightness</label>
+            <input type="range" id="litR" class="cslider lit" min="0" max="100" value="62" aria-label="lightness">
           </div>
           <div class="note" style="margin-bottom:8px">Or start from a preset:</div>
           <div class="pickrow" id="presetRow"></div>
@@ -325,13 +344,13 @@
       '.hero h1{font-size:clamp(30px,6vw,54px);margin:.3em 0;line-height:1.05}' +
       '.tag{background:'+p.accent+';-webkit-background-clip:text;background-clip:text;color:transparent}' +
       '.hero p{font-size:clamp(16px,2.4vw,20px);color:'+p.muted+';max-width:60ch;margin:0 auto 28px}' +
-      '.cta{display:inline-block;padding:15px 30px;border-radius:999px;background:'+p.accent+';color:'+p.btnInk+';font-weight:800;text-decoration:none}' +
+      '.cta{display:inline-block;padding:15px 30px;border-radius:999px;background:'+p.accent+';color:'+p.btnInk+';font-weight:800;text-decoration:none;cursor:pointer}' +
       '.who{margin-top:30px;display:inline-block;padding:10px 18px;border:1px solid '+p.second+'66;border-radius:999px;color:'+p.muted+'}' +
       'footer{text-align:center;color:'+p.muted+';padding:30px;border-top:1px solid #ffffff14;font-size:14px}' +
       '</style></head><body>' +
       '<header class="bar">'+logoMarkup(26,p.solid)+'<b>'+name+'</b><nav><span>Home</span><span>About</span><span>'+cta+'</span></nav></header>' +
       '<section class="hero">'+bgImageLayer()+'<div class="in"><div class="logo">'+logoMarkup(78,p.solid)+'</div>' +
-      '<h1><span class="tag">'+tag+'</span></h1><p>'+what+'</p><a class="cta" href="#">'+cta+'</a>' +
+      '<h1><span class="tag">'+tag+'</span></h1><p>'+what+'</p><a class="cta">'+cta+'</a>' +
       (who ? '<div class="who">Made for '+who+'</div>' : '') + '</div></section>' +
       '<footer>'+(maker ? 'Made by '+maker+' · ' : '')+'An Idea Lab project</footer></body></html>';
   }
@@ -445,10 +464,28 @@
     });
   });
 
-  /* ---- color controls ---- */
+  /* ---- color controls: native swatch + hex field + HSL sliders, all kept in sync ---- */
   var baseColor = document.getElementById("baseColor");
-  baseColor.value = state.baseColor;
-  baseColor.addEventListener("input", function(){ state.baseColor=baseColor.value; save(); schedulePreview(); });
+  var hexInput = document.getElementById("hexInput");
+  var hueR = document.getElementById("hueR"), satR = document.getElementById("satR"), litR = document.getElementById("litR");
+  function validHex(v){ v = String(v).replace("#","").trim();
+    if (/^[0-9a-fA-F]{3}$/.test(v)) v = v.split("").map(function(c){ return c+c; }).join("");
+    return /^[0-9a-fA-F]{6}$/.test(v) ? "#"+v.toLowerCase() : null; }
+  function trackGrads(hex){ var hsl=hexToHsl(hex), h=hsl[0], l=Math.min(Math.max(hsl[2],22),78);
+    satR.style.background="linear-gradient(90deg,"+hslToHex(h,0,l)+","+hslToHex(h,100,l)+")";
+    litR.style.background="linear-gradient(90deg,#05070c,"+hslToHex(h,Math.max(55,hsl[1]),52)+",#ffffff)"; }
+  function setColor(hex, src){ var v = validHex(hex); if (!v) return;
+    state.baseColor = v;
+    if (src!=="native") baseColor.value = v;
+    if (src!=="hex") hexInput.value = v;
+    if (src!=="slider"){ var hsl=hexToHsl(v); hueR.value=Math.round(hsl[0]); satR.value=Math.round(hsl[1]); litR.value=Math.round(hsl[2]); }
+    trackGrads(v); save(); schedulePreview(); }
+  baseColor.value = state.baseColor; hexInput.value = state.baseColor;
+  (function(){ var hsl=hexToHsl(state.baseColor); hueR.value=Math.round(hsl[0]); satR.value=Math.round(hsl[1]); litR.value=Math.round(hsl[2]); trackGrads(state.baseColor); })();
+  baseColor.addEventListener("input", function(){ setColor(baseColor.value, "native"); });
+  hexInput.addEventListener("input", function(){ if (validHex(hexInput.value)) setColor(hexInput.value, "hex"); });
+  hexInput.addEventListener("blur", function(){ hexInput.value = state.baseColor; });
+  [hueR, satR, litR].forEach(function(s){ s.addEventListener("input", function(){ setColor(hslToHex(+hueR.value, +satR.value, +litR.value), "slider"); }); });
   document.querySelectorAll("#harmonySeg button").forEach(function(b){
     if (b.dataset.h===state.harmony) b.classList.add("on"); else b.classList.remove("on");
     b.addEventListener("click", function(){
@@ -460,7 +497,7 @@
   var presetRow = document.getElementById("presetRow");
   PRESETS.forEach(function(col){
     var b=document.createElement("button"); b.type="button"; b.className="swatch"; b.style.background=col; b.setAttribute("aria-label","preset "+col);
-    b.addEventListener("click", function(){ state.baseColor=col; baseColor.value=col; save(); renderPreview(); });
+    b.addEventListener("click", function(){ setColor(col, "preset"); });
     presetRow.appendChild(b);
   });
 

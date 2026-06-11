@@ -130,7 +130,7 @@
       "</nav>" +
       '<button class="fv-burger" aria-label="Menu"><span></span><span></span><span></span></button>' +
     "</div>" +
-    '<div class="fv-wrap fv-mobile">' + links("") +
+    '<div class="fv-mobile">' + links("") +
       '<a class="btn btn--primary" href="' + MAIL + '">Work with us</a>' +
     "</div>";
   document.body.insertBefore(header, document.getElementById("fv-stars").nextSibling);
