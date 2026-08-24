@@ -245,6 +245,10 @@ p{margin:0}
   .cta-split__media{order:-1}
   .cta-bh{width:min(340px,94%)}
 }
+/* beaker variant (Idea Lab): transparent SVG mark, so no orb ring and no
+   circle-crop; it floats over the streak with its own cosmic glow */
+.cta-bh--beaker::before{display:none}
+.cta-bh--beaker .cta-logo{border-radius:0;width:34%;filter:drop-shadow(0 10px 30px rgba(62,224,255,.45))}
 @media(prefers-reduced-motion:reduce){.cta-bh{animation:none}}
 
 /* ---------- reveal on scroll ---------- */
