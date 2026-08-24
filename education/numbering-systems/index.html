@@ -1,0 +1,1889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Numbering Systems &amp; Codes Lab (Binary, Octal, Hex, BCD, ASCII) | Field Pocket Guide</title>
+  <meta name="description" content="An interactive numbering-systems lab: binary, octal, hex, BCD, ASCII, and two's complement, with an ADC sampling bench, step-through successive division, bit grouping, column arithmetic with carries, a tank-farm alarm demo, and a practice problem generator.">
+  <meta name="color-scheme" content="dark" />
+  <link rel="canonical" href="https://fortiviewholdings.com/education/numbering-systems/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Numbering Systems &amp; Codes Lab — Field Pocket Guide">
+  <meta property="og:description" content="Binary, octal, hex, BCD, ASCII, and two's complement — interactive calculators that show every step of the work.">
+  <meta property="og:image" content="https://fortiviewholdings.com/images/social-preview.png">
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" href="/images/favicon.png" sizes="192x192">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/fortiview.css">
+  <link rel="stylesheet" href="/education/assets/pocketguide.css">
+  <style>
+    /* ============================================================
+       Numbering Systems lab — page styles.
+       Rides on fortiview.css tokens (galactic glass). The lab's
+       per-base color coding maps onto the cosmic gradient palette.
+       ============================================================ */
+    :root{
+      --surface-3:rgba(255,255,255,.09);
+      --line:rgba(255,255,255,.12);
+      --line-strong:rgba(255,255,255,.22);
+      --ink-3:#7a8499;
+      --on-accent:#03140f;
+      --dec:#3ee0ff;
+      --bin:#2fd4c2;
+      --oct:#f2b24c;
+      --hex:#a08bff;
+      --bcd:#ff6ea9;
+      --good:#2fd4c2;
+      --warn:#f2b24c;
+      --led-off:rgba(255,255,255,.14);
+      --led-on:#ff6b6b;
+    }
+
+    /* ---------- type & sections ---------- */
+    .pg-lab section{margin:0 0 60px;scroll-margin-top:132px}
+    .pg-lab section h2{font-family:var(--display);color:var(--ink);font-size:clamp(1.32rem,2.6vw,1.65rem);margin:.45rem 0 .8rem;letter-spacing:-.005em}
+    .pg-lab section>p{color:var(--ink-2);max-width:70ch;margin:0 0 1em;font-size:.98rem}
+    .pg-lab section>p strong,.pg-lab .panel-body p strong{color:var(--ink)}
+    .pg-lab section>h3{font-size:1.05rem;color:var(--ink);margin:0 0 .5rem}
+    code{font-family:var(--mono);font-size:.88em;background:rgba(8,12,22,.6);border:1px solid var(--glass-border);padding:.06em .35em;border-radius:5px;color:var(--ink)}
+    .ui{font-family:var(--body)}
+    .mono{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--ink)}
+    .pg-lab :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+    sub,sup{line-height:0}
+
+    /* ---------- section jump rail (horizontal chips) ---------- */
+    .rail{position:sticky;top:64px;z-index:40;display:flex;gap:6px;overflow-x:auto;white-space:nowrap;align-items:center;
+      margin:0 0 30px;padding:10px 2px;background:linear-gradient(180deg,rgba(5,7,14,.94),rgba(5,7,14,.8));
+      backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-bottom:1px solid var(--glass-border);scrollbar-width:none}
+    .rail::-webkit-scrollbar{display:none}
+    .rail a{flex:none;font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);
+      border:1px solid var(--glass-border-2);border-radius:999px;padding:6px 12px}
+    .rail a:hover{color:var(--ink);border-color:var(--accent)}
+    .rail a.active{color:var(--accent);border-color:rgba(47,212,194,.5);background:var(--accent-soft)}
+
+    /* ---------- masthead ---------- */
+    .masthead-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);gap:28px;align-items:start;margin-top:4px}
+    .basekey{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+    .basekey span{font-family:var(--mono);font-size:.72rem;padding:.4em .7em;border-radius:999px;border:1px solid var(--glass-border-2)}
+    .bk10{color:var(--dec)} .bk2{color:var(--bin)} .bk8{color:var(--oct)} .bk16{color:var(--hex)} .bkA{color:var(--bcd)}
+    .channel{background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+      border:1px solid var(--glass-border);border-radius:var(--radius-lg);overflow:hidden;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.06),var(--shadow)}
+    .channel-head{display:flex;align-items:center;gap:9px;padding:10px 14px;border-bottom:1px solid var(--glass-border);
+      font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+    .channel-head .led{width:9px;height:9px;border-radius:50%;background:var(--led-on);box-shadow:0 0 10px rgba(255,107,107,.7);animation:chpulse 2.4s infinite}
+    @keyframes chpulse{0%,100%{opacity:1}50%{opacity:.35}}
+    .channel-head button{margin-left:auto;background:none;border:1px solid var(--glass-border-2);border-radius:6px;
+      font-family:var(--mono);font-size:.64rem;letter-spacing:.08em;padding:4px 10px;color:var(--ink-2);cursor:pointer}
+    .channel-head button:hover{border-color:var(--accent);color:var(--accent)}
+    .channel-body{padding:14px 16px 16px;font-family:var(--mono)}
+    .channel-dec{font-size:2.2rem;font-weight:600;color:var(--dec);line-height:1.1;font-variant-numeric:tabular-nums}
+    .channel-dec small{font-size:.85rem;color:var(--muted);font-weight:500}
+    .channel-rows{margin-top:10px;display:grid;gap:5px;font-size:.9rem}
+    .channel-rows div{display:flex;justify-content:space-between;gap:14px;border-top:1px dashed var(--glass-border);padding-top:5px}
+    .channel-rows .lab{font-family:var(--body);font-size:.64rem;font-weight:600;letter-spacing:.1em;color:var(--muted);padding-top:3px;text-transform:uppercase}
+
+    /* ---------- instrument panels (glass) ---------- */
+    .panel{background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+      border:1px solid var(--glass-border);border-radius:var(--radius-lg);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.07),var(--shadow);margin:26px 0;overflow:hidden}
+    .panel-head{display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--glass-border);background:rgba(8,12,22,.35)}
+    .panel-head .sq{width:9px;height:9px;border-radius:50%;flex:none;box-shadow:0 0 10px rgba(255,255,255,.3)}
+    .panel-head h3{margin:0;font-family:var(--display);font-size:.95rem;color:var(--ink);font-weight:700;letter-spacing:.01em}
+    .panel-head .ref{margin-left:auto;font-family:var(--mono);font-size:.64rem;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;white-space:nowrap}
+    .panel-body{padding:18px}
+    .panel-body p{color:var(--ink-2);font-size:.9rem;max-width:72ch;margin:0 0 1em}
+
+    /* ---------- controls ---------- */
+    .controls{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:14px}
+    .field{display:flex;flex-direction:column;gap:6px}
+    .field label{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .pg-lab input[type=text]{font-family:var(--mono);font-size:1.05rem;color:var(--ink);background:rgba(8,12,22,.6);
+      border:1px solid var(--glass-border);border-radius:var(--radius);padding:.55em .8em;min-height:46px;min-width:0;
+      transition:border-color .15s ease,box-shadow .15s ease}
+    .pg-lab input[type=text]:hover{border-color:var(--glass-border-2)}
+    .pg-lab input[type=text]:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);outline:none}
+    .pg-lab input[type=range]{accent-color:var(--accent);min-height:30px}
+    .pg-lab select{font-family:var(--body);font-weight:600;font-size:.9rem;color:var(--ink);background:rgba(8,12,22,.6);
+      border:1px solid var(--glass-border);border-radius:var(--radius);padding:.6em .8em;min-height:46px}
+    .pg-lab select:focus{border-color:var(--accent);outline:none}
+    .chk{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);padding:12px 0;cursor:pointer}
+    .chk input{accent-color:var(--accent);width:16px;height:16px;margin:0}
+
+    /* segmented base pickers — pressed color = the base's color */
+    .seg{display:inline-flex;background:rgba(8,12,22,.6);border:1px solid var(--glass-border);border-radius:var(--radius);padding:4px;gap:4px;flex-wrap:wrap}
+    .seg button{font-family:var(--mono);font-weight:600;font-size:.88rem;color:var(--ink-2);background:transparent;border:0;
+      padding:.5em 1em;border-radius:var(--radius-sm);cursor:pointer;min-height:40px;transition:.15s}
+    .seg button:hover{color:var(--ink)}
+    .seg button:focus-visible{outline-offset:-3px}
+    .seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+    .seg button[data-b="2"][aria-pressed="true"]{background:var(--bin)}
+    .seg button[data-b="8"][aria-pressed="true"]{background:var(--oct)}
+    .seg button[data-b="10"][aria-pressed="true"]{background:var(--dec)}
+    .seg button[data-b="16"][aria-pressed="true"]{background:var(--hex)}
+    #arOpSeg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+    /* the two's-complement width picker uses one accent, not base colors */
+    #panel-tc .seg button[aria-pressed="true"]{background:var(--bin);color:var(--on-accent)}
+
+    /* ---------- worked output ---------- */
+    .work{background:rgba(8,12,22,.55);border:1px solid var(--glass-border);border-radius:var(--radius);padding:14px 16px;overflow-x:auto;
+      font-family:var(--mono);font-size:.92rem;line-height:1.9;font-variant-numeric:tabular-nums;color:var(--ink-2)}
+    .work b{color:var(--ink)}
+    .work .faded{color:var(--muted)}
+    .divrow{white-space:nowrap}
+    .divrow .tag{font-family:var(--body);font-size:.6rem;font-weight:700;letter-spacing:.08em;padding:2px 7px;border-radius:5px;margin-left:10px;vertical-align:2px;text-transform:uppercase}
+    .tag-lsb{background:var(--surface-3);color:var(--ink-2)}
+    .tag-msb{background:var(--accent);color:var(--on-accent)}
+    .hiderow{display:none}
+    .dgt{font-weight:600}
+    .b2{color:var(--bin)} .b8{color:var(--oct)} .b10{color:var(--dec)} .b16{color:var(--hex)} .bC{color:var(--bcd)}
+    .work b.b2,.work b.b8,.work b.b10,.work b.b16,.work b.bC{color:inherit}
+    .work b.b2{color:var(--bin)} .work b.b8{color:var(--oct)} .work b.b10{color:var(--dec)} .work b.b16{color:var(--hex)} .work b.bC{color:var(--bcd)}
+    .result-line{border-top:1px solid var(--glass-border-2);margin-top:10px;padding-top:10px;font-size:1.02rem;color:var(--ink)}
+    .err{font-family:var(--body);font-size:.85rem;color:var(--bad);font-weight:500;white-space:normal}
+    .okmark{color:var(--good);font-weight:600}
+    .note{font-family:var(--mono);font-size:.72rem;color:var(--muted);margin-top:10px;white-space:normal}
+    .note b{color:var(--ink-2)}
+
+    /* rule box — the pocket guide's callout palette */
+    .rulebox{background:var(--accent-soft);border:1px solid rgba(47,212,194,.25);border-radius:var(--radius);padding:.85em 1em;margin:22px 0;max-width:70ch}
+    .rulebox .rb-label{font-family:var(--mono);font-size:.64rem;font-weight:600;letter-spacing:.14em;color:var(--accent);text-transform:uppercase;display:block;margin-bottom:4px}
+    .rulebox p{margin:0;font-size:.92rem;color:var(--ink-2)}
+    .rulebox b,.rulebox strong{color:var(--ink)}
+
+    /* group cells (bit grouping / BCD) */
+    .grps{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end}
+    .grp{text-align:center}
+    .grp .bits{font-size:1.1rem;letter-spacing:.12em;border-bottom:2px solid var(--glass-border-2);padding:0 4px 3px}
+    .grp .bits .padbit{color:var(--muted)}
+    .grp .gd{font-size:1.3rem;font-weight:600;padding-top:5px}
+    .grp .gname{font-family:var(--body);font-size:.6rem;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+    .grp.invalid .bits{border-bottom-color:var(--bad)}
+    .grp.invalid .gd{color:var(--bad)}
+
+    /* tables */
+    .tblwrap{overflow-x:auto;border:1px solid var(--glass-border);border-radius:var(--radius);background:rgba(8,12,22,.4)}
+    table.dt{border-collapse:collapse;width:100%;font-family:var(--mono);font-size:.9rem;font-variant-numeric:tabular-nums}
+    table.dt th{font-family:var(--mono);font-size:.66rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;text-align:left;
+      padding:9px 14px;background:rgba(12,17,28,.96);color:var(--ink-2);border-bottom:1px solid var(--glass-border-2);white-space:nowrap}
+    table.dt td{padding:6px 14px;border-bottom:1px solid var(--glass-border);white-space:nowrap;color:var(--ink-2)}
+    table.dt td b{color:var(--ink)}
+    table.dt tr:last-child td{border-bottom:none}
+    table.dt tbody tr:nth-child(even) td{background:rgba(255,255,255,.022)}
+
+    /* converter rows */
+    .convrows{display:grid;gap:8px}
+    .convrow{display:grid;grid-template-columns:88px minmax(0,1fr) auto;gap:12px;align-items:center;
+      background:rgba(8,12,22,.5);border:1px solid var(--glass-border);border-radius:var(--radius);padding:10px 14px}
+    .convrow .lab{font-family:var(--mono);font-size:.66rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+    .convrow .val{font-family:var(--mono);font-size:1.05rem;font-weight:500;overflow-x:auto;white-space:nowrap}
+    .convrow .showwork{font-family:var(--mono);font-size:.64rem;letter-spacing:.06em;text-transform:uppercase;background:none;
+      border:1px solid var(--glass-border-2);border-radius:6px;padding:5px 10px;color:var(--ink-2);white-space:nowrap;cursor:pointer}
+    .convrow .showwork:hover{border-color:var(--accent);color:var(--accent)}
+
+    /* ASCII grid */
+    .ascii-grid{border-collapse:collapse;font-family:var(--mono);font-size:.82rem}
+    .ascii-grid th{font-size:.66rem;font-weight:600;color:var(--muted);padding:4px 6px;background:rgba(12,17,28,.96);position:sticky;top:0;z-index:1}
+    .ascii-grid td{border:1px solid var(--glass-border);padding:0}
+    .ascii-grid button{display:block;width:100%;min-width:52px;background:none;border:none;padding:6px 4px;font-family:inherit;font-size:.86rem;text-align:center;color:var(--ink);cursor:pointer}
+    .ascii-grid button .ctl{font-size:.64rem;color:var(--muted)}
+    .ascii-grid button:hover{background:var(--accent-soft)}
+    .ascii-grid td.sel button{background:var(--accent);color:var(--on-accent)}
+    .ascii-grid td.sel button .ctl{color:var(--on-accent)}
+    .ascii-detail{margin-top:16px}
+
+    /* switch bank (tank monitor) */
+    .bank{display:grid;grid-template-columns:repeat(8,minmax(56px,1fr));gap:10px;max-width:640px}
+    .sw{display:flex;flex-direction:column;align-items:center;gap:7px;background:rgba(8,12,22,.5);border:1px solid var(--glass-border);border-radius:var(--radius);padding:10px 6px}
+    .sw .swled{width:12px;height:12px;border-radius:50%;background:var(--led-off);border:1px solid var(--glass-border-2)}
+    .sw.on .swled{background:var(--led-on);border-color:var(--led-on);box-shadow:0 0 10px var(--led-on)}
+    .sw .swname{font-family:var(--mono);font-size:.8rem;font-weight:600;color:var(--ink)}
+    .sw .swsub{font-family:var(--body);font-size:.58rem;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;text-align:center}
+    .sw button.toggle{width:36px;height:20px;border-radius:999px;border:1px solid var(--glass-border-2);background:rgba(255,255,255,.08);position:relative;cursor:pointer}
+    .sw button.toggle::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--ink);transition:left .12s}
+    .sw.on button.toggle{background:var(--accent);border-color:var(--accent)}
+    .sw.on button.toggle::after{left:18px;background:var(--on-accent)}
+    .alarms{margin-top:14px;font-family:var(--body);font-size:.88rem}
+    .alarms .al{display:flex;gap:8px;align-items:center;padding:3px 0;font-weight:500;color:var(--bad)}
+    .alarms .al::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--bad);flex:none}
+    .alarms .clear{color:var(--good);font-weight:600}
+
+    /* practice */
+    .quiz-q{font-family:var(--mono);font-size:1.15rem;margin:6px 0 14px;color:var(--ink)}
+    .feedback-good{font-family:var(--body);color:var(--good);font-weight:650}
+    .feedback-bad{font-family:var(--body);color:var(--bad);font-weight:650}
+
+    /* ADC canvas */
+    .adc-wrap{position:relative}
+    canvas#adc{width:100%;height:280px;display:block;border-radius:var(--radius);background:rgba(8,12,22,.55);border:1px solid var(--glass-border);cursor:crosshair;touch-action:manipulation}
+    .adc-read{font-family:var(--mono);font-size:.88rem;margin-top:10px;min-height:1.6em;color:var(--ink-2)}
+
+    /* glossary */
+    dl.gloss{max-width:70ch;margin:0}
+    dl.gloss dt{font-family:var(--display);font-weight:700;font-size:.95rem;margin-top:14px;color:var(--ink)}
+    dl.gloss dd{margin:2px 0 0;color:var(--ink-2);font-size:.92rem}
+
+    /* SAR register display */
+    .sarreg{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 14px}
+    .sarreg .rb{display:flex;flex-direction:column;align-items:center;gap:4px}
+    .sarreg .rb .cell{font-family:var(--mono);font-size:1.3rem;font-weight:600;width:46px;height:46px;display:flex;align-items:center;justify-content:center;
+      border:1px dashed var(--glass-border-2);border-radius:var(--radius);color:var(--muted);background:rgba(8,12,22,.5)}
+    .sarreg .rb.decided .cell{border-style:solid;color:var(--ink)}
+    .sarreg .rb.kept .cell{background:var(--bin);border-color:var(--bin);color:var(--on-accent)}
+    .sarreg .rb.testing .cell{border-style:solid;border-color:var(--accent);color:var(--accent)}
+    .sarreg .rb .bw{font-family:var(--mono);font-size:.56rem;color:var(--muted);text-align:center;line-height:1.35}
+
+    /* two's complement bit flipper */
+    .bitflip{display:flex;gap:8px;flex-wrap:wrap}
+    .bitflip .bf{display:flex;flex-direction:column;align-items:center;gap:4px}
+    .bitflip button{font-family:var(--mono);font-size:1.3rem;font-weight:600;width:44px;height:50px;border-radius:var(--radius);
+      border:1px solid var(--glass-border);background:rgba(8,12,22,.5);color:var(--muted);cursor:pointer;transition:.12s}
+    .bitflip button:hover{border-color:var(--accent)}
+    .bitflip button[aria-pressed="true"]{background:var(--bin);border-color:var(--bin);color:var(--on-accent)}
+    .bitflip .bf.sign button[aria-pressed="true"]{background:var(--bad);border-color:var(--bad);color:#fff}
+    .bitflip .bf .bw{font-family:var(--mono);font-size:.56rem;color:var(--muted)}
+    .bf-reads{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .bf-reads .bfr{background:rgba(8,12,22,.5);border:1px solid var(--glass-border);border-radius:var(--radius);padding:8px 14px;
+      font-family:var(--mono);font-size:1.05rem;display:flex;gap:10px;align-items:baseline;font-variant-numeric:tabular-nums}
+    .bf-reads .bfr .lab{font-size:.6rem;font-weight:600;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+
+    /* column arithmetic machine */
+    .colmath{display:flex;margin:4px 0 14px;width:max-content;max-width:100%}
+    .cmcol{display:flex;flex-direction:column;align-items:center;padding:0 6px;border-radius:6px}
+    .cmcol.active{background:var(--surface-3)}
+    .cmcol .cmcarry{font-size:.68em;line-height:1.7;color:var(--warn);min-height:1.7em;font-weight:600;white-space:nowrap}
+    .cmcol .cmd{font-size:1.25rem;line-height:1.5;color:var(--ink)}
+    .cmcol .cmd.dim{color:var(--muted)}
+    .cmcol .cmres{font-size:1.25rem;line-height:1.6;font-weight:600;border-top:2px solid var(--glass-border-2);width:100%;text-align:center;margin-top:2px;padding-top:2px;min-height:1.6em}
+
+    /* ---------- responsive ---------- */
+    @media (max-width:860px){
+      .masthead-grid{grid-template-columns:1fr}
+      /* the site header runs 73px tall once it collapses to the burger */
+      .rail{top:72px}
+    }
+    @media (max-width:760px){
+      .pg-lab section{margin-bottom:46px}
+      .panel-body{padding:14px}
+      .controls{gap:10px}
+      .controls .field{flex:1 1 150px;min-width:0}
+      .controls .field input[type=text]{width:100%;box-sizing:border-box}
+      .work{padding:12px 13px;font-size:.85rem}
+      canvas#adc{height:230px}
+      .convrow{grid-template-columns:52px minmax(0,1fr) auto;gap:8px;padding:9px 11px}
+      .convrow .val{font-size:.95rem}
+      .quiz-q{font-size:1.05rem}
+      .channel-dec{font-size:2rem}
+      .rulebox p{font-size:.9rem}
+    }
+    @media (max-width:640px){
+      .bank{grid-template-columns:repeat(4,minmax(56px,1fr))}
+    }
+    @media (max-width:480px){
+      canvas#adc{height:200px}
+      .work{font-size:.78rem;padding:10px 11px}
+      .seg button{padding:.45em .7em;font-size:.8rem;min-height:38px}
+      table.dt{font-size:.8rem}
+      table.dt th,table.dt td{padding:6px 9px}
+      .grp .bits{font-size:1rem}
+      .grps{gap:10px}
+      .bitflip{gap:5px}
+      .bitflip button{width:34px;height:44px;font-size:1.05rem}
+      .sarreg .rb .cell{width:40px;height:40px;font-size:1.1rem}
+      .bank{gap:7px}
+      .convrow .showwork{padding:3px 7px}
+      .basekey span{font-size:.64rem;padding:.35em .6em}
+      .panel-head{padding:10px 12px}
+      .panel-head .ref{display:none}
+      .cmcol{padding:0 4px}
+      .cmcol .cmd,.cmcol .cmres{font-size:1.05rem}
+    }
+    /* touch devices: bigger targets */
+    @media (pointer:coarse){
+      .ascii-grid button{padding:10px 6px}
+      .sw button.toggle{width:48px;height:28px}
+      .sw button.toggle::after{width:22px;height:22px}
+      .sw.on button.toggle::after{left:22px}
+      .rail a{padding:8px 14px}
+      .convrow .showwork{padding:11px 12px;min-height:40px}
+      .channel-head button{padding:10px 12px;min-height:38px}
+      .seg button{min-width:44px;box-sizing:border-box}
+      .chk{min-height:44px}
+    }
+  </style>
+</head>
+<body>
+<main class="pg-main">
+  <div class="pg-wrap--wide pg-wrap pg-lab">
+
+    <!-- ================= MASTHEAD ================= -->
+    <header class="pg-head" id="s-overview">
+      <a class="pg-back" href="/education/">Field Pocket Guide</a>
+      <h1 class="fv-h2">Numbering Systems</h1>
+      <div class="masthead-grid">
+        <div>
+          <p class="fv-lead">Every digital instrument — data logger, panel meter, PLC, DMM — speaks in 1s and 0s. This lab teaches the four number systems, and the codes built on them, that let you read what the instrument is saying: work the theory, then prove it to yourself in the calculators. Each tool shows the <em>entire</em> chain of work, the way you'd write it by hand.</p>
+          <div class="basekey" aria-hidden="true">
+            <span class="bk10">Base 10 · Decimal</span>
+            <span class="bk2">Base 2 · Binary</span>
+            <span class="bk8">Base 8 · Octal</span>
+            <span class="bk16">Base 16 · Hex</span>
+            <span class="bkA">BCD &amp; ASCII</span>
+          </div>
+        </div>
+        <div class="channel" aria-label="Live readout demo">
+          <div class="channel-head"><span class="led" id="chLed"></span>CH 01 · DATA LOGGER
+            <button id="chPause" aria-label="Pause or resume the live readout">PAUSE</button>
+          </div>
+          <div class="channel-body">
+            <div class="channel-dec"><span id="chDec">72</span><small> DEC</small></div>
+            <div class="channel-rows">
+              <div><span class="lab">BIN</span><span class="b2" id="chBin">0100 1000</span></div>
+              <div><span class="lab">OCT</span><span class="b8" id="chOct">110</span></div>
+              <div><span class="lab">HEX</span><span class="b16" id="chHex">48</span></div>
+              <div><span class="lab">ASCII</span><span class="bC" id="chAsc">'H'</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ================= NAV RAIL ================= -->
+    <nav class="rail" id="rail" aria-label="Sections">
+      <a href="#s-overview">Top</a>
+      <a href="#s-analog">Digital vs. Analog</a>
+      <a href="#s-positional">Positional Notation</a>
+      <a href="#s-binary">Binary</a>
+      <a href="#s-division">Successive Division</a>
+      <a href="#s-octal">Octal</a>
+      <a href="#s-hex">Hex</a>
+      <a href="#s-grouping">Bit Grouping</a>
+      <a href="#s-converter">Converter</a>
+      <a href="#s-arith">Add &amp; Subtract</a>
+      <a href="#s-twoscomp">Two's Complement</a>
+      <a href="#s-bcd">BCD</a>
+      <a href="#s-compare">Side by Side</a>
+      <a href="#s-ascii">ASCII</a>
+      <a href="#s-apps">Instrumentation</a>
+      <a href="#s-practice">Practice</a>
+      <a href="#s-reference">Reference</a>
+    </nav>
+
+    <!-- ================= 1. DIGITAL VS ANALOG ================= -->
+    <section id="s-analog">
+      <span class="fv-eyebrow"><span class="n">01</span> Foundations</span>
+      <h2>Digital versus Analog</h2>
+      <p><strong>Analog</strong> quantities vary continuously: temperature, pressure, flow, velocity, voltage. Nearly everything a transducer measures in the field is analog. <strong>Digital</strong> systems, by contrast, deal only in discrete states — ON and OFF, typically +5&nbsp;V and 0&nbsp;V — which we write as 1 and 0. A digital value is just a string of those two symbols.</p>
+      <p>Why digitize a world that is naturally analog? Because two clean voltage levels are cheap to generate, immune to small noise, and easy to store and transmit. A little noise riding on an analog signal is part of the measurement forever; the same noise on a digital line still reads unambiguously as HIGH or LOW. That is why a data logger converts each sensor's analog voltage through an <strong>analog-to-digital converter (ADC)</strong> before anything else happens — and why the rest of this lab is about reading the binary words an ADC produces.</p>
+      <p>The demo below is the front end of every digital instrument you will ever use. An analog waveform is sampled at regular intervals, and each sample is <em>quantized</em> to the nearest of 2<sup>n</sup> levels, where <em>n</em> is the converter's resolution in bits. Drag the sliders: more samples track the wave more faithfully in <em>time</em>; more bits resolve it more finely in <em>amplitude</em>.</p>
+
+      <div class="panel">
+        <div class="panel-head"><span class="sq" style="background:var(--accent)"></span><h3>ADC Sampling Bench</h3><span class="ref">sample · quantize · encode</span></div>
+        <div class="panel-body">
+          <div class="controls">
+            <div class="field"><label for="adcN">Samples: <span class="mono" id="adcNv">12</span></label><input type="range" id="adcN" min="4" max="24" value="12"></div>
+            <div class="field"><label for="adcB">Resolution: <span class="mono" id="adcBv">4</span> bits (<span class="mono" id="adcLv">16</span> levels)</label><input type="range" id="adcB" min="2" max="6" value="4"></div>
+          </div>
+          <div class="adc-wrap"><canvas id="adc" tabindex="0" role="img" aria-label="Analog waveform being sampled and quantized. Focus the graph and use the arrow keys to step through samples."></canvas></div>
+          <div class="adc-read" id="adcRead" aria-live="polite">Hover, tap, or focus the graph and use ← → to read each sample's code.</div>
+          <div class="note" id="adcStep"></div>
+          <p>The staircase is what the computer "sees." Each step is one sample; its height is the code the ADC stored. An 8-bit converter has 256 levels; a 12-bit converter, 4096; a 16-bit converter, 65 536. Resolution costs money — knowing how many bits you need is an instrumentation decision.</p>
+        </div>
+      </div>
+
+      <h3 style="margin-top:36px">How an ADC actually works</h3>
+      <p>Every ADC, whatever its price tag, performs the same three jobs in sequence:</p>
+      <p><strong>1 — Sample and hold.</strong> A switch briefly connects the input to a small capacitor, then disconnects. The capacitor "freezes" the voltage so it cannot change while it is being measured — like photographing a moving dial instead of trying to read it live.</p>
+      <p><strong>2 — Quantize.</strong> The frozen voltage is compared against a ruler of 2<sup>n</sup> evenly spaced levels and rounded to the nearest one. The spacing of that ruler is the <strong>step size</strong>, also called 1&nbsp;LSB — because moving up exactly one level changes only the last bit of the code.</p>
+      <p><strong>3 — Encode.</strong> The chosen level number is output as an n-bit binary code — exactly the weighted binary of the sections below. From here on, the measurement is just a number.</p>
+      <div class="rulebox"><span class="rb-label">Rule — resolution</span>
+        <p>Step size (1 LSB) = full-scale range ÷ 2<sup>n</sup>. A 0–5 V input on an 8-bit ADC: 5 ÷ 256 = 19.5 mV per step. The rounding in step 2 makes every reading uncertain by up to ±½ LSB — that error is designed in, and the only cure is more bits. (Watch the readout under the graph recompute this as you move the resolution slider.)</p>
+      </div>
+      <p>Timing matters as much as resolution. The sample rate must be at least <em>twice</em> the highest frequency in the signal — the <strong>Nyquist rate</strong> — or the samples tell a false story: a fast wiggle masquerades as a slow one, an effect called <em>aliasing</em>. You can see the beginnings of it in the demo: pull the samples slider down to 4 and the staircase invents a wave shape that isn't there. Real instruments sample several times faster than the minimum and low-pass filter the input first.</p>
+
+      <div class="panel">
+        <div class="panel-head"><span class="sq" style="background:var(--accent)"></span><h3>Four Ways to Build One</h3><span class="ref">architectures</span></div>
+        <div class="panel-body">
+          <p>Different instruments make the "which level?" decision differently. The trade is always speed against precision against cost — and each architecture has a home turf you will recognize.</p>
+          <div class="tblwrap"><table class="dt">
+            <thead><tr><th>Type</th><th>How it decides</th><th>Speed</th><th>You'll find it in</th></tr></thead>
+            <tbody>
+              <tr><td><b>Flash</b></td><td>One comparator per level — all 2ⁿ−1 of them vote at once</td><td>Fastest (ns)</td><td>Oscilloscopes, video capture</td></tr>
+              <tr><td><b>SAR</b></td><td>Binary search: tests one bit per clock tick, MSB first</td><td>Fast (µs)</td><td>Data loggers, DAQ boards, control loops</td></tr>
+              <tr><td><b>Dual-slope</b></td><td>Integrates the input for a fixed time, then times how long a reference takes to discharge the integrator</td><td>Slow (ms)</td><td>Bench DMMs — integrating over a mains cycle rejects 50/60 Hz hum</td></tr>
+              <tr><td><b>Sigma-delta</b></td><td>Oversamples with a 1-bit converter, then averages digitally</td><td>Slow–medium</td><td>Load cells, thermocouple modules, audio</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <p>The <strong>successive-approximation (SAR)</strong> converter is worth opening up, because it runs on this lab's math. Inside is a small DAC and one comparator, playing "higher or lower": starting at the MSB, the logic switches in one binary weight at a time, keeps the bit if the guess is still at or below the input, and clears it if the guess overshoots. After n clock ticks the code is finished. It is the largest-power-of-2 conversion method, executed in silicon.</p>
+
+      <div class="panel" id="panel-sar">
+        <div class="panel-head"><span class="sq" style="background:var(--accent)"></span><h3>Inside a SAR ADC — step through one conversion</h3><span class="ref">4-bit · 0–5 V</span></div>
+        <div class="panel-body">
+          <div class="controls">
+            <div class="field" style="flex:1;min-width:200px"><label for="sarV">Input voltage: <span class="mono" id="sarVv">3.20</span> V</label><input type="range" id="sarV" min="0" max="499" value="320" style="width:100%"></div>
+            <button class="btn btn--primary btn--sm" id="sarStep">Clock ▸</button>
+            <button class="btn btn--ghost btn--sm" id="sarRun">Run all</button>
+            <button class="btn btn--ghost btn--sm" id="sarReset">Reset</button>
+          </div>
+          <div class="sarreg" id="sarReg"></div>
+          <div class="work" id="sarOut"></div>
+          <div class="note">Each register cell is one bit of the answer; the value beneath it is that bit's weight as a voltage (weight × 5 V ÷ 16). Filled = kept, empty = cleared. Four clocks, four decisions, done.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 2. POSITIONAL NOTATION ================= -->
+    <section id="s-positional">
+      <span class="fv-eyebrow"><span class="n">02</span> Foundations</span>
+      <h2>Positional Notation and Weighting Factors</h2>
+      <p>Decimal feels natural only because you have used it since childhood; structurally, it is nothing special. In any positional number system each digit position carries a <strong>weighting factor</strong> equal to the base raised to the position number, counting from 0 at the right. In base 10 the weights are …10³, 10², 10¹, 10⁰ — thousands, hundreds, tens, ones.</p>
+      <p>Read 4623 as a machine would: 4×1000 + 6×100 + 2×10 + 3×1. The digit tells you <em>how many</em>; the position tells you <em>of what</em>. Everything in this lab follows from that single idea — swap the 10 for a 2, an 8, or a 16 and the machinery is identical.</p>
+      <div class="rulebox"><span class="rb-label">Rule — any base → decimal</span>
+        <p>Multiply each digit by its weighting factor (base<sup>position</sup>) and add the products. The least-significant digit of <em>any</em> base always has weight base⁰ = 1.</p>
+      </div>
+      <p>The expander below performs that multiply-and-add for any base — use it now with base 10 to see the familiar system dissected, and come back to it after the binary, octal, and hex sections. It also accepts a radix point: positions to the right of the point take <em>negative</em> powers (base⁻¹, base⁻², …), which is how fractional binary works.</p>
+
+      <div class="panel" id="panel-weighted">
+        <div class="panel-head"><span class="sq" style="background:var(--dec)"></span><h3>Weighted-Sum Expander — any base → decimal</h3><span class="ref">weighted sum</span></div>
+        <div class="panel-body">
+          <div class="controls">
+            <div class="field"><label for="wsIn">Number</label><input type="text" id="wsIn" value="01010110" size="16" spellcheck="false" autocomplete="off"></div>
+            <div class="field"><label id="wsBaseLab">Base</label>
+              <div class="seg" role="group" aria-labelledby="wsBaseLab">
+                <button data-b="2" aria-pressed="true">2</button><button data-b="8" aria-pressed="false">8</button><button data-b="10" aria-pressed="false">10</button><button data-b="16" aria-pressed="false">16</button>
+              </div>
+            </div>
+          </div>
+          <div class="work" id="wsOut"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 3. BINARY ================= -->
+    <section id="s-binary">
+      <span class="fv-eyebrow"><span class="n">03</span> Foundations</span>
+      <h2>Binary — Base 2</h2>
+      <p>Digital electronics settled on <strong>binary</strong> because its two digits, 0 and 1, map directly onto two transistor states: 0&nbsp;V and +5&nbsp;V. Each binary digit is a <strong>bit</strong>. Four bits make a <strong>nibble</strong>, eight make a <strong>byte</strong> — the standard width of a memory location and of most basic ADC outputs.</p>
+      <p>Binary weights are the powers of 2: …128, 64, 32, 16, 8, 4, 2, 1. Memorize the first eight — you will use them constantly. To evaluate a binary number, add the weights wherever a 1 appears: 0101 0110₂ = 64 + 16 + 4 + 2 = 86₁₀. (Try it in the expander above — it is preloaded with exactly that number.)</p>
+      <p>The weights continue <em>past</em> the radix point by successive division: each step down the ladder divides by 2. That ladder is also the cleanest proof that 2⁰ = 1 — it is the rung between 2¹ = 2 and 2⁻¹ = 0.5.</p>
+
+      <div class="panel">
+        <div class="panel-head"><span class="sq" style="background:var(--bin)"></span><h3>The Powers-of-2 Ladder</h3><span class="ref">2⁻⁴ … 2⁷</span></div>
+        <div class="panel-body">
+          <div class="tblwrap"><table class="dt" id="pow2tbl">
+            <thead><tr><th>Power</th><th>Weight</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table></div>
+          <p>Positions left of the point: 2⁰ up through 2⁷ for one byte. Positions right of the point: 2⁻¹ = 0.5, 2⁻² = 0.25, … — seldom used in hardware, but they complete the pattern.</p>
+        </div>
+      </div>
+
+      <div class="rulebox"><span class="rb-label">Terminology</span>
+        <p>The rightmost bit is the <strong>LSB</strong> (least significant bit, weight 2⁰); the leftmost is the <strong>MSB</strong> (most significant bit). Answers are normally padded with leading zeros to a full 4-, 8-, 16-, or 32-bit width — padding never changes the value.</p>
+      </div>
+    </section>
+
+    <!-- ================= 4. SUCCESSIVE DIVISION ================= -->
+    <section id="s-division">
+      <span class="fv-eyebrow"><span class="n">04</span> Conversions</span>
+      <h2>Successive Division — Decimal to Any Base</h2>
+      <p>Going <em>toward</em> decimal, you multiply by weights. Going <em>away</em> from decimal, the universal procedure is <strong>successive division</strong>: divide the decimal number by the target base, keep the whole-number quotient, and write down the remainder. Divide that quotient by the base again. Repeat until the quotient reaches 0.</p>
+      <p>The remainders, read in reverse order, are the answer. The <em>first</em> remainder is the least significant digit — it is what is left over after everything divisible by the base has been carried upward — and the <em>last</em> remainder is the most significant digit. Reversing them is the classic exam mistake; the calculator below labels both ends so the habit sticks.</p>
+      <div class="rulebox"><span class="rb-label">Rule — decimal → any base</span>
+        <p>Divide by the base repeatedly until the quotient is 0. First remainder = LSD, last remainder = MSD. Read the remainders bottom-up. Works for base 2, 8, 16 — any base at all.</p>
+      </div>
+      <p>There is also a calculator-friendly way to pull out each remainder. Your calculator answers 61 ÷ 2 with 30.5 — a decimal, not a quotient-and-remainder pair. No problem: the whole part (30) is the next quotient, and the <em>fractional part times the base</em> recovers the remainder: .5 × 2 = 1. It works in every base: 498 ÷ 16 = 31.125, and .125 × 16 = 2, so the low digit is 2; then 31 ÷ 16 = 1.9375, and .9375 × 16 = 15 = F. The machine below can annotate every line with this shortcut — leave it on until it's second nature.</p>
+      <div class="rulebox"><span class="rb-label">Calculator shortcut</span>
+        <p>Calculator shows: whole part <b>.</b> fraction &nbsp;→&nbsp; remainder = fraction × base. Keep the whole part as the next quotient, convert the fraction, repeat until the display reads 0.</p>
+      </div>
+
+      <div class="panel" id="panel-div">
+        <div class="panel-head"><span class="sq" style="background:var(--bin)"></span><h3>Successive-Division Machine</h3><span class="ref">step through</span></div>
+        <div class="panel-body">
+          <div class="controls">
+            <div class="field"><label for="dvIn">Decimal number</label><input type="text" id="dvIn" value="122" size="10" inputmode="numeric" spellcheck="false" autocomplete="off"></div>
+            <div class="field"><label id="dvBaseLab">Convert to base</label>
+              <div class="seg" role="group" aria-labelledby="dvBaseLab">
+                <button data-b="2" aria-pressed="true">2</button><button data-b="8" aria-pressed="false">8</button><button data-b="16" aria-pressed="false">16</button>
+              </div>
+            </div>
+            <button class="btn btn--primary btn--sm" id="dvStep">Step ▸</button>
+            <button class="btn btn--ghost btn--sm" id="dvAll">Show all</button>
+            <button class="btn btn--ghost btn--sm" id="dvReset">Reset</button>
+            <label class="chk"><input type="checkbox" id="dvCalc" checked> calculator shortcut</label>
+          </div>
+          <div class="work" id="dvOut"></div>
+          <div class="note">Step through division-by-division, exactly as you would write the chain by hand. The check at the end multiplies the answer back out through its weighting factors.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 5. OCTAL ================= -->
+    <section id="s-octal">
+      <span class="fv-eyebrow"><span class="n">05</span> Conversions</span>
+      <h2>Octal — Base 8</h2>
+      <p><strong>Octal</strong> uses the eight digits 0–7, and it exists for one reason: 8 = 2³, so <em>one octal digit is exactly three bits</em>. Long binary strings become short, readable octal with no arithmetic at all — just grouping. Octal shows up in legacy minicomputer documentation, Unix file permissions (<code>chmod 755</code>), and some older PLC addressing schemes.</p>
+      <p>Counting in octal: 0, 1, 2, 3, 4, 5, 6, 7 — and then, with 8 and 9 unavailable, the position resets and carries: 10, 11, 12, … 17, 20. Octal 10 is decimal 8.</p>
+      <p>Three conversions, three tools. Octal → decimal: weighted sum with powers of 8 (the Weighted-Sum Expander above). Decimal → octal: successive division by 8 (the machine above). Octal ↔ binary: pure regrouping — the Bit Grouping Lab below draws the braces for you.</p>
+      <div class="rulebox"><span class="rb-label">Rule — octal ↔ binary</span>
+        <p>Binary → octal: starting at the LSB, mark off groups of <strong>3 bits</strong> (pad the left group with leading zeros) and write each group's octal digit. Octal → binary: replace each octal digit with its 3 bits.</p>
+      </div>
+    </section>
+
+    <!-- ================= 6. HEX ================= -->
+    <section id="s-hex">
+      <span class="fv-eyebrow"><span class="n">06</span> Conversions</span>
+      <h2>Hexadecimal — Base 16</h2>
+      <p><strong>Hexadecimal</strong> is the working language of modern digital instrumentation. Since 16 = 2⁴, one hex digit is exactly four bits — one nibble — so a byte is always two hex characters, a 16-bit register four, a 32-bit word eight. Memory addresses, Modbus register maps, CAN identifiers, and raw sensor payloads are all documented in hex.</p>
+      <p>Sixteen digit symbols are needed and only ten numerals exist, so the alphabet fills in: A=10, B=11, C=12, D=13, E=14, F=15. A hex value is flagged with a subscript 16, a trailing H (2A6H), or the programmer's prefix 0x (0x2A6) — all three mean the same thing.</p>
+      <p>The same three routes apply. Hex → decimal: weighted sum with powers of 16 (2A6₁₆ = 2×256 + 10×16 + 6×1 = 678₁₀). Decimal → hex: successive division by 16 — remainders of 10 through 15 are written A through F. Hex ↔ binary: regroup by fours. Many students find two-step routes through binary (hex → binary → decimal) easier than direct arithmetic; both are valid.</p>
+      <div class="rulebox"><span class="rb-label">Rule — hex ↔ binary</span>
+        <p>Binary → hex: from the LSB, mark off groups of <strong>4 bits</strong> and write each group's hex digit. Hex → binary: each hex digit expands to its 4 bits. A byte is two nibbles: 0111 0000₂ = 70₁₆.</p>
+      </div>
+    </section>
+
+    <!-- ================= 7. GROUPING ================= -->
+    <section id="s-grouping">
+      <span class="fv-eyebrow"><span class="n">07</span> Conversions</span>
+      <h2>Bit Grouping Lab</h2>
+      <p>The regrouping conversions deserve their own bench because they are the ones you will do most often at an instrument. The lab pads the left group for you and dims the padding, so you can see it never changes the value.</p>
+
+      <div class="panel" id="panel-grp">
+        <div class="panel-head"><span class="sq" style="background:var(--oct)"></span><h3>Grouping Visualizer — binary ↔ octal / hex</h3><span class="ref">3s and 4s</span></div>
+        <div class="panel-body">
+          <div class="controls">
+            <div class="field"><label for="grMode">Conversion</label>
+              <select id="grMode">
+                <option value="b2o">binary → octal (groups of 3)</option>
+                <option value="b2h" selected>binary → hex (groups of 4)</option>
+                <option value="o2b">octal → binary</option>
+                <option value="h2b">hex → binary</option>
+              </select>
+            </div>
+            <div class="field"><label for="grIn">Input</label><input type="text" id="grIn" value="10111001" size="20" spellcheck="false" autocomplete="off"></div>
+          </div>
+          <div class="work" id="grOut"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 8. UNIVERSAL CONVERTER ================= -->
+    <section id="s-converter">
+      <span class="fv-eyebrow"><span class="n">08</span> Conversions</span>
+      <h2>Universal Converter</h2>
+      <p>Enter a value in any one system and read it in all of them at once. This is the "answer key" view — but every row has a <em>show the work</em> button that jumps to the right calculator, pre-loaded, so the answer is never divorced from the method. (Master the hand procedures before you trust the hex key on your calculator.)</p>
+
+      <div class="panel" id="panel-conv">
+        <div class="panel-head"><span class="sq" style="background:var(--accent)"></span><h3>All-Bases Converter</h3><span class="ref">answer key</span></div>
+        <div class="panel-body">
+          <div class="controls">
+            <div class="field"><label for="cvIn">Value</label><input type="text" id="cvIn" value="86" size="16" spellcheck="false" autocomplete="off"></div>
+            <div class="field"><label id="cvBaseLab">Interpreted as</label>
+              <div class="seg" role="group" aria-labelledby="cvBaseLab">
+                <button data-b="10" aria-pressed="true">DEC</button><button data-b="2" aria-pressed="false">BIN</button><button data-b="8" aria-pressed="false">OCT</button><button data-b="16" aria-pressed="false">HEX</button>
+              </div>
+            </div>
+          </div>
+          <div class="convrows" id="cvOut"></div>
+          <div class="note" id="cvNote"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 9. ARITHMETIC ================= -->
+    <section id="s-arith">
+      <span class="fv-eyebrow"><span class="n">09</span> Arithmetic</span>
+      <h2>Binary &amp; Hex Arithmetic</h2>
+      <p>Digital systems don't just store numbers — they compute with them, and the arithmetic happens in the machine's own bases. Column addition in base 2 or base 16 works exactly like the addition you learned in grade school; the only thing that changes is <em>when you carry</em>. A column carries when its sum reaches the base — not when it reaches ten.</p>
+      <p>Binary addition needs only four facts: 0+0 = 0, 0+1 = 1, 1+1 = 0 carry 1 (because two is 10₂), and — once carries start rippling — 1+1+1 = 1 carry 1 (three is 11₂). Work right to left, exactly as on paper. That ripple of carries is not just a hand method: it is literally how a ripple-carry adder circuit computes, one full-adder per column, built from logic gates.</p>
+      <p>Hex addition: add the digit <em>values</em> as ordinary decimal numbers; if a column reaches 16, subtract 16 and carry 1. So A + 9 is 10 + 9 = 19 → write 3, carry 1. You will use this constantly in the field — stepping through a register map (base address 4000H + offset 1AH = 401AH) or checking a serial-frame checksum, which in many ASCII protocols is simply the hex sum of the message bytes.</p>
+      <div class="rulebox"><span class="rb-label">Rule — column arithmetic in base b</span>
+        <p>Adding: if a column's sum reaches b, write (sum − b) and carry 1 into the next column. Subtracting: if the top digit is too small, borrow 1 from the next column — it arrives worth b in this one.</p>
+      </div>
+      <p>Subtraction with borrows follows the same column discipline — 0 − 1 borrows a 2 from the next binary column, and a hex borrow arrives worth 16. But long borrow chains are where people (and early computer designers) slip, which is exactly why real hardware subtracts by <em>adding the two's complement</em> instead — the subject of the next section. Learn the borrow method here for hand work and exams; then watch the next section make it unnecessary in silicon.</p>
+
+      <div class="panel" id="panel-ar">
+        <div class="panel-head"><span class="sq" style="background:var(--bin)"></span><h3>Column Arithmetic Machine</h3><span class="ref">carries &amp; borrows</span></div>
+        <div class="panel-body">
+          <div class="controls">
+            <div class="field"><label for="arA">A</label><input type="text" id="arA" value="1011" size="10" spellcheck="false" autocomplete="off"></div>
+            <div class="field"><label id="arOpLab">Op</label>
+              <div class="seg" role="group" aria-labelledby="arOpLab" id="arOpSeg">
+                <button data-b="add" aria-pressed="true">+</button><button data-b="sub" aria-pressed="false">−</button>
+              </div>
+            </div>
+            <div class="field"><label for="arB">B</label><input type="text" id="arB" value="1110" size="10" spellcheck="false" autocomplete="off"></div>
+            <div class="field"><label id="arBaseLab">Base</label>
+              <div class="seg" role="group" aria-labelledby="arBaseLab" id="arBaseSeg">
+                <button data-b="2" aria-pressed="true">2</button><button data-b="16" aria-pressed="false">16</button>
+              </div>
+            </div>
+            <button class="btn btn--primary btn--sm" id="arStep">Step ▸</button>
+            <button class="btn btn--ghost btn--sm" id="arAll">Show all</button>
+            <button class="btn btn--ghost btn--sm" id="arReset">Reset</button>
+            <button class="btn btn--ghost btn--sm" id="arSwap">Swap A ↔ B</button>
+          </div>
+          <div class="work" id="arOut"></div>
+          <div class="note">Columns are worked right to left, one Step per column, with a narration line for each. A carry appears above the next column; a borrow shows as −1 above the column it was taken from.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 10. TWO'S COMPLEMENT ================= -->
+    <section id="s-twoscomp">
+      <span class="fv-eyebrow"><span class="n">10</span> Arithmetic</span>
+      <h2>Two's Complement — Signed Binary</h2>
+      <p>Everything so far has been <em>unsigned</em> — fine for a tank level or a memory address, but instrumentation is full of quantities that swing negative: temperatures below zero, bipolar inputs (±10&nbsp;V), reverse flow, the error term in a control loop. A binary word has no minus key; the sign has to live in the bits themselves.</p>
+      <p>The industry's answer is <strong>two's complement</strong>. Keep every weighting factor from the binary section except one: in an n-bit word, the MSB's weight turns <em>negative</em> — for 8 bits, −128 instead of +128. Any code with the MSB clear is an ordinary positive number; any code with the MSB set is negative. The scheme gives one unambiguous zero, and — the reason it won — the same adder hardware works for both signs, so subtraction comes free.</p>
+      <p>You rarely evaluate that negative weight directly. To <em>negate</em> any value there is a two-step recipe: <strong>invert every bit, then add 1</strong>. Run it on +73 and you get −73; run it again and you are back at +73. Subtraction then disappears as a separate operation: A − B is computed as A + (−B), and any carry out of the MSB is simply discarded.</p>
+      <div class="rulebox"><span class="rb-label">Rule — two's complement</span>
+        <p>Negate = invert all bits, add 1. In an n-bit word the MSB weighs −2<sup>n−1</sup>; the range is −2<sup>n−1</sup> … +2<sup>n−1</sup>−1. MSB = 1 always means negative.</p>
+      </div>
+      <div class="tblwrap" style="max-width:560px;margin:0 0 22px"><table class="dt">
+        <thead><tr><th>Width</th><th>Range</th><th>−1 looks like</th></tr></thead>
+        <tbody>
+          <tr><td>4-bit</td><td>−8 … +7</td><td class="b2">1111</td></tr>
+          <tr><td>8-bit</td><td>−128 … +127</td><td class="b2">1111 1111</td></tr>
+          <tr><td>16-bit</td><td>−32 768 … +32 767</td><td class="b2">1111 1111 1111 1111</td></tr>
+        </tbody>
+      </table></div>
+      <p>Where you will meet it: a bipolar ADC digitizing ±10 V hands you two's-complement codes; a digital temperature sensor reporting −40 °C sends a two's-complement word; every processor's subtract instruction is invert-add-1 under the hood. When a datasheet says <em>signed 16-bit</em>, this is what it means — and note the asymmetry: there is one more negative value than positive, so −128 exists in 8 bits but +128 does not.</p>
+
+      <div class="panel" id="panel-tc">
+        <div class="panel-head"><span class="sq" style="background:var(--bin)"></span><h3>Two's-Complement Lab</h3><span class="ref">signed numbers</span></div>
+        <div class="panel-body">
+          <div class="controls">
+            <div class="field"><label for="tcMode">Operation</label>
+              <select id="tcMode">
+                <option value="enc" selected>decimal → two's complement</option>
+                <option value="dec">binary word → decimal</option>
+                <option value="sub">subtract by adding: A − B</option>
+              </select>
+            </div>
+            <div class="field"><label id="tcWLab">Word width</label>
+              <div class="seg" role="group" aria-labelledby="tcWLab">
+                <button data-b="4" aria-pressed="false">4</button><button data-b="8" aria-pressed="true">8</button><button data-b="16" aria-pressed="false">16</button>
+              </div>
+            </div>
+            <div class="field"><label for="tcIn" id="tcInLab">Decimal value</label><input type="text" id="tcIn" value="-73" size="14" spellcheck="false" autocomplete="off"></div>
+            <div class="field" id="tcBWrap" style="display:none"><label for="tcB">B</label><input type="text" id="tcB" value="53" size="10" spellcheck="false" autocomplete="off"></div>
+          </div>
+          <div class="work" id="tcOut"></div>
+        </div>
+      </div>
+
+      <div class="panel" id="panel-bf">
+        <div class="panel-head"><span class="sq" style="background:var(--bad)"></span><h3>Feel the Sign Bit — flip an 8-bit word</h3><span class="ref">unsigned vs. signed</span></div>
+        <div class="panel-body">
+          <p>The same eight bits, two readings. Click bits on and off: the two interpretations agree completely — until the red sign bit goes high, where unsigned keeps counting up while two's complement dives to −128 and climbs back toward −1.</p>
+          <div class="bitflip" id="bfBits"></div>
+          <div class="bf-reads">
+            <div class="bfr"><span class="lab">UNSIGNED</span><span class="b10" id="bfU">0</span></div>
+            <div class="bfr"><span class="lab">2'S COMP</span><span class="b10" id="bfS">0</span></div>
+            <div class="bfr"><span class="lab">HEX</span><span class="b16" id="bfH">00</span></div>
+          </div>
+          <div class="note" id="bfNote">Sign bit low: both interpretations agree.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 11. BCD ================= -->
+    <section id="s-bcd">
+      <span class="fv-eyebrow"><span class="n">11</span> Codes</span>
+      <h2>Binary-Coded Decimal</h2>
+      <p><strong>BCD</strong> is not a number system — it is a <em>code</em>. Each decimal digit is written as its own 4-bit group: 496 becomes 0100&nbsp;1001&nbsp;0110. No division, no weighting across groups; digit by digit, done. That makes BCD ideal for driving numeric displays — digital voltmeters, panel thermometers, clocks — where each nibble feeds one seven-segment digit directly.</p>
+      <p>The cost is efficiency: pure binary stores 496 in 9 bits, BCD needs 12. And only nibbles 0000–1001 are legal. The six patterns 1010 through 1111 (10–15) are <strong>invalid BCD</strong> — if a display driver receives one, something upstream is broken. The decoder below flags them — a classic display-driver failure mode.</p>
+
+      <div class="panel" id="panel-bcd">
+        <div class="panel-head"><span class="sq" style="background:var(--bcd)"></span><h3>BCD Encoder / Decoder</h3><span class="ref">digit by digit</span></div>
+        <div class="panel-body">
+          <div class="controls">
+            <div class="field"><label for="bcdMode">Direction</label>
+              <select id="bcdMode">
+                <option value="enc" selected>decimal → BCD</option>
+                <option value="dec">BCD → decimal</option>
+              </select>
+            </div>
+            <div class="field"><label for="bcdIn">Input</label><input type="text" id="bcdIn" value="496" size="22" spellcheck="false" autocomplete="off"></div>
+            <button class="btn btn--ghost btn--sm" id="bcdBad">Load an invalid code</button>
+          </div>
+          <div class="work" id="bcdOut"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 12. COMPARISON ================= -->
+    <section id="s-compare">
+      <span class="fv-eyebrow"><span class="n">12</span> Codes</span>
+      <h2>The Systems Side by Side</h2>
+      <p>Counting is where the systems' personalities show. Watch where each column "rolls over": binary at every power of 2, octal after 7, hex after F, and BCD — the impostor — after 9, because it mirrors decimal digit-for-digit. Notice too that BCD and binary agree perfectly from 0 through 9 and then permanently part ways at 10.</p>
+      <div class="panel">
+        <div class="panel-head"><span class="sq" style="background:var(--dec)"></span><h3>Counting Table</h3><span class="ref">roll-overs</span></div>
+        <div class="panel-body">
+          <div class="controls">
+            <div class="field"><label for="cmpN">Count 0 through <span class="mono" id="cmpNv">20</span></label><input type="range" id="cmpN" min="15" max="64" value="20"></div>
+          </div>
+          <div class="tblwrap"><table class="dt" id="cmpTbl">
+            <thead><tr><th class="b10">Decimal</th><th class="b2">Binary</th><th class="b8">Octal</th><th class="b16">Hex</th><th class="bC">BCD</th></tr></thead>
+            <tbody></tbody>
+          </table></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 13. ASCII ================= -->
+    <section id="s-ascii">
+      <span class="fv-eyebrow"><span class="n">13</span> Codes</span>
+      <h2>The ASCII Code</h2>
+      <p>Numbers are not enough — instruments must also move <em>alphanumeric</em> data: unit labels, part numbers, error messages, commands. The industry's I/O code is <strong>ASCII</strong> (American Standard Code for Information Interchange): 7 bits per character, 2⁷ = 128 combinations covering letters, numerals, punctuation, and 33 control characters. In memory each code is normally padded to 8 bits with a leading 0 (the eighth bit is sometimes a parity bit instead).</p>
+      <p>ASCII is everywhere in instrumentation. A bench meter answering a SCPI query over RS-232 or USB replies in ASCII text; when a DMM sends <code>MEAS:VOLT?</code> results back as <code>+1.2345E+00</code>, every one of those characters is a 7-bit code from this table. Reading a raw serial capture in hex and recognizing <code>0x41</code>–<code>0x5A</code> as capital letters is a genuinely useful field skill.</p>
+      <p>A code is assembled from the table as <em>column bits then row bits</em>: the 3-bit column group is the MSB side, the 4-bit row group the LSB side. G sits in column 100, row 0111 → 100&nbsp;0111. Click any cell to see the assembly; note the elegant structure — <code>0</code>–<code>9</code> are 011&nbsp;0000 through 011&nbsp;1001 (hex 30–39), and upper/lowercase letters differ by exactly one bit (bit 5).</p>
+
+      <div class="panel" id="panel-atable">
+        <div class="panel-head"><span class="sq" style="background:var(--bcd)"></span><h3>ASCII Table — click a character</h3><span class="ref">7-bit code</span></div>
+        <div class="panel-body">
+          <div class="tblwrap" style="max-height:420px;overflow-y:auto"><table class="ascii-grid" id="aTbl"></table></div>
+          <div class="ascii-detail work" id="aDet">Click a character above to break its code apart.</div>
+        </div>
+      </div>
+
+      <div class="panel" id="panel-astr">
+        <div class="panel-head"><span class="sq" style="background:var(--bcd)"></span><h3>Text → ASCII Encoder</h3><span class="ref">SCPI-friendly</span></div>
+        <div class="panel-body">
+          <div class="controls">
+            <div class="field" style="flex:1;min-width:220px"><label for="asIn">Text (a SCPI command, a part number…)</label><input type="text" id="asIn" value="MEAS:VOLT?" maxlength="24" spellcheck="false" autocomplete="off" style="width:100%"></div>
+          </div>
+          <div class="tblwrap"><table class="dt" id="asOut">
+            <thead><tr><th>Char</th><th class="b2">7-bit</th><th class="b2">8-bit (padded)</th><th class="b16">Hex</th><th class="b10">Dec</th><th class="b8">Oct</th></tr></thead>
+            <tbody></tbody>
+          </table></div>
+          <div class="note" id="asNote"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 14. APPLICATIONS ================= -->
+    <section id="s-apps">
+      <span class="fv-eyebrow"><span class="n">14</span> Apply</span>
+      <h2>Applications in Instrumentation</h2>
+      <p>Which system you use depends on how the data were produced and where they are going. An ADC hands you raw binary; a technician reads it back as hex because bytes chunk cleanly into two characters; a BCD word drives a numeric display; ASCII carries text over a serial link. The classic teaching example ties them all together: a monitoring computer watching alarm contacts.</p>
+      <p>A geothermal plant monitors the temperature (T) and pressure (P) of four storage tanks, A through D. Each sensor drives one bit of an 8-bit status word — 1 means <em>danger limit exceeded</em>, 0 means OK. The computer reads the word; the technician must interpret it. Flip the sensors below, or load one of the preset fault codes, and read the same status word all four ways.</p>
+
+      <div class="panel" id="panel-tank">
+        <div class="panel-head"><span class="sq" style="background:var(--warn)"></span><h3>Tank-Farm Alarm Monitor</h3><span class="ref">8-bit status word</span></div>
+        <div class="panel-body">
+          <div class="controls">
+            <button class="btn btn--ghost btn--sm" data-preset="0">All clear</button>
+            <button class="btn btn--ghost btn--sm" data-preset="40">0010 1000₂</button>
+            <button class="btn btn--ghost btn--sm" data-preset="85">55H</button>
+            <button class="btn btn--ghost btn--sm" data-preset="204">CCH</button>
+            <button class="btn btn--ghost btn--sm" data-preset="12">0CH</button>
+            <button class="btn btn--ghost btn--sm" data-preset="170">AAH</button>
+          </div>
+          <div class="bank" id="tkBank"></div>
+          <div class="convrows" style="margin-top:16px;max-width:640px" id="tkRead"></div>
+          <div class="alarms" id="tkAlarms"></div>
+          <div class="note">Bit order (MSB → LSB): P<sub>D</sub> T<sub>D</sub> P<sub>C</sub> T<sub>C</sub> P<sub>B</sub> T<sub>B</sub> P<sub>A</sub> T<sub>A</sub>. A reading of 55H = 0101 0101 sets every T bit — all four temperatures high.</div>
+        </div>
+      </div>
+
+      <p>Two more patterns worth carrying with you. <strong>BCD at the display:</strong> a three-digit panel thermometer needs 12 bits, four per digit — 147°F arrives as 0001&nbsp;0100&nbsp;0111. <strong>Hex at the memory map:</strong> a 20-bit address bus reaches 2²⁰ ≈ one million locations, written as exactly five hex characters, 00000H–FFFFFH. Every register map and datasheet you read from here on assumes you can move between these representations without friction.</p>
+    </section>
+
+    <!-- ================= 15. PRACTICE ================= -->
+    <section id="s-practice">
+      <span class="fv-eyebrow"><span class="n">15</span> Apply</span>
+      <h2>Practice</h2>
+      <p>Randomly generated problems in the classic textbook forms. Answer in the box — spacing and leading zeros don't matter, hex is case-insensitive — then check yourself. Every problem can show its full worked solution using the same layouts as the calculators above.</p>
+
+      <div class="panel" id="panel-quiz">
+        <div class="panel-head"><span class="sq" style="background:var(--good)"></span><h3>Problem Generator</h3><span class="ref">17 problem types</span></div>
+        <div class="panel-body">
+          <div class="controls">
+            <div class="field"><label for="qType">Problem type</label>
+              <select id="qType">
+                <option value="any" selected>Mixed (any type)</option>
+                <option value="d2b">decimal → binary</option>
+                <option value="d2o">decimal → octal</option>
+                <option value="d2h">decimal → hex</option>
+                <option value="b2d">binary → decimal</option>
+                <option value="o2d">octal → decimal</option>
+                <option value="h2d">hex → decimal</option>
+                <option value="b2o">binary → octal</option>
+                <option value="b2h">binary → hex</option>
+                <option value="badd">binary addition</option>
+                <option value="bsub">binary subtraction</option>
+                <option value="hadd">hex addition</option>
+                <option value="hsub">hex subtraction</option>
+                <option value="d2bcd">decimal → BCD</option>
+                <option value="bcd2d">BCD → decimal</option>
+                <option value="d2tc">decimal → two's complement</option>
+                <option value="tc2d">two's complement → decimal</option>
+                <option value="ascii">ASCII lookup</option>
+              </select>
+            </div>
+            <button class="btn btn--primary btn--sm" id="qNew">New problem</button>
+          </div>
+          <div class="quiz-q" id="qText"></div>
+          <div class="controls">
+            <div class="field"><label for="qAns">Your answer</label><input type="text" id="qAns" size="24" spellcheck="false" autocomplete="off"></div>
+            <button class="btn btn--primary btn--sm" id="qCheck">Check</button>
+            <button class="btn btn--ghost btn--sm" id="qShow">Show the work</button>
+          </div>
+          <div id="qFeed" class="ui" style="min-height:1.5em;font-size:.95rem"></div>
+          <div class="work hiderow" id="qWork" style="margin-top:12px"></div>
+          <div class="note">Score this session: <span class="mono" id="qScore">0 correct · 0 attempted</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 16. REFERENCE ================= -->
+    <section id="s-reference">
+      <span class="fv-eyebrow"><span class="n">16</span> Apply</span>
+      <h2>Reference</h2>
+
+      <div class="panel">
+        <div class="panel-head"><span class="sq" style="background:var(--ink-3)"></span><h3>Powers of 8 and 16</h3><span class="ref">weights</span></div>
+        <div class="panel-body">
+          <div class="tblwrap"><table class="dt">
+            <thead><tr><th>n</th><th class="b8">8ⁿ</th><th class="b16">16ⁿ</th><th class="b2">2ⁿ</th></tr></thead>
+            <tbody id="powTbl"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:30px">Glossary</h3>
+      <dl class="gloss">
+        <dt>Analog</dt><dd>A quantity or system that varies continuously — temperature, pressure, voltage. Infinitely many in-between values.</dd>
+        <dt>Digital</dt><dd>A quantity or system restricted to discrete states; in electronics, the two states HIGH and LOW, written 1 and 0.</dd>
+        <dt>ADC / DAC</dt><dd>Analog-to-digital converter / digital-to-analog converter. The ADC quantizes a sensor voltage into an n-bit binary code; the DAC reverses the process.</dd>
+        <dt>Base (radix)</dt><dd>The number of distinct digit symbols in a positional number system, and the multiplier between adjacent position weights.</dd>
+        <dt>Bit · Nibble · Byte · Word</dt><dd>One binary digit · four bits · eight bits · the natural data width of a processor (16, 32, or 64 bits today).</dd>
+        <dt>Weighting factor</dt><dd>The value of a digit position: base raised to the position number. The rightmost integer position of every system weighs base⁰ = 1.</dd>
+        <dt>LSB / MSB (LSD / MSD)</dt><dd>Least / most significant bit of a binary string — the lowest and highest weighted positions. LSD/MSD are the digit equivalents in any base.</dd>
+        <dt>Successive division</dt><dd>The decimal-to-any-base procedure: divide by the base until the quotient is zero and read the remainders in reverse.</dd>
+        <dt>BCD</dt><dd>Binary-coded decimal: each decimal digit encoded independently as 4 bits. Nibbles 1010–1111 are invalid. Used to drive numeric displays.</dd>
+        <dt>ASCII</dt><dd>The 7-bit alphanumeric I/O code (128 characters) used to move text into, out of, and between digital systems.</dd>
+        <dt>Alphanumeric</dt><dd>Data containing letters and symbols as well as numerals.</dd>
+        <dt>Quantization / resolution</dt><dd>Rounding a sampled analog value to the nearest of 2ⁿ levels; n bits of resolution divide the input range into 2ⁿ steps of (full scale ÷ 2ⁿ) each, with a built-in uncertainty of ±½ step.</dd>
+        <dt>Nyquist rate</dt><dd>The minimum sampling rate — twice the highest frequency present in the signal — below which samples alias into false, slower waveforms.</dd>
+        <dt>SAR (successive approximation)</dt><dd>The workhorse mid-speed ADC architecture: an internal DAC binary-searches the input one bit per clock, MSB first, using the binary weighting factors directly.</dd>
+        <dt>Carry / borrow</dt><dd>The overflow between adjacent columns in positional arithmetic. A column carries 1 outward when its sum reaches the base; a borrow taken from the next column arrives worth one whole base (2 in binary, 16 in hex).</dd>
+        <dt>Two's complement</dt><dd>The standard signed-binary code: the MSB carries weight −2ⁿ⁻¹, so an 8-bit word spans −128 … +127. Negate any value by inverting every bit and adding 1.</dd>
+        <dt>Parity bit</dt><dd>An extra bit appended to a code word (often ASCII's eighth bit) making the count of 1s even or odd, to detect single-bit transmission errors.</dd>
+      </dl>
+
+      <p class="pg-tablenote" style="margin-top:26px">An interactive study lab for number systems and digital codes. Every calculation runs locally in your browser — nothing leaves your device. A working aid for coursework and the field, not a substitute for either.</p>
+    </section>
+
+  </div>
+</main>
+<script src="/education/assets/pocketguide.js"></script>
+<script>
+(function(){
+"use strict";
+
+/* ============ utilities ============ */
+const $ = (s,el)=> (el||document).querySelector(s);
+const $$ = (s,el)=> Array.from((el||document).querySelectorAll(s));
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const BASECLS = {2:'b2', 8:'b8', 10:'b10', 16:'b16'};
+const BASENAME = {2:'binary', 8:'octal', 10:'decimal', 16:'hexadecimal'};
+const SUBS = {2:'₂', 8:'₈', 10:'₁₀', 16:'₁₆'};
+
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function groupBits(s, n, sep){ // group string s from the right in chunks of n
+  n = n||4; sep = sep||' ';
+  let out=[], i=s.length;
+  while(i>0){ out.unshift(s.slice(Math.max(0,i-n), i)); i-=n; }
+  return out.join(sep);
+}
+function padTo(s, mult){ const r = s.length % mult; return r ? '0'.repeat(mult-r)+s : s; }
+function digitChar(v){ return v.toString(16).toUpperCase(); }
+function validDigits(base){
+  return base===2 ? '01' : base===8 ? '01234567' : base===10 ? '0123456789' : '0123456789ABCDEF';
+}
+function parseIn(raw, base){
+  // returns {ok, clean, val, err}
+  const clean = raw.replace(/\s+/g,'').toUpperCase().replace(/^0X/,'');
+  if(!clean.length) return {ok:false, err:'Enter a number.'};
+  const ok = validDigits(base);
+  for(const ch of clean){
+    if(ok.indexOf(ch)<0) return {ok:false, err:BASENAME[base][0].toUpperCase()+BASENAME[base].slice(1)+' uses only the digits '+
+      (base===16?'0–9 and A–F':ok.split('').join(', '))+' — remove “'+esc(ch)+'”.'};
+  }
+  const maxLen = {2:32, 8:10, 10:10, 16:8}[base];
+  if(clean.length>maxLen) return {ok:false, err:'Keep it to '+maxLen+' '+(base===2?'bits':'digits')+' or fewer for this tool.'};
+  return {ok:true, clean, val: parseInt(clean, base)};
+}
+function sup(n){ return '<sup>'+n+'</sup>'; }
+function subTag(b){ return '<sub>'+b+'</sub>'; }
+function fmtInBase(v, b){
+  const s = v.toString(b).toUpperCase();
+  return b===2 ? groupBits(padTo(s, s.length>4?4:s.length===0?4:Math.min(4, Math.max(1,s.length))),4) : s;
+}
+
+/* segmented base pickers */
+function wireSeg(container, onPick){
+  const btns = $$('button', container);
+  btns.forEach(b=> b.addEventListener('click', ()=>{
+    btns.forEach(x=> x.setAttribute('aria-pressed', x===b ? 'true':'false'));
+    onPick(b.dataset.b);
+  }));
+  return {
+    get: ()=> btns.find(b=> b.getAttribute('aria-pressed')==='true').dataset.b,
+    set: (v)=> { btns.forEach(x=> x.setAttribute('aria-pressed', x.dataset.b===String(v) ? 'true':'false')); }
+  };
+}
+
+/* ============ masthead live channel ============ */
+let chVal = 72, chOn = !REDUCED;
+const chPause = $('#chPause');
+function chRender(){
+  $('#chDec').textContent = chVal;
+  $('#chBin').textContent = groupBits(chVal.toString(2).padStart(8,'0'));
+  $('#chOct').textContent = chVal.toString(8);
+  $('#chHex').textContent = chVal.toString(16).toUpperCase().padStart(2,'0');
+  $('#chAsc').textContent = (chVal>=32 && chVal<127) ? "'"+String.fromCharCode(chVal)+"'" : '—';
+}
+function chTick(){ if(!chOn) return; chVal = chVal>=126 ? 32 : chVal+1; chRender(); }
+setInterval(chTick, 2400);
+function chSync(){ chPause.textContent = chOn ? 'PAUSE':'RUN'; $('#chLed').style.animationPlayState = chOn?'running':'paused'; $('#chLed').style.opacity = chOn?'':'0.35'; }
+chPause.addEventListener('click', ()=>{ chOn=!chOn; chSync(); });
+chRender(); chSync();
+
+/* ============ ADC demo ============ */
+const adc = $('#adc'), adcCtx = adc.getContext('2d');
+const adcN = $('#adcN'), adcB = $('#adcB');
+let adcSel = -1;
+function wave(t){ return 0.5 + 0.32*Math.sin(2*Math.PI*(t*1.3)+0.6) + 0.13*Math.sin(2*Math.PI*(t*3.1)); }
+function cssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+function drawADC(){
+  const dpr = window.devicePixelRatio||1;
+  const W = adc.clientWidth, H = adc.clientHeight;
+  if(!W) return;
+  adc.width = W*dpr; adc.height = H*dpr;
+  adcCtx.setTransform(dpr,0,0,dpr,0,0);
+  adcCtx.clearRect(0,0,W,H);
+  const N = +adcN.value, bits = +adcB.value, L = 1<<bits;
+  const padL = 56, padR = 12, padB = 16;
+  const iw = W-padL-padR;
+  // codes must never disappear: pick a label orientation that fits the density
+  adcCtx.font = '10px "IBM Plex Mono", monospace';
+  const labW = adcCtx.measureText('0'.repeat(bits)).width;
+  const per = iw/N;
+  const labelMode = per >= labW+8 ? 'h' : (2*per >= labW+10 ? 's' : 'v');
+  const padT = labelMode==='v' ? Math.min(H*0.42, labW+16) : (labelMode==='s' ? 36 : 26);
+  const ih = H-padT-padB;
+  const X = t=> padL + t*iw;
+  const Y = v=> padT + (1-v)*ih;
+  const ink3 = cssVar('--ink-3'), line = cssVar('--line'), ink2 = cssVar('--ink-2');
+  const accent = cssVar('--accent'), bin = cssVar('--dec');
+  // level grid — axis labels always drawn, thinned as resolution grows
+  adcCtx.textAlign = 'right'; adcCtx.textBaseline = 'middle';
+  const every = L<=16 ? 1 : L/8;
+  for(let l=0;l<L;l+=every){
+    const v = (l+0.5)/L;
+    adcCtx.strokeStyle = line; adcCtx.lineWidth = 1;
+    adcCtx.beginPath(); adcCtx.moveTo(padL, Y(v)); adcCtx.lineTo(W-padR, Y(v)); adcCtx.stroke();
+    adcCtx.fillStyle = ink3;
+    adcCtx.fillText(l.toString(2).padStart(bits,'0'), padL-6, Y(v));
+  }
+  // analog curve
+  adcCtx.strokeStyle = ink2; adcCtx.lineWidth = 1.75;
+  adcCtx.beginPath();
+  for(let i=0;i<=iw;i++){ const t=i/iw, y=Y(Math.min(.98,Math.max(.02,wave(t)))); i?adcCtx.lineTo(padL+i,y):adcCtx.moveTo(padL+i,y); }
+  adcCtx.stroke();
+  // pass 1: staircase + sample dots
+  const samples=[];
+  for(let i=0;i<N;i++){
+    const t=(i+0.5)/N, v=Math.min(.98,Math.max(.02,wave(t)));
+    const code=Math.min(L-1, Math.floor(v*L));
+    const qv=(code+0.5)/L;
+    samples.push({t,v,code,qv});
+    adcCtx.strokeStyle=accent; adcCtx.lineWidth = i===adcSel?3.5:2.25;
+    adcCtx.beginPath(); adcCtx.moveTo(X(i/N), Y(qv)); adcCtx.lineTo(X((i+1)/N), Y(qv)); adcCtx.stroke();
+    adcCtx.fillStyle = i===adcSel?accent:bin;
+    adcCtx.beginPath(); adcCtx.arc(X(t), Y(v), i===adcSel?4.5:3, 0, 7); adcCtx.fill();
+  }
+  // pass 2: code labels on top, in whichever orientation fits
+  const vfont = (labelMode==='v' && per<13) ? '9px "IBM Plex Mono", monospace' : '10px "IBM Plex Mono", monospace';
+  samples.forEach((s,i)=>{
+    const codeTxt = s.code.toString(2).padStart(bits,'0');
+    adcCtx.fillStyle = i===adcSel?accent:ink3;
+    if(labelMode==='h'){
+      adcCtx.font='10px "IBM Plex Mono", monospace'; adcCtx.textAlign='center'; adcCtx.textBaseline='alphabetic';
+      adcCtx.fillText(codeTxt, X(s.t), Y(s.qv)-8);
+    } else if(labelMode==='s'){
+      adcCtx.font='10px "IBM Plex Mono", monospace'; adcCtx.textAlign='center'; adcCtx.textBaseline='alphabetic';
+      adcCtx.fillText(codeTxt, X(s.t), Y(s.qv)-(i%2? 8 : 20));
+    } else {
+      adcCtx.save();
+      adcCtx.font=vfont; adcCtx.textAlign='left'; adcCtx.textBaseline='middle';
+      adcCtx.translate(X(s.t), Math.max(labW+6, Y(s.qv)-7));
+      adcCtx.rotate(-Math.PI/2);
+      adcCtx.fillText(codeTxt, 0, 0);
+      adcCtx.restore();
+    }
+  });
+  adcCtx.textAlign='right'; adcCtx.textBaseline='middle';
+}
+function adcStepInfo(){
+  const bits=+adcB.value, L=1<<bits, step=5/L;
+  $('#adcStep').innerHTML = 'This converter: 0–5 V full scale · '+L+' levels · 1 LSB = '
+    +(step>=0.1 ? (+step.toFixed(4))+' V' : (step*1000).toFixed(1)+' mV')
+    +' · worst-case quantization error ±'+(step*500).toFixed(1)+' mV';
+}
+function adcReadout(){
+  const N=+adcN.value, bits=+adcB.value, L=1<<bits;
+  if(adcSel<0 || adcSel>=N){ $('#adcRead').textContent='Hover, tap, or focus the graph and use ← → to read each sample’s code.'; return; }
+  const t=(adcSel+0.5)/N, v=Math.min(.98,Math.max(.02,wave(t)));
+  const code=Math.min(L-1, Math.floor(v*L));
+  $('#adcRead').innerHTML = 'Sample '+(adcSel+1)+' of '+N+' &nbsp;→&nbsp; analog level '+(v*5).toFixed(2)+'&nbsp;V of 5&nbsp;V'
+    +' &nbsp;→&nbsp; quantized to level '+code+' of '+L
+    +' &nbsp;→&nbsp; code <b class="b2">'+code.toString(2).padStart(bits,'0')+'</b>';
+}
+function adcPick(ev){
+  const r=adc.getBoundingClientRect();
+  const x=(ev.clientX-r.left), N=+adcN.value;
+  const padL=56, padR=12;
+  const t=(x-padL)/(r.width-padL-padR);
+  adcSel = (t>=0&&t<=1) ? Math.min(N-1, Math.max(0, Math.floor(t*N))) : -1;
+  drawADC(); adcReadout();
+}
+adc.addEventListener('mousemove', adcPick);
+adc.addEventListener('click', adcPick);
+adc.addEventListener('mouseleave', ()=>{ adcSel=-1; drawADC(); adcReadout(); });
+adc.addEventListener('keydown', e=>{
+  if(e.key!=='ArrowRight' && e.key!=='ArrowLeft') return;
+  e.preventDefault();
+  const N=+adcN.value;
+  adcSel = adcSel<0 ? 0 : Math.min(N-1, Math.max(0, adcSel + (e.key==='ArrowRight'?1:-1)));
+  drawADC(); adcReadout();
+});
+adc.addEventListener('blur', ()=>{ adcSel=-1; drawADC(); adcReadout(); });
+adcN.addEventListener('input', ()=>{ $('#adcNv').textContent=adcN.value; adcSel=-1; drawADC(); adcReadout(); });
+adcB.addEventListener('input', ()=>{ $('#adcBv').textContent=adcB.value; $('#adcLv').textContent=(1<<+adcB.value); adcSel=-1; drawADC(); adcReadout(); adcStepInfo(); });
+new ResizeObserver(()=>drawADC()).observe(adc.parentElement);
+adcStepInfo();
+
+/* ============ SAR ADC step-through ============ */
+const SAR_BITS=4, SAR_FS=5;
+const sarV=$('#sarV');
+let sarState;
+function sarVin(){ return (+sarV.value)/100; }
+function fmtV(x){ return (+x.toFixed(4)).toString(); }
+function sarInit(){
+  sarState={i:SAR_BITS-1, bits:Array(SAR_BITS).fill(null), rows:[], acc:0, done:false};
+  sarRender();
+}
+function sarStepOnce(){
+  if(sarState.done) return;
+  const k = sarState.i;
+  const Vin = sarVin();
+  const w = SAR_FS*Math.pow(2,k)/Math.pow(2,SAR_BITS);
+  const trial = sarState.acc + w;
+  const keep = Vin >= trial;
+  sarState.bits[SAR_BITS-1-k] = keep?1:0;
+  if(keep) sarState.acc = trial;
+  sarState.rows.push({k, w, trial, keep, Vin});
+  sarState.i--;
+  if(sarState.i<0) sarState.done=true;
+  sarRender();
+}
+function sarRender(){
+  let reg='';
+  for(let idx=0; idx<SAR_BITS; idx++){
+    const k=SAR_BITS-1-idx;
+    const b=sarState.bits[idx];
+    const testing = !sarState.done && k===sarState.i;
+    const cls='rb'+(b!==null?' decided'+(b===1?' kept':''):'')+(testing?' testing':'');
+    const w=SAR_FS*Math.pow(2,k)/Math.pow(2,SAR_BITS);
+    reg+='<div class="'+cls+'"><div class="cell">'+(b===null?(testing?'?':'·'):b)+'</div><div class="bw">2'+sup(k)+'<br>'+fmtV(w)+' V</div></div>';
+  }
+  $('#sarReg').innerHTML=reg;
+  let html='';
+  if(!sarState.rows.length){
+    html='<div class="faded">Input sampled and held at '+sarVin().toFixed(2)+' V. Press Clock to test the MSB.</div>';
+  }
+  sarState.rows.forEach(r=>{
+    html+='<div class="divrow">bit '+r.k+': try +'+fmtV(r.w)+' V → DAC guesses '+fmtV(r.trial)+' V. Is '
+      +r.Vin.toFixed(2)+' V ≥ that? '
+      +(r.keep?'<b class="okmark">YES → keep the 1</b>':'<b style="color:var(--bad)">NO → clear to 0</b>')+'</div>';
+  });
+  if(sarState.done){
+    const code=sarState.bits.join('');
+    const step=SAR_FS/Math.pow(2,SAR_BITS);
+    html+='<div class="result-line">Done in '+SAR_BITS+' clocks: code <b class="b2">'+code+'</b> &nbsp;·&nbsp; DAC settled at '
+      +fmtV(sarState.acc)+' V — within 1 LSB ('+fmtV(step)+' V) of the input <span class="okmark">✓</span></div>';
+  }
+  $('#sarOut').innerHTML=html;
+}
+$('#sarStep').addEventListener('click', sarStepOnce);
+$('#sarRun').addEventListener('click', ()=>{ if(sarState.done) sarInit(); while(!sarState.done) sarStepOnce(); });
+$('#sarReset').addEventListener('click', sarInit);
+sarV.addEventListener('input', ()=>{ $('#sarVv').textContent=sarVin().toFixed(2); sarInit(); });
+sarInit();
+
+/* ============ weighted-sum expander ============ */
+const wsIn = $('#wsIn'), wsOut = $('#wsOut');
+const wsSeg = wireSeg($('#panel-weighted .seg'), ()=> renderWS());
+function renderWS(){
+  const base = +wsSeg.get();
+  const raw = wsIn.value;
+  const cls = BASECLS[base];
+  let s = raw.replace(/\s+/g,'').toUpperCase().replace(/^0X/,'');
+  if(!s){ wsOut.innerHTML='<span class="err">Enter a number.</span>'; return; }
+  const parts = s.split('.');
+  if(parts.length>2){ wsOut.innerHTML='<span class="err">Only one radix point allowed.</span>'; return; }
+  const ok = validDigits(base);
+  for(const ch of s.replace('.','')){
+    if(ok.indexOf(ch)<0){ wsOut.innerHTML='<span class="err">'+BASENAME[base][0].toUpperCase()+BASENAME[base].slice(1)+' digits are '+(base===16?'0–9, A–F':ok.split('').join(', '))+' — remove “'+esc(ch)+'”.</span>'; return; }
+  }
+  const intp = parts[0]||'0', frac = parts[1]||'';
+  const maxInt = base===2 ? 32 : 12;
+  if(intp.length>maxInt || frac.length>6){ wsOut.innerHTML='<span class="err">Keep it to '+maxInt+' integer digits and 6 fractional digits.</span>'; return; }
+  let rows=[], total=0;
+  for(let i=0;i<intp.length;i++){
+    const d=parseInt(intp[i],base), p=intp.length-1-i, w=Math.pow(base,p), pv=d*w;
+    total+=pv;
+    rows.push({d:intp[i], p, w, pv});
+  }
+  for(let i=0;i<frac.length;i++){
+    const d=parseInt(frac[i],base), p=-(i+1), w=Math.pow(base,p), pv=d*w;
+    total+=pv;
+    rows.push({d:frac[i], p, w, pv});
+  }
+  const fmt = x => {
+    if(Number.isInteger(x)) return x.toLocaleString('en-US').replace(/,/g,' ');
+    return (+x.toFixed(6)).toString();
+  };
+  let html = '<div class="faded">'+ (base===2?groupBits(intp,4):intp) + (frac?'.'+frac:'') + SUBS[base] + ' expanded by weighting factors:</div>';
+  rows.forEach(r=>{
+    html += '<div class="divrow"><b class="dgt '+cls+'">'+r.d+'</b> × '+base+sup(r.p)+' '
+         +'<span class="faded">('+base+sup(r.p)+' = '+fmt(r.w)+')</span>'
+         +' = <b>'+fmt(r.pv)+'</b></div>';
+  });
+  html += '<div class="result-line">Total = <b class="b10">'+fmt(total)+SUBS[10]+'</b></div>';
+  wsOut.innerHTML = html;
+}
+wsIn.addEventListener('input', renderWS);
+renderWS();
+
+/* ============ powers-of-2 ladder table ============ */
+(function(){
+  const tb = $('#pow2tbl tbody');
+  let rows='';
+  for(let p=7;p>=-4;p--){
+    const w = Math.pow(2,p);
+    const wtxt = p>=0 ? w : ('1/'+Math.pow(2,-p)+' = '+w);
+    const cue = p===0 ? '← the LSB weight — always 1' : (p===-1?'← radix point crossed: keep dividing by 2':'');
+    rows += '<tr><td>2'+sup(p)+'</td><td class="b2">'+wtxt+'</td><td class="ui" style="color:var(--ink-3);font-size:.78rem">'+cue+'</td></tr>';
+  }
+  tb.innerHTML = rows;
+})();
+
+/* ============ successive division machine ============ */
+const dvIn=$('#dvIn'), dvOut=$('#dvOut');
+let dvSteps=[], dvShown=0, dvVal=0, dvBaseCur=2;
+const dvSeg = wireSeg($('#panel-div .seg'), ()=> dvCompute(true));
+function dvCompute(revealAll){
+  const base=+dvSeg.get(); dvBaseCur=base;
+  const p=parseIn(dvIn.value,10);
+  if(!p.ok){ dvOut.innerHTML='<span class="err">'+p.err+'</span>'; dvSteps=[]; return; }
+  dvVal=p.val;
+  dvSteps=[];
+  let q=p.val;
+  if(q===0) dvSteps.push({q:0,nq:0,r:0});
+  while(q>0){ const r=q%base, nq=Math.floor(q/base); dvSteps.push({q,nq,r}); q=nq; }
+  dvShown = revealAll ? dvSteps.length : 0;
+  dvRender();
+}
+function dvRender(){
+  const base=dvBaseCur, cls=BASECLS[base];
+  if(!dvSteps.length){ return; }
+  let html='<div class="faded">Convert '+dvVal.toLocaleString('en-US')+SUBS[10]+' to '+BASENAME[base]+' — divide by '+base+' until the quotient is 0:</div>';
+  const colW=Math.max(String(dvVal).length, 3);
+  const calcOn=$('#dvCalc').checked;
+  dvSteps.forEach((s,i)=>{
+    const digit=digitChar(s.r);
+    const fr = s.r===0 ? '.0' : String(s.r/base).slice(1);
+    const ann = calcOn ? '&nbsp;&nbsp;<span class="faded">calc: '+s.nq+fr+' → '+fr+' × '+base+' = '+s.r+'</span>' : '';
+    const tags=(i===0?'<span class="tag tag-lsb">LSD — first remainder</span>':'')+(i===dvSteps.length-1&&dvSteps.length>1?'<span class="tag tag-msb">MSD — last remainder</span>':'');
+    const shown=i<dvShown?'':' hiderow';
+    html+='<div class="divrow'+shown+'">'+String(s.q).padStart(colW,' ')+' ÷ '+base+' = '+String(s.nq).padStart(colW,' ')
+      +'&nbsp;&nbsp;remainder <b class="dgt '+cls+'">'+digit+'</b>'
+      +(s.r>9?' <span class="faded">(= '+s.r+')</span>':'')+tags+ann+'</div>';
+  });
+  if(dvShown>=dvSteps.length){
+    const digits=dvSteps.map(s=>digitChar(s.r)).reverse().join('');
+    let res=digits, extra='';
+    if(base===2){
+      const padded=padTo(digits, digits.length<=4?4:8);
+      extra='<div>Padded to '+(padded.length)+' bits: <b class="b2">'+groupBits(padded,4)+'</b>'+SUBS[2]+'</div>';
+    }
+    // check: weighted multiply-back
+    let terms=[], tot=0;
+    for(let i=0;i<digits.length;i++){
+      const d=parseInt(digits[i],base), pw=digits.length-1-i, v=d*Math.pow(base,pw);
+      if(v>0){ terms.push(base===2? String(v) : digits[i]+'×'+Math.pow(base,pw)); tot+=v; }
+    }
+    if(dvVal===0){ terms=['0']; }
+    html+='<div class="result-line">Read the remainders <b>bottom-up</b> (MSD → LSD): &nbsp;'
+      +dvVal.toLocaleString('en-US')+SUBS[10]+' = <b class="'+cls+'" style="font-size:1.15em;letter-spacing:.06em">'+res+'</b>'+SUBS[base]+'</div>'
+      +extra
+      +'<div class="faded">Check: '+terms.join(' + ')+' = '+tot.toLocaleString('en-US')+' <span class="okmark">✓</span></div>';
+  } else {
+    html+='<div class="note ui">'+(dvShown===0?'Press <b>Step</b> to run the first division.':'Step '+dvShown+' of '+dvSteps.length+' — keep going until the quotient is 0.')+'</div>';
+  }
+  dvOut.innerHTML=html;
+}
+$('#dvStep').addEventListener('click', ()=>{ if(!dvSteps.length||dvShown>=dvSteps.length){ dvCompute(false); } if(dvSteps.length){ dvShown=Math.min(dvSteps.length,dvShown+1); dvRender(); }});
+$('#dvAll').addEventListener('click', ()=>{ dvCompute(true); });
+$('#dvReset').addEventListener('click', ()=>{ dvCompute(false); });
+$('#dvCalc').addEventListener('change', dvRender);
+dvIn.addEventListener('input', ()=> dvCompute(false));
+dvCompute(true);
+
+/* ============ grouping visualizer ============ */
+const grMode=$('#grMode'), grIn=$('#grIn'), grOut=$('#grOut');
+function renderGR(){
+  const mode=grMode.value;
+  let raw=grIn.value.replace(/\s+/g,'').toUpperCase().replace(/^0X/,'');
+  if(!raw){ grOut.innerHTML='<span class="err">Enter a number.</span>'; return; }
+  const toBin = (mode==='o2b'||mode==='h2b');
+  const k = (mode==='b2o'||mode==='o2b')?3:4;
+  const tgt = k===3?8:16, tcls=BASECLS[tgt];
+  if(!toBin){
+    for(const ch of raw){ if(ch!=='0'&&ch!=='1'){ grOut.innerHTML='<span class="err">Binary uses only 0 and 1 — remove “'+esc(ch)+'”.</span>'; return; } }
+    if(raw.length>32){ grOut.innerHTML='<span class="err">Keep it to 32 bits or fewer.</span>'; return; }
+    const padded=padTo(raw,k), padCount=padded.length-raw.length;
+    let cells='';
+    for(let i=0;i<padded.length;i+=k){
+      const g=padded.slice(i,i+k);
+      const isPadGroup = i===0&&padCount>0;
+      const bitsHtml = isPadGroup ? '<span class="padbit">'+'0'.repeat(padCount)+'</span>'+g.slice(padCount) : g;
+      cells+='<div class="grp"><div class="bits b2">'+bitsHtml+'</div><div class="gd '+tcls+'">'+parseInt(g,2).toString(tgt).toUpperCase()+'</div></div>';
+    }
+    const res=[];
+    for(let i=0;i<padded.length;i+=k) res.push(parseInt(padded.slice(i,i+k),2).toString(tgt).toUpperCase());
+    grOut.innerHTML='<div class="faded">Group in '+k+'s starting at the LSB'+(padCount?'; the dimmed leading zeros are padding':'')+':</div>'
+      +'<div class="grps">'+cells+'</div>'
+      +'<div class="result-line">'+groupBits(raw,4)+SUBS[2]+' = <b class="'+tcls+'" style="font-size:1.15em">'+res.join('')+'</b>'+SUBS[tgt]+'</div>';
+  } else {
+    const src=k===3?8:16, scls=BASECLS[src];
+    const okd=validDigits(src);
+    for(const ch of raw){ if(okd.indexOf(ch)<0){ grOut.innerHTML='<span class="err">'+BASENAME[src][0].toUpperCase()+BASENAME[src].slice(1)+' digits are '+(src===16?'0–9, A–F':'0–7')+' — remove “'+esc(ch)+'”.</span>'; return; } }
+    if(raw.length>10){ grOut.innerHTML='<span class="err">Keep it to 10 digits or fewer.</span>'; return; }
+    let cells='', out='';
+    for(const ch of raw){
+      const bits=parseInt(ch,src).toString(2).padStart(k,'0');
+      out+=bits;
+      cells+='<div class="grp"><div class="bits '+scls+'" style="border-bottom:none;font-size:1.3rem;font-weight:600">'+ch+'</div><div class="gd b2" style="font-size:1.05rem;border-top:2px solid var(--line-strong);padding-top:4px;letter-spacing:.1em">'+bits+'</div></div>';
+    }
+    grOut.innerHTML='<div class="faded">Each '+BASENAME[src]+' digit expands to exactly '+k+' bits:</div>'
+      +'<div class="grps">'+cells+'</div>'
+      +'<div class="result-line">'+raw+SUBS[src]+' = <b class="b2" style="font-size:1.1em">'+groupBits(out.replace(/^0+(?=.)/,''),4)+'</b>'+SUBS[2]
+      +' <span class="faded">(raw: '+groupBits(out,k===3?3:4)+')</span></div>';
+  }
+}
+grMode.addEventListener('change', ()=>{
+  const defs={b2o:'10111001', b2h:'10111001', o2b:'624', h2b:'2A6'};
+  grIn.value=defs[grMode.value]; renderGR();
+});
+grIn.addEventListener('input', renderGR);
+renderGR();
+
+/* ============ universal converter ============ */
+const cvIn=$('#cvIn'), cvOut=$('#cvOut'), cvNote=$('#cvNote');
+const cvSeg = wireSeg($('#panel-conv .seg'), ()=> renderCV());
+function renderCV(){
+  const base=+cvSeg.get();
+  const p=parseIn(cvIn.value, base);
+  if(!p.ok){ cvOut.innerHTML='<div class="err" style="padding:6px 2px">'+p.err+'</div>'; cvNote.textContent=''; return; }
+  const v=p.val;
+  const bin=v.toString(2), oct=v.toString(8), hex=v.toString(16).toUpperCase(), dec=String(v);
+  const bin8=padTo(bin, bin.length<=8?8:(bin.length<=16?16:32));
+  const bcd = dec.split('').map(d=> (+d).toString(2).padStart(4,'0')).join(' ');
+  const rows=[
+    {lab:'DEC', cls:'b10', val:v.toLocaleString('en-US'), work: base===10?null:{kind:'ws', arg:(base===2?bin:base===8?oct:hex), b:base}},
+    {lab:'BIN', cls:'b2', val:groupBits(bin8,4), work: base===10?{kind:'div', b:2}: base===8?{kind:'gr', mode:'o2b', arg:oct}: base===16?{kind:'gr', mode:'h2b', arg:hex}: null},
+    {lab:'OCT', cls:'b8', val:oct, work: base===10?{kind:'div', b:8}: base===2?{kind:'gr', mode:'b2o', arg:bin}: null},
+    {lab:'HEX', cls:'b16', val:hex, work: base===10?{kind:'div', b:16}: base===2?{kind:'gr', mode:'b2h', arg:bin}: null},
+    {lab:'BCD', cls:'bC', val:bcd, work:null}
+  ];
+  cvOut.innerHTML = rows.map((r,i)=>
+    '<div class="convrow"><span class="lab '+r.cls+'">'+r.lab+'</span><span class="val '+r.cls+'">'+r.val+'</span>'
+    +(r.work?'<button class="showwork" data-i="'+i+'">show the work</button>':'<span></span>')+'</div>'
+  ).join('');
+  cvNote.innerHTML = (v>=32&&v<127) ? 'As an ASCII code, '+v+' is the character <b class="mono">'+esc(String.fromCharCode(v))+'</b>. '
+    : (v<128 ? 'As an ASCII code, '+v+' is a control character. ' : '');
+  cvNote.innerHTML += 'BCD encodes the <em>decimal digits</em> “'+dec+'” nibble-by-nibble — note it differs from pure binary for values above 9.';
+  $$('.showwork', cvOut).forEach(btn=> btn.addEventListener('click', ()=>{
+    const w=rows[+btn.dataset.i].work;
+    if(w.kind==='div'){ dvIn.value=String(v); dvSeg.set(w.b); dvCompute(true); $('#panel-div').scrollIntoView({behavior:REDUCED?'auto':'smooth'}); }
+    else if(w.kind==='ws'){ wsIn.value=w.arg; wsSeg.set(w.b); renderWS(); $('#panel-weighted').scrollIntoView({behavior:REDUCED?'auto':'smooth'}); }
+    else { grMode.value=w.mode; grIn.value=w.arg; renderGR(); $('#panel-grp').scrollIntoView({behavior:REDUCED?'auto':'smooth'}); }
+  }));
+}
+cvIn.addEventListener('input', renderCV);
+renderCV();
+
+/* ============ BCD tool ============ */
+const bcdMode=$('#bcdMode'), bcdIn=$('#bcdIn'), bcdOut=$('#bcdOut');
+function renderBCD(){
+  const enc = bcdMode.value==='enc';
+  const raw = bcdIn.value.replace(/\s+/g,'');
+  if(!raw){ bcdOut.innerHTML='<span class="err">Enter a value.</span>'; return; }
+  if(enc){
+    for(const ch of raw){ if('0123456789'.indexOf(ch)<0){ bcdOut.innerHTML='<span class="err">Decimal uses only 0–9 — remove “'+esc(ch)+'”.</span>'; return; } }
+    if(raw.length>8){ bcdOut.innerHTML='<span class="err">Keep it to 8 digits or fewer.</span>'; return; }
+    let cells='';
+    for(const ch of raw){
+      cells+='<div class="grp"><div class="bits bC" style="border-bottom:none;font-size:1.3rem;font-weight:600">'+ch+'</div><div class="gd b2" style="font-size:1.05rem;border-top:2px solid var(--line-strong);padding-top:4px;letter-spacing:.1em">'+(+ch).toString(2).padStart(4,'0')+'</div></div>';
+    }
+    bcdOut.innerHTML='<div class="faded">Each decimal digit becomes its own 4-bit nibble — no cross-digit arithmetic:</div>'
+      +'<div class="grps">'+cells+'</div>'
+      +'<div class="result-line">'+raw+SUBS[10]+' = <b class="bC">'+raw.split('').map(d=>(+d).toString(2).padStart(4,'0')).join(' ')+'</b><sub>BCD</sub></div>'
+      +'<div class="faded">Compare pure binary: '+raw+SUBS[10]+' = '+groupBits(padTo(parseInt(raw,10).toString(2),4),4)+SUBS[2]+' — '+(parseInt(raw,10)>9?'different patterns':'same pattern for a single digit')+'.</div>';
+  } else {
+    for(const ch of raw){ if(ch!=='0'&&ch!=='1'){ bcdOut.innerHTML='<span class="err">BCD input is binary — only 0 and 1 (spaces OK). Remove “'+esc(ch)+'”.</span>'; return; } }
+    if(raw.length%4){ bcdOut.innerHTML='<span class="err">BCD comes in whole nibbles — this input is '+raw.length+' bits. Pad the left with zeros to a multiple of 4.</span>'; return; }
+    if(raw.length>32){ bcdOut.innerHTML='<span class="err">Keep it to 32 bits (8 BCD digits) or fewer.</span>'; return; }
+    let cells='', digits='', anyBad=false;
+    for(let i=0;i<raw.length;i+=4){
+      const nib=raw.slice(i,i+4), v=parseInt(nib,2), bad=v>9;
+      if(bad) anyBad=true;
+      digits+= bad?'✗':String(v);
+      cells+='<div class="grp'+(bad?' invalid':'')+'"><div class="bits b2">'+nib+'</div><div class="gd '+(bad?'':'bC')+'">'+(bad?'✗':v)+'</div>'+(bad?'<div class="gname">invalid</div>':'')+'</div>';
+    }
+    bcdOut.innerHTML='<div class="faded">Read each nibble as one decimal digit:</div>'
+      +'<div class="grps">'+cells+'</div>'
+      +(anyBad
+        ? '<div class="result-line err">Invalid BCD — a nibble above 1001 (9) can never occur in a valid BCD word. If an instrument produces this, suspect a fault upstream of the display driver.</div>'
+        : '<div class="result-line">= <b class="b10" style="font-size:1.15em">'+digits+SUBS[10]+'</b></div>');
+  }
+}
+bcdMode.addEventListener('change', ()=>{ bcdIn.value = bcdMode.value==='enc' ? '496' : '0111 0101 1000'; renderBCD(); });
+bcdIn.addEventListener('input', renderBCD);
+$('#bcdBad').addEventListener('click', ()=>{ bcdMode.value='dec'; bcdIn.value='0110 0100 1011'; renderBCD(); });
+renderBCD();
+
+/* ============ two's complement lab ============ */
+const tcMode=$('#tcMode'), tcIn=$('#tcIn'), tcB=$('#tcB'), tcOut=$('#tcOut');
+const tcSeg = wireSeg($('#panel-tc .seg'), ()=> renderTC());
+function tcPat(v,n){
+  const m = Math.pow(2,n);
+  const u = v<0 ? m+v : v;
+  return u.toString(2).padStart(n,'0');
+}
+function invertBits(s){ return s.split('').map(c=> c==='1'?'0':'1').join(''); }
+function parseSigned(str){
+  const s=str.trim().replace(/−/g,'-');
+  if(!/^[-+]?\d+$/.test(s)) return null;
+  return parseInt(s,10);
+}
+function tcHex(pat){ return parseInt(pat,2).toString(16).toUpperCase().padStart(Math.ceil(pat.length/4),'0'); }
+function renderTC(){
+  const n=+tcSeg.get(), mode=tcMode.value;
+  const R={min:-Math.pow(2,n-1), max:Math.pow(2,n-1)-1};
+  const fmtN=x=>x.toLocaleString('en-US');
+  $('#tcBWrap').style.display = mode==='sub' ? '' : 'none';
+  $('#tcInLab').textContent = mode==='enc' ? 'Decimal value' : mode==='dec' ? 'Binary word' : 'A';
+  if(mode==='enc'){
+    const v=parseSigned(tcIn.value);
+    if(v===null){ tcOut.innerHTML='<span class="err">Enter a decimal integer — a minus sign is allowed (e.g., -73).</span>'; return; }
+    if(v<R.min||v>R.max){ tcOut.innerHTML='<span class="err">'+n+'-bit two&rsquo;s complement covers '+fmtN(R.min)+' … +'+fmtN(R.max)+'. Use a wider word for '+fmtN(v)+'.</span>'; return; }
+    const pat=tcPat(v,n);
+    if(v>=0){
+      tcOut.innerHTML='<div class="faded">Positive values are plain weighted binary — just pad to the word width:</div>'
+        +'<div class="divrow">'+v+SUBS[10]+' = <b class="b2">'+groupBits(pat,4)+'</b> &nbsp;<span class="faded">MSB is 0 → reads as positive</span></div>'
+        +'<div class="result-line">'+v+SUBS[10]+' = <b class="b2">'+groupBits(pat,4)+'</b> &nbsp;·&nbsp; hex <b class="b16">'+tcHex(pat)+'</b></div>';
+    } else {
+      const mag=-v, magP=mag.toString(2).padStart(n,'0');
+      const inv=invertBits(magP);
+      let terms=['−'+fmtN(Math.pow(2,n-1))], tot=-Math.pow(2,n-1);
+      for(let i=1;i<n;i++){ if(pat[i]==='1'){ const w=Math.pow(2,n-1-i); terms.push(String(w)); tot+=w; } }
+      tcOut.innerHTML='<div class="faded">Negative — take the magnitude, invert, add 1:</div>'
+        +'<div class="divrow">|'+v+'| = '+mag+SUBS[10]+' = <b class="b2">'+groupBits(magP,4)+'</b></div>'
+        +'<div class="divrow">invert every bit → <b class="b2">'+groupBits(inv,4)+'</b> <span class="faded">(one&rsquo;s complement)</span></div>'
+        +'<div class="divrow">add 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; → <b class="b2">'+groupBits(pat,4)+'</b></div>'
+        +'<div class="result-line">'+v+SUBS[10]+' = <b class="b2">'+groupBits(pat,4)+'</b> &nbsp;·&nbsp; hex <b class="b16">'+tcHex(pat)+'</b></div>'
+        +'<div class="faded">Check by weights (MSB = −'+fmtN(Math.pow(2,n-1))+'): '+terms.join(' + ')+' = '+fmtN(tot)+' <span class="okmark">✓</span></div>';
+    }
+  } else if(mode==='dec'){
+    const raw=tcIn.value.replace(/\s+/g,'');
+    if(!raw || [...raw].some(c=>c!=='0'&&c!=='1')){ tcOut.innerHTML='<span class="err">Enter a binary word — only 0 and 1 (spaces OK).</span>'; return; }
+    if(raw.length>n){ tcOut.innerHTML='<span class="err">That&rsquo;s '+raw.length+' bits but the word width is set to '+n+'. Widen the word or shorten the input — in signed numbers the width changes the meaning.</span>'; return; }
+    const pat=raw.padStart(n,'0');
+    const neg=pat[0]==='1';
+    const u=parseInt(pat,2);
+    const val=neg? u-Math.pow(2,n) : u;
+    if(neg){
+      let rows='<div class="divrow">MSB is 1 → its weight is <b style="color:var(--bad)">−2'+sup(n-1)+' = −'+fmtN(Math.pow(2,n-1))+'</b></div>';
+      let terms=['−'+fmtN(Math.pow(2,n-1))];
+      for(let i=1;i<n;i++){ if(pat[i]==='1'){ const w=Math.pow(2,n-1-i); rows+='<div class="divrow">bit '+(n-1-i)+' set → +'+fmtN(w)+'</div>'; terms.push(fmtN(w)); } }
+      const inv=invertBits(pat);
+      const mag=parseInt(inv,2)+1;
+      tcOut.innerHTML='<div class="faded">Interpreting <b class="b2">'+groupBits(pat,4)+'</b> as an '+n+'-bit two&rsquo;s-complement word:</div>'
+        +rows
+        +'<div class="result-line">'+terms.join(' + ')+' = <b class="b10">'+fmtN(val)+SUBS[10]+'</b></div>'
+        +'<div class="faded">Shortcut: invert → '+groupBits(inv,4)+', add 1 → '+fmtN(mag)+', so the value is −'+fmtN(mag)+' <span class="okmark">✓</span></div>';
+    } else {
+      let terms=[], tot=0;
+      for(let i=0;i<n;i++){ if(pat[i]==='1'){ const w=Math.pow(2,n-1-i); terms.push(fmtN(w)); tot+=w; } }
+      if(!terms.length) terms=['0'];
+      tcOut.innerHTML='<div class="faded">MSB is 0 → ordinary positive binary:</div>'
+        +'<div class="result-line">'+groupBits(pat,4)+SUBS[2]+' = '+terms.join(' + ')+' = <b class="b10">+'+fmtN(val)+SUBS[10]+'</b></div>';
+    }
+  } else {
+    const a=parseSigned(tcIn.value), b=parseSigned(tcB.value);
+    if(a===null||b===null){ tcOut.innerHTML='<span class="err">Enter decimal integers for A and B.</span>'; return; }
+    if(a<R.min||a>R.max||b<R.min||b>R.max){ tcOut.innerHTML='<span class="err">Keep A and B inside the '+n+'-bit range '+fmtN(R.min)+' … +'+fmtN(R.max)+'.</span>'; return; }
+    if(b===R.min){ tcOut.innerHTML='<span class="err">−('+fmtN(b)+') doesn&rsquo;t fit in '+n+' bits — the range is asymmetric ('+fmtN(R.min)+' … +'+fmtN(R.max)+'), so negating the most negative value overflows. Widen the word.</span>'; return; }
+    const diff=a-b;
+    const pa=tcPat(a,n), pb=tcPat(b,n), pnb=tcPat(-b,n);
+    const inv=invertBits(pb);
+    const sum=parseInt(pa,2)+parseInt(pnb,2);
+    const carry = sum >= Math.pow(2,n);
+    const pr=(sum % Math.pow(2,n)).toString(2).padStart(n,'0');
+    const rval = pr[0]==='1' ? parseInt(pr,2)-Math.pow(2,n) : parseInt(pr,2);
+    const overflow = diff<R.min || diff>R.max;
+    tcOut.innerHTML='<div class="faded">Compute '+a+' − '+b+' as '+a+' + (−'+b+') — no subtractor circuit needed:</div>'
+      +'<div class="divrow">A = '+a+SUBS[10]+' → <b class="b2">'+groupBits(pa,4)+'</b></div>'
+      +'<div class="divrow">B = '+b+SUBS[10]+' → <b class="b2">'+groupBits(pb,4)+'</b></div>'
+      +'<div class="divrow">−B: invert → '+groupBits(inv,4)+', add 1 → <b class="b2">'+groupBits(pnb,4)+'</b></div>'
+      +'<div class="divrow">add: '+groupBits(pa,4)+' + '+groupBits(pnb,4)+' = '+(carry?'<b style="color:var(--warn)">1</b>&nbsp;':'')+'<b class="b2">'+groupBits(pr,4)+'</b>'
+      +(carry?' <span class="faded">— the carry-out falls off the end; discard it</span>':'')+'</div>'
+      +(overflow
+        ? '<div class="result-line err">Overflow — the true answer '+fmtN(diff)+' doesn&rsquo;t fit in '+n+' bits. Real hardware raises a flag here.</div>'
+        : '<div class="result-line">Result: <b class="b2">'+groupBits(pr,4)+'</b> = <b class="b10">'+fmtN(rval)+SUBS[10]+'</b> <span class="okmark">✓ ('+a+' − '+b+' = '+fmtN(diff)+')</span></div>');
+  }
+}
+tcMode.addEventListener('change', ()=>{
+  const defs={enc:'-73', dec:'10110111', sub:'87'};
+  tcIn.value=defs[tcMode.value];
+  if(tcMode.value==='sub') tcB.value='53';
+  renderTC();
+});
+tcIn.addEventListener('input', renderTC);
+tcB.addEventListener('input', renderTC);
+renderTC();
+
+/* bit flipper */
+const bfState=Array(8).fill(0);
+function bfRead(){
+  const u=parseInt(bfState.join(''),2);
+  const s=u>127? u-256 : u;
+  $('#bfU').textContent=u;
+  $('#bfS').textContent=(s>0?'+':'')+s;
+  $('#bfH').textContent=u.toString(16).toUpperCase().padStart(2,'0');
+  $('#bfNote').textContent = bfState[0]
+    ? 'Sign bit high: the two readings now differ by exactly 256 (unsigned = signed + 256).'
+    : 'Sign bit low: both interpretations agree.';
+}
+$('#bfBits').innerHTML = bfState.map((b,i)=>{
+  const k=7-i;
+  return '<div class="bf'+(i===0?' sign':'')+'"><button aria-pressed="false" data-i="'+i+'" aria-label="bit '+k+', weight '+(i===0?'minus 128':Math.pow(2,k))+'">0</button><span class="bw">'+(i===0?'−128':Math.pow(2,k))+'</span></div>';
+}).join('');
+$$('#bfBits button').forEach(btn=> btn.addEventListener('click', ()=>{
+  const i=+btn.dataset.i;
+  bfState[i]^=1;
+  btn.setAttribute('aria-pressed', bfState[i]?'true':'false');
+  btn.textContent=bfState[i];
+  bfRead();
+}));
+bfRead();
+
+/* ============ column arithmetic machine ============ */
+const arA=$('#arA'), arB=$('#arB'), arOut=$('#arOut');
+let arMeta=null, arShown=0;
+const AR_DEFS={'2add':['1011','1110'],'2sub':['1101','0110'],'16add':['2C9','15B'],'16sub':['52','2F']};
+function hxd(v,base){ return v.toString(base).toUpperCase(); }
+function hxx(v,base){ return hxd(v,base)+(v>9?' (='+v+')':''); }
+function buildArithSteps(aStr,bStr,base,op){
+  const n=Math.max(aStr.length,bStr.length);
+  const A=aStr.padStart(n,'0'), B=bStr.padStart(n,'0');
+  const steps=[]; let res='';
+  if(op==='add'){
+    let carry=0;
+    for(let i=0;i<n;i++){
+      const da=parseInt(A[n-1-i],base), db=parseInt(B[n-1-i],base);
+      const s=da+db+carry, dout=s%base, cout=s>=base?1:0;
+      let text;
+      if(base===2){
+        text = da+' + '+db+(carry?' + carry 1':'')+' = '+s.toString(2)+SUBS[2]+' → write '+dout+(cout?', carry 1':'');
+      } else {
+        text = hxx(da,16)+' + '+hxx(db,16)+(carry?' + carry 1':'')+' = '+s
+          +(cout? ' → '+s+' − 16 = '+dout : '')+' → write '+hxd(dout,16)+(cout?', carry 1':'');
+      }
+      steps.push({i, cin:carry, dout, cout, text});
+      res=hxd(dout,base)+res;
+      carry=cout;
+    }
+    if(carry){ steps.push({i:n, cin:1, dout:1, cout:0, text:'the last carry falls into a new column → write 1'}); res='1'+res; }
+    return {ok:true, A, B, res, steps, cols:res.length};
+  }
+  const av=parseInt(aStr,base), bv=parseInt(bStr,base);
+  if(bv>av) return {ok:false, err:'sub-negative', av, bv};
+  let borrow=0;
+  for(let i=0;i<n;i++){
+    const da=parseInt(A[n-1-i],base), db=parseInt(B[n-1-i],base);
+    const eff=da-borrow;
+    let dout, bout, text;
+    if(eff<db){
+      dout=eff+base-db; bout=1;
+      text = hxx(da,base)+(borrow?' − borrow 1 = '+String(eff).replace('-','−'):'')+' is too small for '+hxx(db,base)
+        +' → borrow 1 (worth '+base+' here): '+(borrow?'('+String(eff).replace('-','−')+' + '+base+' =) ':'')+(eff+base)+' − '+db+' = '+dout+' → write '+hxd(dout,base);
+    } else {
+      dout=eff-db; bout=0;
+      text = hxx(da,base)+(borrow?' − borrow 1':'')+' − '+hxx(db,base)+' = '+hxd(dout,base)+(dout>9?' (='+dout+')':'');
+    }
+    steps.push({i, cin:borrow, dout, cout:bout, text});
+    res=hxd(dout,base)+res;
+    borrow=bout;
+  }
+  return {ok:true, A, B, res, steps, cols:n};
+}
+const arOpSeg=wireSeg($('#arOpSeg'), ()=> arModeChange());
+const arBaseSeg=wireSeg($('#arBaseSeg'), ()=> arModeChange());
+function arClean(s){ return s.replace(/\s+/g,'').toUpperCase().replace(/^0X/,''); }
+function arModeChange(){
+  const base=+arBaseSeg.get(), op=arOpSeg.get();
+  const ok=validDigits(base), cap=(base===2?10:5);
+  const a=arClean(arA.value), b=arClean(arB.value);
+  let valid = !!a && !!b && a.length<=cap && b.length<=cap && [...a+b].every(c=> ok.indexOf(c)>=0);
+  if(valid && op==='sub' && parseInt(b,base)>parseInt(a,base)) valid=false;
+  if(!valid){ const d=AR_DEFS[base+op]; arA.value=d[0]; arB.value=d[1]; }
+  arCompute(true);
+}
+function arCompute(revealAll){
+  const base=+arBaseSeg.get(), op=arOpSeg.get();
+  const a=arClean(arA.value), b=arClean(arB.value);
+  const ok=validDigits(base);
+  let err=null;
+  if(!a||!b) err='Enter both A and B.';
+  else for(const ch of a+b){ if(ok.indexOf(ch)<0){ err=(base===2?'Binary':'Hex')+' uses only '+(base===2?'0 and 1':'0–9 and A–F')+' — remove “'+esc(ch)+'”.'; break; } }
+  const cap = base===2?10:5;
+  if(!err && (a.length>cap || b.length>cap)) err='Keep each operand to '+cap+' '+(base===2?'bits':'hex digits')+' or fewer.';
+  if(err){ arMeta={ok:false, plain:err}; arRender(); return; }
+  arMeta=buildArithSteps(a,b,base,op);
+  arMeta.base=base; arMeta.op=op; arMeta.aLen=a.length; arMeta.bLen=b.length;
+  arShown=(revealAll && arMeta.ok)? arMeta.steps.length : 0;
+  arRender();
+}
+function arRender(){
+  if(!arMeta) return;
+  if(!arMeta.ok){
+    arOut.innerHTML = arMeta.err==='sub-negative'
+      ? '<div class="err">B is larger than A ('+arMeta.bv+' &gt; '+arMeta.av+' in decimal), so the paper borrow method stalls — the answer is negative. Press <b>Swap A ↔ B</b> and negate the result, or let the two&rsquo;s-complement machine below subtract it directly.</div>'
+      : '<div class="err">'+arMeta.plain+'</div>';
+    return;
+  }
+  const {A,B,res,steps,cols,base,op,aLen,bLen}=arMeta;
+  const n=A.length, cls=base===2?'b2':'b16';
+  const activeP = arShown>0 ? steps[Math.min(arShown,steps.length)-1].i : -1;
+  let grid='<div class="cmcol"><span class="cmcarry"></span><span class="cmd">&nbsp;</span><span class="cmd">'+(op==='add'?'+':'−')+'</span><span class="cmres">&nbsp;</span></div>';
+  for(let p=cols-1;p>=0;p--){
+    const ai = p<n ? A[n-1-p] : '';
+    const bi = p<n ? B[n-1-p] : '';
+    const aDim = p<n && (n-1-p) < n-aLen, bDim = p<n && (n-1-p) < n-bLen;
+    const stepIdx = steps.findIndex(s=>s.i===p);
+    const revealed = stepIdx>-1 && stepIdx<arShown;
+    const prevIdx = steps.findIndex(s=>s.i===p-1);
+    const mark = (prevIdx>-1 && steps[prevIdx].cout && prevIdx<arShown) ? (op==='add'?'1':'−1') : '';
+    grid+='<div class="cmcol'+(p===activeP?' active':'')+'">'
+      +'<span class="cmcarry">'+mark+'</span>'
+      +'<span class="cmd'+(aDim?' dim':'')+'">'+(ai||'&nbsp;')+'</span>'
+      +'<span class="cmd'+(bDim?' dim':'')+'">'+(bi||'&nbsp;')+'</span>'
+      +'<span class="cmres '+cls+'">'+(revealed? res[cols-1-p] : '&nbsp;')+'</span>'
+      +'</div>';
+  }
+  let html='<div class="colmath">'+grid+'</div>';
+  steps.slice(0,arShown).forEach(s=>{ html+='<div class="divrow"><span class="faded">col '+s.i+':</span> '+s.text+'</div>'; });
+  if(arShown>=steps.length){
+    const av=parseInt(A,base), bv=parseInt(B,base);
+    const fmt = x=> base===2? groupBits(x,4) : x;
+    html+='<div class="result-line">'+fmt(A)+SUBS[base]+' '+(op==='add'?'+':'−')+' '+fmt(B)+SUBS[base]
+      +' = <b class="'+cls+'" style="font-size:1.1em">'+fmt(res)+'</b>'+SUBS[base]
+      +' <span class="faded">check: '+av+' '+(op==='add'?'+':'−')+' '+bv+' = '+(op==='add'?av+bv:av-bv)+' <span class="okmark">✓</span></span></div>';
+  } else {
+    html+='<div class="note ui">'+(arShown===0?'Press <b>Step</b> to work the first (rightmost) column.':arShown+' of '+steps.length+' columns done — keep going.')+'</div>';
+  }
+  arOut.innerHTML=html;
+}
+$('#arStep').addEventListener('click', ()=>{
+  if(!arMeta || !arMeta.ok || arShown>=arMeta.steps.length){ arCompute(false); }
+  if(arMeta && arMeta.ok){ arShown=Math.min(arMeta.steps.length, arShown+1); arRender(); }
+});
+$('#arAll').addEventListener('click', ()=> arCompute(true));
+$('#arReset').addEventListener('click', ()=> arCompute(false));
+$('#arSwap').addEventListener('click', ()=>{ const t=arA.value; arA.value=arB.value; arB.value=t; arCompute(true); });
+arA.addEventListener('input', ()=> arCompute(false));
+arB.addEventListener('input', ()=> arCompute(false));
+arCompute(true);
+function workArith(a,b,base,op){
+  const r=buildArithSteps(a.toString(base).toUpperCase(), b.toString(base).toUpperCase(), base, op);
+  const cls=base===2?'b2':'b16';
+  let html='<div class="faded">Work the columns right to left:</div>';
+  r.steps.forEach(s=>{ html+='<div class="divrow"><span class="faded">col '+s.i+':</span> '+s.text+'</div>'; });
+  html+='<div class="result-line">= <b class="'+cls+'">'+(base===2? groupBits(r.res,4) : r.res)+'</b>'+SUBS[base]
+    +' <span class="faded">('+a+' '+(op==='add'?'+':'−')+' '+b+' = '+(op==='add'?a+b:a-b)+' in decimal)</span></div>';
+  return html;
+}
+
+/* ============ comparison table ============ */
+const cmpN=$('#cmpN');
+function renderCMP(){
+  const n=+cmpN.value; $('#cmpNv').textContent=n;
+  let rows='';
+  for(let i=0;i<=n;i++){
+    const b=i.toString(2);
+    const bcd=String(i).split('').map(d=>(+d).toString(2).padStart(4,'0')).join(' ');
+    rows+='<tr><td class="b10">'+i+'</td><td class="b2">'+groupBits(padTo(b,4),4)+'</td><td class="b8">'+i.toString(8)+'</td><td class="b16">'+i.toString(16).toUpperCase()+'</td><td class="bC">'+bcd+'</td></tr>';
+  }
+  $('#cmpTbl tbody').innerHTML=rows;
+}
+cmpN.addEventListener('input', renderCMP);
+renderCMP();
+
+/* ============ ASCII ============ */
+const CTL=['NUL','SOH','STX','ETX','EOT','ENQ','ACK','BEL','BS','HT','LF','VT','FF','CR','SO','SI','DLE','DC1','DC2','DC3','DC4','NAK','SYN','ETB','CAN','EM','SUB','ESC','FS','GS','RS','US'];
+const CTLNAME={NUL:'Null',SOH:'Start of heading',STX:'Start of text',ETX:'End of text',EOT:'End of transmission',ENQ:'Enquiry',ACK:'Acknowledge',BEL:'Bell',BS:'Backspace',HT:'Horizontal tab',LF:'Line feed',VT:'Vertical tab',FF:'Form feed',CR:'Carriage return',SO:'Shift out',SI:'Shift in',DLE:'Data link escape',DC1:'Device control 1',DC2:'Device control 2',DC3:'Device control 3',DC4:'Device control 4',NAK:'Negative acknowledge',SYN:'Synchronous idle',ETB:'End of transmission block',CAN:'Cancel',EM:'End of medium',SUB:'Substitute',ESC:'Escape',FS:'File separator',GS:'Group separator',RS:'Record separator',US:'Unit separator',SP:'Space',DEL:'Delete'};
+function charLabel(code){
+  if(code<32) return {t:CTL[code], ctl:true};
+  if(code===32) return {t:'SP', ctl:true};
+  if(code===127) return {t:'DEL', ctl:true};
+  return {t:String.fromCharCode(code), ctl:false};
+}
+function buildAsciiTable(){
+  let html='<thead><tr><th>LSB \\ MSB</th>';
+  for(let c=0;c<8;c++) html+='<th>'+c.toString(2).padStart(3,'0')+'</th>';
+  html+='</tr></thead><tbody>';
+  for(let r=0;r<16;r++){
+    html+='<tr><th>'+r.toString(2).padStart(4,'0')+'</th>';
+    for(let c=0;c<8;c++){
+      const code=c*16+r, L=charLabel(code);
+      html+='<td data-code="'+code+'"><button'+(L.ctl?' class="isctl"':'')+'>'+(L.ctl?'<span class="ctl">'+L.t+'</span>':esc(L.t))+'</button></td>';
+    }
+    html+='</tr>';
+  }
+  $('#aTbl').innerHTML=html+'</tbody>';
+  $$('#aTbl td').forEach(td=> td.addEventListener('click', ()=> selAscii(+td.dataset.code)));
+}
+function selAscii(code){
+  $$('#aTbl td').forEach(td=> td.classList.toggle('sel', +td.dataset.code===code));
+  const L=charLabel(code);
+  const msb=(code>>4).toString(2).padStart(3,'0'), lsb=(code&15).toString(2).padStart(4,'0');
+  const disp = L.ctl ? L.t+' — '+(CTLNAME[L.t]||'') : '“'+esc(L.t)+'”';
+  $('#aDet').innerHTML =
+    '<div><b class="ui">'+disp+'</b></div>'
+    +'<div class="divrow">Column (MSB group, 3 bits): <b class="b2">'+msb+'</b> &nbsp;+&nbsp; Row (LSB group, 4 bits): <b class="b2">'+lsb+'</b></div>'
+    +'<div class="divrow">7-bit code: <b class="b2">'+msb+' '+lsb+'</b> &nbsp;→&nbsp; padded to 8 bits: <b class="b2">0'+msb+' '+lsb+'</b></div>'
+    +'<div class="divrow">Hex: <b class="b16">'+code.toString(16).toUpperCase().padStart(2,'0')+'</b> &nbsp;·&nbsp; Dec: <b class="b10">'+code+'</b> &nbsp;·&nbsp; Oct: <b class="b8">'+code.toString(8)+'</b></div>';
+}
+buildAsciiTable();
+selAscii(71); // 'G' — the classic column-plus-row assembly example
+
+const asIn=$('#asIn');
+function renderAS(){
+  const txt=asIn.value;
+  let rows='', skipped=0;
+  for(const ch of txt){
+    const code=ch.codePointAt(0);
+    if(code>127){ skipped++; continue; }
+    const L=charLabel(code);
+    const b7=code.toString(2).padStart(7,'0');
+    rows+='<tr><td>'+(L.ctl?L.t:esc(ch))+'</td><td class="b2">'+b7.slice(0,3)+' '+b7.slice(3)+'</td><td class="b2">'+groupBits('0'+b7,4)+'</td><td class="b16">'+code.toString(16).toUpperCase().padStart(2,'0')+'</td><td class="b10">'+code+'</td><td class="b8">'+code.toString(8)+'</td></tr>';
+  }
+  $('#asOut tbody').innerHTML = rows || '<tr><td colspan="6" class="ui" style="color:var(--ink-3)">Type some text above.</td></tr>';
+  $('#asNote').textContent = skipped ? skipped+' non-ASCII character(s) skipped — ASCII covers only codes 0–127.' :
+    (txt? 'In memory this string occupies '+[...txt].filter(c=>c.codePointAt(0)<128).length+' bytes, one padded code per location.' : '');
+}
+asIn.addEventListener('input', renderAS);
+renderAS();
+
+/* ============ tank monitor ============ */
+const TK=[['P','D'],['T','D'],['P','C'],['T','C'],['P','B'],['T','B'],['P','A'],['T','A']];
+const TKDESC=['Tank D pressure','Tank D temperature','Tank C pressure','Tank C temperature','Tank B pressure','Tank B temperature','Tank A pressure','Tank A temperature'];
+let tkBits=[0,0,0,0,0,0,0,0];
+function buildTank(){
+  $('#tkBank').innerHTML = TK.map((t,i)=>
+    '<div class="sw" data-i="'+i+'"><span class="swled"></span><span class="swname">'+t[0]+'<sub>'+t[1]+'</sub></span>'
+    +'<button class="toggle" aria-pressed="false" aria-label="Toggle '+TKDESC[i]+' sensor"></button>'
+    +'<span class="swsub">'+(t[0]==='P'?'press':'temp')+'</span></div>'
+  ).join('');
+  $$('#tkBank .toggle').forEach((b,i)=> b.addEventListener('click', ()=>{ tkBits[i]^=1; renderTank(); }));
+}
+function renderTank(){
+  $$('#tkBank .sw').forEach((el,i)=>{
+    el.classList.toggle('on', !!tkBits[i]);
+    el.querySelector('.toggle').setAttribute('aria-pressed', tkBits[i]?'true':'false');
+  });
+  const v=tkBits.reduce((a,b)=>a*2+b,0);
+  const bin=tkBits.join('');
+  $('#tkRead').innerHTML=
+    '<div class="convrow"><span class="lab b2">BIN</span><span class="val b2">'+bin.slice(0,4)+' '+bin.slice(4)+'</span><span></span></div>'
+    +'<div class="convrow"><span class="lab b16">HEX</span><span class="val b16">'+v.toString(16).toUpperCase().padStart(2,'0')+'H</span><span></span></div>'
+    +'<div class="convrow"><span class="lab b8">OCT</span><span class="val b8">'+v.toString(8).padStart(3,'0')+'</span><span></span></div>'
+    +'<div class="convrow"><span class="lab b10">DEC</span><span class="val b10">'+v+'</span><span></span></div>';
+  const alarms=tkBits.map((b,i)=> b?'<div class="al">'+TKDESC[i]+' above danger limit</div>':'').join('');
+  $('#tkAlarms').innerHTML = v===0 ? '<div class="clear">All conditions normal — status word 00H.</div>' : alarms;
+}
+buildTank(); renderTank();
+$$('#panel-tank [data-preset]').forEach(b=> b.addEventListener('click', ()=>{
+  const v=+b.dataset.preset;
+  tkBits = v.toString(2).padStart(8,'0').split('').map(Number);
+  renderTank();
+}));
+
+/* ============ practice generator ============ */
+const QT={
+  d2b:{q:v=>'Convert '+v+SUBS[10]+' to 8-bit binary.', gen:()=> 16+Math.floor(Math.random()*240), ans:v=>v.toString(2).padStart(8,'0'), chk:(u,v)=> cleanNum(u,2)===v, work:v=>workDiv(v,2)},
+  d2o:{q:v=>'Convert '+v+SUBS[10]+' to octal.', gen:()=> 64+Math.floor(Math.random()*448), ans:v=>v.toString(8), chk:(u,v)=> cleanNum(u,8)===v, work:v=>workDiv(v,8)},
+  d2h:{q:v=>'Convert '+v+SUBS[10]+' to hexadecimal.', gen:()=> 100+Math.floor(Math.random()*3996), ans:v=>v.toString(16).toUpperCase(), chk:(u,v)=> cleanNum(u,16)===v, work:v=>workDiv(v,16)},
+  b2d:{q:v=>'Convert '+groupBits(v.toString(2).padStart(8,'0'),4)+SUBS[2]+' to decimal.', gen:()=> 16+Math.floor(Math.random()*240), ans:v=>String(v), chk:(u,v)=> cleanNum(u,10)===v, work:v=>workWS(v.toString(2).padStart(8,'0'),2)},
+  o2d:{q:v=>'Convert '+v.toString(8)+SUBS[8]+' to decimal.', gen:()=> 64+Math.floor(Math.random()*448), ans:v=>String(v), chk:(u,v)=> cleanNum(u,10)===v, work:v=>workWS(v.toString(8),8)},
+  h2d:{q:v=>'Convert '+v.toString(16).toUpperCase()+SUBS[16]+' to decimal.', gen:()=> 100+Math.floor(Math.random()*3996), ans:v=>String(v), chk:(u,v)=> cleanNum(u,10)===v, work:v=>workWS(v.toString(16).toUpperCase(),16)},
+  b2o:{q:v=>'Convert '+groupBits(v.toString(2),3)+SUBS[2]+' to octal.', gen:()=> 32+Math.floor(Math.random()*480), ans:v=>v.toString(8), chk:(u,v)=> cleanNum(u,8)===v, work:v=>workGR(v,'b2o')},
+  b2h:{q:v=>'Convert '+groupBits(v.toString(2),4)+SUBS[2]+' to hexadecimal.', gen:()=> 32+Math.floor(Math.random()*480), ans:v=>v.toString(16).toUpperCase(), chk:(u,v)=> cleanNum(u,16)===v, work:v=>workGR(v,'b2h')},
+  badd:{q:v=>'Add '+groupBits(v.a.toString(2),4)+SUBS[2]+' + '+groupBits(v.b.toString(2),4)+SUBS[2]+' (answer in binary).', gen:()=>({a:16+Math.floor(Math.random()*200), b:16+Math.floor(Math.random()*200)}), ans:v=>groupBits((v.a+v.b).toString(2),4), chk:(u,v)=> cleanNum(u,2)===v.a+v.b, work:v=>workArith(v.a,v.b,2,'add')},
+  bsub:{q:v=>'Subtract '+groupBits(v.a.toString(2),4)+SUBS[2]+' − '+groupBits(v.b.toString(2),4)+SUBS[2]+' (answer in binary).', gen:()=>{const a=64+Math.floor(Math.random()*190); const b=8+Math.floor(Math.random()*(a-16)); return {a,b};}, ans:v=>groupBits((v.a-v.b).toString(2),4), chk:(u,v)=> cleanNum(u,2)===v.a-v.b, work:v=>workArith(v.a,v.b,2,'sub')},
+  hadd:{q:v=>'Add '+v.a.toString(16).toUpperCase()+SUBS[16]+' + '+v.b.toString(16).toUpperCase()+SUBS[16]+' (answer in hex).', gen:()=>({a:64+Math.floor(Math.random()*960), b:64+Math.floor(Math.random()*960)}), ans:v=>(v.a+v.b).toString(16).toUpperCase(), chk:(u,v)=> cleanNum(u,16)===v.a+v.b, work:v=>workArith(v.a,v.b,16,'add')},
+  hsub:{q:v=>'Subtract '+v.a.toString(16).toUpperCase()+SUBS[16]+' − '+v.b.toString(16).toUpperCase()+SUBS[16]+' (answer in hex).', gen:()=>{const a=128+Math.floor(Math.random()*896); const b=16+Math.floor(Math.random()*(a-32)); return {a,b};}, ans:v=>(v.a-v.b).toString(16).toUpperCase(), chk:(u,v)=> cleanNum(u,16)===v.a-v.b, work:v=>workArith(v.a,v.b,16,'sub')},
+  d2bcd:{q:v=>'Convert '+v+SUBS[10]+' to BCD.', gen:()=> 100+Math.floor(Math.random()*900), ans:v=>String(v).split('').map(d=>(+d).toString(2).padStart(4,'0')).join(' '), chk:(u,v)=> bcdDecode(u)===String(v), work:v=>workBCDenc(String(v))},
+  bcd2d:{q:v=>'Convert '+String(v).split('').map(d=>(+d).toString(2).padStart(4,'0')).join(' ')+'<sub>BCD</sub> to decimal.', gen:()=> 100+Math.floor(Math.random()*900), ans:v=>String(v), chk:(u,v)=> cleanNum(u,10)===v, work:v=>workBCDdec(String(v))},
+  d2tc:{q:v=>'Convert '+v+SUBS[10]+' to 8-bit two&rsquo;s complement.', gen:()=> -(1+Math.floor(Math.random()*128)), ans:v=>groupBits((256+v).toString(2).padStart(8,'0'),4), chk:(u,v)=> cleanNum(u,2)===256+v, work:v=>workTCenc(v)},
+  tc2d:{q:v=>'The 8-bit two&rsquo;s-complement word '+groupBits(v.toString(2).padStart(8,'0'),4)+' equals what decimal value?', gen:()=> 128+Math.floor(Math.random()*128), ans:v=>String(v-256), chk:(u,v)=> /^[-+−]?\d+$/.test(u.trim()) && parseInt(u.trim().replace(/−/g,'-'),10)===v-256, work:v=>workTCdec(v)},
+  ascii:{q:v=>'What is the ASCII code for “'+String.fromCharCode(v)+'”, in hex?', gen:()=> 33+Math.floor(Math.random()*94), ans:v=>v.toString(16).toUpperCase(), chk:(u,v)=> cleanNum(u,16)===v, work:v=>workASCII(v)}
+};
+function cleanNum(u,b){ let s=u.replace(/\s+/g,'').toUpperCase().replace(/^0X/,''); if(b===16) s=s.replace(/H$/,''); if(!s||[...s].some(c=>validDigits(b).indexOf(c)<0)) return NaN; return parseInt(s,b); }
+function bcdDecode(u){ const s=u.replace(/\s+/g,''); if(s.length%4||[...s].some(c=>c!=='0'&&c!=='1')) return null;
+  let out=''; for(let i=0;i<s.length;i+=4){ const v=parseInt(s.slice(i,i+4),2); if(v>9) return null; out+=v; } return String(+out); }
+/* worked-solution builders reuse the same visual language */
+function workDiv(v,b){
+  let q=v, html='<div class="faded">Successive division by '+b+':</div>';
+  const steps=[]; if(q===0) steps.push({q:0,nq:0,r:0});
+  while(q>0){ steps.push({q, nq:Math.floor(q/b), r:q%b}); q=Math.floor(q/b); }
+  steps.forEach((s,i)=>{
+    const fr=s.r===0?'.0':String(s.r/b).slice(1);
+    html+='<div class="divrow">'+s.q+' ÷ '+b+' = '+s.nq+'&nbsp;&nbsp;remainder <b class="dgt '+BASECLS[b]+'">'+digitChar(s.r)+'</b>'+(i===0?' <span class="tag tag-lsb">LSD</span>':'')+(i===steps.length-1?' <span class="tag tag-msb">MSD</span>':'')
+      +'&nbsp;&nbsp;<span class="faded">calc: '+s.nq+fr+' → '+fr+' × '+b+' = '+s.r+'</span></div>';
+  });
+  const d=steps.map(s=>digitChar(s.r)).reverse().join('');
+  html+='<div class="result-line">'+v+SUBS[10]+' = <b class="'+BASECLS[b]+'">'+(b===2?groupBits(padTo(d,8),4):d)+'</b>'+SUBS[b]+'</div>';
+  return html;
+}
+function workWS(s,b){
+  let html='<div class="faded">Weighted sum — each digit × '+b+'<sup>position</sup>:</div>', tot=0;
+  for(let i=0;i<s.length;i++){ const d=parseInt(s[i],b), p=s.length-1-i, pv=d*Math.pow(b,p); tot+=pv;
+    if(d>0||s.length<=4) html+='<div class="divrow"><b class="dgt '+BASECLS[b]+'">'+s[i]+'</b> × '+b+sup(p)+' = '+pv+'</div>'; }
+  html+='<div class="result-line">Total = <b class="b10">'+tot+SUBS[10]+'</b></div>'; return html;
+}
+function workGR(v,mode){
+  const k=mode==='b2o'?3:4, b=k===3?8:16;
+  const raw=v.toString(2), padded=padTo(raw,k);
+  let parts=[]; for(let i=0;i<padded.length;i+=k) parts.push(padded.slice(i,i+k)+' → '+parseInt(padded.slice(i,i+k),2).toString(b).toUpperCase());
+  return '<div class="faded">Group in '+k+'s from the LSB (pad the left):</div><div class="divrow">'+parts.join(' &nbsp;·&nbsp; ')+'</div>'
+    +'<div class="result-line">= <b class="'+BASECLS[b]+'">'+v.toString(b).toUpperCase()+'</b>'+SUBS[b]+'</div>';
+}
+function workBCDenc(s){
+  return '<div class="faded">Each decimal digit → its own 4-bit nibble:</div><div class="divrow">'
+    + s.split('').map(d=> d+' → '+(+d).toString(2).padStart(4,'0')).join(' &nbsp;·&nbsp; ')
+    +'</div><div class="result-line">'+s+SUBS[10]+' = <b class="bC">'+s.split('').map(d=>(+d).toString(2).padStart(4,'0')).join(' ')+'</b><sub>BCD</sub></div>';
+}
+function workBCDdec(s){
+  return '<div class="faded">Split into 4-bit nibbles from the left; each nibble → one decimal digit:</div><div class="divrow">'
+    + s.split('').map(d=> (+d).toString(2).padStart(4,'0')+' → '+d).join(' &nbsp;·&nbsp; ')
+    +'</div><div class="result-line"><b class="bC">'+s.split('').map(d=>(+d).toString(2).padStart(4,'0')).join(' ')+'</b><sub>BCD</sub> = <b class="b10">'+s+SUBS[10]+'</b></div>';
+}
+function workASCII(code){
+  const b7=code.toString(2).padStart(7,'0');
+  return '<div class="divrow">“'+esc(String.fromCharCode(code))+'” → column '+b7.slice(0,3)+', row '+b7.slice(3)+' → 7-bit <b class="b2">'+b7.slice(0,3)+' '+b7.slice(3)+'</b>'
+    +' → hex <b class="b16">'+code.toString(16).toUpperCase()+'</b> · dec <b class="b10">'+code+'</b></div>';
+}
+function workTCenc(v){
+  const mag=-v, magP=mag.toString(2).padStart(8,'0');
+  const inv=magP.split('').map(c=>c==='1'?'0':'1').join('');
+  const pat=(256+v).toString(2).padStart(8,'0');
+  return '<div class="divrow">|'+v+'| = '+mag+SUBS[10]+' = <b class="b2">'+groupBits(magP,4)+'</b></div>'
+    +'<div class="divrow">invert → '+groupBits(inv,4)+' &nbsp;·&nbsp; add 1 → <b class="b2">'+groupBits(pat,4)+'</b></div>'
+    +'<div class="result-line">'+v+SUBS[10]+' = <b class="b2">'+groupBits(pat,4)+'</b></div>';
+}
+function workTCdec(u){
+  const pat=u.toString(2).padStart(8,'0');
+  let terms=['−128'], tot=-128;
+  for(let i=1;i<8;i++){ if(pat[i]==='1'){ terms.push(String(Math.pow(2,7-i))); tot+=Math.pow(2,7-i); } }
+  return '<div class="divrow">MSB is set, so its weight is −128; add the other set weights:</div>'
+    +'<div class="result-line">'+terms.join(' + ')+' = <b class="b10">'+tot+SUBS[10]+'</b></div>';
+}
+let qCur=null, qGood=0, qTried=0, qCounted=false;
+function newQ(){
+  const sel=$('#qType').value;
+  const keys=Object.keys(QT);
+  const k= sel==='any' ? keys[Math.floor(Math.random()*keys.length)] : sel;
+  const t=QT[k], v=t.gen();
+  qCur={k, t, v};
+  qCounted=false;
+  $('#qText').innerHTML=t.q(v);
+  $('#qAns').value=''; $('#qFeed').textContent='';
+  $('#qWork').classList.add('hiderow'); $('#qWork').innerHTML='';
+}
+$('#qNew').addEventListener('click', newQ);
+$('#qType').addEventListener('change', newQ);
+$('#qCheck').addEventListener('click', ()=>{
+  if(!qCur) return;
+  const u=$('#qAns').value;
+  if(!u.trim()){ $('#qFeed').innerHTML='<span class="feedback-bad">Type an answer first.</span>'; return; }
+  const right=qCur.t.chk(u, qCur.v);
+  if(!qCounted){ qTried++; if(right) qGood++; qCounted=true; }
+  $('#qFeed').innerHTML = right
+    ? '<span class="feedback-good">✓ Correct — '+qCur.t.ans(qCur.v)+'</span>'
+    : '<span class="feedback-bad">✗ Not yet — check the work below or try again.</span>';
+  $('#qScore').textContent=qGood+' correct · '+qTried+' attempted';
+});
+$('#qShow').addEventListener('click', ()=>{
+  if(!qCur) return;
+  $('#qWork').innerHTML=qCur.t.work(qCur.v);
+  $('#qWork').classList.remove('hiderow');
+});
+$('#qAns').addEventListener('keydown', e=>{ if(e.key==='Enter') $('#qCheck').click(); });
+newQ();
+
+/* ============ powers reference table ============ */
+(function(){
+  let rows='';
+  for(let n=0;n<=6;n++){
+    rows+='<tr><td>'+n+'</td><td class="b8">'+Math.pow(8,n).toLocaleString('en-US')+'</td><td class="b16">'+Math.pow(16,n).toLocaleString('en-US')+'</td><td class="b2">'+Math.pow(2,n).toLocaleString('en-US')+'</td></tr>';
+  }
+  $('#powTbl').innerHTML=rows;
+})();
+
+/* ============ scrollspy ============ */
+(function(){
+  const links=$$('.rail a');
+  const map={};
+  links.forEach(a=> map[a.getAttribute('href').slice(1)]=a);
+  const obs=new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        links.forEach(a=>a.classList.remove('active'));
+        const a=map[e.target.id]; if(a) a.classList.add('active');
+      }
+    });
+  },{rootMargin:'-15% 0px -70% 0px'});
+  $$('main section, main header').forEach(s=> s.id && obs.observe(s));
+})();
+
+drawADC();
+window.addEventListener('load', drawADC);
+})();
+</script>
+<script src="/assets/fortiview.js"></script>
+</body>
+</html>
