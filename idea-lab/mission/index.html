@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mission Control — Idea Lab</title>
+<title>Mission Control | Idea Lab</title>
 <meta name="description" content="Turn your idea into a real website, a printable flyer, and business cards, right in your browser. Free, no accounts, saved only on your device.">
 <link rel="canonical" href="https://bridgesindust.com/idea-lab/mission/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Bridges Industrial">
-<meta property="og:title" content="Mission Control — Idea Lab">
+<meta property="og:title" content="Mission Control | Idea Lab">
 <meta property="og:description" content="Turn your idea into a real website, a printable flyer, and business cards, right in your browser. Free, no accounts, saved only on your device.">
 <meta property="og:image" content="https://bridgesindust.com/images/social-preview.png">
 <meta property="og:url" content="https://bridgesindust.com/idea-lab/mission/">
@@ -373,7 +373,7 @@
     var name = val(state.name,"My Big Idea"), tag = val(state.tagline, state.name||"A brand new idea");
     var what = val(state.what,"Tell people what your idea does."), cta = val(state.cta,"Try it");
     var who = state.who.trim()?esc(state.who):"", maker = state.maker.trim()?esc(state.maker):"";
-    return '<!doctype html><html><head><meta charset="utf-8"><title>'+name+' — flyer</title><style>' +
+    return '<!doctype html><html><head><meta charset="utf-8"><title>'+name+' | flyer</title><style>' +
       '@page{size:A4;margin:0}*{box-sizing:border-box}body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:#2a2f3a;padding:70px 16px 24px;display:flex;flex-direction:column;align-items:center}' +
       '.page{position:relative;overflow:hidden;width:210mm;min-height:297mm;'+heroBgCss(p)+'color:'+p.ink+';padding:34mm 24mm;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:16px;box-shadow:0 20px 60px #0008}' +
       '.in{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:16px}' +
@@ -392,7 +392,7 @@
     var one = '<div class="card"><div class="top">'+logoMarkup(26,p.solid)+'<span class="nm">'+name+'</span></div>' +
       '<div class="tg">'+tag+'</div><div class="by">'+(maker?esc(state.maker)+' · ':'')+'An Idea Lab project</div></div>';
     var cards=""; for (var i=0;i<10;i++) cards+=one;
-    return '<!doctype html><html><head><meta charset="utf-8"><title>'+name+' — business cards</title><style>' +
+    return '<!doctype html><html><head><meta charset="utf-8"><title>'+name+' | business cards</title><style>' +
       '@page{size:A4;margin:8mm}*{box-sizing:border-box}body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:#2a2f3a;padding:70px 16px 24px;display:flex;flex-direction:column;align-items:center}' +
       '.sheet{display:grid;grid-template-columns:repeat(2,85mm);gap:6mm;background:#fff;padding:8mm;border-radius:6px;box-shadow:0 20px 60px #0008}' +
       '.card{width:85mm;height:54mm;border:1px dashed #c9c9c9;border-radius:9px;padding:7mm;display:flex;flex-direction:column;gap:3mm;justify-content:center;'+heroBgCss(p)+'color:'+p.ink+';overflow:hidden}' +

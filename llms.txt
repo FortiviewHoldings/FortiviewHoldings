@@ -1,28 +1,34 @@
 # Bridges Industrial
 
-> Bridges Industrial is an industrial automation, instrumentation, and technical training company in League City, Texas. Through its PragOptics group it also builds custom field-data hardware, writes control logic for one-off projects, and runs short production batches in photopolymer resin. Contact: support@fortiviewholdings.com, +1 (832) 425-0421.
+> Bridges Industrial is an industrial automation, instrumentation, and technical training company in League City, Texas. Through its PragOptics group it also builds the Omni product line of open field hardware, designs custom hardware and control logic for one-off projects, and runs short production batches in photopolymer resin. Contact: support@fortiviewholdings.com, +1 (832) 425-0421.
 
-Bridges Industrial designs, integrates, and services industrial automation and instrumentation systems, and provides hands-on technical training including community-college instruction. Alongside that field work, the company builds things: custom hardware for field data capture, function and control logic for custom projects, custom hardware for products, and one-off or short-run production parts printed by MSLA in photopolymer resin.
+Bridges Industrial designs, integrates, and services industrial automation and instrumentation systems, and provides hands-on technical training including community-college instruction. Alongside that field work, the company builds things: hardware for field data capture, function and control logic for custom projects, custom hardware for products, and one-off or short-run production parts printed by MSLA in photopolymer resin.
 
-PragOptics is the named internal group that handles the hardware and software side of the business. It develops open field hardware — OmniBus, a universal vendor-neutral HART communicator and calibration recorder, and OmniSource, a pocket loop-power supply — which can be bought assembled or built free from published schematics, BOMs, and print-ready case files. PragOptics also runs a studio for building, publishing, and monetizing websites, web apps, and APIs, plus Field Node Manager for pairing software with hardware, a 3D Suite for modeling and slicing, and business automation, managed Microsoft 365, dashboards, and connected apps.
+PragOptics is the named internal group handling the hardware and software side of the business. On hardware it builds the Omni product line, plus custom boards, enclosures, and control logic for one-off projects. On software it runs a studio for building, publishing, and monetizing websites, web apps, and APIs, plus Field Node Manager, a 3D Suite for modeling and slicing, business automation, managed Microsoft 365, dashboards, and connected apps.
 
 Bridges Industrial also runs the Idea Lab, a free coding and cybersecurity academy for kids, and publishes the Field Pocket Guide, a free set of instrumentation calculators.
 
-Note on naming: the company was formerly **Fortiview Holdings** and the site formerly lived at fortiviewholdings.com. Bridges Industrial is the same company under a new name; the old domain now redirects here. Company email remains @fortiviewholdings.com.
+Note on naming: the company was formerly **Fortiview Holdings**, and the site formerly lived at fortiviewholdings.com. Bridges Industrial is the same company under a new name, and the old domain now redirects here. Company email remains @fortiviewholdings.com.
+
+## The Omni product line
+Open field hardware from PragOptics. Every product can be bought assembled or built free from the published schematics, BOMs, and print-ready case files.
+- **OmniSource** is a pocket loop-power supply. Released.
+- **OmniPulse** is in development, arriving ahead of OmniBus.
+- **OmniBus** is a universal, vendor-agnostic HART communicator and calibration recorder, expected Q4 2027. It carries Bluetooth, iOS app integration, standalone field operation, calibration datalogging over HTTPS, a local WiFi hotspot, GPS location tracking, and OptiBeacon support from Q4 2028.
 
 ## Services
-- **Industrial automation and instrumentation** — calibration, configuration, and troubleshooting; pneumatic, digital, and smart devices for flow, level, temperature, and analytical measurement; Coriolis, magnetic flow, ultrasonic, radar, and guided-wave radar transmitters; HART communication and smart transmitter diagnostics; startup, commissioning, and loop verification across all major OEM platforms.
-- **Control logic development** — PLC and DCS logic, motor and relay logic, interlocks, PID loop tuning and control strategy, safety instrumented functions, and custom sequence or batch logic for one-off machines.
-- **Custom hardware design and build** — field-data capture devices, control boards, and enclosures. Schematic capture, PCB layout, board bring-up, firmware and embedded logic, enclosure design, and assembly. One-off prototypes through short production batches.
-- **MSLA printing and short-run production** — masked stereolithography in photopolymer resin, for parts needing fine feature detail and smooth surface finish: prototypes, custom enclosures and housings, jigs and fixtures, replacement or discontinued components, and one-off production runs.
-- **Technical training** — hands-on instrumentation and controls instruction, including community-college teaching, so teams can own the systems they run.
-- **Software and integration** — custom APIs and system bridges, dashboards and analytics, managed Microsoft 365, websites and web apps, and connected app development, delivered through PragOptics.
+- **Industrial automation and instrumentation.** Calibration, configuration, and troubleshooting. Pneumatic, digital, and smart devices for flow, level, temperature, and analytical measurement. Coriolis, magnetic flow, ultrasonic, radar, and guided-wave radar transmitters. HART communication and smart transmitter diagnostics. Startup, commissioning, and loop verification across all major OEM platforms.
+- **Control logic development.** PLC and DCS logic, motor and relay logic, interlocks, PID loop tuning and control strategy, safety instrumented functions, and custom sequence or batch logic for one-off machines.
+- **Custom hardware design and build.** Field-data capture devices, control boards, and enclosures. Schematic capture, PCB layout, board bring-up, firmware and embedded logic, enclosure design, and assembly. One-off prototypes through short production batches.
+- **MSLA printing and short-run production.** Masked stereolithography in photopolymer resin, for parts needing fine feature detail and a smooth surface finish: prototypes, custom enclosures and housings, jigs and fixtures, replacement or discontinued components, and one-off production runs.
+- **Technical training.** Hands-on instrumentation and controls instruction, including community-college teaching, so teams can own the systems they run.
+- **Software and integration.** Custom APIs and system bridges, dashboards and analytics, managed Microsoft 365, websites and web apps, and connected app development, delivered through PragOptics.
 
 ## Core pages
 - [Home](https://bridgesindust.com/): What Bridges Industrial does, across all four arms.
 - [Industrial Automation & Technical Training](https://bridgesindust.com/industrial/): Instrumentation and controls, PLC and DCS, motor and relay logic, calibration, PID and safety instrumented functions, IT/OT integration, and hands-on technical training. Fifteen years of field experience.
 - [Partnerships](https://bridgesindust.com/partnerships/): A vetted network of vendors and integrators. Vendor network, bulk procurement, co-selling, referrals, integration partners.
-- [PragOptics](https://bridgesindust.com/integration/): The hardware and software group. Open hardware (OmniBus, the universal HART communicator and calibration recorder; OmniSource, the pocket loop-power supply) sold assembled or built free from published designs; custom hardware and control logic for one-off projects; MSLA resin production runs; the PragOptics studio for websites, web apps, and APIs; Field Node Manager; the 3D Suite for modeling and slicing; plus automation and workflows, managed Microsoft 365, dashboards, security and audit, and iOS and connected apps. Tiers are User at $7.50, Partner at $49, and Super at $350 per user per month, with 10 percent off annual billing. Subscribe and manage at https://pragoptics.com.
+- [PragOptics](https://bridgesindust.com/integration/): The hardware and software group. The Omni product line, custom hardware and control logic for one-off projects, MSLA resin production runs, the PragOptics studio for websites, web apps, and APIs, Field Node Manager, the 3D Suite, plus automation and workflows, managed Microsoft 365, dashboards, security and audit, and iOS and connected apps. Tiers are User at $7.50, Partner at $49, and Super at $350 per user per month, with 10 percent off annual billing. Subscribe and manage at https://pragoptics.com.
 - [Idea Lab](https://bridgesindust.com/idea-lab/): A free, cosmic coding and cybersecurity academy for kids. Teaches how a rock becomes a computer, online safety, how AI works, and how to launch an idea. No accounts, no cost, runs in the browser.
 - [Field Pocket Guide](https://bridgesindust.com/education/): Free instrumentation calculators and reference tables. No accounts, runs in the browser, works offline once loaded.
 
@@ -36,9 +42,9 @@ Note on naming: the company was formerly **Fortiview Holdings** and the site for
 - [Numbering Systems](https://bridgesindust.com/education/numbering-systems/): Interactive lab for binary, octal, hexadecimal, BCD, ASCII and two's complement, with a master any-base converter that shows every step of the work, an ADC sampling bench, successive division, bit grouping, column arithmetic, and a practice problem generator.
 
 ## Idea Lab wings
-- [The Foundry](https://bridgesindust.com/idea-lab/foundry/): How a rock becomes a computer — binary, logic gates, adders, memory, pixels, CPUs, and a first program.
-- [Defense Wing](https://bridgesindust.com/idea-lab/defense/): Staying safe online — passwords, two-factor authentication, phishing, HTTPS, cookies, privacy, threat modeling, and responsible disclosure.
-- [AI Wing](https://bridgesindust.com/idea-lab/ai-wing/): How AI actually works — prediction, prompts, hallucinations, bias, provenance, telling real from generated, and using AI responsibly.
+- [The Foundry](https://bridgesindust.com/idea-lab/foundry/): How a rock becomes a computer. Binary, logic gates, adders, memory, pixels, CPUs, and a first program.
+- [Defense Wing](https://bridgesindust.com/idea-lab/defense/): Staying safe online. Passwords, two-factor authentication, phishing, HTTPS, cookies, privacy, threat modeling, and responsible disclosure.
+- [AI Wing](https://bridgesindust.com/idea-lab/ai-wing/): How AI actually works. Prediction, prompts, hallucinations, bias, provenance, telling real from generated, and using AI responsibly.
 - [Mission](https://bridgesindust.com/idea-lab/mission/): Turning an idea into something real.
 - [Starcharts](https://bridgesindust.com/idea-lab/starcharts/): Progress tracking across the wings.
 
