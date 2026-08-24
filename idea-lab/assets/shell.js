@@ -281,6 +281,59 @@
     else document.body.insertBefore(el, document.body.children[1] || null);
   }
 
+  /* ---- structured data ----
+     Idea Lab pages carry their own chrome and deliberately do not load
+     the main site's fortiview.js, so they would otherwise ship no
+     schema.org markup at all. Emitting it here covers every page in the
+     subsystem from one place: a breadcrumb trail built from the URL
+     (Home > Idea Lab > wing > page) plus the page itself as a free
+     LearningResource published by the parent company. */
+  var SITE = "https://bridgesindust.com";
+  function structuredData() {
+    if (document.querySelector('script[type="application/ld+json"]')) return;
+    var path = location.pathname.replace(/index\.html$/, "");
+    if (path.indexOf("/idea-lab/") !== 0) return;
+
+    var crumbs = [{ name: "Home", item: SITE + "/" },
+                  { name: "Idea Lab", item: SITE + "/idea-lab/" }];
+    var segs = path.replace(/^\/idea-lab\/?/, "").replace(/\/$/, "").split("/").filter(Boolean);
+    if (segs.length) {
+      var wing = wingByKey(segs[0]);
+      crumbs.push({ name: wing ? wing.name : segs[0], item: SITE + "/idea-lab/" + segs[0] + "/" });
+    }
+    if (segs.length > 1) {
+      var leaf = (document.title || "").split("—")[0].trim() || segs[segs.length - 1];
+      crumbs.push({ name: leaf, item: SITE + path });
+    }
+
+    var desc = document.querySelector('meta[name="description"]');
+    var graph = [{
+      "@type": "BreadcrumbList",
+      "itemListElement": crumbs.map(function (c, i) {
+        return { "@type": "ListItem", "position": i + 1, "name": c.name, "item": c.item };
+      })
+    }, {
+      "@type": "LearningResource",
+      "@id": SITE + path + "#page",
+      "url": SITE + path,
+      "name": (document.title || "Idea Lab").replace(/\s*—\s*Idea Lab$/, ""),
+      "description": desc ? desc.getAttribute("content") : "",
+      "inLanguage": "en-US",
+      "isAccessibleForFree": true,
+      "educationalLevel": "beginner",
+      "learningResourceType": "interactive lesson",
+      "audience": { "@type": "EducationalAudience", "educationalRole": "student" },
+      "isPartOf": { "@type": "WebSite", "name": "Idea Lab", "url": SITE + "/idea-lab/" },
+      "publisher": { "@type": "Organization", "name": "Bridges Industrial", "url": SITE }
+    }];
+
+    var el = document.createElement("script");
+    el.type = "application/ld+json";
+    el.textContent = JSON.stringify({ "@context": "https://schema.org", "@graph": graph });
+    document.head.appendChild(el);
+  }
+  structuredData();
+
   /* ---- public API ---- */
   window.IdeaLab = {
     data: DATA,

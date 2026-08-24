@@ -28,7 +28,9 @@
     var graph = [];
     if (!hasOrg) {
       graph.push({
-        "@type": "Organization", "@id": ORG, "name": "Bridges Industrial", "url": "https://bridgesindust.com",
+        "@type": "Organization", "@id": ORG, "name": "Bridges Industrial",
+        "alternateName": "Fortiview Holdings", /* former name: keeps the rebrand connected for search */
+        "url": "https://bridgesindust.com",
         "logo": "https://bridgesindust.com/images/Logo.png", "email": "support@fortiviewholdings.com",
         "telephone": "+1-832-425-0421", "areaServed": "United States",
         "contactPoint": { "@type": "ContactPoint", "telephone": "+1-832-425-0421", "email": "support@fortiviewholdings.com", "contactType": "customer support" },
@@ -41,6 +43,7 @@
       });
       graph.push({
         "@type": "LocalBusiness", "@id": "https://bridgesindust.com/#local", "name": "Bridges Industrial",
+        "alternateName": "Fortiview Holdings",
         "url": "https://bridgesindust.com", "image": "https://bridgesindust.com/images/social-preview.png",
         "telephone": "+1-832-425-0421", "email": "support@fortiviewholdings.com", "priceRange": "$$",
         "address": { "@type": "PostalAddress", "addressLocality": "League City", "addressRegion": "TX", "addressCountry": "US" },

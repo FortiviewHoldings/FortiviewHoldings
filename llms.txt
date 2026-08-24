@@ -2,7 +2,9 @@
 
 > Bridges Industrial is the parent company behind industrial automation and technical training, PragOptics technology, and the Idea Lab. Based in League City, Texas. Contact: support@fortiviewholdings.com, +1 (832) 425-0421.
 
-Bridges Industrial designs and integrates industrial automation and instrumentation systems, provides hands-on technical training (including community-college instruction), and operates PragOptics, its technology arm. PragOptics is a creation platform — where ideas become real: open hardware you can buy assembled or build free from the published designs (schematics, BOMs, print-ready case files), a studio for building, publishing, and monetizing websites, web apps, and APIs, Field Node Manager for pairing software with hardware, and a 3D Suite for modeling and slicing. PragOptics makes OmniBus, the universal HART communicator and calibration recorder, and OmniSource, the pocket loop-power supply, and also powers business automation and workflows, managed Microsoft 365, dashboards, and connected apps. Bridges Industrial also runs the Idea Lab, a free coding and cybersecurity academy for kids.
+Bridges Industrial designs and integrates industrial automation and instrumentation systems, provides hands-on technical training (including community-college instruction), and operates PragOptics, its technology arm. PragOptics is a creation platform — where ideas become real: open hardware you can buy assembled or build free from the published designs (schematics, BOMs, print-ready case files), a studio for building, publishing, and monetizing websites, web apps, and APIs, Field Node Manager for pairing software with hardware, and a 3D Suite for modeling and slicing. PragOptics makes OmniBus, the universal HART communicator and calibration recorder, and OmniSource, the pocket loop-power supply, and also powers business automation and workflows, managed Microsoft 365, dashboards, and connected apps. Bridges Industrial also runs the Idea Lab, a free coding and cybersecurity academy for kids, and publishes the Field Pocket Guide, a free set of instrumentation calculators.
+
+Note on naming: the company was formerly **Fortiview Holdings** and the site formerly lived at fortiviewholdings.com. Bridges Industrial is the same company under a new name; the old domain now redirects here. Company email remains @fortiviewholdings.com.
 
 ## Core pages
 - [Home](https://bridgesindust.com/): Parent company overview.
@@ -10,7 +12,26 @@ Bridges Industrial designs and integrates industrial automation and instrumentat
 - [Partnerships](https://bridgesindust.com/partnerships/): A vetted network of vendors and integrators. Vendor network, bulk procurement, co-selling, referrals, integration partners.
 - [PragOptics](https://bridgesindust.com/integration/): The technology arm — a creation platform where ideas become real. Open hardware (OmniBus, the universal HART communicator and calibration recorder; OmniSource, the pocket loop-power supply) sold assembled or built free from published designs; the PragOptics studio for building, publishing, and monetizing websites, web apps, and APIs; Field Node Manager; the PragOptics 3D Suite for modeling and slicing; plus automation and workflows, managed Microsoft 365, dashboards, security and audit, and iOS and connected apps. Tiers are User at $7.50, Partner at $49, and Super at $350 per user per month, with 10 percent off annual billing. Subscribe and manage at https://pragoptics.com.
 - [Idea Lab](https://bridgesindust.com/idea-lab/): A free, cosmic coding and cybersecurity academy for kids. Teaches how a rock becomes a computer, online safety, how AI works, and how to launch an idea. No accounts, no cost, runs in the browser.
-- [Field Pocket Guide](https://bridgesindust.com/education/): Free instrumentation calculators and reference tables — calibration error (percent of span), signal scaling, square-root flow extraction, RTD and thermocouple tables (IEC 60751, ITS-90), field formulas, and an interactive numbering-systems lab (binary, octal, hex, BCD, ASCII, two's complement). No accounts, runs in the browser, works offline once loaded.
+- [Field Pocket Guide](https://bridgesindust.com/education/): Free instrumentation calculators and reference tables. No accounts, runs in the browser, works offline once loaded.
+
+## Field Pocket Guide tools
+- [Calibration Error](https://bridgesindust.com/education/calibration/): Multi-point As-Found / As-Left worksheet. Error as percent of span, with pass/fail against a tolerance you set. Handles compound and reverse-acting ranges.
+- [Signal Scaling](https://bridgesindust.com/education/scaling/): Two-way linear scaling between any input and output span. 4-20 mA to engineering units and back, with percent of span.
+- [Square-Root Extraction](https://bridgesindust.com/education/square-root/): Differential-pressure flow, both directions, showing DP-linear and flow-extracted mA side by side.
+- [RTD Tables](https://bridgesindust.com/education/rtd/): Pt100, Pt500 and Pt1000 resistance against temperature per IEC 60751 (alpha 0.00385), Callendar-Van Dusen. Table generation and single-reading conversion either way.
+- [Thermocouple Tables](https://bridgesindust.com/education/thermocouple/): Types J, K, T, E, N, R, S and B. Millivolts against temperature per ITS-90, reference junction 0 °C, with cold-junction compensation.
+- [Field Formulas](https://bridgesindust.com/education/formulas/): The working set of instrumentation formulas with worked examples: percent of span, mA conversions, scaling, square root, calibration error, turndown, RTD and thermocouple basics, Ohm's law and loop burden.
+- [Numbering Systems](https://bridgesindust.com/education/numbering-systems/): Interactive lab for binary, octal, hexadecimal, BCD, ASCII and two's complement, with a master any-base converter that shows every step of the work, an ADC sampling bench, successive division, bit grouping, column arithmetic, and a practice problem generator.
+
+## Idea Lab wings
+- [The Foundry](https://bridgesindust.com/idea-lab/foundry/): How a rock becomes a computer — binary, logic gates, adders, memory, pixels, CPUs, and a first program.
+- [Defense Wing](https://bridgesindust.com/idea-lab/defense/): Staying safe online — passwords, two-factor authentication, phishing, HTTPS, cookies, privacy, threat modeling, and responsible disclosure.
+- [AI Wing](https://bridgesindust.com/idea-lab/ai-wing/): How AI actually works — prediction, prompts, hallucinations, bias, provenance, telling real from generated, and using AI responsibly.
+- [Mission](https://bridgesindust.com/idea-lab/mission/): Turning an idea into something real.
+- [Starcharts](https://bridgesindust.com/idea-lab/starcharts/): Progress tracking across the wings.
+
+## Optional
+- [Terms, Privacy & Communications](https://bridgesindust.com/integration/terms/): Terms of service, pricing policy, privacy protections, and communication standards.
 
 ## Contact
 - Email: support@fortiviewholdings.com
