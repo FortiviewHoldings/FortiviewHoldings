@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Numbering Systems &amp; Codes Lab (Binary, Octal, Hex, BCD, ASCII) | Field Pocket Guide</title>
-  <meta name="description" content="An interactive numbering-systems lab: binary, octal, hex, BCD, ASCII, and two's complement, with an ADC sampling bench, step-through successive division, bit grouping, column arithmetic with carries, a tank-farm alarm demo, and a practice problem generator.">
+  <meta name="description" content="An interactive numbering-systems lab: binary, octal, hex, BCD, ASCII, and two's complement, with a master any-base converter that shows every step of the work, an ADC sampling bench, step-through successive division, bit grouping, column arithmetic with carries, a tank-farm alarm demo, and a practice problem generator.">
   <meta name="color-scheme" content="dark" />
   <link rel="canonical" href="https://fortiviewholdings.com/education/numbering-systems/">
   <meta property="og:type" content="website">
@@ -182,6 +182,8 @@
     .convrow .showwork{font-family:var(--mono);font-size:.64rem;letter-spacing:.06em;text-transform:uppercase;background:none;
       border:1px solid var(--glass-border-2);border-radius:6px;padding:5px 10px;color:var(--ink-2);white-space:nowrap;cursor:pointer}
     .convrow .showwork:hover{border-color:var(--accent);color:var(--accent)}
+    .convrows .work{font-size:.85rem}
+    .mc-self{font-family:var(--mono);font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap;justify-self:end}
 
     /* ASCII grid */
     .ascii-grid{border-collapse:collapse;font-family:var(--mono);font-size:.82rem}
@@ -360,7 +362,6 @@
       <a href="#s-octal">Octal</a>
       <a href="#s-hex">Hex</a>
       <a href="#s-grouping">Bit Grouping</a>
-      <a href="#s-converter">Converter</a>
       <a href="#s-arith">Add &amp; Subtract</a>
       <a href="#s-twoscomp">Two's Complement</a>
       <a href="#s-bcd">BCD</a>
@@ -446,20 +447,23 @@
       <div class="rulebox"><span class="rb-label">Rule — any base → decimal</span>
         <p>Multiply each digit by its weighting factor (base<sup>position</sup>) and add the products. The least-significant digit of <em>any</em> base always has weight base⁰ = 1.</p>
       </div>
-      <p>The expander below performs that multiply-and-add for any base — use it now with base 10 to see the familiar system dissected, and come back to it after the binary, octal, and hex sections. It also accepts a radix point: positions to the right of the point take <em>negative</em> powers (base⁻¹, base⁻², …), which is how fractional binary works.</p>
+      <p>The master converter below is built on that idea. Enter a number in any one system — decimal included — and the table shows it in every one of them, BCD and ASCII codes included, each row with its complete worked breakdown: a weighted sum toward decimal, successive division or bit grouping away from it. Work it in any direction, and come back to it after the octal and hex sections.</p>
 
-      <div class="panel" id="panel-weighted">
-        <div class="panel-head"><span class="sq" style="background:var(--dec)"></span><h3>Weighted-Sum Expander — any base → decimal</h3><span class="ref">weighted sum</span></div>
+      <div class="panel" id="panel-master">
+        <div class="panel-head"><span class="sq" style="background:var(--accent)"></span><h3>Master Converter — every base at once</h3><span class="ref">any direction</span></div>
         <div class="panel-body">
+          <p>Pick the base you're starting in, type the number, and read the rest. Every row carries its own work — the same procedures the sections below teach by hand.</p>
           <div class="controls">
-            <div class="field"><label for="wsIn">Number</label><input type="text" id="wsIn" value="01010110" size="16" spellcheck="false" autocomplete="off"></div>
-            <div class="field"><label id="wsBaseLab">Base</label>
-              <div class="seg" role="group" aria-labelledby="wsBaseLab">
-                <button data-b="2" aria-pressed="true">2</button><button data-b="8" aria-pressed="false">8</button><button data-b="10" aria-pressed="false">10</button><button data-b="16" aria-pressed="false">16</button>
+            <div class="field"><label for="mcIn">Number</label><input type="text" id="mcIn" value="01010110" size="16" spellcheck="false" autocomplete="off"></div>
+            <div class="field"><label id="mcBaseLab">Input base</label>
+              <div class="seg" role="group" aria-labelledby="mcBaseLab">
+                <button data-b="10" aria-pressed="false">DEC</button><button data-b="2" aria-pressed="true">BIN</button><button data-b="8" aria-pressed="false">OCT</button><button data-b="16" aria-pressed="false">HEX</button>
               </div>
             </div>
+            <button class="btn btn--ghost btn--sm" id="mcAll">Hide all work</button>
           </div>
-          <div class="work" id="wsOut"></div>
+          <div class="convrows" id="mcOut"></div>
+          <div class="note" id="mcNote"></div>
         </div>
       </div>
     </section>
@@ -469,7 +473,7 @@
       <span class="fv-eyebrow"><span class="n">03</span> Foundations</span>
       <h2>Binary — Base 2</h2>
       <p>Digital electronics settled on <strong>binary</strong> because its two digits, 0 and 1, map directly onto two transistor states: 0&nbsp;V and +5&nbsp;V. Each binary digit is a <strong>bit</strong>. Four bits make a <strong>nibble</strong>, eight make a <strong>byte</strong> — the standard width of a memory location and of most basic ADC outputs.</p>
-      <p>Binary weights are the powers of 2: …128, 64, 32, 16, 8, 4, 2, 1. Memorize the first eight — you will use them constantly. To evaluate a binary number, add the weights wherever a 1 appears: 0101 0110₂ = 64 + 16 + 4 + 2 = 86₁₀. (Try it in the expander above — it is preloaded with exactly that number.)</p>
+      <p>Binary weights are the powers of 2: …128, 64, 32, 16, 8, 4, 2, 1. Memorize the first eight — you will use them constantly. To evaluate a binary number, add the weights wherever a 1 appears: 0101 0110₂ = 64 + 16 + 4 + 2 = 86₁₀. (The master converter above starts loaded with exactly that number — its DEC row shows this expansion.)</p>
       <p>The weights continue <em>past</em> the radix point by successive division: each step down the ladder divides by 2. That ladder is also the cleanest proof that 2⁰ = 1 — it is the rung between 2¹ = 2 and 2⁻¹ = 0.5.</p>
 
       <div class="panel">
@@ -529,7 +533,7 @@
       <h2>Octal — Base 8</h2>
       <p><strong>Octal</strong> uses the eight digits 0–7, and it exists for one reason: 8 = 2³, so <em>one octal digit is exactly three bits</em>. Long binary strings become short, readable octal with no arithmetic at all — just grouping. Octal shows up in legacy minicomputer documentation, Unix file permissions (<code>chmod 755</code>), and some older PLC addressing schemes.</p>
       <p>Counting in octal: 0, 1, 2, 3, 4, 5, 6, 7 — and then, with 8 and 9 unavailable, the position resets and carries: 10, 11, 12, … 17, 20. Octal 10 is decimal 8.</p>
-      <p>Three conversions, three tools. Octal → decimal: weighted sum with powers of 8 (the Weighted-Sum Expander above). Decimal → octal: successive division by 8 (the machine above). Octal ↔ binary: pure regrouping — the Bit Grouping Lab below draws the braces for you.</p>
+      <p>Three conversions, three tools. Octal → decimal: weighted sum with powers of 8 (the master converter above). Decimal → octal: successive division by 8 (the machine above). Octal ↔ binary: pure regrouping — the Bit Grouping Lab below draws the braces for you.</p>
       <div class="rulebox"><span class="rb-label">Rule — octal ↔ binary</span>
         <p>Binary → octal: starting at the LSB, mark off groups of <strong>3 bits</strong> (pad the left group with leading zeros) and write each group's octal digit. Octal → binary: replace each octal digit with its 3 bits.</p>
       </div>
@@ -572,32 +576,9 @@
       </div>
     </section>
 
-    <!-- ================= 8. UNIVERSAL CONVERTER ================= -->
-    <section id="s-converter">
-      <span class="fv-eyebrow"><span class="n">08</span> Conversions</span>
-      <h2>Universal Converter</h2>
-      <p>Enter a value in any one system and read it in all of them at once. This is the "answer key" view — but every row has a <em>show the work</em> button that jumps to the right calculator, pre-loaded, so the answer is never divorced from the method. (Master the hand procedures before you trust the hex key on your calculator.)</p>
-
-      <div class="panel" id="panel-conv">
-        <div class="panel-head"><span class="sq" style="background:var(--accent)"></span><h3>All-Bases Converter</h3><span class="ref">answer key</span></div>
-        <div class="panel-body">
-          <div class="controls">
-            <div class="field"><label for="cvIn">Value</label><input type="text" id="cvIn" value="86" size="16" spellcheck="false" autocomplete="off"></div>
-            <div class="field"><label id="cvBaseLab">Interpreted as</label>
-              <div class="seg" role="group" aria-labelledby="cvBaseLab">
-                <button data-b="10" aria-pressed="true">DEC</button><button data-b="2" aria-pressed="false">BIN</button><button data-b="8" aria-pressed="false">OCT</button><button data-b="16" aria-pressed="false">HEX</button>
-              </div>
-            </div>
-          </div>
-          <div class="convrows" id="cvOut"></div>
-          <div class="note" id="cvNote"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= 9. ARITHMETIC ================= -->
+    <!-- ================= 8. ARITHMETIC ================= -->
     <section id="s-arith">
-      <span class="fv-eyebrow"><span class="n">09</span> Arithmetic</span>
+      <span class="fv-eyebrow"><span class="n">08</span> Arithmetic</span>
       <h2>Binary &amp; Hex Arithmetic</h2>
       <p>Digital systems don't just store numbers — they compute with them, and the arithmetic happens in the machine's own bases. Column addition in base 2 or base 16 works exactly like the addition you learned in grade school; the only thing that changes is <em>when you carry</em>. A column carries when its sum reaches the base — not when it reaches ten.</p>
       <p>Binary addition needs only four facts: 0+0 = 0, 0+1 = 1, 1+1 = 0 carry 1 (because two is 10₂), and — once carries start rippling — 1+1+1 = 1 carry 1 (three is 11₂). Work right to left, exactly as on paper. That ripple of carries is not just a hand method: it is literally how a ripple-carry adder circuit computes, one full-adder per column, built from logic gates.</p>
@@ -634,9 +615,9 @@
       </div>
     </section>
 
-    <!-- ================= 10. TWO'S COMPLEMENT ================= -->
+    <!-- ================= 9. TWO'S COMPLEMENT ================= -->
     <section id="s-twoscomp">
-      <span class="fv-eyebrow"><span class="n">10</span> Arithmetic</span>
+      <span class="fv-eyebrow"><span class="n">09</span> Arithmetic</span>
       <h2>Two's Complement — Signed Binary</h2>
       <p>Everything so far has been <em>unsigned</em> — fine for a tank level or a memory address, but instrumentation is full of quantities that swing negative: temperatures below zero, bipolar inputs (±10&nbsp;V), reverse flow, the error term in a control loop. A binary word has no minus key; the sign has to live in the bits themselves.</p>
       <p>The industry's answer is <strong>two's complement</strong>. Keep every weighting factor from the binary section except one: in an n-bit word, the MSB's weight turns <em>negative</em> — for 8 bits, −128 instead of +128. Any code with the MSB clear is an ordinary positive number; any code with the MSB set is negative. The scheme gives one unambiguous zero, and — the reason it won — the same adder hardware works for both signs, so subtraction comes free.</p>
@@ -692,9 +673,9 @@
       </div>
     </section>
 
-    <!-- ================= 11. BCD ================= -->
+    <!-- ================= 10. BCD ================= -->
     <section id="s-bcd">
-      <span class="fv-eyebrow"><span class="n">11</span> Codes</span>
+      <span class="fv-eyebrow"><span class="n">10</span> Codes</span>
       <h2>Binary-Coded Decimal</h2>
       <p><strong>BCD</strong> is not a number system — it is a <em>code</em>. Each decimal digit is written as its own 4-bit group: 496 becomes 0100&nbsp;1001&nbsp;0110. No division, no weighting across groups; digit by digit, done. That makes BCD ideal for driving numeric displays — digital voltmeters, panel thermometers, clocks — where each nibble feeds one seven-segment digit directly.</p>
       <p>The cost is efficiency: pure binary stores 496 in 9 bits, BCD needs 12. And only nibbles 0000–1001 are legal. The six patterns 1010 through 1111 (10–15) are <strong>invalid BCD</strong> — if a display driver receives one, something upstream is broken. The decoder below flags them — a classic display-driver failure mode.</p>
@@ -717,9 +698,9 @@
       </div>
     </section>
 
-    <!-- ================= 12. COMPARISON ================= -->
+    <!-- ================= 11. COMPARISON ================= -->
     <section id="s-compare">
-      <span class="fv-eyebrow"><span class="n">12</span> Codes</span>
+      <span class="fv-eyebrow"><span class="n">11</span> Codes</span>
       <h2>The Systems Side by Side</h2>
       <p>Counting is where the systems' personalities show. Watch where each column "rolls over": binary at every power of 2, octal after 7, hex after F, and BCD — the impostor — after 9, because it mirrors decimal digit-for-digit. Notice too that BCD and binary agree perfectly from 0 through 9 and then permanently part ways at 10.</p>
       <div class="panel">
@@ -736,9 +717,9 @@
       </div>
     </section>
 
-    <!-- ================= 13. ASCII ================= -->
+    <!-- ================= 12. ASCII ================= -->
     <section id="s-ascii">
-      <span class="fv-eyebrow"><span class="n">13</span> Codes</span>
+      <span class="fv-eyebrow"><span class="n">12</span> Codes</span>
       <h2>The ASCII Code</h2>
       <p>Numbers are not enough — instruments must also move <em>alphanumeric</em> data: unit labels, part numbers, error messages, commands. The industry's I/O code is <strong>ASCII</strong> (American Standard Code for Information Interchange): 7 bits per character, 2⁷ = 128 combinations covering letters, numerals, punctuation, and 33 control characters. In memory each code is normally padded to 8 bits with a leading 0 (the eighth bit is sometimes a parity bit instead).</p>
       <p>ASCII is everywhere in instrumentation. A bench meter answering a SCPI query over RS-232 or USB replies in ASCII text; when a DMM sends <code>MEAS:VOLT?</code> results back as <code>+1.2345E+00</code>, every one of those characters is a 7-bit code from this table. Reading a raw serial capture in hex and recognizing <code>0x41</code>–<code>0x5A</code> as capital letters is a genuinely useful field skill.</p>
@@ -767,9 +748,9 @@
       </div>
     </section>
 
-    <!-- ================= 14. APPLICATIONS ================= -->
+    <!-- ================= 13. APPLICATIONS ================= -->
     <section id="s-apps">
-      <span class="fv-eyebrow"><span class="n">14</span> Apply</span>
+      <span class="fv-eyebrow"><span class="n">13</span> Apply</span>
       <h2>Applications in Instrumentation</h2>
       <p>Which system you use depends on how the data were produced and where they are going. An ADC hands you raw binary; a technician reads it back as hex because bytes chunk cleanly into two characters; a BCD word drives a numeric display; ASCII carries text over a serial link. The classic teaching example ties them all together: a monitoring computer watching alarm contacts.</p>
       <p>A geothermal plant monitors the temperature (T) and pressure (P) of four storage tanks, A through D. Each sensor drives one bit of an 8-bit status word — 1 means <em>danger limit exceeded</em>, 0 means OK. The computer reads the word; the technician must interpret it. Flip the sensors below, or load one of the preset fault codes, and read the same status word all four ways.</p>
@@ -795,9 +776,9 @@
       <p>Two more patterns worth carrying with you. <strong>BCD at the display:</strong> a three-digit panel thermometer needs 12 bits, four per digit — 147°F arrives as 0001&nbsp;0100&nbsp;0111. <strong>Hex at the memory map:</strong> a 20-bit address bus reaches 2²⁰ ≈ one million locations, written as exactly five hex characters, 00000H–FFFFFH. Every register map and datasheet you read from here on assumes you can move between these representations without friction.</p>
     </section>
 
-    <!-- ================= 15. PRACTICE ================= -->
+    <!-- ================= 14. PRACTICE ================= -->
     <section id="s-practice">
-      <span class="fv-eyebrow"><span class="n">15</span> Apply</span>
+      <span class="fv-eyebrow"><span class="n">14</span> Apply</span>
       <h2>Practice</h2>
       <p>Randomly generated problems in the classic textbook forms. Answer in the box — spacing and leading zeros don't matter, hex is case-insensitive — then check yourself. Every problem can show its full worked solution using the same layouts as the calculators above.</p>
 
@@ -842,9 +823,9 @@
       </div>
     </section>
 
-    <!-- ================= 16. REFERENCE ================= -->
+    <!-- ================= 15. REFERENCE ================= -->
     <section id="s-reference">
-      <span class="fv-eyebrow"><span class="n">16</span> Apply</span>
+      <span class="fv-eyebrow"><span class="n">15</span> Apply</span>
       <h2>Reference</h2>
 
       <div class="panel">
@@ -1138,51 +1119,6 @@ sarV.addEventListener('input', ()=>{
 });
 sarInit();
 
-/* ============ weighted-sum expander ============ */
-const wsIn = $('#wsIn'), wsOut = $('#wsOut');
-const wsSeg = wireSeg($('#panel-weighted .seg'), ()=> renderWS());
-function renderWS(){
-  const base = +wsSeg.get();
-  const raw = wsIn.value;
-  const cls = BASECLS[base];
-  let s = raw.replace(/\s+/g,'').toUpperCase().replace(/^0X/,'');
-  if(!s){ wsOut.innerHTML='<span class="err">Enter a number.</span>'; return; }
-  const parts = s.split('.');
-  if(parts.length>2){ wsOut.innerHTML='<span class="err">Only one radix point allowed.</span>'; return; }
-  const ok = validDigits(base);
-  for(const ch of s.replace('.','')){
-    if(ok.indexOf(ch)<0){ wsOut.innerHTML='<span class="err">'+BASENAME[base][0].toUpperCase()+BASENAME[base].slice(1)+' digits are '+(base===16?'0–9, A–F':ok.split('').join(', '))+' — remove “'+esc(ch)+'”.</span>'; return; }
-  }
-  const intp = parts[0]||'0', frac = parts[1]||'';
-  const maxInt = base===2 ? 32 : 12;
-  if(intp.length>maxInt || frac.length>6){ wsOut.innerHTML='<span class="err">Keep it to '+maxInt+' integer digits and 6 fractional digits.</span>'; return; }
-  let rows=[], total=0;
-  for(let i=0;i<intp.length;i++){
-    const d=parseInt(intp[i],base), p=intp.length-1-i, w=Math.pow(base,p), pv=d*w;
-    total+=pv;
-    rows.push({d:intp[i], p, w, pv});
-  }
-  for(let i=0;i<frac.length;i++){
-    const d=parseInt(frac[i],base), p=-(i+1), w=Math.pow(base,p), pv=d*w;
-    total+=pv;
-    rows.push({d:frac[i], p, w, pv});
-  }
-  const fmt = x => {
-    if(Number.isInteger(x)) return x.toLocaleString('en-US').replace(/,/g,' ');
-    return (+x.toFixed(6)).toString();
-  };
-  let html = '<div class="faded">'+ (base===2?groupBits(intp,4):intp) + (frac?'.'+frac:'') + SUBS[base] + ' expanded by weighting factors:</div>';
-  rows.forEach(r=>{
-    html += '<div class="divrow"><b class="dgt '+cls+'">'+r.d+'</b> × '+base+sup(r.p)+' '
-         +'<span class="faded">('+base+sup(r.p)+' = '+fmt(r.w)+')</span>'
-         +' = <b>'+fmt(r.pv)+'</b></div>';
-  });
-  html += '<div class="result-line">Total = <b class="b10">'+fmt(total)+SUBS[10]+'</b></div>';
-  wsOut.innerHTML = html;
-}
-wsIn.addEventListener('input', renderWS);
-renderWS();
-
 /* ============ powers-of-2 ladder table ============ */
 (function(){
   const tb = $('#pow2tbl tbody');
@@ -1306,41 +1242,6 @@ grMode.addEventListener('change', ()=>{
 });
 grIn.addEventListener('input', renderGR);
 renderGR();
-
-/* ============ universal converter ============ */
-const cvIn=$('#cvIn'), cvOut=$('#cvOut'), cvNote=$('#cvNote');
-const cvSeg = wireSeg($('#panel-conv .seg'), ()=> renderCV());
-function renderCV(){
-  const base=+cvSeg.get();
-  const p=parseIn(cvIn.value, base);
-  if(!p.ok){ cvOut.innerHTML='<div class="err" style="padding:6px 2px">'+p.err+'</div>'; cvNote.textContent=''; return; }
-  const v=p.val;
-  const bin=v.toString(2), oct=v.toString(8), hex=v.toString(16).toUpperCase(), dec=String(v);
-  const bin8=padTo(bin, bin.length<=8?8:(bin.length<=16?16:32));
-  const bcd = dec.split('').map(d=> (+d).toString(2).padStart(4,'0')).join(' ');
-  const rows=[
-    {lab:'DEC', cls:'b10', val:v.toLocaleString('en-US'), work: base===10?null:{kind:'ws', arg:(base===2?bin:base===8?oct:hex), b:base}},
-    {lab:'BIN', cls:'b2', val:groupBits(bin8,4), work: base===10?{kind:'div', b:2}: base===8?{kind:'gr', mode:'o2b', arg:oct}: base===16?{kind:'gr', mode:'h2b', arg:hex}: null},
-    {lab:'OCT', cls:'b8', val:oct, work: base===10?{kind:'div', b:8}: base===2?{kind:'gr', mode:'b2o', arg:bin}: null},
-    {lab:'HEX', cls:'b16', val:hex, work: base===10?{kind:'div', b:16}: base===2?{kind:'gr', mode:'b2h', arg:bin}: null},
-    {lab:'BCD', cls:'bC', val:bcd, work:null}
-  ];
-  cvOut.innerHTML = rows.map((r,i)=>
-    '<div class="convrow"><span class="lab '+r.cls+'">'+r.lab+'</span><span class="val '+r.cls+'">'+r.val+'</span>'
-    +(r.work?'<button class="showwork" data-i="'+i+'">show the work</button>':'<span></span>')+'</div>'
-  ).join('');
-  cvNote.innerHTML = (v>=32&&v<127) ? 'As an ASCII code, '+v+' is the character <b class="mono">'+esc(String.fromCharCode(v))+'</b>. '
-    : (v<128 ? 'As an ASCII code, '+v+' is a control character. ' : '');
-  cvNote.innerHTML += 'BCD encodes the <em>decimal digits</em> “'+dec+'” nibble-by-nibble — note it differs from pure binary for values above 9.';
-  $$('.showwork', cvOut).forEach(btn=> btn.addEventListener('click', ()=>{
-    const w=rows[+btn.dataset.i].work;
-    if(w.kind==='div'){ dvIn.value=String(v); dvSeg.set(w.b); dvCompute(true); $('#panel-div').scrollIntoView({behavior:REDUCED?'auto':'smooth'}); }
-    else if(w.kind==='ws'){ wsIn.value=w.arg; wsSeg.set(w.b); renderWS(); $('#panel-weighted').scrollIntoView({behavior:REDUCED?'auto':'smooth'}); }
-    else { grMode.value=w.mode; grIn.value=w.arg; renderGR(); $('#panel-grp').scrollIntoView({behavior:REDUCED?'auto':'smooth'}); }
-  }));
-}
-cvIn.addEventListener('input', renderCV);
-renderCV();
 
 /* ============ BCD tool ============ */
 const bcdMode=$('#bcdMode'), bcdIn=$('#bcdIn'), bcdOut=$('#bcdOut');
@@ -1715,6 +1616,67 @@ function renderAS(){
 }
 asIn.addEventListener('input', renderAS);
 renderAS();
+
+/* ============ master converter ============
+   One tool, any direction: enter a number in any base and every row of
+   the table shows its own worked breakdown inline. The work builders
+   (workWS / workDiv / workGR / workBCDenc) are the same ones the
+   practice generator uses, so answers and methods always agree. */
+const mcIn=$('#mcIn'), mcOut=$('#mcOut');
+const mcOpen={dec:true,bin:true,oct:true,hex:true,bcd:true,ascii:true};
+const mcSeg=wireSeg($('#panel-master .seg'), ()=> renderMC());
+function expandWork(s, src){
+  const k = src===8?3:4;
+  const v = parseInt(s, src);
+  return '<div class="faded">Each '+BASENAME[src]+' digit expands to exactly '+k+' bits:</div><div class="divrow">'
+    + s.split('').map(ch=> ch+' → '+parseInt(ch,src).toString(2).padStart(k,'0')).join(' &nbsp;·&nbsp; ')
+    + '</div><div class="result-line">'+s+SUBS[src]+' = <b class="b2">'+groupBits(v.toString(2),4)+'</b>'+SUBS[2]+'</div>';
+}
+function crossWork(s, src, tgt){ // octal ↔ hex: route through binary, then regroup
+  return expandWork(s, src) + workGR(parseInt(s,src), tgt===8?'b2o':'b2h');
+}
+function asciiWork(v){
+  if(v>127) return '<div class="faded">ASCII is a 7-bit code — only 0–127 map to characters, so '+v.toLocaleString('en-US')+' has no ASCII meaning.</div>';
+  const L=charLabel(v);
+  const b7=v.toString(2).padStart(7,'0');
+  const name = L.ctl ? L.t+(CTLNAME[L.t]?' — '+CTLNAME[L.t]:'') : '“'+esc(L.t)+'”';
+  return '<div class="divrow">Code '+v+' is '+(L.ctl?'the control character ':'the character ')+'<b class="ui">'+name+'</b></div>'
+    +'<div class="divrow">7-bit: <b class="b2">'+b7.slice(0,3)+' '+b7.slice(3)+'</b> → padded to 8: <b class="b2">'+groupBits('0'+b7,4)+'</b> · hex <b class="b16">'+v.toString(16).toUpperCase().padStart(2,'0')+'</b> · oct <b class="b8">'+v.toString(8)+'</b></div>';
+}
+function renderMC(){
+  const base=+mcSeg.get();
+  const p=parseIn(mcIn.value, base);
+  $('#mcAll').textContent = Object.values(mcOpen).some(Boolean) ? 'Hide all work' : 'Show all work';
+  if(!p.ok){ mcOut.innerHTML='<div class="err" style="padding:6px 2px">'+p.err+'</div>'; $('#mcNote').textContent=''; return; }
+  const v=p.val, clean=p.clean;
+  const bin=v.toString(2), oct=v.toString(8), hex=v.toString(16).toUpperCase(), dec=String(v);
+  const bin8=padTo(bin, bin.length<=8?8:(bin.length<=16?16:(bin.length<=32?32:4)));
+  const bcd=dec.split('').map(d=>(+d).toString(2).padStart(4,'0')).join(' ');
+  const L = v<=127 ? charLabel(v) : null;
+  const rows=[
+    {k:'dec', lab:'DEC', cls:'b10', val:v.toLocaleString('en-US'), self:base===10, work: base===10?null:workWS(clean,base)},
+    {k:'bin', lab:'BIN', cls:'b2', val:groupBits(bin8,4), self:base===2, work: base===2?null: base===10? workDiv(v,2) : expandWork(clean,base)},
+    {k:'oct', lab:'OCT', cls:'b8', val:oct, self:base===8, work: base===8?null: base===10? workDiv(v,8) : base===2? workGR(v,'b2o') : crossWork(clean,16,8)},
+    {k:'hex', lab:'HEX', cls:'b16', val:hex, self:base===16, work: base===16?null: base===10? workDiv(v,16) : base===2? workGR(v,'b2h') : crossWork(clean,8,16)},
+    {k:'bcd', lab:'BCD', cls:'bC', val:bcd, self:false, work: workBCDenc(dec)},
+    {k:'ascii', lab:'ASCII', cls:'bC', val: v>127?'—':(L.ctl?L.t:'“'+esc(L.t)+'”'), self:false, work: asciiWork(v)}
+  ];
+  mcOut.innerHTML = rows.map(r=>{
+    const third = r.self ? '<span class="mc-self">input</span>'
+      : '<button class="showwork" data-k="'+r.k+'">'+(mcOpen[r.k]?'hide work':'show work')+'</button>';
+    return '<div class="convrow"><span class="lab '+r.cls+'">'+r.lab+'</span><span class="val '+r.cls+'">'+r.val+'</span>'+third+'</div>'
+      + (r.work && mcOpen[r.k] ? '<div class="work mc-work">'+r.work+'</div>' : '');
+  }).join('');
+  $('#mcNote').innerHTML = 'BCD encodes the decimal digits “'+dec+'” nibble-by-nibble — it differs from pure binary above 9. ASCII maps codes 0–127 only.';
+  $$('.showwork', mcOut).forEach(btn=> btn.addEventListener('click', ()=>{ mcOpen[btn.dataset.k]=!mcOpen[btn.dataset.k]; renderMC(); }));
+}
+$('#mcAll').addEventListener('click', ()=>{
+  const anyOpen=Object.values(mcOpen).some(Boolean);
+  Object.keys(mcOpen).forEach(k=> mcOpen[k]=!anyOpen);
+  renderMC();
+});
+mcIn.addEventListener('input', renderMC);
+renderMC();
 
 /* ============ tank monitor ============ */
 const TK=[['P','D'],['T','D'],['P','C'],['T','C'],['P','B'],['T','B'],['P','A'],['T','A']];
