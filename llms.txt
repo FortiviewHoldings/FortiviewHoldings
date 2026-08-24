@@ -4,7 +4,7 @@
 
 Bridges Industrial designs, integrates, and services industrial automation and instrumentation systems, and provides hands-on technical training including community-college instruction. Alongside that field work, the company builds things: hardware for field data capture, function and control logic for custom projects, custom hardware for products, and one-off or short-run production parts printed by MSLA in photopolymer resin.
 
-PragOptics is the named internal group handling the hardware and software side of the business. On hardware it builds the Omni product line, plus custom boards, enclosures, and control logic for one-off projects. On software it runs a studio for building, publishing, and monetizing websites, web apps, and APIs, plus Field Node Manager, a 3D Suite for modeling and slicing, business automation, managed Microsoft 365, dashboards, and connected apps.
+PragOptics is the named internal group handling the hardware and software side of the business. On hardware it builds the Omni product line, plus custom boards, enclosures, and control logic for one-off projects. On software it runs a studio for building, publishing, and monetizing websites, web apps, and APIs, plus Field Node Manager, a 3D Suite for modeling and slicing, business automation, managed Microsoft 365, dashboards, and connected apps. A browser-based PragOptics suite is in development that puts those same tools in customers’ hands: design and build your own hardware, test function logic, build and publish web apps, and clean up and visualize data, with a cloud option that provisions environments and storage once an account is active.
 
 Bridges Industrial also runs the Idea Lab, a free coding and cybersecurity academy for kids, and publishes the Field Pocket Guide, a free set of instrumentation calculators.
 
@@ -22,7 +22,7 @@ Open field hardware from PragOptics. Every product can be bought assembled or bu
 - **Custom hardware design and build.** Field-data capture devices, control boards, and enclosures. Schematic capture, PCB layout, board bring-up, firmware and embedded logic, enclosure design, and assembly. One-off prototypes through short production batches.
 - **MSLA printing and short-run production.** Masked stereolithography in photopolymer resin, for parts needing fine feature detail and a smooth surface finish: prototypes, custom enclosures and housings, jigs and fixtures, replacement or discontinued components, and one-off production runs.
 - **Technical training.** Hands-on instrumentation and controls instruction, including community-college teaching, so teams can own the systems they run.
-- **Software and integration.** Custom APIs and system bridges, dashboards and analytics, managed Microsoft 365, websites and web apps, and connected app development, delivered through PragOptics.
+- **Software and integration.** Custom APIs and system bridges, dashboards and analytics, managed Microsoft 365, websites and web apps, and connected app development, delivered through PragOptics. The browser-based PragOptics suite, in development, brings the same capabilities to customers directly: hardware design, function logic testing, web app creation, and data cleanup and visualization, with cloud environment provisioning.
 
 ## Core pages
 - [Home](https://bridgesindust.com/): What Bridges Industrial does, across all four arms.
