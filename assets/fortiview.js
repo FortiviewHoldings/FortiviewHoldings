@@ -149,7 +149,7 @@
   footer.innerHTML =
     '<div class="fv-wrap fv-footer__top">' +
       '<div class="fv-footer__brand">' +
-        '<a class="fv-brand" href="/"><span class="fv-brand__mark" style="background-image:url(/images/Logo.png)"></span>' +
+        '<a class="fv-brand" href="/"><span class="fv-brand__mark fv-brand__mark--plain" style="background-image:url(/images/Logo.png)"></span>' +
         '<span class="fv-brand__name">Bridges <span>Industrial</span></span></a>' +
         "<p>Industrial automation, technical training, PragOptics technology, and the Idea Lab. Engineered for clarity, accountability, and scale.</p>" +
       "</div>" +
