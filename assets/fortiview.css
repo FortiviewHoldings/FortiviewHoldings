@@ -114,6 +114,16 @@ p{margin:0}
 .fv-brand__mark--plain{border:0;box-shadow:none;border-radius:0;background-size:contain;background-repeat:no-repeat;background-position:center}
 .fv-brand__name{font-family:'Rajdhani',var(--display);font-weight:700;color:var(--ink);letter-spacing:.06em;text-transform:uppercase;font-size:1.32rem;line-height:1}
 .fv-brand__name span{color:var(--accent)}
+/* the brand is the Home nav element, so it behaves like one: lift on hover,
+   glow the mark, name to accent, press feedback on click */
+.fv-brand{transition:transform .16s ease}
+.fv-brand:hover{transform:translateY(-1px)}
+.fv-brand:active{transform:translateY(0) scale(.98)}
+.fv-brand:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:var(--radius-sm)}
+.fv-brand__mark{transition:filter .18s ease}
+.fv-brand:hover .fv-brand__mark--plain{filter:drop-shadow(0 0 12px rgba(62,224,255,.6))}
+.fv-brand__name{transition:color .18s ease}
+.fv-brand:hover .fv-brand__name{color:var(--accent)}
 .fv-links{display:flex;align-items:center;gap:2px;margin-left:auto}
 .fv-link{position:relative;color:var(--ink-2);font-size:.95rem;font-weight:500;padding:10px 14px;border-radius:var(--radius-sm)}
 .fv-link:hover{color:var(--ink)}
