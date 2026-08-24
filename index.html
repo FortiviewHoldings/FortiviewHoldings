@@ -36,37 +36,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/fortiview.css">
 
-  <!-- Structured Data -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "Bridges Industrial",
-    "alternateName": "Fortiview Holdings",
-    "url": "https://bridgesindust.com",
-    "logo": "https://bridgesindust.com/images/Logo.png",
-    "image": "https://bridgesindust.com/images/social-preview.png",
-    "sameAs": [
-      "https://www.linkedin.com/company/fortiviewholdings",
-      "https://www.instagram.com/fortiviewholdings"
-    ]
-  }
-  </script>
-
-   <!-- WebSite + SearchAction (helps assistants & voice search) -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Bridges Industrial",
-    "url": "https://bridgesindust.com/",
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": "https://bridgesindust.com/?q={search_term_string}",
-      "query-input": "required name=search_term_string"
-    }
-  }
-  </script>
+  <!-- Structured Data — Organization and WebSite are declared once, in the
+       @graph block below, where @id lets the nodes reference each other.
+       They used to also be declared standalone here, which described the
+       same company twice with two different search endpoints. -->
 
 <!-- FAQ block tuned for Bridges Industrial voice-style questions -->
 <script type="application/ld+json">
@@ -131,11 +104,7 @@
   "@context": "https://schema.org",
   "@type": "Service",
   "serviceType": "Custom Web Development",
-  "provider": {
-    "@type": "Organization",
-    "name": "Bridges Industrial",
-    "url": "https://bridgesindust.com"
-  },
+  "provider": { "@id": "https://bridgesindust.com/#org" },
   "description": "Modern, responsive websites with secure backend infrastructure, custom portals, and branded UX.",
   "areaServed": "United States",
   "inLanguage": "en-US"
@@ -147,30 +116,15 @@
   "@context": "https://schema.org",
   "@type": "Service",
   "serviceType": "Industrial Automation & Instrumentation",
-  "provider": {
-    "@type": "Organization",
-    "name": "Bridges Industrial",
-    "url": "https://bridgesindust.com"
-  },
+  "provider": { "@id": "https://bridgesindust.com/#org" },
   "description": "Calibration, troubleshooting, PLC/DCS logic, commissioning, and smart device support across major OEM platforms.",
   "areaServed": "United States",
   "inLanguage": "en-US"
 }
 </script>
-    <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Product",
-  "name": "OmniBus",
-  "brand": "PragOptics",
-  "manufacturer": { "@type": "Organization", "name": "PragOptics", "url": "https://pragoptics.com" },
-  "description": "Universal, vendor-neutral HART communicator and calibration recorder from PragOptics: works any HART instrument across manufacturers, measures 4-20 mA loop current on board, and turns every connection into an As-Found / As-Left calibration record. Open hardware — buy it assembled or build it free from the published schematic, BOM, and case files. Bluetooth connectivity, iOS integration, and standalone field operation.",
-  "releaseDate": "2027-10-01",
-  "url": "https://pragoptics.com",
-  "image": "https://bridgesindust.com/images/omnibus.png",
-  "inLanguage": "en-US"
-}
-</script>
+<!-- No Product markup for OmniBus here: the product lives on pragoptics.com,
+     and Product schema belongs on the page that actually sells it. The FAQ
+     entry below still answers what OmniBus is and points there. -->
 
 <script type="application/ld+json">
 {
@@ -180,8 +134,10 @@
       "@type": "Organization",
       "@id": "https://bridgesindust.com/#org",
       "name": "Bridges Industrial",
+      "alternateName": "Fortiview Holdings",
       "url": "https://bridgesindust.com",
       "logo": "https://bridgesindust.com/images/Logo.png",
+      "image": "https://bridgesindust.com/images/social-preview.png",
       "sameAs": [
         "https://www.linkedin.com/company/fortiviewholdings",
         "https://www.instagram.com/fortiviewholdings"
@@ -194,42 +150,36 @@
       "url": "https://bridgesindust.com",
       "name": "Bridges Industrial",
       "publisher": { "@id": "https://bridgesindust.com/#org" },
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://bridgesindust.com/?s={search_term_string}",
-        "query-input": "required name=search_term_string"
-      },
       "inLanguage": "en-US"
     }
   ]
 }
 </script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    {
-      "@type": "ListItem",
-      "position": 1,
-      "name": "Home",
-      "item": "https://bridgesindust.com/"
-    }
-  ]
-}
-</script>
+<!-- No BreadcrumbList on the home page: a single-item trail ending at Home
+     describes nothing. Nested pages get a real trail from fortiview.js. -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
+  "@id": "https://bridgesindust.com/#local",
   "name": "Bridges Industrial",
+  "alternateName": "Fortiview Holdings",
   "url": "https://bridgesindust.com",
+  "image": "https://bridgesindust.com/images/social-preview.png",
+  "telephone": "+1-832-425-0421",
+  "email": "support@fortiviewholdings.com",
+  "priceRange": "$$",
   "address": {
     "@type": "PostalAddress",
     "addressLocality": "League City",
     "addressRegion": "TX",
     "addressCountry": "US"
   },
+  "areaServed": "United States",
+  "sameAs": [
+    "https://www.linkedin.com/company/fortiviewholdings",
+    "https://www.instagram.com/fortiviewholdings"
+  ],
   "inLanguage": "en-US"
 }
 </script>
@@ -909,8 +859,8 @@
       <div class="fv-wrap fv-hero__grid">
         <div class="fv-reveal">
           <span class="fv-eyebrow"><span class="n">00</span> Bridges Industrial</span>
-          <h1>The parent company behind the work.</h1>
-          <p class="fv-lead">Bridges Industrial is the parent behind industrial automation and technical training, PragOptics technology, and the Idea Lab. One company, several arms, pointed at the same thing: durable systems, real clarity, and an audit trail that holds up.</p>
+          <h1>The company behind the work.</h1>
+          <p class="fv-lead">Bridges Industrial does industrial automation and technical training, builds technology through PragOptics, and runs the Idea Lab. Several arms, pointed at the same thing: durable systems, real clarity, and an audit trail that holds up.</p>
           <div class="fv-actions">
             <a class="btn btn--primary" href="mailto:support@fortiviewholdings.com?subject=Bridges%20Industrial%20Inquiry">Work with us</a>
             <a class="btn btn--ghost" href="/integration">Explore PragOptics</a>

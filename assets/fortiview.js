@@ -38,8 +38,9 @@
       });
       graph.push({
         "@type": "WebSite", "@id": "https://bridgesindust.com/#website", "url": "https://bridgesindust.com",
-        "name": "Bridges Industrial", "publisher": { "@id": ORG },
-        "potentialAction": { "@type": "SearchAction", "target": "https://bridgesindust.com/?q={search_term_string}", "query-input": "required name=search_term_string" }
+        "name": "Bridges Industrial", "publisher": { "@id": ORG }
+        /* no SearchAction: the site has no search endpoint, and claiming one
+           advertises a sitelinks searchbox that would not work */
       });
       graph.push({
         "@type": "LocalBusiness", "@id": "https://bridgesindust.com/#local", "name": "Bridges Industrial",
@@ -68,7 +69,7 @@
 
   var MAIL = "mailto:support@fortiviewholdings.com?subject=Bridges%20Industrial%20Inquiry";
 
-  /* the parent-company nav lives here ONCE for the whole site */
+  /* the shared nav lives here ONCE for the whole site */
   var NAV = [
     { href: "/industrial",  name: "Industrial Automation" },
     { href: "/partnerships", name: "Partnerships" },
@@ -149,7 +150,7 @@
       '<div class="fv-footer__brand">' +
         '<a class="fv-brand" href="/"><span class="fv-brand__mark" style="background-image:url(/images/Logo.png)"></span>' +
         '<span class="fv-brand__name">Bridges <span>Industrial</span></span></a>' +
-        "<p>The parent company behind industrial automation, technical training, PragOptics technology, and the Idea Lab. Engineered for clarity, accountability, and scale.</p>" +
+        "<p>Industrial automation, technical training, PragOptics technology, and the Idea Lab. Engineered for clarity, accountability, and scale.</p>" +
       "</div>" +
       '<div class="fv-fcol"><h4>What we do</h4>' +
         '<a href="/industrial">Industrial Automation &amp; Training</a>' +

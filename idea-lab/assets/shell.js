@@ -287,7 +287,7 @@
      schema.org markup at all. Emitting it here covers every page in the
      subsystem from one place: a breadcrumb trail built from the URL
      (Home > Idea Lab > wing > page) plus the page itself as a free
-     LearningResource published by the parent company. */
+     LearningResource published by Bridges Industrial. */
   var SITE = "https://bridgesindust.com";
   function structuredData() {
     if (document.querySelector('script[type="application/ld+json"]')) return;
