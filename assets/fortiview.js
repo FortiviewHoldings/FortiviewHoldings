@@ -127,6 +127,7 @@
   header.innerHTML =
     '<div class="fv-wrap fv-nav">' +
       '<a class="fv-brand" href="/">' +
+        '<span class="fv-brand__mark fv-brand__mark--plain" style="background-image:url(/images/Logo.png)"></span>' +
         '<span class="fv-brand__name">Bridges <span>Industrial</span></span>' +
       "</a>" +
       '<nav class="fv-links" aria-label="Primary">' + links("fv-link") +

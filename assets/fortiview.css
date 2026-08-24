@@ -110,6 +110,8 @@ p{margin:0}
 .fv-brand{display:flex;align-items:center;gap:11px;flex:0 0 auto}
 .fv-brand__mark{width:34px;height:34px;border-radius:var(--radius-sm);background-size:cover;background-position:center;
   border:1px solid var(--glass-border-2);box-shadow:0 0 0 3px rgba(47,212,194,.12)}
+/* header badge: the bare logo, no tile -- the footer keeps the contained version */
+.fv-brand__mark--plain{border:0;box-shadow:none;border-radius:0;background-size:contain;background-repeat:no-repeat;background-position:center}
 .fv-brand__name{font-family:'Rajdhani',var(--display);font-weight:700;color:var(--ink);letter-spacing:.06em;text-transform:uppercase;font-size:1.32rem;line-height:1}
 .fv-brand__name span{color:var(--accent)}
 .fv-links{display:flex;align-items:center;gap:2px;margin-left:auto}
