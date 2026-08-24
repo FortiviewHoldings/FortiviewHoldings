@@ -1127,7 +1127,15 @@ function sarRender(){
 $('#sarStep').addEventListener('click', sarStepOnce);
 $('#sarRun').addEventListener('click', ()=>{ if(sarState.done) sarInit(); while(!sarState.done) sarStepOnce(); });
 $('#sarReset').addEventListener('click', sarInit);
-sarV.addEventListener('input', ()=>{ $('#sarVv').textContent=sarVin().toFixed(2); sarInit(); });
+sarV.addEventListener('input', ()=>{
+  // a new input voltage restarts the conversion, but replay the clocks already
+  // taken so dragging the slider updates the decided bits live instead of wiping them
+  $('#sarVv').textContent=sarVin().toFixed(2);
+  const taken = sarState ? sarState.rows.length : 0;
+  sarState={i:SAR_BITS-1, bits:Array(SAR_BITS).fill(null), rows:[], acc:0, done:false};
+  for(let k=0;k<taken && !sarState.done;k++) sarStepOnce();
+  sarRender();
+});
 sarInit();
 
 /* ============ weighted-sum expander ============ */
