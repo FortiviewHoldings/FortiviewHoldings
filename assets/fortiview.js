@@ -1,5 +1,5 @@
 /* ============================================================
-   Fortiview Holdings — shared starfield + header + footer.
+   Bridges Industrial — shared starfield + header + footer.
    One source of truth for the nav, injected on every page.
    Classic JS, no deps. Galactic glass.
    ============================================================ */
@@ -28,19 +28,19 @@
     var graph = [];
     if (!hasOrg) {
       graph.push({
-        "@type": "Organization", "@id": ORG, "name": "Fortiview Holdings", "url": "https://fortiviewholdings.com",
-        "logo": "https://fortiviewholdings.com/images/logo.png", "email": "support@fortiviewholdings.com",
+        "@type": "Organization", "@id": ORG, "name": "Bridges Industrial", "url": "https://fortiviewholdings.com",
+        "logo": "https://fortiviewholdings.com/images/Logo.png", "email": "support@fortiviewholdings.com",
         "telephone": "+1-832-425-0421", "areaServed": "United States",
         "contactPoint": { "@type": "ContactPoint", "telephone": "+1-832-425-0421", "email": "support@fortiviewholdings.com", "contactType": "customer support" },
         "sameAs": SAME
       });
       graph.push({
         "@type": "WebSite", "@id": "https://fortiviewholdings.com/#website", "url": "https://fortiviewholdings.com",
-        "name": "Fortiview Holdings", "publisher": { "@id": ORG },
+        "name": "Bridges Industrial", "publisher": { "@id": ORG },
         "potentialAction": { "@type": "SearchAction", "target": "https://fortiviewholdings.com/?q={search_term_string}", "query-input": "required name=search_term_string" }
       });
       graph.push({
-        "@type": "LocalBusiness", "@id": "https://fortiviewholdings.com/#local", "name": "Fortiview Holdings",
+        "@type": "LocalBusiness", "@id": "https://fortiviewholdings.com/#local", "name": "Bridges Industrial",
         "url": "https://fortiviewholdings.com", "image": "https://fortiviewholdings.com/images/social-preview.png",
         "telephone": "+1-832-425-0421", "email": "support@fortiviewholdings.com", "priceRange": "$$",
         "address": { "@type": "PostalAddress", "addressLocality": "League City", "addressRegion": "TX", "addressCountry": "US" },
@@ -63,7 +63,7 @@
     document.head.appendChild(sc);
   })();
 
-  var MAIL = "mailto:support@fortiviewholdings.com?subject=Fortiview%20Inquiry";
+  var MAIL = "mailto:support@fortiviewholdings.com?subject=Bridges%20Industrial%20Inquiry";
 
   /* the parent-company nav lives here ONCE for the whole site */
   var NAV = [
@@ -123,7 +123,7 @@
   header.innerHTML =
     '<div class="fv-wrap fv-nav">' +
       '<a class="fv-brand" href="/">' +
-        '<span class="fv-brand__name">Fortiview <span>Holdings</span></span>' +
+        '<span class="fv-brand__name">Bridges <span>Industrial</span></span>' +
       "</a>" +
       '<nav class="fv-links" aria-label="Primary">' + links("fv-link") +
         '<a class="btn btn--primary btn--sm" href="' + MAIL + '">Work with us</a>' +
@@ -145,7 +145,7 @@
     '<div class="fv-wrap fv-footer__top">' +
       '<div class="fv-footer__brand">' +
         '<a class="fv-brand" href="/"><span class="fv-brand__mark" style="background-image:url(/images/Logo.png)"></span>' +
-        '<span class="fv-brand__name">Fortiview <span>Holdings</span></span></a>' +
+        '<span class="fv-brand__name">Bridges <span>Industrial</span></span></a>' +
         "<p>The parent company behind industrial automation, technical training, PragOptics technology, and the Idea Lab. Engineered for clarity, accountability, and scale.</p>" +
       "</div>" +
       '<div class="fv-fcol"><h4>What we do</h4>' +
@@ -165,7 +165,7 @@
       "</div>" +
     "</div>" +
     '<div class="fv-wrap fv-footer__bottom">' +
-      "<span>&copy; <span id=\"fv-year\"></span> Fortiview Holdings LLC. All rights reserved.</span>" +
+      "<span>&copy; <span id=\"fv-year\"></span> Bridges Industrial LLC. All rights reserved.</span>" +
       '<a href="/integration/terms/" style="color:var(--muted)">Terms &amp; Privacy</a>' +
     "</div>";
   document.body.appendChild(footer);

@@ -1,6 +1,6 @@
 {
-  "name": "Fortiview Holdings — Strategic Services",
-  "short_name": "Fortiview",
+  "name": "Bridges Industrial — Strategic Services",
+  "short_name": "Bridges",
   "description": "Secure, branded backend-as-a-service solutions for small businesses.",
   "start_url": "/",
   "display": "standalone",
@@ -26,7 +26,7 @@
     },
     {
       "src": "/images/Logo.png",
-      "sizes": "671x676",
+      "sizes": "1024x1032",
       "type": "image/png"
     }
   ]

@@ -2,7 +2,7 @@
 
 > A cosmic academy where a kid walks in holding a rock and walks out having built with it.
 
-Built into the Fortiview Holdings front end as a self-contained subsystem under `/idea-lab/`.
+Built into the Bridges Industrial front end as a self-contained subsystem under `/idea-lab/`.
 Free. No accounts. No servers in the loop. Pure front end. Real facts.
 
 ---
