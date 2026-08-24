@@ -6,4 +6,4 @@ Disallow: /integration/pragoptics/api/
 Disallow: /_archive/
 
 # Point crawlers to your sitemap
-Sitemap: https://fortiviewholdings.com/sitemap.xml
+Sitemap: https://bridgesindust.com/sitemap.xml

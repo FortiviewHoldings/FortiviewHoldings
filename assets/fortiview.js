@@ -14,7 +14,7 @@
 
   /* ---- site-wide structured data (SEO + voice search) ---- */
   (function structuredData() {
-    var ORG = "https://fortiviewholdings.com/#org";
+    var ORG = "https://bridgesindust.com/#org";
     var existing = document.querySelectorAll('script[type="application/ld+json"]'), hasOrg = false;
     for (var i = 0; i < existing.length && !hasOrg; i++) {
       try {
@@ -28,20 +28,20 @@
     var graph = [];
     if (!hasOrg) {
       graph.push({
-        "@type": "Organization", "@id": ORG, "name": "Bridges Industrial", "url": "https://fortiviewholdings.com",
-        "logo": "https://fortiviewholdings.com/images/Logo.png", "email": "support@fortiviewholdings.com",
+        "@type": "Organization", "@id": ORG, "name": "Bridges Industrial", "url": "https://bridgesindust.com",
+        "logo": "https://bridgesindust.com/images/Logo.png", "email": "support@fortiviewholdings.com",
         "telephone": "+1-832-425-0421", "areaServed": "United States",
         "contactPoint": { "@type": "ContactPoint", "telephone": "+1-832-425-0421", "email": "support@fortiviewholdings.com", "contactType": "customer support" },
         "sameAs": SAME
       });
       graph.push({
-        "@type": "WebSite", "@id": "https://fortiviewholdings.com/#website", "url": "https://fortiviewholdings.com",
+        "@type": "WebSite", "@id": "https://bridgesindust.com/#website", "url": "https://bridgesindust.com",
         "name": "Bridges Industrial", "publisher": { "@id": ORG },
-        "potentialAction": { "@type": "SearchAction", "target": "https://fortiviewholdings.com/?q={search_term_string}", "query-input": "required name=search_term_string" }
+        "potentialAction": { "@type": "SearchAction", "target": "https://bridgesindust.com/?q={search_term_string}", "query-input": "required name=search_term_string" }
       });
       graph.push({
-        "@type": "LocalBusiness", "@id": "https://fortiviewholdings.com/#local", "name": "Bridges Industrial",
-        "url": "https://fortiviewholdings.com", "image": "https://fortiviewholdings.com/images/social-preview.png",
+        "@type": "LocalBusiness", "@id": "https://bridgesindust.com/#local", "name": "Bridges Industrial",
+        "url": "https://bridgesindust.com", "image": "https://bridgesindust.com/images/social-preview.png",
         "telephone": "+1-832-425-0421", "email": "support@fortiviewholdings.com", "priceRange": "$$",
         "address": { "@type": "PostalAddress", "addressLocality": "League City", "addressRegion": "TX", "addressCountry": "US" },
         "areaServed": "United States", "sameAs": SAME
@@ -52,8 +52,8 @@
       var nm = (document.title || "").split("—")[0].split("|")[0].trim() || p;
       graph.push({
         "@type": "BreadcrumbList", "itemListElement": [
-          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://fortiviewholdings.com/" },
-          { "@type": "ListItem", "position": 2, "name": nm, "item": "https://fortiviewholdings.com" + p }
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://bridgesindust.com/" },
+          { "@type": "ListItem", "position": 2, "name": nm, "item": "https://bridgesindust.com" + p }
         ]
       });
     }

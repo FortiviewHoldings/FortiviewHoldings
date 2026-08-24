@@ -6,7 +6,7 @@ This repository contains proprietary, confidential, and privileged materials. Al
 
 By accessing or using any part of this repository, you agree to the following:
 
-- All files, code, documentation, and assets are confidential and may not be shared, reproduced, or distributed without explicit written permission. Please use one of the various contact methods that can be found [by clicking here](https://fortiviewholdings.com).
+- All files, code, documentation, and assets are confidential and may not be shared, reproduced, or distributed without explicit written permission. Please use one of the various contact methods that can be found [by clicking here](https://bridgesindust.com).
   - Our team will respond with a **"Basic Request"** form that must be returned.
   - Once approved, we provide free support for integration and infrastructural development.
 - Unauthorized use, disclosure, or duplication of endpoints hosted in this repository is strictly prohibited.
