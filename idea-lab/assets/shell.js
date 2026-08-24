@@ -136,7 +136,7 @@
     el.className = "il-nav";
     el.innerHTML =
       '<div class="wrap il-nav__inner">' +
-        '<a class="il-nav__brand" href="' + base + '/">' +
+        '<a class="il-nav__brand" href="' + base + '/hub/">' +
           '<img class="il-nav__logo" src="' + base + '/assets/logo.svg" alt="" width="28" height="28"> Idea Lab' +
         "</a>" +
         '<div class="il-nav__links">' + links + "</div>" +
@@ -299,7 +299,8 @@
     var segs = path.replace(/^\/idea-lab\/?/, "").replace(/\/$/, "").split("/").filter(Boolean);
     if (segs.length) {
       var wing = wingByKey(segs[0]);
-      crumbs.push({ name: wing ? wing.name : segs[0], item: SITE + "/idea-lab/" + segs[0] + "/" });
+      var label = wing ? wing.name : (segs[0] === "hub" ? "Explorer Hub" : segs[0]);
+      crumbs.push({ name: label, item: SITE + "/idea-lab/" + segs[0] + "/" });
     }
     if (segs.length > 1) {
       var leaf = (document.title || "").split("—")[0].trim() || segs[segs.length - 1];

@@ -118,6 +118,7 @@ p{margin:0}
 .fv-link{position:relative;color:var(--ink-2);font-size:.95rem;font-weight:500;padding:10px 14px;border-radius:var(--radius-sm)}
 .fv-link:hover{color:var(--ink)}
 .fv-link.is-active{color:var(--accent)}
+.fv-link.is-active::after{content:"";position:absolute;left:14px;right:14px;bottom:3px;height:2px;border-radius:2px;background:var(--cosmic)}
 .fv-nav .btn{margin-left:8px}
 
 /* mobile menu */
@@ -128,6 +129,7 @@ p{margin:0}
 .fv-mobile a:not(.btn),.fv-mobile .fv-mob-h{display:block;padding:15px 4px;border-bottom:1px solid var(--glass-border);color:var(--ink-2);font-size:1.06rem;font-weight:500;transition:color .15s ease,padding-left .15s ease}
 .fv-mobile .fv-mob-h{color:var(--muted);font-family:var(--mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;font-weight:500}
 .fv-mobile a:not(.btn):hover,.fv-mobile a:not(.btn):active{color:var(--accent);padding-left:9px}
+.fv-mobile a.is-active{color:var(--accent);border-left:2px solid var(--accent);padding-left:10px}
 .fv-mobile .btn{width:100%;margin-top:18px}
 
 /* ---------- hero ---------- */
@@ -216,6 +218,34 @@ p{margin:0}
 .fv-social a{width:38px;height:38px;border:1px solid var(--glass-border-2);border-radius:var(--radius-sm);display:grid;place-items:center;color:var(--ink-2);background:var(--glass)}
 .fv-social a:hover{border-color:var(--accent);color:var(--accent)}
 .fv-social svg{width:18px;height:18px;fill:currentColor}
+
+/* ---------- PragOptics CTA art (shared: integration + industrial) ---------- */
+    /* Get-started band: copy + buttons left, brand mark fills the right */
+.cta-split{display:grid;grid-template-columns:1.18fr .82fr;gap:clamp(22px,4vw,52px);align-items:center}
+.cta-split__text{min-width:0}
+.cta-split__media{display:flex;align-items:center;justify-content:center}
+/* a black hole: a dark orb (the logo) with a soft glowing edge and a thin FLAT
+   light streak passing BEHIND it — never across its face */
+.cta-bh{position:relative;width:min(420px,100%);aspect-ratio:1.4/1;display:grid;place-items:center;
+  isolation:isolate;animation:ctaFloat 8s ease-in-out infinite}
+.cta-bh>*{grid-area:1/1}
+/* the orb's edge: a soft thin ring, SAME width/colour as the streak, that the streak flows into */
+.cta-bh::before{content:"";grid-area:1/1;justify-self:center;align-self:center;width:39.5%;aspect-ratio:1;border-radius:50%;z-index:3;
+  background:radial-gradient(circle closest-side, transparent 88%, rgba(190,248,255,.88) 94%, rgba(62,224,255,.93) 98%, rgba(124,92,255,.5) 100%);
+  filter:blur(2.2px) drop-shadow(0 0 10px rgba(62,224,255,.62))}
+/* the accretion streak: thin, flat, passing behind the orb */
+.cta-bh__streak{justify-self:stretch;align-self:center;height:6px;z-index:1;border-radius:50%;
+  background:linear-gradient(90deg, transparent 0%, rgba(124,92,255,.5) 9%, rgba(62,224,255,.9) 22%, rgba(190,248,255,1) 30%, #ffffff 35%, rgba(255,255,255,.5) 50%, #ffffff 65%, rgba(190,248,255,1) 70%, rgba(62,224,255,.9) 78%, rgba(124,92,255,.5) 91%, transparent 100%);
+  filter:blur(1.6px) drop-shadow(0 0 10px rgba(62,224,255,.65))}
+/* the orb = the logo, an OPAQUE dark circle so the streak is fully hidden behind it (only wings show) */
+.cta-logo{justify-self:center;align-self:center;width:38%;height:auto;z-index:2;border-radius:50%}
+@keyframes ctaFloat{0%,100%{transform:translateY(-7px)}50%{transform:translateY(7px)}}
+@media(max-width:760px){
+  .cta-split{grid-template-columns:1fr}
+  .cta-split__media{order:-1}
+  .cta-bh{width:min(340px,94%)}
+}
+@media(prefers-reduced-motion:reduce){.cta-bh{animation:none}}
 
 /* ---------- reveal on scroll ---------- */
 .fv-reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}

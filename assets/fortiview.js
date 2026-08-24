@@ -80,7 +80,8 @@
   var path = location.pathname.replace(/\/index\.html$/, "/");
   function isActive(href) {
     var h = href.replace(/\/$/, ""), p = path.replace(/\/$/, "");
-    return h !== "" && p === h;
+    /* prefix match, so /integration/terms/ still marks PragOptics current */
+    return h !== "" && (p === h || p.indexOf(h + "/") === 0);
   }
 
   /* ---------- cosmic starfield ---------- */
@@ -119,7 +120,8 @@
   /* ---------- header ---------- */
   function links(klass) {
     return NAV.map(function (n) {
-      return '<a class="' + klass + (isActive(n.href) ? " is-active" : "") + '" href="' + n.href + '">' + n.name + "</a>";
+      var on = isActive(n.href);
+      return '<a class="' + klass + (on ? " is-active" : "") + '"' + (on ? ' aria-current="page"' : "") + ' href="' + n.href + '">' + n.name + "</a>";
     }).join("");
   }
   var header = document.createElement("header");
