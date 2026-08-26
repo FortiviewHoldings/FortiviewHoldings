@@ -1,0 +1,55 @@
+name: IndexNow
+
+# Tell Bing (and the other participating engines) what changed, instead of
+# waiting to be crawled. Bing's index feeds ChatGPT and Copilot, so this is
+# the fast path into AI answers. Google does not participate in IndexNow —
+# Search Console covers that side.
+#
+# Fires when the sitemap changes, which is the only reliable signal that a
+# page was added or updated. Can also be run by hand from the Actions tab.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'sitemap.xml'
+  workflow_dispatch:
+    inputs:
+      all:
+        description: 'Submit every URL in the sitemap, not just recent ones'
+        type: boolean
+        default: false
+      days:
+        description: 'How many days back to count as recent'
+        type: string
+        default: '7'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: indexnow
+  cancel-in-progress: false
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # The script polls until the key file is served from the live site,
+      # because this job starts before the Pages build has finished.
+      - name: Submit changed URLs
+        env:
+          INDEXNOW_ATTEMPTS: '20'
+          INDEXNOW_GAP_MS: '15000'
+        run: |
+          if [ "${{ github.event.inputs.all }}" = "true" ]; then
+            node scripts/indexnow.mjs --all
+          else
+            node scripts/indexnow.mjs --days "${{ github.event.inputs.days || '7' }}"
+          fi
