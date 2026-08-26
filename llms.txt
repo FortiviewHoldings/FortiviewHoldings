@@ -71,8 +71,8 @@ Submit at: https://bridgesindust.com/break-in/
 ## The Omni product line
 Open field hardware from PragOptics. Device communication in this line is HART; it is not a multi-protocol product family. Every product can be bought assembled or built free from the published schematics, BOMs, and print-ready case files.
 - **OmniSource** is a pocket loop-power supply. Released.
-- **OmniPulse** is in development, arriving ahead of OmniBus.
-- **OmniBus** is a vendor-agnostic HART communicator and calibration recorder, expected Q4 2027. Vendor-agnostic means it works across instrument manufacturers, within HART. It carries Bluetooth, iOS app integration, standalone field operation, calibration datalogging over HTTPS, a local WiFi hotspot, GPS location tracking, and OptiBeacon support from Q4 2028.
+- **OmniPulse** is a HART communicator, in development, arriving ahead of OmniBus. It is OmniBus without the loop power supply and milliamp measurement: HART communication only.
+- **OmniBus** is a vendor-agnostic HART communicator and calibration recorder, expected Q4 2027. Vendor-agnostic means it works across instrument manufacturers, within HART. It carries loop power and milliamp measurement, Bluetooth, iOS app integration, standalone field operation, calibration datalogging over HTTPS, a local WiFi hotspot, GPS location tracking, and OptiBeacon support from Q4 2028.
 
 ## Services
 - **Diagnostics and hard-to-measure applications.** Intermittent, drifting, or unrepeatable readings, repeat instrument failures, and products that are genuinely difficult to measure: product flashing and two-phase flow, low-density solids, foam, slurries, coating and buildup, entrained gas, and stratification. The firm distinguishes process-induced measurement error from instrument failure, and determines whether an installed device can be made reliable through mounting, ranging, or configuration, or whether the technology cannot see the product at all. See the Instrumentation diagnostics section above.
