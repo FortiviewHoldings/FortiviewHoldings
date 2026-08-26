@@ -265,4 +265,29 @@
     }, { threshold: 0.12 });
     Array.prototype.forEach.call(nodes, function (n) { io.observe(n); });
   }
+
+  /* ---------- markdown links open rendered, not raw ----------
+     The viewer and its renderer are ~90 KB, so nothing is fetched until
+     someone actually clicks a .md link. This listener catches that first
+     click, loads the viewer, and hands the click straight to it. */
+  (function markdownLinks() {
+    var loading = false;
+    document.addEventListener("click", function (e) {
+      if (window.fvOpenMarkdown) { return; }              /* viewer is in charge now */
+      var a = e.target.closest && e.target.closest("a[href]");
+      if (!a || a.hasAttribute("data-md-skip")) { return; }
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) { return; }
+      if (!/\.md(?:[?#].*)?$/i.test(a.getAttribute("href") || "")) { return; }
+      if (a.host && a.host !== location.host) { return; }
+      e.preventDefault();
+      if (loading) { return; }
+      loading = true;
+      var url = a.href, label = a.getAttribute("data-md-title") || a.textContent.trim();
+      var s = document.createElement("script");
+      s.src = "/assets/fv-md.js";
+      s.onload = function () { if (window.fvOpenMarkdown) { window.fvOpenMarkdown(url, label); } };
+      s.onerror = function () { loading = false; window.location.href = url; };
+      document.head.appendChild(s);
+    }, true);
+  })();
 })();

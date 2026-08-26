@@ -22,5 +22,6 @@ exclude:
 # entries by path prefix, so it silently swallowed LICENSES.md too and the
 # codex could not fetch it. Serving the licence itself is harmless anyway.
 
-# README.md and LICENSES.md are deliberately NOT excluded: /docs/ fetches them
-# over HTTP and renders them, so they have to be served.
+# Markdown files are deliberately NOT excluded. The in-page viewer
+# (assets/fv-md.js) fetches them over HTTP and renders them, so they have to be
+# served as-is.
