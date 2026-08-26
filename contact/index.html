@@ -104,19 +104,19 @@
 
           <div class="fv-form__field">
             <label for="ctTopic">What is this about? <span class="req">*</span></label>
-            <select id="ctTopic" name="topic" required data-label="Topic" data-subject-part
+            <select id="ctTopic" name="topic" required data-label="Topic" data-subject-part data-hint-for="message"
                     data-reveal="#ctOtherWrap" data-reveal-when="Something else"
                     data-msg="Please tell us what this is about.">
               <option value="">Select&hellip;</option>
-              <option data-key="work-with-us">Work with us, general</option>
-              <option data-key="industrial">Instrumentation and field work</option>
-              <option data-key="training">Technical training</option>
-              <option data-key="logic">Control logic, PLC or DCS</option>
-              <option data-key="hardware">Custom hardware or a print run</option>
-              <option data-key="software">Software, APIs, or PragOptics</option>
-              <option data-key="refer">Refer a project</option>
-              <option data-key="site">A problem with this website</option>
-              <option data-key="other">Something else</option>
+              <option data-key="work-with-us" data-hint="What are you trying to do, what does the situation look like now, and what would a good outcome be?">Work with us, general</option>
+              <option data-key="industrial" data-hint="What is being measured, what is the instrument doing wrong, and where is it installed? If it is misbehaving right now, Submit Break-In is the faster door.">Instrumentation and field work</option>
+              <option data-key="training" data-hint="Who needs training and how many of them, on what equipment, and where are they starting from? On site, in a classroom, or both?">Technical training</option>
+              <option data-key="logic" data-hint="What platform is it running on, what is the logic meant to do, and what is it doing instead? Say whether you have the program and the drawings.">Control logic, PLC or DCS</option>
+              <option data-key="hardware" data-hint="What does the part or device need to do, how many, and what has to fit or survive? Any material, size, or environment constraints.">Custom hardware or a print run</option>
+              <option data-key="software" data-hint="What systems need to talk to each other, what data moves between them, and where should it end up? Say whether you want the API in your own system or hosted.">Software, APIs, or PragOptics</option>
+              <option data-key="refer" data-hint="Who is the client, what do they need, and what is your involvement? Tell us how you would like the introduction handled.">Refer a project</option>
+              <option data-key="site" data-hint="What page were you on, what did you click, and what happened instead of what you expected? Your browser helps too.">A problem with this website</option>
+              <option data-key="other" data-hint="Tell it however you would say it out loud. We would rather have the messy version than a tidy one that leaves out the important part.">Something else</option>
             </select>
           </div>
 

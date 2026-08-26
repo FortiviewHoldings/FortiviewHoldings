@@ -28,6 +28,10 @@
      required, minlength, type="email"   validated as you would expect
      data-pot                    honeypot; if filled, accept and send nothing
 
+   On a select that should retune another field's prompt:
+     data-hint-for="message"     the field whose placeholder follows this select
+     data-hint="…"               on each option, the prompt to show when picked
+
    Safety, deliberate: values are read with .value and written back only
    with textContent, so nothing a visitor types can execute. CR and LF are
    stripped from every single-line value before it reaches the subject,
@@ -106,6 +110,22 @@
         if (inner && !on) { inner.value = ""; flag(inner, false); }
       };
       sel.addEventListener("change", function () { sync(); if (inner && !wrap.hidden) inner.focus(); });
+      sync();
+    });
+
+    /* a select can retune another field's prompt: data-hint-for="message" on
+       the select, data-hint on each option. A multi-purpose form otherwise
+       asks the same vague question no matter what the visitor picked. */
+    [].slice.call(form.querySelectorAll("[data-hint-for]")).forEach(function (sel) {
+      var target = form.querySelector('[name="' + sel.getAttribute("data-hint-for") + '"]');
+      if (!target) return;
+      var base = target.getAttribute("placeholder") || "";
+      var sync = function () {
+        var opt = sel.options[sel.selectedIndex];
+        var hint = opt && opt.getAttribute("data-hint");
+        target.setAttribute("placeholder", hint || base);
+      };
+      sel.addEventListener("change", sync);
       sync();
     });
 
