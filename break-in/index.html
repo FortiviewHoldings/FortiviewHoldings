@@ -32,40 +32,6 @@
     "publisher":{"@id":"https://bridgesindust.com/#org"},
     "inLanguage":"en-US" }
   </script>
-  <style>
-    .bi-form{background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
-      border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:clamp(20px,3vw,32px);
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.07),var(--shadow)}
-    .bi-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-    .bi-field{display:flex;flex-direction:column;gap:7px;margin-bottom:14px;min-width:0}
-    .bi-field label{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-    .bi-field label .req{color:var(--accent)}
-    .bi-field input,.bi-field select,.bi-field textarea{
-      font-family:var(--body);font-size:1rem;color:var(--ink);background:rgba(8,12,22,.6);
-      border:1px solid var(--glass-border);border-radius:var(--radius);padding:.7em .8em;
-      min-height:48px;width:100%;transition:border-color .15s ease,box-shadow .15s ease}
-    .bi-field textarea{min-height:150px;resize:vertical;line-height:1.55}
-    .bi-field input:hover,.bi-field select:hover,.bi-field textarea:hover{border-color:var(--glass-border-2)}
-    .bi-field input:focus,.bi-field select:focus,.bi-field textarea:focus{
-      border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);outline:none}
-    .bi-field input[aria-invalid="true"],.bi-field textarea[aria-invalid="true"],.bi-field select[aria-invalid="true"]{
-      border-color:var(--bad);box-shadow:0 0 0 3px rgba(255,107,107,.18)}
-    .bi-hint{font-family:var(--mono);font-size:.68rem;color:var(--muted)}
-    .bi-err{font-family:var(--body);font-size:.82rem;color:var(--bad);min-height:1em}
-    .bi-count{font-family:var(--mono);font-size:.68rem;color:var(--muted);text-align:right}
-    .bi-count.over{color:var(--bad)}
-    /* honeypot: off-screen, never shown, bots fill it */
-    .bi-pot{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
-    .bi-status{margin-top:14px;font-size:.94rem;min-height:1.4em}
-    .bi-status.ok{color:var(--accent)}
-    .bi-status.bad{color:var(--bad)}
-    .bi-expect{display:grid;gap:1px;background:var(--glass-border);border:1px solid var(--glass-border);
-      border-radius:var(--radius-lg);overflow:hidden;margin-top:18px}
-    .bi-expect div{background:var(--glass);padding:14px 16px}
-    .bi-expect b{display:block;color:var(--ink);font-size:.94rem;margin-bottom:2px}
-    .bi-expect span{color:var(--ink-2);font-size:.88rem}
-    @media(max-width:640px){.bi-row{grid-template-columns:1fr}}
-  </style>
 </head>
 <body>
 <main>
@@ -96,7 +62,7 @@
       <div class="fv-reveal">
         <span class="fv-eyebrow"><span class="n">/</span> Before you send</span>
         <h2 class="fv-h2">How this works</h2>
-        <div class="bi-expect">
+        <div class="fv-notes">
           <div><b>This is intake, not a support line</b><span>If you are an existing customer with an active engagement, use your normal contact so your request is not queued behind new intake.</span></div>
           <div><b>Email response, first</b><span>We are a small operation. A specialist replies by email as soon as they can, in the order requests are received. We do not staff a phone queue and will not pretend otherwise.</span></div>
           <div><b>Detail gets you a better answer</b><span>What the reading does, when it does it, and what goes on around the equipment. The product itself matters more than people expect, and so does a task one shift runs that another does not. Symptoms beat conclusions.</span></div>
@@ -104,32 +70,35 @@
         </div>
       </div>
 
-      <div class="bi-form fv-reveal">
-        <form id="biForm" novalidate>
-          <div class="bi-row">
-            <div class="bi-field">
+      <div class="fv-reveal">
+        <form id="biForm" class="fv-form" novalidate
+              data-intake="break-in"
+              data-subject="Break-In"
+              data-title="BREAK-IN SUBMISSION">
+          <div class="fv-form__row">
+            <div class="fv-form__field">
               <label for="biName">Name <span class="req">*</span></label>
-              <input id="biName" name="name" type="text" maxlength="80" autocomplete="name" required>
+              <input id="biName" name="name" type="text" maxlength="80" autocomplete="name" required data-label="Name" data-subject-part data-msg="Please give us a name to reply to.">
             </div>
-            <div class="bi-field">
+            <div class="fv-form__field">
               <label for="biCompany">Company</label>
-              <input id="biCompany" name="company" type="text" maxlength="80" autocomplete="organization">
+              <input id="biCompany" name="company" type="text" maxlength="80" autocomplete="organization" data-label="Company">
             </div>
           </div>
-          <div class="bi-row">
-            <div class="bi-field">
+          <div class="fv-form__row">
+            <div class="fv-form__field">
               <label for="biEmail">Email <span class="req">*</span></label>
-              <input id="biEmail" name="email" type="email" maxlength="120" autocomplete="email" required>
+              <input id="biEmail" name="email" type="email" maxlength="120" autocomplete="email" required data-label="Email" data-msg="Please give us an email to reply to.">
             </div>
-            <div class="bi-field">
+            <div class="fv-form__field">
               <label for="biPhone">Phone</label>
-              <input id="biPhone" name="phone" type="tel" maxlength="32" autocomplete="tel">
+              <input id="biPhone" name="phone" type="tel" maxlength="32" autocomplete="tel" data-label="Phone">
             </div>
           </div>
 
-          <div class="bi-field">
+          <div class="fv-form__field">
             <label for="biSector">Sector <span class="req">*</span></label>
-            <select id="biSector" name="sector" required>
+            <select id="biSector" name="sector" required data-label="Sector" data-subject-part data-reveal="#biOtherWrap" data-reveal-when="Other" data-msg="Please choose a sector.">
               <option value="">Select a sector&hellip;</option>
               <option>Oil &amp; Gas &mdash; Upstream</option>
               <option>Oil &amp; Gas &mdash; Midstream</option>
@@ -150,15 +119,15 @@
             </select>
           </div>
 
-          <div class="bi-field" id="biOtherWrap" hidden>
+          <div class="fv-form__field" id="biOtherWrap" hidden>
             <label for="biOther">Your sector <span class="req">*</span></label>
-            <input id="biOther" name="sectorOther" type="text" maxlength="60" placeholder="Tell us what you run">
+            <input id="biOther" name="sectorOther" type="text" maxlength="60" required data-label="Sector" data-msg="Please tell us your sector." placeholder="Tell us what you run">
           </div>
 
-          <div class="bi-row">
-            <div class="bi-field">
+          <div class="fv-form__row">
+            <div class="fv-form__field">
               <label for="biMeas">What is it measuring? <span class="req">*</span></label>
-              <select id="biMeas" name="measuring" required>
+              <select id="biMeas" name="measuring" required data-label="Measuring" data-group="MEASUREMENT" data-msg="Please tell us what the instrument is measuring.">
                 <option value="">Select&hellip;</option>
                 <option>Level</option>
                 <option>Flow</option>
@@ -171,16 +140,16 @@
                 <option>Something else</option>
               </select>
             </div>
-            <div class="bi-field">
+            <div class="fv-form__field">
               <label for="biProduct">Product or medium <span class="req">*</span></label>
-              <input id="biProduct" name="product" type="text" maxlength="80"
+              <input id="biProduct" name="product" type="text" maxlength="80" required data-label="Product" data-group="MEASUREMENT" data-msg="Please tell us the product or medium being measured."
                 placeholder="Water, crude, caustic, resin pellets, steam, sludge&hellip;">
             </div>
           </div>
 
-          <div class="bi-field">
+          <div class="fv-form__field">
             <label for="biWhen">When does it happen? <span class="req">*</span></label>
-            <select id="biWhen" name="when" required>
+            <select id="biWhen" name="when" required data-label="When" data-group="MEASUREMENT" data-msg="Please tell us when it happens.">
               <option value="">Select&hellip;</option>
               <option>All the time, since it started</option>
               <option>Only on a certain shift or time of day</option>
@@ -193,33 +162,33 @@
             </select>
           </div>
 
-          <div class="bi-field">
+          <div class="fv-form__field">
             <label for="biAround">What happens around this equipment?</label>
-            <input id="biAround" name="around" type="text" maxlength="160"
+            <input id="biAround" name="around" type="text" maxlength="160" data-label="Around it" data-group="MEASUREMENT"
               placeholder="Tasks one shift runs and another does not, cleaning, transfers, nearby equipment starting, sun on the housing&hellip;">
-            <div class="bi-hint">Optional, and often the most useful thing you can tell us.</div>
+            <div class="fv-form__hint">Optional, and often the most useful thing you can tell us.</div>
           </div>
 
-          <div class="bi-field">
+          <div class="fv-form__field">
             <label for="biIssue">The issue <span class="req">*</span></label>
-            <textarea id="biIssue" name="issue" maxlength="1000" required
+            <textarea id="biIssue" name="issue" maxlength="1000" minlength="20" required data-label="Issue" data-block data-msg="Please describe the issue in a bit more detail."
               placeholder="What is the measurement or system doing? When does it happen, and when does it not? What has already been tried?"></textarea>
-            <div class="bi-count" id="biCount">0 / 1000</div>
+            <div class="fv-form__count" data-count-for="issue">0 / 1000</div>
           </div>
 
           <!-- honeypot: hidden from people, attractive to bots -->
-          <div class="bi-pot" aria-hidden="true">
+          <div class="fv-form__pot" aria-hidden="true">
             <label for="biWebsite">Leave this field empty</label>
-            <input id="biWebsite" name="website" type="text" tabindex="-1" autocomplete="off">
+            <input id="biWebsite" name="website" type="text" tabindex="-1" autocomplete="off" data-pot>
           </div>
 
-          <div class="bi-err" id="biErr" role="alert"></div>
+          <div class="fv-form__err" data-err role="alert"></div>
           <div class="fv-actions" style="margin-top:6px">
             <button class="btn btn--primary" type="submit" id="biSubmit">Submit Break-In</button>
-            <button class="btn btn--ghost" type="button" id="biCopy" hidden>Copy the details instead</button>
+            <button class="btn btn--ghost" type="button" data-copy hidden>Copy the details instead</button>
           </div>
-          <div class="bi-status" id="biStatus" role="status" aria-live="polite"></div>
-          <p class="bi-hint" style="margin-top:12px">Submitting opens your email client with the details filled in. If it does not open, a copy button appears so you can paste them in yourself. Prefer to just write it? Email <a href="mailto:support@bridgesindust.com?subject=Break-In" style="color:var(--accent)">support@bridgesindust.com</a>.</p>
+          <div class="fv-form__status" data-status role="status" aria-live="polite"></div>
+          <p class="fv-form__hint" style="margin-top:12px">Submitting opens your email client with the details filled in. If it does not open, a copy button appears so you can paste them in yourself. Prefer to just write it? Email <a href="mailto:support@bridgesindust.com?subject=Break-In" style="color:var(--accent)">support@bridgesindust.com</a>.</p>
         </form>
       </div>
 
@@ -228,227 +197,6 @@
 
 </main>
 <script src="/assets/fortiview.js"></script>
-<script>
-/* ============================================================
-   Break-In intake.
-
-   Delivery: composes a mailto so there is no backend and therefore no
-   server-side injection surface. To move this to a posted endpoint later,
-   set ENDPOINT to the URL and the submit handler will POST the same JSON
-   payload instead. Nothing else here needs to change.
-
-   Safety notes, deliberate:
-   - Every value is read with .value and written back only with
-     textContent. Nothing the visitor types is ever assigned to innerHTML,
-     so there is no path from this form to script execution on the page.
-   - CR and LF are stripped from every single-line field before they reach
-     the mailto subject, which is what stops mail header injection.
-   - Fields are length-capped in the markup and again here, and a honeypot
-     catches the naive bots.
-   ============================================================ */
-(function () {
-  "use strict";
-  var ENDPOINT = null;               /* set to a URL to POST instead of mailto */
-  var TO = "support@bridgesindust.com";
-
-  var form   = document.getElementById("biForm");
-  var sector = document.getElementById("biSector");
-  var otherW = document.getElementById("biOtherWrap");
-  var other  = document.getElementById("biOther");
-  var issue  = document.getElementById("biIssue");
-  var count  = document.getElementById("biCount");
-  var errBox  = document.getElementById("biErr");
-  var status  = document.getElementById("biStatus");
-  var copyBtn = document.getElementById("biCopy");
-  var lastText = "";
-  if (!form) return;
-
-  copyBtn.addEventListener("click", function () {
-    if (!lastText) return;
-
-    function done() {
-      status.textContent = "Copied. Paste it into an email to " + TO + ".";
-      status.className = "bi-status ok";
-    }
-
-    /* Last resort: put the text on the page in a readonly box so it can be
-       selected by hand. A visitor never loses what they wrote because a
-       clipboard permission was denied. */
-    function reveal() {
-      status.textContent = "Your browser would not let us reach the clipboard. Select the text below and send it to " + TO + ".";
-      status.className = "bi-status bad";
-      if (document.getElementById("biDump")) return;
-      var ta = document.createElement("textarea");
-      ta.id = "biDump";
-      ta.value = lastText;                    /* value, not markup */
-      ta.readOnly = true;
-      ta.rows = 12;
-      ta.style.cssText = "width:100%;margin-top:12px;font-family:var(--mono);font-size:.8rem";
-      status.parentNode.insertBefore(ta, status.nextSibling);
-      ta.focus();
-      ta.select();
-    }
-
-    function legacy() {
-      var ta = document.createElement("textarea");
-      ta.value = lastText;
-      ta.readOnly = true;
-      ta.style.cssText = "position:fixed;left:-9999px;top:0";
-      document.body.appendChild(ta);
-      ta.select();
-      var ok = false;
-      try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
-      document.body.removeChild(ta);
-      if (ok) { done(); } else { reveal(); }
-    }
-
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(lastText).then(done, legacy);
-    } else {
-      legacy();
-    }
-  });
-
-  /* collapse newlines and trim: single-line fields must never carry a line break */
-  function oneLine(s, max) {
-    return String(s == null ? "" : s).replace(/[\r\n\t]+/g, " ").replace(/\s{2,}/g, " ").trim().slice(0, max || 200);
-  }
-  function multiLine(s, max) {
-    return String(s == null ? "" : s).replace(/\r\n?/g, "\n").trim().slice(0, max || 4000);
-  }
-  function looksLikeEmail(s) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s);
-  }
-  function flag(el, bad) {
-    if (el) el.setAttribute("aria-invalid", bad ? "true" : "false");
-  }
-  function fail(msg, el) {
-    errBox.textContent = msg;                 /* textContent, not innerHTML */
-    if (el) { flag(el, true); el.focus(); }
-    return false;
-  }
-
-  sector.addEventListener("change", function () {
-    var isOther = sector.value === "Other";
-    otherW.hidden = !isOther;
-    if (isOther) other.focus(); else { other.value = ""; flag(other, false); }
-  });
-
-  issue.addEventListener("input", function () {
-    var n = issue.value.length;
-    count.textContent = n + " / 1000";
-    count.classList.toggle("over", n >= 1000);
-  });
-
-  form.addEventListener("submit", function (e) {
-    e.preventDefault();
-    errBox.textContent = "";
-    status.textContent = "";
-    status.className = "bi-status";
-
-    /* a filled honeypot is a bot: accept silently, send nothing */
-    if (document.getElementById("biWebsite").value) {
-      status.textContent = "Thanks. Your Break-In has been recorded.";
-      status.className = "bi-status ok";
-      form.reset();
-      copyBtn.hidden = true;
-      return;
-    }
-
-    var name    = oneLine(document.getElementById("biName").value, 80);
-    var company = oneLine(document.getElementById("biCompany").value, 80);
-    var email   = oneLine(document.getElementById("biEmail").value, 120);
-    var phone   = oneLine(document.getElementById("biPhone").value, 32);
-    var sec     = oneLine(sector.value, 60);
-    var secOth  = oneLine(other.value, 60);
-    var meas    = oneLine(document.getElementById("biMeas").value, 60);
-    var product = oneLine(document.getElementById("biProduct").value, 80);
-    var when    = oneLine(document.getElementById("biWhen").value, 90);
-    var around  = oneLine(document.getElementById("biAround").value, 160);
-    var body    = multiLine(issue.value, 1000);
-
-    [document.getElementById("biName"), document.getElementById("biEmail"), sector, other,
-     document.getElementById("biMeas"), document.getElementById("biProduct"),
-     document.getElementById("biWhen"), issue]
-      .forEach(function (el) { flag(el, false); });
-
-    if (!name)                      return fail("Please give us a name to reply to.", document.getElementById("biName"));
-    if (!looksLikeEmail(email))     return fail("That email address does not look right.", document.getElementById("biEmail"));
-    if (!sec)                       return fail("Please choose a sector.", sector);
-    if (sec === "Other" && !secOth) return fail("Please tell us your sector.", other);
-    /* the minimum that makes a submission answerable: without the product and the
-       timing, any reply is a guess dressed up as an answer */
-    if (!meas)                      return fail("Please tell us what the instrument is measuring.", document.getElementById("biMeas"));
-    if (!product)                   return fail("Please tell us the product or medium being measured.", document.getElementById("biProduct"));
-    if (!when)                      return fail("Please tell us when it happens.", document.getElementById("biWhen"));
-    if (body.length < 20)           return fail("Please describe the issue in a bit more detail.", issue);
-
-    var sectorFinal = (sec === "Other") ? secOth : sec;
-
-    var payload = {
-      name: name, company: company, email: email, phone: phone,
-      sector: sectorFinal, measuring: meas, product: product, when: when,
-      around: around, issue: body, source: "break-in"
-    };
-
-    if (ENDPOINT) {
-      status.textContent = "Sending…";
-      fetch(ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      }).then(function (r) {
-        if (!r.ok) throw new Error("bad response");
-        status.textContent = "Sent. A specialist will reply by email, in the order received.";
-        status.className = "bi-status ok";
-        form.reset(); count.textContent = "0 / 1000"; otherW.hidden = true; copyBtn.hidden = true; lastText = "";
-      }).catch(function () {
-        status.textContent = "That did not go through. Please email " + TO + " directly.";
-        status.className = "bi-status bad";
-      });
-      return;
-    }
-
-    /* mailto path: subject is single-line by construction, body is encoded whole */
-    var subject = oneLine("Break-In: " + sectorFinal + " — " + name + (company ? " (" + company + ")" : ""), 160);
-    var lines = [
-      "BREAK-IN SUBMISSION",
-      "",
-      "Name:      " + name,
-      "Company:   " + (company || "-"),
-      "Email:     " + email,
-      "Phone:     " + (phone || "-"),
-      "Sector:    " + sectorFinal,
-      "",
-      "MEASUREMENT",
-      "-----------",
-      "Measuring: " + meas,
-      "Product:   " + product,
-      "When:      " + when,
-      "Around it: " + (around || "-"),
-      "",
-      "ISSUE",
-      "-----",
-      body,
-      ""
-    ].join("\n");
-
-    var url = "mailto:" + TO +
-      "?subject=" + encodeURIComponent(subject) +
-      "&body=" + encodeURIComponent(lines);
-
-    /* The copy fallback covers both failure modes of a mailto: no mail client
-       registered, and a handler that truncates a very long URL. Nothing the
-       visitor typed is ever lost, it just changes hands a different way. */
-    lastText = "To: " + TO + "\nSubject: " + subject + "\n\n" + lines;
-    copyBtn.hidden = false;
-
-    window.location.href = url;
-
-    status.textContent = "Your email client should be opening. If nothing happened, use Copy the details instead and paste them into an email to " + TO + ".";
-    status.className = "bi-status ok";
-  });
-})();
-</script>
+<script src="/assets/fv-intake.js"></script>
 </body>
 </html>

@@ -112,7 +112,10 @@
     document.head.appendChild(sc);
   })();
 
-  var MAIL = "mailto:support@bridgesindust.com?subject=Bridges%20Industrial%20Inquiry";
+  /* the header button goes to a form that works; the footer keeps a real
+     mailto so the address itself is still copyable */
+  var WORK = "/contact/?topic=work-with-us";
+  var MAIL = "mailto:support@bridgesindust.com";
 
   /* the shared nav lives here ONCE for the whole site */
   var NAV = [
@@ -181,12 +184,12 @@
         '<span class="fv-brand__name">Bridges <span>Industrial</span></span>' +
       "</a>" +
       '<nav class="fv-links" aria-label="Primary">' + links("fv-link") +
-        '<a class="btn btn--primary btn--sm" href="' + MAIL + '">Work with us</a>' +
+        '<a class="btn btn--primary btn--sm" href="' + WORK + '">Work with us</a>' +
       "</nav>" +
       '<button class="fv-burger" aria-label="Menu" aria-expanded="false" aria-controls="fv-mobile-menu"><span></span><span></span><span></span></button>' +
     "</div>" +
     '<div class="fv-mobile" id="fv-mobile-menu">' + links("") +
-      '<a class="btn btn--primary" href="' + MAIL + '">Work with us</a>' +
+      '<a class="btn btn--primary" href="' + WORK + '">Work with us</a>' +
     "</div>";
   document.body.insertBefore(header, document.getElementById("fv-stars").nextSibling);
   var burger = header.querySelector(".fv-burger");
