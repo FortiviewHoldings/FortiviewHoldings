@@ -29,15 +29,54 @@
       } catch (e) { /* ignore unparseable blocks */ }
     }
     var SAME = ["https://www.linkedin.com/company/fortiviewholdings", "https://www.instagram.com/fortiviewholdings"];
+
+    /* "areaServed: United States" told a local-intent search nothing. On-site work is a
+       drive from League City; the advisory and remote half genuinely is nationwide. */
+    var AREA = [
+      { "@type": "GeoCircle", "name": "On-site service area",
+        "geoMidpoint": { "@type": "GeoCoordinates", "latitude": 29.5075, "longitude": -95.0949 },
+        "geoRadius": "120000" },
+      { "@type": "Country", "name": "United States" }
+    ];
+
+    /* what the firm actually works on, in the words a plant would use */
+    var TOPICS = [
+      "Field instrumentation", "Instrument troubleshooting", "Transmitter calibration",
+      "Flow measurement", "Level measurement", "Temperature measurement", "Pressure measurement",
+      "Analytical measurement", "pH measurement", "HART communication", "4-20 mA loop diagnostics",
+      "Loop verification", "Commissioning and startup", "Intermittent instrument faults",
+      "Process-induced measurement error", "PLC and DCS troubleshooting",
+      "Safety instrumented functions", "Instrumentation training"
+    ];
+
+    var CATALOG = {
+      "@type": "OfferCatalog", "name": "Instrumentation services",
+      "itemListElement": [
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Instrument troubleshooting",
+          "description": "A transmitter or loop that is not working, reading wrong, drifting, or failing intermittently, diagnosed on site in the process rather than on a bench." } },
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Calibration and configuration",
+          "description": "Field calibration, ranging, and configuration of smart and conventional devices for flow, level, temperature, pressure, and analytical measurement." } },
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Commissioning and loop verification",
+          "description": "Startup, loop checks, and verification from the device through to the control system, with documentation a technician can use." } },
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Hard-to-measure applications",
+          "description": "Products that resist measurement: flashing and two-phase flow, low-density solids, foam, slurries, coating and buildup, entrained gas." } },
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Control logic troubleshooting",
+          "description": "Reading, changing, and troubleshooting the logic running on PLC and DCS platforms." } },
+        { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Technical training",
+          "description": "Hands-on instrumentation and controls instruction, including community-college teaching." } }
+      ]
+    };
     var graph = [];
     if (!hasOrg) {
       graph.push({
         "@type": "Organization", "@id": ORG, "name": "Bridges Industrial",
         "alternateName": "Fortiview Holdings", /* former name: keeps the rebrand connected for search */
         "url": "https://bridgesindust.com",
+        "description": "Hands-on field instrumentation and analytical measurement support: troubleshooting instruments that are not working, calibration, configuration, commissioning, and loop verification, including intermittent faults and readings that will not behave. Also control logic and PLC/DCS troubleshooting, technical training, and custom hardware and data connections through PragOptics.",
         "logo": "https://bridgesindust.com/images/Logo.png", "email": "support@bridgesindust.com",
-        "telephone": "+1-832-425-0421", "areaServed": "United States",
-        "contactPoint": { "@type": "ContactPoint", "telephone": "+1-832-425-0421", "email": "support@bridgesindust.com", "contactType": "customer support" },
+        "telephone": "+1-832-425-0421", "areaServed": AREA,
+        "knowsAbout": TOPICS,
+        "contactPoint": { "@type": "ContactPoint", "telephone": "+1-832-425-0421", "email": "support@bridgesindust.com", "contactType": "technical support" },
         "sameAs": SAME
       });
       graph.push({
@@ -50,9 +89,11 @@
         "@type": "LocalBusiness", "@id": "https://bridgesindust.com/#local", "name": "Bridges Industrial",
         "alternateName": "Fortiview Holdings",
         "url": "https://bridgesindust.com", "image": "https://bridgesindust.com/images/social-preview.png",
+        "description": "Instrument technical support for the Texas Gulf Coast: on-site troubleshooting, calibration, configuration, commissioning, and loop verification for flow, level, temperature, pressure, and analytical measurement.",
         "telephone": "+1-832-425-0421", "email": "support@bridgesindust.com", "priceRange": "$$",
         "address": { "@type": "PostalAddress", "addressLocality": "League City", "addressRegion": "TX", "addressCountry": "US" },
-        "areaServed": "United States", "sameAs": SAME
+        "geo": { "@type": "GeoCoordinates", "latitude": 29.5075, "longitude": -95.0949 },
+        "areaServed": AREA, "knowsAbout": TOPICS, "hasOfferCatalog": CATALOG, "sameAs": SAME
       });
     }
     var p = location.pathname.replace(/index\.html$/, "");
@@ -165,8 +206,12 @@
         '<a class="fv-brand" href="/"><span class="fv-brand__mark fv-brand__mark--plain" style="background-image:url(/images/Logo.png)"></span>' +
         '<span class="fv-brand__name">Bridges <span>Industrial</span></span></a>' +
         "<p>Hands-on field instrumentation and analytical measurement, technical training, PragOptics hardware and software, and the Idea Lab. Engineered for clarity, accountability, and scale.</p>" +
+        /* the site never said where the work happens, so local-intent searches had
+           nothing to match on. This is the one line that appears on every page. */
+        "<p>On site across the Texas Gulf Coast from League City, including Houston, Texas City, Pasadena, Baytown, Clear Lake, and Galveston. Remote and advisory work anywhere in the US.</p>" +
       "</div>" +
       '<div class="fv-fcol"><h3>What we do</h3>' +
+        '<a href="/instrument-support/">Instrument Technical Support</a>' +
         '<a href="/industrial">Industrial Automation &amp; Training</a>' +
         '<a href="/education/">Field Pocket Guide</a>' +
         '<a href="/partnerships">Partnerships</a>' +
@@ -175,6 +220,7 @@
       "</div>" +
       '<div class="fv-fcol"><h3>Connect</h3>' +
         '<a href="/break-in/" style="color:var(--accent)">Submit a Break-In</a>' +
+        '<span style="color:var(--muted);font-size:.82rem;display:block;margin:2px 0 6px">Instrument not working? Ask a specialist, free.</span>' +
         '<a href="' + MAIL + '">support@bridgesindust.com</a>' +
         '<a href="tel:+18324250421">+1 (832) 425-0421</a>' +
         '<div class="fv-social" style="margin-top:12px">' +

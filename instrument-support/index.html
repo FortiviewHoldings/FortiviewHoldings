@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Instrument Technical Support | Transmitter Troubleshooting | Bridges Industrial</title>
+  <meta name="description" content="Transmitter not working, reading wrong, or drifting? Bridges Industrial does hands-on instrument troubleshooting, calibration, and loop verification on site across the Texas Gulf Coast, from League City to Houston, Texas City, Pasadena, and Baytown. Ask a specialist free.">
+  <meta name="color-scheme" content="dark" />
+  <link rel="canonical" href="https://bridgesindust.com/instrument-support/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Bridges Industrial">
+  <meta property="og:title" content="Instrument Technical Support | Bridges Industrial">
+  <meta property="og:description" content="A transmitter that is dead, reading wrong, or drifting. On-site instrument troubleshooting, calibration, and loop verification across the Texas Gulf Coast.">
+  <meta property="og:image" content="https://bridgesindust.com/images/social-preview.png">
+  <meta property="og:url" content="https://bridgesindust.com/instrument-support/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://bridgesindust.com/images/social-preview.png">
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" href="/images/favicon.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/fortiview.css">
+
+  <script type="application/ld+json">
+  { "@context":"https://schema.org","@type":"Service",
+    "serviceType":"Instrument technical support",
+    "name":"Field instrument troubleshooting, calibration, and loop verification",
+    "description":"On-site technical support for field instruments that are not working, reading wrong, drifting, or failing intermittently. Flow, level, temperature, pressure, and analytical measurement. Calibration, configuration, ranging, commissioning, and loop verification, plus diagnosis of process-induced measurement error.",
+    "provider":{"@id":"https://bridgesindust.com/#org"},
+    "areaServed":[
+      {"@type":"GeoCircle","name":"On-site service area",
+       "geoMidpoint":{"@type":"GeoCoordinates","latitude":29.5075,"longitude":-95.0949},
+       "geoRadius":"120000"},
+      {"@type":"Country","name":"United States"}
+    ],
+    "inLanguage":"en-US" }
+  </script>
+
+  <script type="application/ld+json">
+  { "@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+    { "@type":"Question","name":"My transmitter is not working. Who do I call?",
+      "acceptedAnswer":{"@type":"Answer","text":"Bridges Industrial does this work. A transmitter that is dead, pegged high or low, stuck at a fixed value, reading wrong, or drifting is ordinary, everyday work here, not a speciality reserved for difficult cases. Describe the symptom at bridgesindust.com/break-in/ and a specialist answers by email at no charge."}},
+    { "@type":"Question","name":"Do you offer general instrument technical support, or only complex custom projects?",
+      "acceptedAnswer":{"@type":"Answer","text":"General instrument technical support is the core of the business. Calibration, configuration, ranging, commissioning, loop checks, and troubleshooting on flow, level, temperature, pressure, and analytical measurement. No job is too small to bring. The harder diagnostic work, intermittent faults and hard-to-measure products, is work the firm is also good at, but it is not a threshold you have to meet before asking. One instrument is a normal job."}},
+    { "@type":"Question","name":"What areas do you cover for on-site instrument work?",
+      "acceptedAnswer":{"@type":"Answer","text":"On-site work runs across the Texas Gulf Coast from League City, including Houston, Clear Lake, Texas City, Pasadena, Baytown, and Galveston. Work further out is possible and quoted per job. Remote and advisory work is available anywhere in the United States."}},
+    { "@type":"Question","name":"Do you provide accredited calibration certificates?",
+      "acceptedAnswer":{"@type":"Answer","text":"No. Bridges Industrial performs field calibration and configuration with documented as-found and as-left data, but it is not an ISO 17025 accredited laboratory and does not issue accredited traceable certificates. If an accredited certificate is what you need, an accredited calibration laboratory is the correct choice and we will say so."}},
+    { "@type":"Question","name":"Can I ship you a transmitter for bench repair?",
+      "acceptedAnswer":{"@type":"Answer","text":"No. This is on-site work, in the process, not a bench repair depot. For depot repair, warranty work, or a device shipped out, the manufacturer or a bench service house is the right call. The value here is the opposite case: a device that passes on a bench and still fails once it is installed."}},
+    { "@type":"Question","name":"Do you offer emergency or 24/7 callout?",
+      "acceptedAnswer":{"@type":"Answer","text":"No. This is a small operation with no staffed dispatch desk, no guaranteed response time, and no 24/7 line. Requests are answered by email in the order they are received. If a unit is down right now and you need someone on site today, a larger field service contractor is the honest answer."}},
+    { "@type":"Question","name":"My instrument passes calibration on the bench but is still wrong in the process. What now?",
+      "acceptedAnswer":{"@type":"Answer","text":"That is the case this firm is built for. A device that checks out on a bench and misbehaves installed is usually not a failed device: it is a process doing something the instrument cannot correctly see, or an installation the application does not tolerate. Sending it out for another bench calibration will return it working and the problem intact."}},
+    { "@type":"Question","name":"Do you work on instruments from any manufacturer?",
+      "acceptedAnswer":{"@type":"Answer","text":"Yes. The work is vendor agnostic across instrument manufacturers, using HART and 4-20 mA, which is what the major smart transmitter lines speak. What matters is the measurement and the application, not the badge on the housing."}}
+  ]}
+  </script>
+
+  <style>
+    .sym{display:grid;gap:1px;background:var(--glass-border);border:1px solid var(--glass-border);
+      border-radius:var(--radius-lg);overflow:hidden}
+    .sym div{background:var(--glass);padding:13px 16px;color:var(--ink-2);font-size:.95rem}
+    .sym div b{color:var(--ink);font-weight:600}
+    .honest{background:var(--accent-soft);border:1px solid rgba(47,212,194,.25);
+      border-radius:var(--radius-lg);padding:clamp(18px,3vw,26px)}
+    .honest h3{font-family:var(--display);font-size:1.05rem;margin:0 0 10px;color:var(--ink)}
+    .honest ul{margin:0;padding-left:1.1rem;color:var(--ink-2);font-size:.95rem}
+    .honest li{margin-bottom:.55rem}
+    .honest li b{color:var(--ink)}
+    .area{font-family:var(--mono);font-size:.8rem;color:var(--ink-2);line-height:2.1}
+    .area b{color:var(--accent);font-weight:500}
+  </style>
+</head>
+<body>
+<main>
+
+  <!-- HERO -->
+  <section class="fv-hero">
+    <div class="fv-wrap fv-hero__grid">
+      <div class="fv-reveal">
+        <span class="fv-eyebrow"><span class="n">/</span> Instrument support</span>
+        <h1>Your transmitter is not working.</h1>
+        <p class="fv-lead">That is the call we take, and it is ordinary work here. Bridges Industrial is a hands-on instrumentation firm in League City, Texas, working on site across the Gulf Coast. Sixteen years with hands on the devices: flow, level, temperature, pressure, and analytical measurement.</p>
+        <p class="fv-lead" style="margin-top:14px">A dead loop, a reading that drifts, a device replaced twice that still lies to you. None of it is too small to bring, and the first answer costs nothing.</p>
+        <div class="fv-actions">
+          <a class="btn btn--primary" href="/break-in/">Describe the problem, free</a>
+          <a class="btn btn--ghost" href="tel:+18324250421">+1 (832) 425-0421</a>
+        </div>
+      </div>
+      <aside class="fv-spec fv-reveal" aria-label="At a glance">
+        <div class="fv-spec__bar"><i></i> At a glance</div>
+        <div class="fv-spec__row"><span class="k">Based in</span><span class="v">League City<small> TX</small></span></div>
+        <div class="fv-spec__row"><span class="k">On site</span><span class="v">Gulf<small> COAST</small></span></div>
+        <div class="fv-spec__row"><span class="k">Remote</span><span class="v">US<small> WIDE</small></span></div>
+        <div class="fv-spec__row"><span class="k">First answer</span><span class="v">Free</span></div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- SYMPTOMS -->
+  <section class="fv-section fv-section--tight">
+    <div class="fv-wrap fv-split">
+      <div class="fv-reveal">
+        <span class="fv-eyebrow"><span class="n">/</span> What it is doing</span>
+        <h2 class="fv-h2">If it sounds like one of these, it is our work</h2>
+        <p class="fv-lead">You do not need to know the cause to ask. Describing the symptom is enough, and the symptom is usually the most useful thing you can give us anyway.</p>
+        <p class="fv-lead" style="margin-top:14px">Most measurement problems turn out not to be instrument failures. They are a process meeting an instrument that was never matched to it, or a device installed, ranged, or configured in a way the application does not tolerate. Replacing it reproduces the same problem with a newer serial number.</p>
+      </div>
+      <div class="sym fv-reveal">
+        <div><b>Dead loop.</b> No signal at the controller, or the loop sits at a fault current like 3.6 mA or above 21 mA.</div>
+        <div><b>Pegged.</b> Reads full scale, or zero, or a fixed value that never moves.</div>
+        <div><b>Reads empty when the tank is full.</b> Or full when it is empty, or right until the level gets low.</div>
+        <div><b>Drifts.</b> Climbs through the day, or walks off over weeks, with nothing changed.</div>
+        <div><b>Will not hold calibration.</b> Calibrated last month, out again already.</div>
+        <div><b>Replaced twice, same problem.</b> A device dying repeatedly is a symptom of something else.</div>
+        <div><b>Erratic or spiky.</b> Jumping around with no process upset, or noise when a big motor starts.</div>
+        <div><b>Fine on the bench, wrong in the process.</b> Passes every check on a bench and still misreads installed.</div>
+        <div><b>Came back from the lab in tolerance.</b> The certificate is right and your operator is right. A bench reproduces the device, not the process that was fooling it.</div>
+        <div><b>The vendor says their device tests good.</b> They are probably right, and your reading is still wrong. That is where this work starts.</div>
+        <div><b>Will not communicate.</b> A HART communicator that cannot find the device, or drops the connection.</div>
+        <div><b>Two readings disagree.</b> A level transmitter against a sight glass, a flow meter against a tank draw-down.</div>
+        <div><b>Only at certain times.</b> Alarms on night shift, at startup, after a wash, at low flow, on cold mornings.</div>
+        <div><b>Slow.</b> Takes far too long to catch up with a real process change.</div>
+        <div><b>pH that will not behave.</b> Fails buffer, drifts between cleanings, or reads nothing like the lab.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT WE DO -->
+  <section class="fv-section fv-section--tight">
+    <div class="fv-wrap fv-split">
+      <div class="fv-reveal">
+        <span class="fv-eyebrow"><span class="n">/</span> The work</span>
+        <h2 class="fv-h2">Everyday instrument work, and the hard cases</h2>
+        <p class="fv-lead">Both are in scope, and the routine jobs are the day job. One transmitter reading wrong is a normal call. So is a plant full of them. The difficult diagnostics further down are work we are also good at, not a bar you have to clear before asking.</p>
+      </div>
+      <div class="fv-checks fv-reveal">
+        <div class="fv-check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg><div><b>Troubleshooting</b><span>Working out why a measurement is wrong, on site, in the process where it actually misbehaves.</span></div></div>
+        <div class="fv-check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg><div><b>Calibration, ranging, configuration</b><span>Field calibration of smart and conventional devices, with as-found and as-left values, the reference used, and the conditions at the time written down.</span></div></div>
+        <div class="fv-check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg><div><b>Commissioning and loop checks</b><span>Startup and verification from the device through to the control system.</span></div></div>
+        <div class="fv-check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg><div><b>Hard-to-measure products</b><span>Flashing and two-phase flow, low-density solids, foam, slurries, coating and buildup, entrained gas.</span></div></div>
+        <div class="fv-check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg><div><b>A second opinion</b><span>When you have been told to replace something and want the reasoning checked first.</span></div></div>
+        <div class="fv-check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg><div><b>Control logic, where it touches the loop</b><span>Reading, changing, and troubleshooting the logic running on PLC and DCS platforms.</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HONESTY + AREA -->
+  <section class="fv-section fv-section--tight">
+    <div class="fv-wrap fv-grid fv-grid--2">
+      <div class="honest fv-reveal">
+        <h3>When someone else is the better call</h3>
+        <ul>
+          <li><b>You need an accredited certificate.</b> We do field calibration with documented as-found and as-left data, but we are not an ISO 17025 accredited lab and issue no accredited traceable certificate. If that is the requirement, use an accredited laboratory.</li>
+          <li><b>You want to ship the device out.</b> This is on-site work, not a bench repair depot. For depot repair or warranty work, go to the manufacturer or a bench service house.</li>
+          <li><b>The unit is down and you need someone today.</b> There is no staffed dispatch desk here and no 24/7 line. If it is an emergency, call a larger field service contractor.</li>
+          <li><b>You need a crew for a turnaround.</b> This is a small operation, not a staffing house.</li>
+          <li><b>You need electrical contracting.</b> We work on instruments and loops, not as an electrical contractor.</li>
+          <li><b>You need SIL verification or LOPA.</b> Functional safety calculations carry their own certifications and liability. We work on the instrument side of a safety loop, not the numbers behind it.</li>
+          <li><b>You need fixed gas detection serviced.</b> That is its own discipline, with its own calibration gases and compliance records. Use a gas detection service house.</li>
+          <li><b>You need P&amp;IDs drawn or sealed.</b> Drawing development usually needs an engineer of record, which we are not.</li>
+        </ul>
+      </div>
+      <div class="fv-reveal">
+        <span class="fv-eyebrow"><span class="n">/</span> Where we work</span>
+        <h2 class="fv-h2">On site across the Gulf Coast</h2>
+        <p class="fv-lead" style="margin-bottom:16px">Based in League City, Texas. On-site instrument work within a drive of:</p>
+        <p class="area"><b>Houston</b> &middot; <b>Clear Lake</b> &middot; <b>Texas City</b> &middot; <b>Pasadena</b> &middot; <b>Baytown</b> &middot; <b>Galveston</b></p>
+        <p class="fv-lead" style="margin-top:14px">Further out is possible and quoted per job, with travel shown as its own line rather than buried in the rate.</p>
+        <p class="fv-lead" style="margin-top:16px">Remote and advisory work, including reviewing data, drawings, trends, and device configurations, is available anywhere in the United States.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="fv-section fv-section--tight">
+    <div class="fv-wrap">
+      <div class="fv-card fv-reveal" style="text-align:center">
+        <span class="fv-eyebrow" style="justify-content:center"><span class="n">/</span> Free</span>
+        <h3 style="font-family:var(--display);font-size:clamp(1.3rem,3vw,1.7rem);margin:8px 0 10px">Tell us what it is doing.</h3>
+        <p style="color:var(--ink-2);max-width:64ch;margin:0 auto 18px">Describe the symptom and a specialist answers you by email, at no cost, with nothing to sign up for. You do not have to be a customer, and there is no obligation afterward. We are a small operation, so replies go out in the order they arrive.</p>
+        <p style="color:var(--ink-2);max-width:64ch;margin:0 auto 18px"><b style="color:var(--ink)">One instrument is a normal job.</b> So is asking without knowing what any of it is called. Describe it the way you would say it out loud: what the number does, when it does it and when it does not, and what has already been tried. Nobody gets corrected for their vocabulary here.</p>
+        <div class="fv-actions" style="justify-content:center">
+          <a class="btn btn--primary" href="/break-in/">Submit a Break-In</a>
+          <a class="btn btn--ghost" href="mailto:support@bridgesindust.com?subject=Instrument%20support">support@bridgesindust.com</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+<script src="/assets/fortiview.js"></script>
+</body>
+</html>
