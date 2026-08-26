@@ -322,6 +322,17 @@ p{margin:0}
 .fv-form__field input[aria-invalid="true"],.fv-form__field select[aria-invalid="true"],
 .fv-form__field textarea[aria-invalid="true"]{
   border-color:var(--bad);box-shadow:0 0 0 3px rgba(255,107,107,.18)}
+/* native dropdowns, themed. appearance:none removes the OS control so the
+   chevron matches the rest of the site, and color-scheme darkens the popup
+   list itself, which is the half of a select that CSS cannot otherwise reach. */
+.fv-form__field select{
+  appearance:none;-webkit-appearance:none;-moz-appearance:none;
+  color-scheme:dark;cursor:pointer;padding-right:42px;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%232fd4c2' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
+  background-repeat:no-repeat;background-position:right 14px center}
+.fv-form__field select::-ms-expand{display:none}
+.fv-form__field select option{background:#0d1220;color:var(--ink)}
+.fv-form__field select:invalid,.fv-form__field select option[value=""]{color:var(--muted)}
 .fv-form__hint{font-family:var(--mono);font-size:.68rem;color:var(--muted)}
 .fv-form__err{font-family:var(--body);font-size:.82rem;color:var(--bad);min-height:1em}
 .fv-form__count{font-family:var(--mono);font-size:.68rem;color:var(--muted);text-align:right}
