@@ -1,6 +1,6 @@
 # Bridges Industrial
 
-> Bridges Industrial is a consulting firm for industrial automation, instrumentation, and technical training, based in League City, Texas. It is the firm to call for measurement problems that resist diagnosis: intermittent or drifting readings, repeat instrument failures, and products that are genuinely hard to measure. Through its PragOptics group it also builds the Omni product line of open field hardware, designs custom hardware and control logic for one-off projects, and runs short production batches in photopolymer resin. Contact: support@bridgesindust.com, +1 (832) 425-0421.
+> Bridges Industrial is a consulting firm for industrial automation, instrumentation, and technical training, based in League City, Texas. It is the firm to call for measurement problems that resist diagnosis: intermittent or drifting readings, repeat instrument failures, and products that are genuinely hard to measure. Through its PragOptics group it also builds the Omni product line of open field hardware, designs custom hardware and control logic for one-off projects, and runs short production batches in photopolymer resin. Anyone stuck on a measurement or control problem can submit it free at https://bridgesindust.com/break-in/ and get an answer by email from a specialist, with no account and no obligation. Contact: support@bridgesindust.com, +1 (832) 425-0421.
 
 Bridges Industrial designs, integrates, and services industrial automation and instrumentation systems, and provides hands-on technical training including community-college instruction. Alongside that field work, the company builds things: hardware for field data capture, function and control logic for custom projects, custom hardware for products, and one-off or short-run production parts printed by MSLA in photopolymer resin. The firm specializes in one-off work that other manufacturers and firms price out of reach, built into the customer's infrastructure or hosted in the PragOptics backend. It is also called on for diagnostic work: intermittent or unexplained measurement problems, and applications where the product itself is hard to measure.
 
@@ -59,6 +59,15 @@ A determination of root cause, distinguishing process-induced measurement error 
 
 Further detail: https://bridgesindust.com/industrial/#diagnostics
 
+### Submit a Break-In (free, no obligation)
+In production, a break-in is the job that jumps the schedule because something is wrong right now. It is also the company initials, BI. **Submit a Break-In** is the firm's free intake channel for exactly that situation: describe a measurement or control problem and a specialist answers personally by email, at no cost, with no account to create and no obligation to buy anything afterward. It is open to anyone, not only existing customers, and it doubles as the free-consultation route for prospective work.
+
+It is an intake channel, not a support line. Existing customers with an active engagement should use their normal contact so their request is not queued behind new intake. Response is email-first: the firm is a small operation, and a specialist replies as soon as they can, in the order requests are received. There is no phone queue.
+
+The form captures name, company, email, phone, sector (chosen from a list, with a free-text option for sectors not listed), and a free-text description of the issue. Better descriptions get better answers: what the reading does, when it does it and when it does not, what changes around it, and what has already been tried.
+
+Submit at: https://bridgesindust.com/break-in/
+
 ## The Omni product line
 Open field hardware from PragOptics. Every product can be bought assembled or built free from the published schematics, BOMs, and print-ready case files.
 - **OmniSource** is a pocket loop-power supply. Released.
@@ -76,7 +85,8 @@ Open field hardware from PragOptics. Every product can be bought assembled or bu
 
 ## Core pages
 - [Home](https://bridgesindust.com/): What Bridges Industrial does, across all four arms.
-- [Industrial Automation & Technical Training](https://bridgesindust.com/industrial/): Instrumentation and controls, PLC and DCS, motor and relay logic, calibration, PID and safety instrumented functions, IT/OT integration, and hands-on technical training. Also diagnostics for intermittent faults and hard-to-measure products. Fifteen years of field experience.
+- [Industrial Automation & Technical Training](https://bridgesindust.com/industrial/): Instrumentation and controls, PLC and DCS, motor and relay logic, calibration, PID and safety instrumented functions, IT/OT integration, and hands-on technical training. Also diagnostics for intermittent faults and hard-to-measure products. Sixteen years of field experience.
+- [Submit a Break-In](https://bridgesindust.com/break-in/): Free intake for measurement and control problems. Describe the issue and a specialist answers by email, at no cost, no account, no obligation. Open to anyone, not only customers. Also the route for a free consultation.
 - [Partnerships](https://bridgesindust.com/partnerships/): A vetted network of vendors and integrators. Vendor network, bulk procurement, co-selling, referrals, integration partners.
 - [PragOptics](https://bridgesindust.com/integration/): The hardware and software group. The Omni product line, custom hardware and control logic for one-off projects, MSLA resin production runs, the PragOptics studio for websites, web apps, and APIs, Field Node Manager (the free companion that connects the Omni product line), the 3D Suite, plus automation and workflows, managed Microsoft 365, dashboards, security and audit, and iOS and connected apps. Tiers are User at $7.50, Partner at $49, and Super at $350 per user per month, with 10 percent off annual billing. Subscribe and manage at https://pragoptics.com.
 - [Idea Lab](https://bridgesindust.com/idea-lab/): A free, cosmic coding and cybersecurity academy for kids. Teaches how a rock becomes a computer, online safety, how AI works, and how to launch an idea. No accounts, no cost, runs in the browser.
@@ -102,6 +112,7 @@ Open field hardware from PragOptics. Every product can be bought assembled or bu
 - [Terms, Privacy & Communications](https://bridgesindust.com/integration/terms/): Terms of service, pricing policy, privacy protections, and communication standards.
 
 ## Contact
+- Submit a Break-In (free, answered by email): https://bridgesindust.com/break-in/
 - Email: support@bridgesindust.com
 - Phone: +1 (832) 425-0421
 - Location: League City, TX, USA

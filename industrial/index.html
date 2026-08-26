@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Industrial Automation &amp; Technical Training | Bridges Industrial</title>
-  <meta name="description" content="Fifteen years of hands-on industrial automation: instrumentation and controls, PLC and DCS, motor and relay logic, calibration, safety instrumented functions, and cyber-aware IT/OT integration.">
+  <meta name="description" content="Sixteen years of hands-on industrial automation: instrumentation and controls, PLC and DCS, motor and relay logic, calibration, safety instrumented functions, and cyber-aware IT/OT integration.">
   <meta name="color-scheme" content="dark" />
   <link rel="canonical" href="https://bridgesindust.com/industrial/">
 
@@ -33,6 +33,40 @@
     "description":"Calibration, troubleshooting, PLC/DCS logic, commissioning, and smart device support across major OEM platforms.",
     "areaServed":"United States","inLanguage":"en-US" }
   </script>
+  <style>
+    /* diagnostic scenario bench: what the instrument reports vs what is there */
+    .dx{background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+      border:1px solid var(--glass-border);border-radius:var(--radius-lg);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.07),var(--shadow);overflow:hidden;margin-top:26px}
+    .dx__head{display:flex;align-items:center;gap:10px;padding:12px 18px;
+      border-bottom:1px solid var(--glass-border);background:rgba(8,12,22,.35)}
+    .dx__head h3{margin:0;font-family:var(--display);font-size:.95rem;color:var(--ink);font-weight:700}
+    .dx__head .dot{width:9px;height:9px;border-radius:50%;background:var(--amber);flex:none;
+      box-shadow:0 0 10px rgba(242,178,76,.6)}
+    .dx__body{padding:18px}
+    .dx__tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+    .dx__tabs button{font-family:var(--body);font-weight:600;font-size:.84rem;color:var(--ink-2);
+      background:rgba(8,12,22,.6);border:1px solid var(--glass-border);border-radius:999px;
+      padding:9px 14px;min-height:40px;cursor:pointer;transition:.15s}
+    .dx__tabs button:hover{color:var(--ink);border-color:var(--glass-border-2)}
+    .dx__tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+    .dx__grid{display:grid;grid-template-columns:minmax(0,260px) minmax(0,1fr);gap:22px;align-items:start}
+    .dx__fig{background:rgba(8,12,22,.5);border:1px solid var(--glass-border);border-radius:var(--radius);padding:12px}
+    .dx__fig svg{width:100%;height:auto;display:block}
+    .dx__reads{display:grid;gap:10px;margin-bottom:14px}
+    .dx__read{background:rgba(8,12,22,.5);border:1px solid var(--glass-border);border-radius:var(--radius);padding:.7em .9em}
+    .dx__read .k{font-family:var(--mono);font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;
+      color:var(--muted);display:block;margin-bottom:.3em}
+    .dx__read .v{font-family:var(--mono);font-size:1.15rem;font-weight:600}
+    .dx__read--bad .v{color:var(--bad)}
+    .dx__read--true .v{color:var(--accent)}
+    .dx__why h4{font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;
+      color:var(--accent);font-weight:500;margin:0 0 .35rem}
+    .dx__why p{color:var(--ink-2);font-size:.93rem;margin:0 0 .9rem;max-width:62ch}
+    .dx__why p:last-child{margin-bottom:0}
+    @media(max-width:760px){.dx__grid{grid-template-columns:1fr}}
+    @media(prefers-reduced-motion:reduce){.dx__fig *{transition:none!important}}
+  </style>
 </head>
 <body>
 <main>
@@ -43,7 +77,7 @@
       <div class="fv-reveal">
         <span class="fv-eyebrow"><span class="n">01</span> Industrial Automation</span>
         <h1>Instrumentation, controls, and the systems that run the world.</h1>
-        <p class="fv-lead">Fifteen years in the field, from pneumatic systems and assembly lines to burner management, relay logic, and PLC/DCS architecture. We design and integrate the systems, then teach your team to own them. Operational technology with modern visibility, safeguards, and an audit trail.</p>
+        <p class="fv-lead">Sixteen years in the field, from pneumatic systems and assembly lines to burner management, relay logic, and PLC/DCS platforms. We do not build the control platforms themselves. We work on the instruments feeding them, the logic running on them, and the systems that integrate with them, and we teach your team to own the result.</p>
         <div class="fv-actions">
           <a class="btn btn--primary" href="mailto:support@bridgesindust.com?subject=Industrial%20Automation">Talk to our team</a>
           <a class="btn btn--ghost" href="#capabilities">See capabilities</a>
@@ -51,7 +85,7 @@
       </div>
       <aside class="fv-spec fv-reveal" aria-label="At a glance">
         <div class="fv-spec__bar"><i></i> Field profile</div>
-        <div class="fv-spec__row"><span class="k">Hands-on experience</span><span class="v">15<small> YRS</small></span></div>
+        <div class="fv-spec__row"><span class="k">Hands-on experience</span><span class="v">16<small> YRS</small></span></div>
         <div class="fv-spec__row"><span class="k">Standards</span><span class="v">IT / OT<small> COMPLIANT</small></span></div>
         <div class="fv-spec__row"><span class="k">Platforms</span><span class="v">Vendor<small> AGNOSTIC</small></span></div>
         <div class="fv-spec__row"><span class="k">Coverage</span><span class="v">Field<small> TO CLOUD</small></span></div>
@@ -126,6 +160,40 @@
         <div class="fv-check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg><div><b>Repeat failures and serial replacements</b><span>The same device dying again and again is a symptom. We look for what keeps killing it.</span></div></div>
         <div class="fv-check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg><div><b>Keep it or change it, answered straight</b><span>Whether the installed technology can be made reliable, or genuinely cannot see your product.</span></div></div>
       </div>
+
+      <div class="dx fv-reveal">
+        <div class="dx__head"><span class="dot"></span><h3>What the instrument reports, and what is actually there</h3></div>
+        <div class="dx__body">
+          <div class="dx__tabs" role="tablist" aria-label="Diagnostic scenarios">
+            <button type="button" role="tab" id="dxTab-solids"  aria-controls="dxPanel" aria-selected="true"  tabindex="0"  data-s="solids">Low-density solids</button>
+            <button type="button" role="tab" id="dxTab-foam"    aria-controls="dxPanel" aria-selected="false" tabindex="-1" data-s="foam">Foam</button>
+            <button type="button" role="tab" id="dxTab-flash"   aria-controls="dxPanel" aria-selected="false" tabindex="-1" data-s="flash">Flashing across an orifice</button>
+            <button type="button" role="tab" id="dxTab-coating" aria-controls="dxPanel" aria-selected="false" tabindex="-1" data-s="coating">Probe coating</button>
+          </div>
+          <div class="dx__grid" id="dxPanel" role="tabpanel" aria-labelledby="dxTab-solids" tabindex="0">
+            <div class="dx__fig" id="dxFig"><svg viewBox="0 0 200 220" role="img" aria-label="Vessel with a level instrument mounted on top"><rect x="34" y="26" width="132" height="176" rx="6" fill="none" stroke="var(--glass-border-2)" stroke-width="2"/><rect x="86" y="8" width="28" height="20" rx="3" fill="rgba(47,212,194,.18)" stroke="var(--accent)" stroke-width="1.5"/><g id="dxProduct"></g><g id="dxBeam"></g><g id="dxEcho"></g></svg></div>
+            <div>
+              <div class="dx__reads">
+                <div class="dx__read dx__read--bad"><span class="k">The instrument reports</span><span class="v" id="dxReported">&mdash;</span></div>
+                <div class="dx__read dx__read--true"><span class="k">What is actually there</span><span class="v" id="dxActual">&mdash;</span></div>
+              </div>
+              <div class="dx__why">
+                <h4>Why it happens</h4><p id="dxWhy"></p>
+                <h4>What we do about it</h4><p id="dxFix"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fv-card fv-reveal" style="text-align:center">
+        <span class="fv-eyebrow" style="justify-content:center"><span class="n">/</span> Free</span>
+        <h3 style="font-family:var(--display);font-size:clamp(1.3rem,3vw,1.7rem);margin:8px 0 10px">Have one of these on your hands right now?</h3>
+        <p style="color:var(--ink-2);max-width:62ch;margin:0 auto 18px">In production, a break-in is the job that jumps the schedule. It is also our initials. Describe what the measurement is doing and a specialist answers you by email, at no cost and with nothing to sign up for.</p>
+        <div class="fv-actions" style="justify-content:center">
+          <a class="btn btn--primary" href="/break-in/">Submit a Break-In</a>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -154,7 +222,7 @@
       <div class="fv-reveal">
         <span class="fv-eyebrow"><span class="n">/</span> Technical Training</span>
         <h2 class="fv-h2">We teach what we build</h2>
-        <p class="fv-lead">The install is only half of it. Your team learns to run the systems and keep them honest. Fifteen years in the field, plus instructing at the local community college, means the training is current, hands-on, and grounded in real plant work, not slides. The same calculators and reference tables we teach with are free for anyone in the <a href="/education/" style="color:var(--accent)">Field Pocket Guide</a>.</p>
+        <p class="fv-lead">The install is only half of it. Your team learns to run the systems and keep them honest. Sixteen years in the field, plus instructing at the local community college, means the training is current, hands-on, and grounded in real plant work, not slides. The same calculators and reference tables we teach with are free for anyone in the <a href="/education/" style="color:var(--accent)">Field Pocket Guide</a>.</p>
         <div class="fv-actions" style="margin-top:18px"><a class="btn btn--primary" href="mailto:support@bridgesindust.com?subject=Technical%20Training">Ask about training</a><a class="btn btn--ghost" href="/education/">Open the Field Pocket Guide</a></div>
       </div>
       <div class="fv-checks fv-reveal">
@@ -187,7 +255,7 @@
   <section class="fv-section--tight">
     <div class="fv-wrap">
       <div class="fv-stats fv-reveal">
-        <div class="fv-stat"><div class="v">15<em>+</em></div><div class="k">Years in the field</div></div>
+        <div class="fv-stat"><div class="v">16<em>+</em></div><div class="k">Years in the field</div></div>
         <div class="fv-stat"><div class="v">All<em>.</em></div><div class="k">Major OEM platforms</div></div>
         <div class="fv-stat"><div class="v">IT<em>/</em>OT</div><div class="k">Compliance mapped</div></div>
         <div class="fv-stat"><div class="v">24<em>/</em>7</div><div class="k">Audit-trail visibility</div></div>
@@ -219,6 +287,128 @@
   </section>
 
 </main>
+<script>
+/* Diagnostic scenario bench. Each scenario redraws the figure and both readouts,
+   so the gap between what is reported and what isthere is the whole point. */
+(function () {
+  "use strict";
+  var fig = document.getElementById("dxFig");
+  if (!fig) return;
+  var TANK = fig.innerHTML;
+  var PIPE = "<svg viewBox=\"0 0 200 220\" role=\"img\" aria-label=\"Pipe with a flow element and a downstream restriction\"><rect x=\"10\" y=\"86\" width=\"180\" height=\"48\" rx=\"4\" fill=\"none\" stroke=\"var(--glass-border-2)\" stroke-width=\"2\"/><path d=\"M96 86 L96 104 M104 86 L104 104 M96 134 L96 116 M104 134 L104 116\" stroke=\"var(--accent)\" stroke-width=\"3\"/><g id=\"dxFlow\"></g><g id=\"dxPhase\"></g></svg>";
+
+  function el(tag, attrs) {
+    var n = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    return n;
+  }
+  function draw(id, nodes) {
+    var g = document.getElementById(id);
+    if (!g) return;
+    while (g.firstChild) g.removeChild(g.firstChild);
+    nodes.forEach(function (n) { g.appendChild(n); });
+  }
+
+  var S = {
+    solids: {
+      shape: "tank",
+      reported: "8% \u00b7 near empty",
+      actual: "62% \u00b7 over half full",
+      why: "Light, low-dielectric solids reflect very little energy. The pulse passes through the product and returns off the vessel floor, so the device measures to the bottom and reports an almost empty vessel. That is not a failed transmitter. It is a product the pulse can see straight through.",
+      fix: "Confirm the dielectric constant of the actual product, not the datasheet stand-in. Where the material is workable we move to a guided-wave probe, adjust the threshold and echo curve, or reposition away from the fill stream. Where it genuinely cannot return a usable echo, we say so and specify a technology that can, instead of selling another radar.",
+      render: function () {
+        draw("dxProduct", [el("rect", {x: 36, y: 120, width: 128, height: 80, fill: "rgba(242,178,76,.22)", stroke: "var(--amber)", "stroke-width": "1.5"})]);
+        draw("dxBeam", [el("line", {x1: 100, y1: 28, x2: 100, y2: 198, stroke: "var(--bad)", "stroke-width": "2", "stroke-dasharray": "5 4"})]);
+        draw("dxEcho", [el("line", {x1: 62, y1: 200, x2: 138, y2: 200, stroke: "var(--bad)", "stroke-width": "3"})]);
+      }
+    },
+    foam: {
+      shape: "tank",
+      reported: "78% \u00b7 by radar",
+      actual: "54% liquid \u00b7 24% foam",
+      why: "Non-contact radar returns off the top of the foam blanket while a differential-pressure transmitter measures only the head of actual liquid. Both devices are working correctly. They are measuring two different surfaces, and the disagreement between them is the foam depth.",
+      fix: "Compare the two deliberately instead of trusting one. That difference is usable information: it tells you how much foam you are carrying. We select or reposition for the surface that matters to your control objective, and where foam depth itself matters, we set the pair up to report it.",
+      render: function () {
+        draw("dxProduct", [
+          el("rect", {x: 36, y: 110, width: 128, height: 36, fill: "rgba(124,92,255,.22)", stroke: "#7c5cff", "stroke-width": "1.5"}),
+          el("rect", {x: 36, y: 146, width: 128, height: 54, fill: "rgba(62,224,255,.20)", stroke: "#3ee0ff", "stroke-width": "1.5"})
+        ]);
+        draw("dxBeam", [el("line", {x1: 100, y1: 28, x2: 100, y2: 110, stroke: "var(--bad)", "stroke-width": "2", "stroke-dasharray": "5 4"})]);
+        draw("dxEcho", [el("line", {x1: 62, y1: 110, x2: 138, y2: 110, stroke: "var(--bad)", "stroke-width": "3"})]);
+      }
+    },
+    flash: {
+      shape: "pipe",
+      reported: "erratic, biased high",
+      actual: "steady liquid flow",
+      why: "Pressure drops across the restriction and the liquid flashes to vapour downstream. The differential no longer represents a single-phase flow relationship, so the reading runs high and unstable. Replacing the transmitter changes nothing, because the transmitter is faithfully reporting the differential it actually sees.",
+      fix: "Check downstream pressure against the vapour pressure at operating temperature. The fix is usually upstream of the meter: recover pressure, relocate the element, or move to a technology that tolerates two-phase flow. We work out which, and we say plainly when the meter was never the problem.",
+      render: function () {
+        draw("dxFlow", [el("path", {d: "M18 110 H92 M112 110 H186", stroke: "#3ee0ff", "stroke-width": "3", "stroke-linecap": "round"})]);
+        var b = [];
+        [[122, 100, 4], [136, 118, 5], [150, 103, 3.5], [164, 117, 4.5], [176, 102, 3]].forEach(function (c) {
+          b.push(el("circle", {cx: c[0], cy: c[1], r: c[2], fill: "none", stroke: "var(--bad)", "stroke-width": "1.6"}));
+        });
+        draw("dxPhase", b);
+      }
+    },
+    coating: {
+      shape: "tank",
+      reported: "41% \u00b7 drifting down",
+      actual: "58% \u00b7 stable",
+      why: "Product builds on the probe over weeks. The measurement drifts slowly rather than failing outright, which is why it survives a spot check and gets written off as a calibration issue. Recalibrating resets the error for a while and the drift quietly resumes.",
+      fix: "Look at the trend over months, not the reading today. Drift that tracks run hours since the last cleaning is buildup, not calibration. We change the mounting, the probe style, or the cleaning interval so the measurement stops walking, instead of scheduling a recalibration that hides it.",
+      render: function () {
+        draw("dxProduct", [el("rect", {x: 36, y: 128, width: 128, height: 72, fill: "rgba(47,212,194,.18)", stroke: "var(--accent)", "stroke-width": "1.5"})]);
+        draw("dxBeam", [el("line", {x1: 100, y1: 28, x2: 100, y2: 128, stroke: "var(--glass-border-2)", "stroke-width": "2"})]);
+        draw("dxEcho", [
+          el("path", {d: "M94 46 q6 10 0 20 q-6 10 0 20 q6 10 0 20", fill: "none", stroke: "var(--amber)", "stroke-width": "4", "stroke-linecap": "round"}),
+          el("path", {d: "M106 46 q-6 10 0 20 q6 10 0 20 q-6 10 0 20", fill: "none", stroke: "var(--amber)", "stroke-width": "4", "stroke-linecap": "round"})
+        ]);
+      }
+    }
+  };
+
+  function show(key) {
+    var s = S[key];
+    if (!s) return;
+    fig.innerHTML = s.shape === "pipe" ? PIPE : TANK;
+    s.render();
+    /* textContent, never innerHTML: these strings stay data */
+    document.getElementById("dxReported").textContent = s.reported;
+    document.getElementById("dxActual").textContent = s.actual;
+    document.getElementById("dxWhy").textContent = s.why;
+    document.getElementById("dxFix").textContent = s.fix;
+  }
+
+  var tabs = [].slice.call(document.querySelectorAll(".dx__tabs button"));
+  var panel = document.getElementById("dxPanel");
+
+  function select(b, focus) {
+    tabs.forEach(function (x) {
+      var on = x === b;
+      x.setAttribute("aria-selected", on ? "true" : "false");
+      x.tabIndex = on ? 0 : -1;
+    });
+    if (panel) panel.setAttribute("aria-labelledby", b.id);
+    show(b.getAttribute("data-s"));
+    if (focus) b.focus();
+  }
+
+  tabs.forEach(function (b, i) {
+    b.addEventListener("click", function () { select(b, false); });
+    b.addEventListener("keydown", function (e) {
+      var k = e.key, next = null;
+      if (k === "ArrowRight" || k === "ArrowDown") next = tabs[(i + 1) % tabs.length];
+      else if (k === "ArrowLeft" || k === "ArrowUp") next = tabs[(i - 1 + tabs.length) % tabs.length];
+      else if (k === "Home") next = tabs[0];
+      else if (k === "End") next = tabs[tabs.length - 1];
+      if (next) { e.preventDefault(); select(next, true); }
+    });
+  });
+  show("solids");
+})();
+</script>
 <script src="/assets/fortiview.js"></script>
 </body>
 </html>
