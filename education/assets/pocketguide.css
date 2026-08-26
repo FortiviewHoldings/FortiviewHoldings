@@ -171,6 +171,11 @@ body.pg-pad-open .pg-main{padding-bottom:320px}
   #typeSeg button{padding:.6em 0}
 }
 
+/* A button row inside a tool card. .fv-actions is a bare flex row with no
+   margin of its own, and p{margin:0} sitewide, so without this the buttons
+   sit flush against the paragraph above them. */
+.pg-tool .fv-actions{margin-top:18px}
+
 /* ---------- reference link library ----------
    Sits under the tool cards on the guide index. Grid auto-fit means the
    column count falls out of the available width on its own: three across on
