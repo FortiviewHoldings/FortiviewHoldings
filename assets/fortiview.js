@@ -164,7 +164,7 @@
       '<div class="fv-footer__brand">' +
         '<a class="fv-brand" href="/"><span class="fv-brand__mark fv-brand__mark--plain" style="background-image:url(/images/Logo.png)"></span>' +
         '<span class="fv-brand__name">Bridges <span>Industrial</span></span></a>' +
-        "<p>Industrial automation, technical training, PragOptics technology, and the Idea Lab. Engineered for clarity, accountability, and scale.</p>" +
+        "<p>Hands-on field instrumentation and analytical measurement, technical training, PragOptics hardware and software, and the Idea Lab. Engineered for clarity, accountability, and scale.</p>" +
       "</div>" +
       '<div class="fv-fcol"><h3>What we do</h3>' +
         '<a href="/industrial">Industrial Automation &amp; Training</a>' +

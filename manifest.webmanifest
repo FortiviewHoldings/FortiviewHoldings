@@ -1,7 +1,7 @@
 {
-  "name": "Bridges Industrial — Strategic Services",
+  "name": "Bridges Industrial",
   "short_name": "Bridges",
-  "description": "Secure, branded backend-as-a-service solutions for small businesses.",
+  "description": "Field instrumentation and analytical measurement, calibration, commissioning, and diagnostics, plus technical training, custom hardware, and custom data connections.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000cc",
