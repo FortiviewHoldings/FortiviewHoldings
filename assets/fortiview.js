@@ -219,7 +219,7 @@
         '<a href="/idea-lab/">Idea Lab</a>' +
       "</div>" +
       '<div class="fv-fcol"><h3>Connect</h3>' +
-        '<a href="/break-in/" style="color:var(--accent)">Submit a Break-In</a>' +
+        '<a href="/break-in/" style="color:var(--accent)">Submit Break-In</a>' +
         '<span style="color:var(--muted);font-size:.82rem;display:block;margin:2px 0 6px">Instrument not working? Ask a specialist, free.</span>' +
         '<a href="' + MAIL + '">support@bridgesindust.com</a>' +
         '<a href="tel:+18324250421">+1 (832) 425-0421</a>' +
