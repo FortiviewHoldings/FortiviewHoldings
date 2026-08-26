@@ -1,0 +1,23 @@
+# GitHub Pages build configuration.
+#
+# This site is plain static HTML. There is no front matter, no Liquid, no
+# layouts, and nothing here needs Jekyll to render. The obvious move would be
+# to drop a .nojekyll file and skip the build entirely — do not.
+#
+# Jekyll excludes anything whose name starts with _ or . That rule is currently
+# the only thing keeping /_archive/ off the live site: fifteen tracked files of
+# retired INTC-2310 course material that answer 404 today and should keep
+# answering 404. Adding .nojekyll would publish every one of them.
+#
+# So Jekyll stays, and the one dot-directory that does need serving is named
+# explicitly below.
+
+include:
+  - .well-known          # RFC 9116 security.txt
+
+exclude:
+  - _archive             # retired course material, deliberately not published
+  - scripts              # IndexNow submitter, runs in CI and not in the browser
+  - README.md
+  - LICENSE
+  - LICENSES.md

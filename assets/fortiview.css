@@ -295,6 +295,21 @@ p{margin:0}
   .fv-reveal{opacity:1;transform:none}
 }
 
+/* skip link: off-screen until focused, then it lands top-left over the header.
+   position:fixed with a transform rather than left:-9999px, so it can never
+   contribute to page width. */
+.fv-skip{position:fixed;top:0;left:0;z-index:200;
+  transform:translateY(-200%);
+  background:var(--accent);color:var(--accent-ink);
+  font-family:var(--body);font-weight:700;font-size:.92rem;
+  padding:13px 20px;border-radius:0 0 var(--radius) 0;text-decoration:none;
+  transition:transform .12s ease}
+.fv-skip:focus{transform:translateY(0)}
+/* main only receives focus programmatically, from the link above; an outline
+   there would read as a stray focus ring rather than a target */
+main[tabindex="-1"]:focus{outline:none}
+@media(prefers-reduced-motion:reduce){.fv-skip{transition:none}}
+
 /* ================= shared intake form =================
    One component behind every contact CTA on the site. The page supplies
    markup; assets/fv-intake.js supplies the behaviour and the single

@@ -1,0 +1,17 @@
+# Security contact for bridgesindust.com — RFC 9116
+#
+# Found something? Tell us. You will get a person, not a ticket robot.
+# We are a small operation with no bug bounty and no formal disclosure
+# programme, so we will not pretend to have one. What we will do is read what
+# you send, answer you, and fix what is real.
+
+Contact: mailto:support@bridgesindust.com
+Contact: https://bridgesindust.com/contact/
+
+Expires: 2027-08-26T00:00:00.000Z
+
+Preferred-Languages: en
+
+Canonical: https://bridgesindust.com/.well-known/security.txt
+
+Policy: https://bridgesindust.com/integration/terms/#security

@@ -192,6 +192,23 @@
       '<a class="btn btn--primary" href="' + WORK + '">Work with us</a>' +
     "</div>";
   document.body.insertBefore(header, document.getElementById("fv-stars").nextSibling);
+
+  /* ---------- skip link ----------
+     The nav is injected into every page, so without this a keyboard or screen
+     reader user tabs the brand and five links before reaching the heading, on
+     all seventy pages. WCAG 2.4.1. It goes in first so it is the first stop,
+     and main takes tabindex -1 so focus can actually land there. */
+  (function skipLink() {
+    var main = document.querySelector("main");
+    if (!main || document.querySelector(".fv-skip")) { return; }
+    if (!main.id) { main.id = "fv-main"; }
+    if (!main.hasAttribute("tabindex")) { main.setAttribute("tabindex", "-1"); }
+    var a = document.createElement("a");
+    a.className = "fv-skip";
+    a.href = "#" + main.id;
+    a.textContent = "Skip to content";
+    document.body.insertBefore(a, document.body.firstChild);
+  })();
   var burger = header.querySelector(".fv-burger");
   burger.addEventListener("click", function () {
     var open = header.classList.toggle("open");
