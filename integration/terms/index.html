@@ -4,13 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Terms, Privacy &amp; Pricing | Bridges Industrial</title>
-  <meta name="description" content="Bridges Industrial LLC provides secure, transparent terms, privacy protections, and communication standards for all clients and partners.">
+  <meta name="description" content="Terms of service, privacy protections, communication standards, and pricing approach for Bridges Industrial LLC: consulting, field services, engineered deliverables, hardware, and the PragOptics platform.">
   <meta name="color-scheme" content="dark" />
   <link rel="canonical" href="https://bridgesindust.com/integration/terms/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Bridges Industrial">
   <meta property="og:title" content="Terms, Privacy &amp; Pricing | Bridges Industrial">
-  <meta property="og:description" content="Terms of service, privacy protections, communication standards, and pricing philosophy.">
+  <meta property="og:description" content="Terms of service, privacy protections, communication standards, and pricing approach.">
   <meta property="og:image" content="https://bridgesindust.com/images/social-preview.png">
   <meta property="og:url" content="https://bridgesindust.com/integration/terms/">
   <meta name="twitter:card" content="summary_large_image">
@@ -26,7 +26,7 @@
   <script type="application/ld+json">
   { "@context":"https://schema.org","@type":"WebPage",
     "name":"Terms, Privacy & Pricing",
-    "description":"Terms of service, privacy protections, communication standards, and pricing philosophy for Bridges Industrial LLC.",
+    "description":"Terms of service, privacy protections, communication standards, and pricing approach for Bridges Industrial LLC.",
     "url":"https://bridgesindust.com/integration/terms/",
     "isPartOf":{"@id":"https://bridgesindust.com/#website"},
     "publisher":{"@id":"https://bridgesindust.com/#org"},
@@ -35,17 +35,17 @@
   <style>
     /* long-form legal prose: one readable column, built on the site tokens */
     .legal{display:grid;grid-template-columns:210px minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:start}
-    .legal__toc{position:sticky;top:88px;align-self:start}
+    .legal__toc{position:sticky;top:88px;align-self:start;max-height:calc(100vh - 108px);overflow-y:auto}
     .legal__toc h2{font-family:var(--mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;
       color:var(--muted);font-weight:500;margin-bottom:12px}
-    .legal__toc a{display:block;color:var(--ink-2);font-size:.92rem;padding:6px 0 6px 12px;
+    .legal__toc a{display:block;color:var(--ink-2);font-size:.88rem;padding:5px 0 5px 12px;
       border-left:1px solid var(--glass-border);transition:color .15s ease,border-color .15s ease}
     .legal__toc a:hover{color:var(--accent);border-left-color:var(--accent)}
     .legal__body{min-width:0}
     .legal__sec{background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
       border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:clamp(20px,3vw,32px);
       box-shadow:inset 0 1px 0 rgba(255,255,255,.06);margin-bottom:18px;scroll-margin-top:96px}
-    .legal__sec h2{font-size:1.35rem;margin-bottom:.2rem}
+    .legal__sec h2{font-size:1.3rem;margin-bottom:.2rem}
     .legal__sec h3{font-family:var(--mono);font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;
       color:var(--accent);font-weight:500;margin:1.5rem 0 .4rem}
     .legal__sec h3:first-of-type{margin-top:1.1rem}
@@ -59,9 +59,14 @@
       text-underline-offset:3px;text-decoration-thickness:1px}
     .legal__sec p a:hover,.legal__sec li a:hover{text-decoration-thickness:2px}
     .legal__updated{font-family:var(--mono);font-size:.72rem;color:var(--muted);letter-spacing:.06em}
+    /* a clause that carries more weight than the prose around it */
+    .legal__note{background:var(--accent-soft);border:1px solid rgba(47,212,194,.25);
+      border-radius:var(--radius);padding:.85em 1em;margin:0 0 .9rem;max-width:70ch}
+    .legal__note p{margin:0;font-size:.94rem}
     @media(max-width:900px){
       .legal{grid-template-columns:1fr}
-      .legal__toc{position:static;border-bottom:1px solid var(--glass-border);padding-bottom:14px}
+      .legal__toc{position:static;max-height:none;overflow:visible;
+        border-bottom:1px solid var(--glass-border);padding-bottom:14px}
       .legal__toc div{display:flex;flex-wrap:wrap;gap:6px}
       .legal__toc a{border-left:0;border:1px solid var(--glass-border-2);border-radius:999px;
         padding:11px 14px;font-size:.8rem;min-height:44px;display:flex;align-items:center}
@@ -78,7 +83,7 @@
       <div class="fv-head fv-reveal" style="margin-bottom:0">
         <span class="fv-eyebrow"><span class="n">/</span> Legal</span>
         <h1>Terms, Privacy &amp; Pricing</h1>
-        <p class="fv-lead">The agreements that govern our services, how we handle your data, and how our pricing works. Written to be read, not to hide anything.</p>
+        <p class="fv-lead">The agreements that govern our work, how we handle your data, and how our pricing works. Written to be read, not to hide anything.</p>
       </div>
     </div>
   </section>
@@ -89,49 +94,247 @@
       <nav class="legal__toc fv-reveal" aria-label="On this page">
         <h2>On this page</h2>
         <div>
-          <a href="#terms">Terms of Service</a>
-          <a href="#privacy">Privacy Policy</a>
+          <a href="#scope">Scope</a>
+          <a href="#services">Services</a>
+          <a href="#engagements">Engagements</a>
+          <a href="#client">Your Responsibilities</a>
+          <a href="#field">Field &amp; On-Site Work</a>
+          <a href="#advisory">Advisory Services</a>
+          <a href="#deliverables">Deliverables</a>
+          <a href="#safety">Safety-Critical Systems</a>
+          <a href="#hardware">Hardware &amp; Parts</a>
+          <a href="#free">Free Resources</a>
+          <a href="#platform">PragOptics Platform</a>
+          <a href="#fees">Fees &amp; Payment</a>
+          <a href="#ip">Intellectual Property</a>
+          <a href="#insurance">Insurance &amp; Risk</a>
+          <a href="#warranty">Warranties &amp; Liability</a>
+          <a href="#privacy">Privacy</a>
           <a href="#communications">Communications</a>
-          <a href="#cookies">Cookies &amp; Tracking</a>
           <a href="#security">Data Security</a>
-          <a href="#rights">Rights &amp; Responsibilities</a>
-          <a href="#pricing-policy">Pricing Philosophy</a>
+          <a href="#general">General</a>
           <a href="#contact">Contact</a>
         </div>
       </nav>
 
       <div class="legal__body">
 
-        <section class="legal__sec fv-reveal" id="terms">
-          <h2>Terms of Service</h2>
-          <h3>Scope</h3>
-          <p>These Terms govern your use of Bridges Industrial's services, including the PragOptics&trade; platform, system integration, and related offerings. By accessing or using our services, you agree to these Terms.</p>
+        <section class="legal__sec fv-reveal" id="scope">
+          <h2>Scope</h2>
+          <p>These Terms govern your use of the services, products, software, documentation, and websites provided by <strong>Bridges Industrial LLC</strong> ("Bridges Industrial," "we," "us"), a Texas limited liability company. By engaging us, purchasing from us, or using our websites or free resources, you agree to these Terms.</p>
+          <p>Bridges Industrial operates through divisions and product lines, including <strong>PragOptics</strong>, our hardware and software group. References to Bridges Industrial include its divisions unless stated otherwise.</p>
+          <p>These Terms are the baseline. Where a signed agreement, statement of work, purchase order, quotation, or product-specific agreement applies to particular work, that document controls to the extent it conflicts with these Terms.</p>
 
           <h3>Eligibility</h3>
-          <p>You must be at least 18 years old and legally able to enter into contracts to use our services.</p>
+          <p>You must be at least 18 years old and legally able to enter into contracts. Where you act for an organization, you represent that you are authorized to bind it.</p>
+        </section>
 
-          <h3>Service Agreement</h3>
-          <p>We will provide services with reasonable skill, care, and in good faith. You agree to provide accurate information, maintain necessary access, and use our services only for lawful purposes.</p>
+        <section class="legal__sec fv-reveal" id="services">
+          <h2>Services</h2>
+          <p>Bridges Industrial provides professional, technical, and engineered services, including without limitation:</p>
+          <ul>
+            <li>Consulting and advisory services in industrial automation, instrumentation, controls, and operations</li>
+            <li>Field and on-site services, including calibration, configuration, troubleshooting, commissioning, startup, loop verification, and related hands-on technical work</li>
+            <li>Control and function logic development, including PLC, DCS, motor, relay, interlock, sequence, and batch logic</li>
+            <li>Custom hardware design, development, fabrication, and assembly</li>
+            <li>Additive manufacturing and short-run production, including MSLA printing in photopolymer resin</li>
+            <li>Technical training and instruction</li>
+            <li>Software development and systems integration, including APIs, dashboards, managed cloud services, and connected applications</li>
+            <li>Subscription access to the PragOptics platform and related products</li>
+            <li>Free public resources, reference tools, and educational material</li>
+          </ul>
+          <p>This list describes the general nature of our work and is not exhaustive. We may add, modify, or discontinue services at any time. No service, capability, or deliverable is implied unless it is described in an accepted engagement document.</p>
+        </section>
 
-          <h3>Acceptable Use</h3>
-          <p>You may not misuse our systems, attempt unauthorized access, or interfere with service integrity.</p>
+        <section class="legal__sec fv-reveal" id="engagements">
+          <h2>Engagements</h2>
+          <p>Work is performed under a statement of work, quotation, proposal, purchase order, service agreement, or other written engagement document (each, an "Engagement Document"). The Engagement Document defines the scope, deliverables, schedule, location, pricing, and any terms specific to that work.</p>
+          <p>Estimates, budgetary figures, and schedules are good-faith projections based on the information available at the time. They are not fixed prices or guaranteed completion dates unless expressly stated as such in writing.</p>
 
-          <h3>Termination</h3>
-          <p>Either party may terminate services with written notice if the other materially breaches these Terms and fails to cure within 30 days. We may suspend or terminate immediately for unlawful use or security risks.</p>
+          <h3>Changes</h3>
+          <p>Changes to scope, site conditions, equipment, schedule, or requirements may affect price and timeline. Material changes are handled by written change order or a revised Engagement Document before the affected work proceeds, where practicable.</p>
 
-          <h3>Liability</h3>
-          <p>We are not liable for indirect, incidental, or consequential damages. Our total liability is limited to the fees paid for the services in the 12 months preceding the claim.</p>
+          <h3>Subcontractors and partners</h3>
+          <p>We may use qualified subcontractors, vendors, or partner firms to perform portions of an engagement. We remain responsible for work we have contracted to deliver, subject to these Terms.</p>
+        </section>
 
-          <h3>Governing Law</h3>
-          <p>These Terms are governed by the laws of the State of Texas, without regard to conflict of law principles.</p>
+        <section class="legal__sec fv-reveal" id="client">
+          <h2>Your Responsibilities</h2>
+          <p>Our work depends on conditions and information you control. You agree to:</p>
+          <ul>
+            <li>Provide accurate, complete, and current information about systems, equipment, processes, drawings, configurations, and hazards</li>
+            <li>Provide timely access to sites, systems, personnel, credentials, and equipment as reasonably required</li>
+            <li>Obtain and maintain all permits, approvals, licenses, and regulatory authorizations applicable to your facility and operations</li>
+            <li>Maintain a safe work environment and disclose known or suspected hazards in advance</li>
+            <li>Maintain current backups of systems, configurations, programs, and data before work begins</li>
+            <li>Designate an authorized representative empowered to make decisions and grant approvals</li>
+            <li>Independently review, test, and approve any configuration, logic, or change before it is placed into production or relied upon in live operation</li>
+          </ul>
+          <p>Delays, errors, damage, or additional cost arising from incomplete or inaccurate information, restricted access, unsafe conditions, or missing backups are your responsibility.</p>
+        </section>
+
+        <section class="legal__sec fv-reveal" id="field">
+          <h2>Field &amp; On-Site Work</h2>
+          <p>Where we perform hands-on work at your facility or a site you designate, the following applies in addition to the rest of these Terms.</p>
+
+          <h3>Site control and conditions</h3>
+          <p>The site remains under your control. You are responsible for site safety, facility conditions, environmental controls, security, and the condition and suitability of the equipment we are asked to work on. You will inform us of applicable site rules, safety programs, and permit-to-work requirements before work begins.</p>
+
+          <h3>Safety practices and stop-work</h3>
+          <p>We observe applicable safety practices, including energy isolation, lockout/tagout, and permit requirements, and will comply with reasonable site-specific safety programs you provide. We may stop, pause, or decline work at any time if conditions are unsafe, if required isolation or permits are not in place, or if proceeding would create unacceptable risk. A stop-work decision is not a breach of these Terms.</p>
+
+          <h3>Existing systems and pre-existing conditions</h3>
+          <p>Industrial equipment, wiring, instrumentation, and control systems may contain undocumented conditions, latent defects, prior modifications, deferred maintenance, or impending failures that are not reasonably discoverable in advance. We are not responsible for pre-existing conditions or for failures arising from them.</p>
+
+          <h3>Production impact</h3>
+          <p>Work on live or in-service systems carries inherent risk to process availability. You are responsible for scheduling work windows, for production and operational decisions, and for the consequences of taking systems in or out of service.</p>
+        </section>
+
+        <section class="legal__sec fv-reveal" id="advisory">
+          <h2>Advisory Services</h2>
+          <p>Consulting, assessment, audit, review, recommendation, and other advisory deliverables are professional opinions based on the information available to us and the scope defined in the Engagement Document.</p>
+          <div class="legal__note">
+            <p>Advisory output is informational. You retain sole responsibility for evaluating our recommendations, for deciding whether and how to act on them, and for the results of those decisions. We do not assume operational, design-of-record, engineering-of-record, or management responsibility for your facility unless we have expressly agreed to do so in a signed writing.</p>
+          </div>
+          <p>We are not acting as your licensed professional engineer, safety authority, regulatory consultant, or legal or financial advisor unless expressly engaged and appropriately licensed to do so.</p>
+        </section>
+
+        <section class="legal__sec fv-reveal" id="deliverables">
+          <h2>Deliverables &amp; Acceptance</h2>
+          <p>Deliverables are provided as described in the Engagement Document. Unless that document states otherwise, deliverables are furnished for the application you have described, and you are responsible for confirming their suitability for that application.</p>
+
+          <h3>Verification and acceptance</h3>
+          <p>You are responsible for reviewing, testing, and validating deliverables in your environment before production use. Where an acceptance process is defined in the Engagement Document, that process controls. Where none is defined, deliverables are deemed accepted upon use in production or thirty (30) days after delivery, whichever occurs first.</p>
+
+          <h3>Documentation and records</h3>
+          <p>Calibration records, as-found and as-left data, configuration records, and similar documentation reflect conditions observed at the time of the work. They are not a warranty of continued performance and do not substitute for your own quality, maintenance, or regulatory recordkeeping obligations.</p>
+        </section>
+
+        <section class="legal__sec fv-reveal" id="safety">
+          <h2>Safety-Critical Systems</h2>
+          <p>Some work touches systems where failure can cause injury, environmental release, equipment damage, or loss of life, including safety instrumented systems and functions, alarm and interlock systems, emergency shutdown systems, and protective controls.</p>
+          <div class="legal__note">
+            <p><strong>Independent verification is required.</strong> You are responsible for the independent review, validation, functional testing, and approval of any safety-related design, logic, configuration, calibration, or change before it is relied upon for protection. You remain responsible for your process hazard analysis, safety requirement specification, safety lifecycle obligations, and regulatory compliance.</p>
+          </div>
+          <p>Nothing we deliver transfers to us ownership of, or accountability for, the safety of your process, facility, or personnel. Where a deliverable supports a safety function, its integrity must be verified within your own safety lifecycle.</p>
+        </section>
+
+        <section class="legal__sec fv-reveal" id="hardware">
+          <h2>Hardware &amp; Parts</h2>
+
+          <h3>Custom hardware and produced parts</h3>
+          <p>Custom devices, boards, enclosures, printed parts, and short-run production items are produced to the specifications and tolerances agreed in the Engagement Document. Unless expressly stated in writing, produced parts are not certified, listed, rated, or qualified to any particular standard, hazardous-area classification, safety rating, load, pressure, or temperature, carry no regulatory approval, and are not represented as suitable for life-safety or safety-critical applications.</p>
+          <p>Photopolymer resin and additive-manufactured parts have material characteristics, including dimensional variation, anisotropic strength, and sensitivity to heat, chemicals, and ultraviolet exposure, that differ from machined or molded parts. You are responsible for determining whether a produced part is suitable for its intended use and environment.</p>
+
+          <h3>Open hardware and published designs</h3>
+          <p>We publish designs, schematics, bills of materials, and enclosure files for certain products, including the Omni product line, so they may be built by others. Published designs are provided <strong>as is and without warranty of any kind</strong>.</p>
+          <div class="legal__note">
+            <p>If you build, modify, assemble, source components for, or operate hardware from our published designs, you do so entirely at your own risk and are solely responsible for the result, including component selection, workmanship, electrical safety, regulatory compliance, and fitness for your application. We have no liability for self-built or third-party-built units. Warranty coverage, where offered, applies only to units we supply assembled.</p>
+          </div>
+
+          <h3>Sale of assembled products</h3>
+          <p>Terms governing the sale of assembled products, including any product warranty, return, and shipping terms, are those presented at the time of purchase.</p>
+        </section>
+
+        <section class="legal__sec fv-reveal" id="free">
+          <h2>Free Resources</h2>
+          <p>We publish free tools, calculators, reference tables, documentation, and educational material, including the Field Pocket Guide and the Idea Lab.</p>
+          <div class="legal__note">
+            <p>Free resources are provided <strong>as is, without warranty of any kind</strong>, for reference and educational use only. They are working aids, not certified instruments, engineering deliverables, or a substitute for your facility's procedures, qualified reference standards, or professional judgment. Always confirm results against your own procedure and a calibrated reference before relying on them.</p>
+          </div>
+          <p>We make no representation that free resources are accurate, complete, current, or fit for any purpose, and we accept no liability arising from their use.</p>
+        </section>
+
+        <section class="legal__sec fv-reveal" id="platform">
+          <h2>PragOptics Platform</h2>
+          <p>Access to and use of the PragOptics platform, including subscriptions, API access, custom endpoints, hosted solutions, provisioning, and platform billing, is governed by the <strong>PragOptics Platform Agreement</strong>, which is presented and accepted separately.</p>
+          <p>Where the PragOptics Platform Agreement applies, it controls over these Terms with respect to platform access, platform roles and delegation, platform subscriptions, usage-based charges and overages, tenancy and provisioning, and platform availability.</p>
+          <p>Platform tiers, capabilities, limits, and pricing are defined at the point of purchase, renewal, or in an applicable pricing schedule. Descriptions of tiers or capabilities appearing in marketing or documentation are illustrative and non-binding.</p>
+        </section>
+
+        <section class="legal__sec fv-reveal" id="fees">
+          <h2>Fees &amp; Payment</h2>
+          <p>Pricing is established per engagement. Rates, fees, minimums, and included scope are those stated in the applicable Engagement Document, quotation, order form, checkout, or pricing schedule in effect at the time of purchase or renewal.</p>
+          <p>Pricing figures appearing in marketing material, documentation, or general correspondence are informational and non-binding. The authoritative price is the one presented at the time of purchase, renewal, or acceptance.</p>
+
+          <h3>Additional costs</h3>
+          <p>Unless the Engagement Document states otherwise, quoted amounts exclude taxes, travel and per-diem, expedited freight, third-party licenses and subscriptions, permits, rental or specialty equipment, materials, and pass-through costs incurred on your behalf. Usage-based charges, where applicable, are billed as incurred.</p>
+
+          <h3>Payment and suspension</h3>
+          <p>Invoices are due as stated on the invoice or in the Engagement Document. We may suspend work, access, or delivery for non-payment. Amounts remain payable for work performed prior to suspension or termination.</p>
+        </section>
+
+        <section class="legal__sec fv-reveal" id="ip">
+          <h2>Intellectual Property &amp; Confidentiality</h2>
+
+          <h3>Our materials</h3>
+          <p>We retain all rights in our pre-existing materials, methods, tooling, know-how, software, libraries, templates, reference designs, and platform technology, including improvements to them. Nothing in an engagement transfers ownership of these materials.</p>
+
+          <h3>Your materials</h3>
+          <p>You retain ownership of your data, drawings, specifications, process information, and other materials you provide. You grant us the right to use them as reasonably necessary to perform the engagement.</p>
+
+          <h3>Deliverables</h3>
+          <p>Rights in engagement-specific deliverables are as stated in the Engagement Document. Unless it states otherwise, upon full payment you receive a non-exclusive, non-transferable license to use the deliverable for your internal business purposes, and we retain ownership of the underlying methods and components used to create it.</p>
+
+          <h3>Confidentiality</h3>
+          <p>Each party will protect the other's non-public information disclosed in connection with an engagement, use it only for that engagement, and not disclose it to third parties except to personnel, subcontractors, and advisors with a need to know who are bound by comparable obligations. This does not apply to information that is public, independently developed, rightfully received from another source, or required to be disclosed by law.</p>
+        </section>
+
+        <!-- ==========================================================
+             INSURANCE — MODULAR SLOT
+             This section deliberately makes NO representation that any
+             particular coverage is carried. To add coverage later, insert
+             an "Our coverage" <h3> block below "Your insurance" listing
+             carrier-confirmed types and limits. Nothing else in this
+             document needs to change.
+             ========================================================== -->
+        <section class="legal__sec fv-reveal" id="insurance">
+          <h2>Insurance &amp; Risk Allocation</h2>
+
+          <h3>Your insurance</h3>
+          <p>You are responsible for maintaining insurance appropriate to your operations, facility, and equipment, including property, general liability, and business interruption coverage as applicable. Your coverage applies to your premises, your equipment, and your operations regardless of who is performing work there.</p>
+
+          <h3>Coverage applicable to an engagement</h3>
+          <p>Insurance requirements applicable to particular work, including any coverage types, limits, additional-insured status, certificates, or waivers of subrogation, are addressed in the Engagement Document for that work and agreed in writing before the affected work begins.</p>
+          <p>Nothing in these Terms constitutes a representation that any particular insurance coverage is carried, applicable, or available for a given engagement, except as expressly stated in a signed Engagement Document.</p>
+
+          <h3>Allocation of risk</h3>
+          <p>The pricing of our services reflects the allocation of risk set out in these Terms, including the disclaimers and limitations below. Where you require a different allocation of risk, contact us before work begins so that scope, terms, and pricing can be adjusted accordingly.</p>
+        </section>
+
+        <section class="legal__sec fv-reveal" id="warranty">
+          <h2>Warranties, Disclaimers &amp; Liability</h2>
+
+          <h3>What we warrant</h3>
+          <p>We warrant that services will be performed with the reasonable skill and care of a competent provider in our field, in good faith, and in accordance with the Engagement Document. This is our sole warranty as to services.</p>
+
+          <h3>Disclaimer</h3>
+          <p>Except as expressly stated in these Terms or a signed Engagement Document, all services, deliverables, hardware, software, published designs, documentation, and free resources are provided <strong>as is</strong>, and we disclaim all other warranties, express, implied, or statutory, including implied warranties of merchantability, fitness for a particular purpose, title, and non-infringement, and any warranty arising from course of dealing or usage of trade.</p>
+          <p>We do not warrant uninterrupted or error-free operation, that defects will be corrected, or that any particular result, outcome, saving, uptime, yield, or performance level will be achieved.</p>
+
+          <h3>Your remedy</h3>
+          <p>Where services do not meet the warranty above and you notify us in writing within thirty (30) days of the work, our obligation, and your exclusive remedy, is to re-perform the affected services or, at our option, refund the fees paid for them.</p>
+
+          <h3>Exclusion of indirect damages</h3>
+          <p>To the fullest extent permitted by law, we are not liable for indirect, incidental, special, consequential, exemplary, or punitive damages, or for lost profits, lost revenue, lost production, downtime, loss of use, loss of data, cost of substitute goods or services, or business interruption, however caused and under any theory of liability, even if advised of the possibility.</p>
+
+          <h3>Limitation of liability</h3>
+          <p>To the fullest extent permitted by law, our total aggregate liability arising out of or relating to these Terms, an engagement, or any service, deliverable, or product, whether in contract, tort, negligence, strict liability, or otherwise, is limited to the amounts you paid to us for the specific service or product giving rise to the claim during the twelve (12) months preceding the event on which the claim is based.</p>
+          <p>Some jurisdictions do not allow certain exclusions or limitations, so portions of this section may not apply to you. Nothing in these Terms excludes or limits liability that cannot be excluded or limited under applicable law.</p>
+
+          <h3>Time to bring a claim</h3>
+          <p>Any claim arising out of or relating to these Terms or an engagement must be brought within one (1) year after the cause of action accrues, except where a longer period is required by law.</p>
+
+          <h3>Indemnification</h3>
+          <p>You will defend, indemnify, and hold harmless Bridges Industrial and its members, employees, and subcontractors from third-party claims, damages, losses, and expenses arising out of your operations, your facility or site conditions, your equipment, your use of deliverables outside the scope or application described in the Engagement Document, your failure to independently verify safety-related work, your modification of anything we provide, or your breach of these Terms.</p>
         </section>
 
         <section class="legal__sec fv-reveal" id="privacy">
-          <h2>Privacy Policy</h2>
-          <h3>Information We Collect</h3>
+          <h2>Privacy</h2>
+          <h3>Information we collect</h3>
           <p>Contact details, account and billing information, and technical data such as IP address and usage logs.</p>
 
-          <h3>How We Use Information</h3>
+          <h3>How we use information</h3>
           <p>To provide and improve services, communicate with you, and comply with legal obligations.</p>
 
           <h3>Sharing</h3>
@@ -140,18 +343,16 @@
           <h3>Retention</h3>
           <p>We retain data only as long as necessary for service delivery, legal compliance, or legitimate business purposes.</p>
 
-          <h3>Your Rights</h3>
+          <h3>Your rights</h3>
           <p>You may request access, correction, or deletion of your personal data, subject to applicable law.</p>
+
+          <h3>Cookies and tracking</h3>
+          <p>We use cookies and similar technologies to manage sessions, analyze site usage, and improve user experience. You may disable cookies in your browser, but some features may not function properly.</p>
         </section>
 
         <section class="legal__sec fv-reveal" id="communications">
-          <h2>Client Communications</h2>
+          <h2>Communications</h2>
           <p>We may contact you via email, SMS, or phone for service updates, billing, and support. Marketing communications require your opt&#8209;in consent and include an unsubscribe option. You are responsible for keeping your contact information current.</p>
-        </section>
-
-        <section class="legal__sec fv-reveal" id="cookies">
-          <h2>Cookies &amp; Tracking</h2>
-          <p>We use cookies and similar technologies to manage sessions, analyze site usage, and improve user experience. You may disable cookies in your browser, but some features may not function properly.</p>
         </section>
 
         <section class="legal__sec fv-reveal" id="security">
@@ -159,48 +360,34 @@
           <p>We implement administrative, technical, and physical safeguards to protect your data. While no system is 100% secure, we take reasonable measures to prevent unauthorized access, disclosure, or loss. You are responsible for maintaining the confidentiality of your account credentials. We will notify you of any data breach as required by law.</p>
         </section>
 
-        <section class="legal__sec fv-reveal" id="rights">
-          <h2>Rights &amp; Responsibilities</h2>
-          <p><strong>Your rights:</strong> Access to services as agreed, data protection rights, and the ability to terminate under these Terms.</p>
-          <p><strong>Our rights:</strong> To update services, enforce policies, and protect system integrity.</p>
-          <p><strong>Mutual good faith:</strong> Both parties agree to act honestly, fairly, and in good faith in all dealings.</p>
-        </section>
+        <section class="legal__sec fv-reveal" id="general">
+          <h2>General</h2>
 
-        <section class="legal__sec fv-reveal" id="pricing-policy">
-          <h2>Pricing Philosophy</h2>
+          <h3>Acceptable use</h3>
+          <p>You may not misuse our systems, attempt unauthorized access, or interfere with the integrity or availability of our services.</p>
 
-          <h3>One-Time Setup Fee</h3>
-          <p>Our advertised setup fee includes foundational infrastructure and is delivered regardless of usage. This covers:</p>
-          <ul>
-            <li>One full webpage with a singular automation aligned to the selected service tier</li>
-            <li>Additional infrastructure and backend setup not billed ad-hoc</li>
-            <li>No surprise billing, setup is inclusive and transparent</li>
-          </ul>
+          <h3>Term and termination</h3>
+          <p>Either party may terminate an engagement with written notice if the other materially breaches these Terms and fails to cure within thirty (30) days. We may suspend or terminate immediately for unlawful use, non-payment, or security risk. On termination you remain responsible for amounts accrued, and provisions that by their nature should survive, including intellectual property, confidentiality, disclaimers, limitations of liability, and indemnification, survive termination.</p>
 
-          <h3>Additional Web Pages</h3>
-          <p>Clients may request additional functional pages beyond the included setup. Pricing:</p>
-          <ul>
-            <li>Informational-only pages: <strong>$250 minimum</strong> per page</li>
-            <li>Pages requiring automation (e.g. eCommerce, dynamic forms): priced based on integration complexity</li>
-          </ul>
-          <p>Integration development is billed at <strong>$125.00/hour</strong>, only after initial setup completion and only for requested services.</p>
+          <h3>Force majeure</h3>
+          <p>Neither party is liable for delay or failure to perform due to causes beyond its reasonable control, including natural events, utility or network failure, supplier or carrier failure, labor disruption, and governmental action.</p>
 
-          <h3>Tiered Service Model</h3>
-          <p>Our four-tier system is designed for accessibility, modular growth, and operational transparency:</p>
-          <ul>
-            <li><strong>Email Essentials</strong> &ndash; a value-added, hassle-free entry point with branded email, backend support, and SharePoint access</li>
-            <li><strong>Productivity Suite</strong> &ndash; includes Office apps, Teams, and advanced SharePoint features for collaborative work</li>
-            <li><strong>Automation Builder</strong> &ndash; adds PowerApps Developer and Power Automate Premium licensing, enabling custom automation and app development</li>
-            <li><strong>Super User Suite</strong> &ndash; includes all previous tiers plus MS Agent access, Bridges Industrial workflow sharing, and personalized training for high-impact operators</li>
-          </ul>
-          <p>All tiers are priced per user and can be upgraded at any time. Licensing is included, billing is transparent, and each tier is built to scale with your needs.</p>
+          <h3>Changes to these Terms</h3>
+          <p>We may update these Terms to reflect changes in our services, operations, or legal requirements. The current version is the one published on this page. Material changes take effect on posting and apply to engagements entered into afterward. Continued use of our services or resources constitutes acceptance.</p>
+
+          <h3>Governing law</h3>
+          <p>These Terms are governed by the laws of the State of Texas, without regard to conflict of law principles. The exclusive venue for disputes is the state or federal courts located in Texas, and each party consents to that jurisdiction.</p>
+
+          <h3>Severability and entire agreement</h3>
+          <p>If any provision is held unenforceable, it is limited or severed to the minimum extent necessary and the remainder stays in force. These Terms, together with any applicable Engagement Document and product-specific agreement, are the entire agreement on their subject matter and supersede prior discussions. A failure to enforce a provision is not a waiver of it.</p>
         </section>
 
         <section class="legal__sec fv-reveal" id="contact">
           <h2>Contact Bridges Industrial</h2>
-          <p>If you have questions or concerns about these Terms or our Pricing Policy, please contact us:</p>
+          <p>If you have questions or concerns about these Terms, our pricing, or our privacy practices, please contact us:</p>
           <p>
             <strong>Bridges Industrial LLC</strong><br>
+            League City, Texas, USA<br>
             Email: <a href="mailto:support@bridgesindust.com">support@bridgesindust.com</a><br>
             Phone: <a href="tel:+18324250421">(832) 425-0421</a>
           </p>
