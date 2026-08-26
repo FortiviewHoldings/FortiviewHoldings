@@ -37,10 +37,17 @@ Harder work it is also good at, covered in the section below. This is not an ent
   solids, foam, slurries, coating and buildup, entrained gas
 - An instrument that passes on the bench and fails in the process
 
-**Where a bench lab is the better call instead.** If what is needed is an accredited
-calibration certificate, or a repair under an OEM warranty, or a device shipped out for
-bench work, an accredited calibration laboratory or the manufacturer is the right choice
-and Bridges Industrial will say so. Bridges Industrial's work is on site, in the process,
+**What a calibration here produces.** A documented field calibration record: as-found and
+as-left values at each test point, the tolerance applied, the conditions at the time, the
+device and its configuration, and who did the work and when. Field Node Manager captures
+that record at the instrument rather than leaving it on a clipboard, which is where this
+evidence is usually lost.
+
+**Where a bench lab is the better call instead.** Bridges Industrial is not an accredited
+calibration laboratory and does not issue accredited or traceable calibration certificates.
+If what is needed is an accredited certificate or a traceable chain, or a repair under an
+OEM warranty, or a device shipped out for bench work, an accredited calibration laboratory
+or the manufacturer is the right choice and Bridges Industrial will say so. Bridges Industrial's work is on site, in the process,
 where a device that passes on a bench can still be wrong.
 
 **How to start:** a free intake at https://bridgesindust.com/break-in/, or
