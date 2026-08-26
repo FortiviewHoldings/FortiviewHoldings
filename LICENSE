@@ -1,0 +1,63 @@
+Copyright (c) 2026 Bridges Industrial LLC. All rights reserved.
+
+This repository is public so that the website it serves can be hosted from it
+and inspected by anyone. Public is not the same as licensed, so this file says
+plainly what you may and may not do with what is here.
+
+Two different licences apply, depending on the file. LICENSES.md maps them.
+
+
+1. WRITTEN REFERENCE MATERIAL — CC BY 4.0
+------------------------------------------------------------------------------
+The written instrumentation reference material published under /education/ is
+licensed Creative Commons Attribution 4.0 International (CC BY 4.0).
+
+That means you may copy it, quote it, republish it, translate it, and build on
+it, including commercially, provided you give credit to Bridges Industrial and
+indicate whether you changed anything.
+
+This is deliberate. The material exists to be read, cited, and quoted, by people
+and by machines. A licence that made citation awkward would defeat the point.
+
+Full text: https://creativecommons.org/licenses/by/4.0/
+Exactly which files: LICENSES.md.
+
+
+2. EVERYTHING ELSE — ALL RIGHTS RESERVED
+------------------------------------------------------------------------------
+All other files are the property of Bridges Industrial LLC and are not licensed
+for reuse. That includes the site markup, stylesheets, and scripts, the
+calculator implementations, the Idea Lab, brand assets, and the contents of
+/images/.
+
+You may read this repository, clone it, and run it locally to understand how
+something works. You may not republish it, redistribute it, or use it as the
+basis of another site or product without written permission.
+
+
+3. NAMES AND MARKS
+------------------------------------------------------------------------------
+"Bridges Industrial", "PragOptics", "OmniSource", "OmniPulse", "OmniBus",
+"OmniTok", "Field Node Manager", "Field Pocket Guide", "Idea Lab" and the
+Bridges Industrial logo are unregistered trademarks of Bridges Industrial LLC.
+
+No licence in this repository grants any right to use them. Attribution under
+CC BY 4.0 means naming the source; it does not mean branding your work as ours,
+and it does not imply endorsement.
+
+
+4. WHAT IS NOT IN THIS REPOSITORY
+------------------------------------------------------------------------------
+The Omni hardware design files are published at pragoptics.com and carry their
+own licence. They are source-available, not open source: building for yourself
+or your employer is permitted, manufacturing for resale is not. Omni firmware is
+proprietary and is not published.
+
+The PragOptics platform and Field Node Manager are proprietary. Field Node
+Manager is free of charge; free of charge is not open source.
+
+
+5. CONTACT
+------------------------------------------------------------------------------
+Permission requests, questions about scope, or anything this file does not
+cover: support@bridgesindust.com
