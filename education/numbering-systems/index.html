@@ -60,8 +60,22 @@
     /* ---------- section jump rail (horizontal chips) ---------- */
     .rail{position:sticky;top:64px;z-index:40;display:flex;gap:6px;overflow-x:auto;white-space:nowrap;align-items:center;
       margin:0 0 30px;padding:10px 2px;background:linear-gradient(180deg,rgba(5,7,14,.94),rgba(5,7,14,.8));
-      backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-bottom:1px solid var(--glass-border);scrollbar-width:none}
+      backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-bottom:1px solid var(--glass-border);
+      scrollbar-width:none;overscroll-behavior-x:contain}
     .rail::-webkit-scrollbar{display:none}
+    /* the scrollbar is hidden, so a faded edge is the only cue that the strip
+       carries on past the last visible chip. JS sets these from scrollLeft. */
+    .rail.can-right{-webkit-mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 36px),transparent 100%);
+                            mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 36px),transparent 100%)}
+    .rail.can-left{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 36px,#000 100%);
+                           mask-image:linear-gradient(90deg,transparent 0,#000 36px,#000 100%)}
+    .rail.can-left.can-right{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 36px,#000 calc(100% - 36px),transparent 100%);
+                                     mask-image:linear-gradient(90deg,transparent 0,#000 36px,#000 calc(100% - 36px),transparent 100%)}
+    /* wide enough to lay every chip out: wrap rather than hide them off the edge */
+    @media (min-width:900px){
+      .rail{flex-wrap:wrap;overflow-x:visible;white-space:normal;row-gap:6px}
+      .rail.can-left,.rail.can-right,.rail.can-left.can-right{-webkit-mask-image:none;mask-image:none}
+    }
     .rail a{flex:none;font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);
       border:1px solid var(--glass-border-2);border-radius:999px;padding:6px 12px}
     .rail a:hover{color:var(--ink);border-color:var(--accent)}
@@ -1838,16 +1852,55 @@ newQ();
   $('#powTbl').innerHTML=rows;
 })();
 
-/* ============ scrollspy ============ */
+/* ============ scrollspy + jump rail ============ */
 (function(){
+  const rail=document.getElementById('rail');
   const links=$$('.rail a');
   const map={};
   links.forEach(a=> map[a.getAttribute('href').slice(1)]=a);
+
+  const overflowing=()=> !!rail && rail.scrollWidth-rail.clientWidth>1;
+
+  /* mark which direction still has chips in it, so the faded edge appears */
+  function edges(){
+    if(!rail) return;
+    if(!overflowing()){ rail.classList.remove('can-left','can-right'); return; }
+    const max=rail.scrollWidth-rail.clientWidth;
+    rail.classList.toggle('can-left', rail.scrollLeft>1);
+    rail.classList.toggle('can-right', rail.scrollLeft<max-1);
+  }
+
+  if(rail){
+    /* a mouse wheel has no horizontal axis and the scrollbar is hidden, which
+       left the overflow completely unreachable with a mouse. Translate the
+       vertical intent while the pointer is over the strip. */
+    rail.addEventListener('wheel',function(e){
+      if(!overflowing()) return;
+      if(Math.abs(e.deltaY)<=Math.abs(e.deltaX)) return;
+      const before=rail.scrollLeft;
+      rail.scrollLeft+=e.deltaY;
+      /* at either end, let the page take the scroll back */
+      if(rail.scrollLeft!==before) e.preventDefault();
+    },{passive:false});
+    rail.addEventListener('scroll',edges,{passive:true});
+    window.addEventListener('resize',edges);
+    edges();
+  }
+
+  /* keep the chip for the section being read inside the visible strip */
+  function follow(a){
+    if(!overflowing()) return;
+    const r=a.getBoundingClientRect(), b=rail.getBoundingClientRect();
+    if(r.left<b.left+8) rail.scrollLeft-=(b.left+8-r.left);
+    else if(r.right>b.right-8) rail.scrollLeft+=(r.right-b.right+8);
+  }
+
   const obs=new IntersectionObserver(es=>{
     es.forEach(e=>{
       if(e.isIntersecting){
         links.forEach(a=>a.classList.remove('active'));
-        const a=map[e.target.id]; if(a) a.classList.add('active');
+        const a=map[e.target.id];
+        if(a){ a.classList.add('active'); follow(a); }
       }
     });
   },{rootMargin:'-15% 0px -70% 0px'});
