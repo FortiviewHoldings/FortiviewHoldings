@@ -31,9 +31,9 @@
         "@type": "Organization", "@id": ORG, "name": "Bridges Industrial",
         "alternateName": "Fortiview Holdings", /* former name: keeps the rebrand connected for search */
         "url": "https://bridgesindust.com",
-        "logo": "https://bridgesindust.com/images/Logo.png", "email": "support@fortiviewholdings.com",
+        "logo": "https://bridgesindust.com/images/Logo.png", "email": "support@bridgesindust.com",
         "telephone": "+1-832-425-0421", "areaServed": "United States",
-        "contactPoint": { "@type": "ContactPoint", "telephone": "+1-832-425-0421", "email": "support@fortiviewholdings.com", "contactType": "customer support" },
+        "contactPoint": { "@type": "ContactPoint", "telephone": "+1-832-425-0421", "email": "support@bridgesindust.com", "contactType": "customer support" },
         "sameAs": SAME
       });
       graph.push({
@@ -46,7 +46,7 @@
         "@type": "LocalBusiness", "@id": "https://bridgesindust.com/#local", "name": "Bridges Industrial",
         "alternateName": "Fortiview Holdings",
         "url": "https://bridgesindust.com", "image": "https://bridgesindust.com/images/social-preview.png",
-        "telephone": "+1-832-425-0421", "email": "support@fortiviewholdings.com", "priceRange": "$$",
+        "telephone": "+1-832-425-0421", "email": "support@bridgesindust.com", "priceRange": "$$",
         "address": { "@type": "PostalAddress", "addressLocality": "League City", "addressRegion": "TX", "addressCountry": "US" },
         "areaServed": "United States", "sameAs": SAME
       });
@@ -67,7 +67,7 @@
     document.head.appendChild(sc);
   })();
 
-  var MAIL = "mailto:support@fortiviewholdings.com?subject=Bridges%20Industrial%20Inquiry";
+  var MAIL = "mailto:support@bridgesindust.com?subject=Bridges%20Industrial%20Inquiry";
 
   /* the shared nav lives here ONCE for the whole site */
   var NAV = [
@@ -163,7 +163,7 @@
         '<a href="/idea-lab/">Idea Lab</a>' +
       "</div>" +
       '<div class="fv-fcol"><h4>Connect</h4>' +
-        '<a href="' + MAIL + '">support@fortiviewholdings.com</a>' +
+        '<a href="' + MAIL + '">support@bridgesindust.com</a>' +
         '<a href="tel:+18324250421">+1 (832) 425-0421</a>' +
         '<div class="fv-social" style="margin-top:12px">' +
           '<a href="https://www.linkedin.com/company/fortiviewholdings" aria-label="LinkedIn" target="_blank" rel="noopener">' + li + "</a>" +

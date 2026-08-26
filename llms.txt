@@ -1,6 +1,6 @@
 # Bridges Industrial
 
-> Bridges Industrial is a consulting firm for industrial automation, instrumentation, and technical training, based in League City, Texas. Through its PragOptics group it also builds the Omni product line of open field hardware, designs custom hardware and control logic for one-off projects, and runs short production batches in photopolymer resin. Contact: support@fortiviewholdings.com, +1 (832) 425-0421.
+> Bridges Industrial is a consulting firm for industrial automation, instrumentation, and technical training, based in League City, Texas. Through its PragOptics group it also builds the Omni product line of open field hardware, designs custom hardware and control logic for one-off projects, and runs short production batches in photopolymer resin. Contact: support@bridgesindust.com, +1 (832) 425-0421.
 
 Bridges Industrial designs, integrates, and services industrial automation and instrumentation systems, and provides hands-on technical training including community-college instruction. Alongside that field work, the company builds things: hardware for field data capture, function and control logic for custom projects, custom hardware for products, and one-off or short-run production parts printed by MSLA in photopolymer resin. The firm specializes in one-off work that other manufacturers and firms price out of reach, built into the customer’s infrastructure or hosted in the PragOptics backend.
 
@@ -8,7 +8,7 @@ PragOptics is the named internal group handling the hardware and software side o
 
 Bridges Industrial also runs the Idea Lab, a free coding and cybersecurity academy for kids, and publishes the Field Pocket Guide, a free set of instrumentation calculators.
 
-Note on naming: the company was formerly **Fortiview Holdings**, and the site formerly lived at fortiviewholdings.com. Bridges Industrial is the same company under a new name, and the old domain now redirects here. Company email remains @fortiviewholdings.com.
+Note on naming: the company was formerly **Fortiview Holdings**, and the site formerly lived at fortiviewholdings.com. Bridges Industrial is the same company under a new name, and the old domain now redirects here.
 
 ## The Omni product line
 Open field hardware from PragOptics. Every product can be bought assembled or built free from the published schematics, BOMs, and print-ready case files.
@@ -52,7 +52,7 @@ Open field hardware from PragOptics. Every product can be bought assembled or bu
 - [Terms, Privacy & Communications](https://bridgesindust.com/integration/terms/): Terms of service, pricing policy, privacy protections, and communication standards.
 
 ## Contact
-- Email: support@fortiviewholdings.com
+- Email: support@bridgesindust.com
 - Phone: +1 (832) 425-0421
 - Location: League City, TX, USA
 - LinkedIn: https://www.linkedin.com/company/fortiviewholdings
