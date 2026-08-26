@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Docs | Bridges Industrial</title>
+  <meta name="description" content="Documentation and reference for bridgesindust.com: licensing, the repository, and published reference material, rendered in the browser.">
+  <meta name="color-scheme" content="dark" />
+  <meta name="robots" content="noindex, follow">
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" href="/images/favicon.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+
+  <!-- The site's own design system, then the codex, unchanged from PragOptics. -->
+  <link rel="stylesheet" href="/assets/fortiview.css">
+  <link rel="stylesheet" href="codex/codex.css">
+
+  <style>
+    /* ---- token bridge ----
+       codex.css is a verbatim copy of the PragOptics renderer, so it asks for
+       that site's token names. Rather than fork the stylesheet and have the two
+       drift, the names are defined here in terms of this site's tokens. Copying
+       a newer codex.css over this one stays a straight file copy. */
+    body.codex{
+      --border:var(--glass-border);
+      --brand-600:var(--accent);
+      --brand-purp:#7c5cffc5;
+      --card-surface:linear-gradient(150deg,rgba(255,255,255,.045),rgba(255,255,255,.015));
+      --card-border:var(--glass-border);
+      --card-border-hover:rgba(47,212,194,.45);
+      --card-title:var(--ink);
+      --card-shadow-rest:0 10px 30px rgba(0,0,0,.45);
+      --card-shadow-hover:0 18px 42px rgba(0,0,0,.55);
+      --card-ease:200ms cubic-bezier(.22,.61,.36,1);
+      --card-lift:translateY(-3px);
+      --radius-card:14px;
+      --grad:linear-gradient(130deg,#05070e 0%,#0b1020 55%,#050a12 100%);
+      --aura:transparent;
+      background:var(--bg,#05070e);
+    }
+    @media(prefers-reduced-motion:reduce){
+      body.codex{--card-lift:none;--card-ease:0ms linear}
+    }
+  </style>
+</head>
+<body class="codex">
+  <div class="codex-shell">
+    <aside class="codex-nav" aria-label="Documentation navigation">
+      <div class="codex-nav-head">
+        <a class="codex-brand-link" href="/" title="Back to Bridges Industrial">
+          <img class="codex-logo" src="/images/Logo.png" alt="" width="28" height="28">
+          <span class="codex-brand">Bridges Industrial Docs</span>
+        </a>
+        <button id="codexNavToggle" class="codex-nav-toggle" type="button" aria-label="Toggle navigation">
+          &#9776;
+        </button>
+      </div>
+
+      <div class="codex-nav-actions">
+        <a id="codexHome" class="codex-home" href="#">Library index</a>
+      </div>
+
+      <div id="codexTree" class="codex-tree" role="tree" aria-label="Docs tree"></div>
+    </aside>
+
+    <main class="codex-main" aria-label="Documentation viewer">
+      <header class="codex-head">
+        <div class="codex-head-left">
+          <h1 id="codexTitle" class="codex-title">Documentation</h1>
+          <div id="codexPath" class="codex-path">Select a document</div>
+        </div>
+        <div class="codex-head-right">
+          <a id="codexOpenRaw" class="codex-raw" href="#" target="_blank" rel="noopener noreferrer">Open raw</a>
+        </div>
+      </header>
+
+      <section class="codex-body">
+        <div id="codexLoading" class="codex-loading">Loading&hellip;</div>
+        <article id="codexContent" class="md-view" aria-live="polite"></article>
+      </section>
+    </main>
+  </div>
+
+  <!-- Markdown engine, vendored. No CDN. -->
+  <script src="codex/vendor/markdown-it.min.js"></script>
+  <script src="codex/vendor/markdownItAnchor.umd.js"></script>
+  <script src="codex/vendor/highlight.min.js"></script>
+  <script type="module" src="codex/codex.js"></script>
+</body>
+</html>

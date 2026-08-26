@@ -1,0 +1,20 @@
+{
+  "title": "Bridges Industrial Docs",
+  "root": "https://bridgesindust.com/docs/",
+  "items": [
+    {
+      "type": "folder",
+      "name": "Licensing",
+      "items": [
+        { "type": "file", "name": "What is licensed, and what is not", "path": "../LICENSES.md" }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "This repository",
+      "items": [
+        { "type": "file", "name": "README", "path": "../README.md" }
+      ]
+    }
+  ]
+}

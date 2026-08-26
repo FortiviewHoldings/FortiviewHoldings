@@ -18,6 +18,7 @@ include:
 exclude:
   - _archive             # retired course material, deliberately not published
   - scripts              # IndexNow submitter, runs in CI and not in the browser
-  - README.md
-  - LICENSE
-  - LICENSES.md
+  - LICENSE              # plain text, not markdown; nothing renders it
+
+# README.md and LICENSES.md are deliberately NOT excluded: /docs/ fetches them
+# over HTTP and renders them, so they have to be served.

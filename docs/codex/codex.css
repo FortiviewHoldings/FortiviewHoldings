@@ -1,0 +1,295 @@
+/* /docs/.codex/codex.css */
+
+body.codex{
+  margin:0;
+  background: transparent;
+  color: var(--ink);
+}
+
+.codex-shell{
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 360px 1fr;
+}
+
+.codex-nav{
+  border-right: 1px solid var(--border);
+  background: rgba(0,0,0,0.40);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  backdrop-filter: blur(14px) saturate(160%);
+  padding: 14px 12px;
+}
+
+.codex-nav-head{
+  display:flex;
+  justify-content: space-between;
+  align-items:center;
+  gap: 10px;
+  padding: 10px 10px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+.codex-brand{
+  font-weight: 850;
+  letter-spacing: 0.02em;
+  background: linear-gradient(130deg, var(--ink) 12%, var(--brand-600) 62%, var(--brand-purp) 96%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.codex-brand .tm{
+  font-size: 0.7em;
+  vertical-align: super;
+  opacity: 0.9;
+}
+
+.codex-nav-toggle{
+  display:none;
+  appearance:none;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.86);
+  border-radius: 10px;
+  height: 38px;
+  width: 44px;
+  cursor:pointer;
+}
+
+/* Brand links home to the main PragOptics site */
+.codex-brand-link{ display:flex; align-items:center; gap:10px; text-decoration:none; min-width:0; }
+.codex-logo{ width:28px; height:28px; border-radius:8px; display:block; flex:none; }
+
+/* App-return links + library-index — same .ph-btn-ghost pill language as the app subnav */
+.codex-nav-actions{ display:flex; flex-wrap:wrap; gap:8px; padding:10px 10px 4px; }
+.codex-back, .codex-home{
+  flex:1 1 auto; text-align:center; text-decoration:none;
+  font-size:.82rem; font-weight:700; letter-spacing:.02em;
+  padding:8px 12px; border-radius:var(--radius-card);
+  border:1px solid var(--card-border);
+  color: rgba(225,235,250,.86);
+  background: rgba(255,255,255,.04);
+  transition: border-color var(--card-ease), background var(--card-ease), color var(--card-ease);
+}
+.codex-back:hover,
+.codex-home:hover{
+  color:#fff;
+  border-color: var(--card-border-hover);
+  background: linear-gradient(120deg, rgba(33,188,165,.28), rgba(162,0,255,.28));
+}
+.codex-home{ color: var(--brand-600); }
+
+.codex-tree{
+  padding: 12px 6px;
+}
+
+/* ---- Library index (landing) ---- */
+.codex-idx-hero{ padding: 6px 4px 18px; border-bottom:1px solid var(--border); margin-bottom:18px; }
+.codex-idx-kicker{
+  display:inline-block; font-size:.7rem; letter-spacing:.22em; text-transform:uppercase;
+  font-weight:800; color: var(--brand-600); margin-bottom:8px;
+}
+.codex-idx-title{
+  margin:0 0 6px; font-weight:900; font-size:1.85rem; line-height:1.1;
+  background: linear-gradient(130deg, var(--ink) 8%, var(--brand-600) 54%, var(--brand-purp) 96%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.codex-idx-lede{ margin:0; color: var(--muted); max-width:62ch; line-height:1.55; }
+
+.codex-idx-group{ margin:0 0 22px; }
+.codex-idx-h{ display:flex; align-items:center; gap:10px; margin:0 0 12px; }
+.codex-idx-h h2{ margin:0; font-size:.82rem; letter-spacing:.16em; text-transform:uppercase; font-weight:800; color: rgba(225,235,250,.7); }
+.codex-idx-count{
+  font: 700 .68rem/1 ui-monospace, Menlo, Consolas, monospace; color: var(--muted);
+  border:1px solid var(--border); border-radius:999px; padding:3px 8px;
+}
+.codex-idx-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:10px; }
+
+.codex-card{
+  display:flex; align-items:center; gap:12px; text-align:left; cursor:pointer;
+  padding:14px; border-radius:var(--radius-card);
+  border:1px solid var(--card-border); background: var(--card-surface);
+  box-shadow: var(--card-shadow-rest);
+  color: var(--ink); font: inherit;
+  transition: transform var(--card-ease), border-color var(--card-ease), box-shadow var(--card-ease);
+}
+.codex-card:hover{
+  transform: var(--card-lift);
+  border-color: var(--card-border-hover);
+  box-shadow: var(--card-shadow-hover);
+}
+.codex-card:focus-visible{ outline:2px solid var(--brand-600); outline-offset:2px; }
+.codex-card-ico{ font-size:1.1rem; opacity:.8; flex:none; }
+.codex-card-body{ display:flex; flex-direction:column; gap:2px; min-width:0; flex:1; }
+.codex-card-name{ font-weight:800; font-size:.95rem; color:var(--card-title); }
+.codex-card-path{ font: 500 .74rem/1.3 ui-monospace, Menlo, Consolas, monospace; color: var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.codex-card-go{ color: var(--brand-600); font-weight:800; flex:none; opacity:.5; transition: opacity .16s ease, transform .16s ease; }
+.codex-card:hover .codex-card-go{ opacity:1; transform: translateX(2px); }
+
+.codex-node{
+  display:flex;
+  align-items:center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+  color: rgba(225,235,250,0.82);
+}
+
+.codex-node:hover{
+  background: rgba(255,255,255,0.04);
+}
+
+.codex-node.is-active{
+  background: rgba(33,188,165,0.10);
+  border: 1px solid rgba(33,188,165,0.22);
+}
+
+.codex-node .icon{
+  width: 20px;
+  text-align:center;
+  opacity: 0.85;
+}
+
+.codex-children{
+  margin-left: 18px;
+  padding-left: 10px;
+  border-left: 1px dashed rgba(255,255,255,0.10);
+}
+
+.codex-main{
+  padding: 18px;
+}
+
+.codex-head{
+  display:flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  backdrop-filter: blur(14px) saturate(160%);
+  box-shadow: var(--aura);
+}
+
+.codex-title{
+  margin:0;
+  font-weight: 900;
+  font-size: 1.2rem;
+}
+
+.codex-path{
+  margin-top: 4px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.codex-raw{
+  color: rgba(225,235,250,0.86);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+  padding: 4px 8px;
+  border-radius: 10px;
+}
+
+.codex-raw:hover{
+  background: rgba(255,255,255,0.04);
+  border-bottom-color: rgba(33,188,165,0.35);
+}
+
+.codex-body{
+  margin-top: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--grad);
+  overflow: hidden;
+}
+
+.codex-loading{
+  padding: 14px 16px;
+  color: var(--muted);
+  display:none;
+}
+
+/* md-view comes from /css/components/modals.css */
+.codex-body .md-view{
+  padding: 18px 22px;
+}
+
+/* Rendered doc lives in an isolated iframe (auto-sized by codex.js). */
+.codex-frame{
+  width: 100%;
+  border: 0;
+  display: block;
+  background: transparent;
+  min-height: 60vh;
+}
+
+.doc-console-header {
+  padding: 8px 12px;
+  background: var(--glass);
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.doc-status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.doc-status-dot.unsigned {
+  background: var(--brand-purp); /* purple */
+}
+
+.doc-status-dot.signed-in {
+  background: #21c47b; /* green */
+}
+
+/* Markdown images (badges, diagrams) */
+.md-view img{
+  max-width: 100%;
+  height: auto;
+  vertical-align: middle;
+}
+
+/* Shields-style badges: keep them compact and crisp */
+.md-view img.md-badge{
+  height: 20px;
+  width: auto;
+  margin: 2px 6px 2px 0;
+}
+
+/* mobile */
+@media (max-width: 960px){
+  .codex-shell{
+    grid-template-columns: 1fr;
+  }
+  .codex-nav{
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .codex-nav-toggle{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .codex-tree{
+    display:none;
+  }
+  .codex-nav.is-open .codex-tree{
+    display:block;
+  }
+  /* header: stack so the title and "Open raw" never collide, and keep the long path from shifting the layout */
+  .codex-main{ padding: 12px; }
+  .codex-head{ flex-direction: column; align-items: stretch; gap: 8px; }
+  .codex-head-right{ align-self: flex-end; }
+  .codex-path{ white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; font-size: .8rem; }
+}
