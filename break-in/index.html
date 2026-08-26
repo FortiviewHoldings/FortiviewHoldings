@@ -127,17 +127,17 @@
           <div class="fv-form__row">
             <div class="fv-form__field">
               <label for="biMeas">What is it measuring? <span class="req">*</span></label>
-              <select id="biMeas" name="measuring" required data-label="Measuring" data-group="MEASUREMENT" data-msg="Please tell us what the instrument is measuring.">
+              <select id="biMeas" name="measuring" required data-hint-for="issue" data-label="Measuring" data-group="MEASUREMENT" data-msg="Please tell us what the instrument is measuring.">
                 <option value="">Select&hellip;</option>
-                <option>Level</option>
-                <option>Flow</option>
-                <option>Pressure</option>
-                <option>Temperature</option>
-                <option>Analytical (pH, conductivity, analyzer)</option>
-                <option>Weight or density</option>
-                <option>Control logic (PLC / DCS)</option>
-                <option>Not sure</option>
-                <option>Something else</option>
+                <option data-hint="What does it read against what is actually in the vessel? Vessel and technology if you know them, and what the surface does: foam, agitation, coating, a light product.">Level</option>
+                <option data-hint="What does it read against what you expect? Meter type and line size if you know them, and whether the line ever runs partly full, flashes, or carries gas.">Flow</option>
+                <option data-hint="What does it read against what you expect? Whether it is gauge, differential, or absolute, and what the taps and impulse lines look like.">Pressure</option>
+                <option data-hint="What does it read against a reference? Thermowell or direct, immersion depth if you know it, and how fast the process really moves.">Temperature</option>
+                <option data-hint="What does it read against a lab or grab sample? How often it is cleaned and calibrated, and what the process does to the sensor between cleanings.">Analytical (pH, conductivity, analyzer)</option>
+                <option data-hint="What does it read against what you expect? Load cells or a density meter, and anything touching the vessel that should not be: piping, conduit, a walkway.">Weight or density</option>
+                <option data-hint="What platform is it on, what is the logic meant to do, and what does it do instead? Say whether you have the program and the drawings.">Control logic (PLC / DCS)</option>
+                <option data-hint="Describe it however you would say it out loud: what the number does, when it does it and when it does not, and what has already been tried.">Not sure</option>
+                <option data-hint="Tell us what the device is and what it is doing wrong. Symptoms beat conclusions, and you will not be corrected for the vocabulary.">Something else</option>
               </select>
             </div>
             <div class="fv-form__field">

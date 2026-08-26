@@ -113,16 +113,16 @@
 
           <div class="fv-form__field">
             <label for="paType">What kind of partner are you? <span class="req">*</span></label>
-            <select id="paType" name="type" required data-label="Type" data-subject-part data-msg="Please tell us what kind of partner you are.">
+            <select id="paType" name="type" required data-label="Type" data-subject-part data-hint-for="offering" data-msg="Please tell us what kind of partner you are.">
               <option value="">Select&hellip;</option>
-              <option>Vendor or supplier</option>
-              <option>Distributor or procurement</option>
-              <option>Manufacturer or manufacturer&#8217;s rep</option>
-              <option>Integrator or contractor</option>
-              <option>Specialist trade or service</option>
-              <option>Software or technology</option>
-              <option>Referral or co-selling only</option>
-              <option value="Other">Other (tell us below)</option>
+              <option data-hint="What do you supply, which lines or brands do you carry, and what are your lead times like? Where do you deliver?">Vendor or supplier</option>
+              <option data-hint="What do you distribute, which manufacturers, and what does your stocking and pricing look like? Any minimums worth knowing about.">Distributor or procurement</option>
+              <option data-hint="What do you make or represent, which territories do you cover, and what does support look like after the sale?">Manufacturer or manufacturer&#8217;s rep</option>
+              <option data-hint="What kind of work do you take on, what size jobs, and which industries? Where do you work and how big is the crew?">Integrator or contractor</option>
+              <option data-hint="What is the speciality, who do you normally do it for, and what does your crew look like? Any certifications or site access worth naming.">Specialist trade or service</option>
+              <option data-hint="What does the product do, who uses it today, and how would it sit alongside field or plant work?">Software or technology</option>
+              <option data-hint="Who are you talking to and what do they need? Tell us how you would like the introduction handled.">Referral or co-selling only</option>
+              <option data-hint="Tell us what you do and how you think the two of us would work together." value="Other">Other (tell us below)</option>
             </select>
           </div>
 
