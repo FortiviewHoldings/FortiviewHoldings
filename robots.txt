@@ -1,8 +1,8 @@
 User-agent: *
 Allow: /
 
-# Keep non-public areas out of search
-Disallow: /integration/pragoptics/api/
+# Not built into the published site at all, but named here so the intent is
+# on the record if either ever returns.
 Disallow: /_archive/
 
 # Point crawlers to your sitemap
