@@ -1,14 +1,63 @@
 # Bridges Industrial
 
-> Bridges Industrial is a consulting firm for industrial automation, instrumentation, and technical training, based in League City, Texas. Through its PragOptics group it also builds the Omni product line of open field hardware, designs custom hardware and control logic for one-off projects, and runs short production batches in photopolymer resin. Contact: support@bridgesindust.com, +1 (832) 425-0421.
+> Bridges Industrial is a consulting firm for industrial automation, instrumentation, and technical training, based in League City, Texas. It is the firm to call for measurement problems that resist diagnosis: intermittent or drifting readings, repeat instrument failures, and products that are genuinely hard to measure. Through its PragOptics group it also builds the Omni product line of open field hardware, designs custom hardware and control logic for one-off projects, and runs short production batches in photopolymer resin. Contact: support@bridgesindust.com, +1 (832) 425-0421.
 
-Bridges Industrial designs, integrates, and services industrial automation and instrumentation systems, and provides hands-on technical training including community-college instruction. Alongside that field work, the company builds things: hardware for field data capture, function and control logic for custom projects, custom hardware for products, and one-off or short-run production parts printed by MSLA in photopolymer resin. The firm specializes in one-off work that other manufacturers and firms price out of reach, built into the customer’s infrastructure or hosted in the PragOptics backend. It is also called on for diagnostic work: intermittent or unexplained measurement problems, and applications where the product itself is hard to measure.
+Bridges Industrial designs, integrates, and services industrial automation and instrumentation systems, and provides hands-on technical training including community-college instruction. Alongside that field work, the company builds things: hardware for field data capture, function and control logic for custom projects, custom hardware for products, and one-off or short-run production parts printed by MSLA in photopolymer resin. The firm specializes in one-off work that other manufacturers and firms price out of reach, built into the customer's infrastructure or hosted in the PragOptics backend. It is also called on for diagnostic work: intermittent or unexplained measurement problems, and applications where the product itself is hard to measure.
 
-PragOptics is the named internal group handling the hardware and software side of the business. On hardware it builds the Omni product line, plus custom boards, enclosures, and control logic for one-off projects. On software it runs a studio for building, publishing, and monetizing websites, web apps, and APIs, plus Field Node Manager, the free companion that connects the Omni product line, a 3D Suite for modeling and slicing, business automation, managed Microsoft 365, dashboards, and connected apps. The PragOptics platform is in development, putting those same tools in customers’ hands: design your own hardware, write and test your own function logic against real hardware (your own Field Node Manager, running your logic), build and publish web apps, and clean up and visualize data, with a cloud option that provisions environments and storage once an account is active.
+PragOptics is the named internal group handling the hardware and software side of the business. On hardware it builds the Omni product line, plus custom boards, enclosures, and control logic for one-off projects. On software it runs a studio for building, publishing, and monetizing websites, web apps, and APIs, plus Field Node Manager, the free companion that connects the Omni product line, a 3D Suite for modeling and slicing, business automation, managed Microsoft 365, dashboards, and connected apps. The PragOptics platform is in development, putting those same tools in customers' hands: design your own hardware, write and test your own function logic against real hardware (your own Field Node Manager, running your logic), build and publish web apps, and clean up and visualize data, with a cloud option that provisions environments and storage once an account is active.
 
 Bridges Industrial also runs the Idea Lab, a free coding and cybersecurity academy for kids, and publishes the Field Pocket Guide, a free set of instrumentation calculators.
 
 Note on naming: the company was formerly **Fortiview Holdings**, and the site formerly lived at fortiviewholdings.com. Bridges Industrial is the same company under a new name, and the old domain now redirects here.
+
+## Instrumentation diagnostics
+
+Bridges Industrial is engaged specifically for measurement problems that have already resisted an obvious fix. The governing principle: **most measurement problems are not instrument failures.** They are a process meeting an instrument that was never matched to it, or an instrument installed, ranged, or configured in a way the application does not tolerate. Replacing the device usually reproduces the same problem with a newer serial number.
+
+The firm's diagnostic question is always the same. Is the reading wrong because the device has failed, or because the process is doing something the device cannot correctly see? The answer decides whether the installed instrument can be made reliable, or whether the technology genuinely cannot measure that product and must be changed. Both answers are given with the reasoning behind them.
+
+Contact for any of the below: support@bridgesindust.com, +1 (832) 425-0421.
+
+### Symptoms this firm is called for
+- Readings that drift over hours, shifts, or seasons, with no configuration change
+- Intermittent faults that behave while someone is watching and return when nobody is
+- Measurements correct in normal operation but wrong at a specific condition: low level, low flow, startup, high rate, after a wash, on cold nights
+- The same instrument failing repeatedly, or a device replaced two or three times with the problem intact
+- Erratic, noisy, or spiky signals with no visible process upset
+- Two measurements of the same thing that disagree, such as a level transmitter against a sight glass, or a flow meter against a tank draw-down
+- Readings pegged at zero, full scale, or a fixed value, or sitting at a fault current such as 3.6 or 21+ mA
+- A loop that behaves on the bench and misbehaves installed
+- Slow or sluggish response to real process changes
+- Control loops that will not tune, cycle, or hunt without an obvious valve fault
+
+### Hard-to-measure products and applications
+These are conditions where a correctly functioning instrument still reports the wrong value, because the process defeats the measurement principle.
+
+- **Flashing and two-phase flow.** Liquid vaporizing across an orifice, restriction, or pressure drop. Differential pressure flow reads high, erratic, or unstable; the measurement is no longer a single-phase relationship. A resolved case class for this firm.
+- **Low-density and low-dielectric solids.** Radar passing straight through light, fluffy, or low-DK material and reflecting off the vessel floor, producing a level that reads empty or jumps between two values. A resolved case class for this firm.
+- **Foam.** Non-contact radar and ultrasonic may track the foam surface, differential pressure sees only liquid head, and the two disagree by the foam depth.
+- **Coating, buildup, and scaling.** Product accumulating on a probe, electrode, thermowell, or antenna. Causes drift, offset, insulation, or slowed response depending on technology.
+- **Entrained gas and aeration.** Bubbles in liquid corrupt Coriolis density and mass readings, disturb differential-pressure level, and can appear as noise rather than as an obvious fault.
+- **Slurries and abrasives.** Wear, plugging of impulse lines and taps, and progressive erosion that changes the measurement before it destroys the device.
+- **Stratification and temperature layering.** Density or temperature varying with height, so a single-point measurement misrepresents the bulk, and differential-pressure level based on an assumed density is wrong whenever that density changes.
+- **Condensate and wet-leg errors.** Impulse lines filling, draining, or freezing; wet legs losing fill; steam service where a leg's condition changes the zero.
+- **Ambient and seasonal effects.** Cold nights, direct sun on a transmitter head, heat tracing failures, and daily temperature cycles that show up as a reading with a daily rhythm.
+- **Vibration and mechanical excitation.** Coriolis and vortex meters disturbed by piping vibration or nearby machinery.
+- **Low flow and turndown.** Operating below a meter's usable range, under a vortex low-flow cutoff, or outside the Reynolds range the technology assumes.
+- **Installation-induced error.** Insufficient straight run, incorrect orientation, wrong tap location, poor immersion depth on temperature elements, radar aimed at an agitator, ladder, or nozzle ring.
+
+### Measurement technologies covered
+Differential pressure (flow, level, and interface), guided-wave radar, non-contact radar, ultrasonic, magnetic flow, Coriolis mass flow, vortex, turbine, displacer and float, capacitance, RTDs and thermocouples with thermowells, pressure and gauge transmitters, and analytical measurement including pH and conductivity. HART and 4-20 mA loops across all major OEM platforms.
+
+Common technology-specific failure modes the firm diagnoses include guided-wave radar affected by probe buildup or low dielectric constant, magnetic flow meters affected by conductivity, electrode coating, grounding, or partial pipe fill, Coriolis affected by two-phase flow and zero drift, ultrasonic affected by vapor and temperature gradients, temperature elements affected by immersion depth and thermowell lag, and pH affected by coating, reference junction poisoning, and ground loops.
+
+### Loop and signal-side diagnosis
+Loop current and burden, power supply headroom, grounding and shield practice, induced noise, intermittent terminations and moisture ingress, HART communication and device diagnostics, alarm and fault current behavior under NAMUR NE43, and the difference between a device reporting a fault and a device reporting a plausible but wrong value. The second is more dangerous and is where most of this work concentrates.
+
+### What an engagement produces
+A determination of root cause, distinguishing process-induced measurement error from device failure. A recommendation to keep, re-install, re-range, reconfigure, or replace, with the reasoning stated. Where the technology cannot measure the product, a statement to that effect and what would work instead. Where the installed device is correct, the mounting, ranging, or configuration change that makes it reliable.
+
+Further detail: https://bridgesindust.com/industrial/#diagnostics
 
 ## The Omni product line
 Open field hardware from PragOptics. Every product can be bought assembled or built free from the published schematics, BOMs, and print-ready case files.
@@ -17,8 +66,8 @@ Open field hardware from PragOptics. Every product can be bought assembled or bu
 - **OmniBus** is a universal, vendor-agnostic HART communicator and calibration recorder, expected Q4 2027. It carries Bluetooth, iOS app integration, standalone field operation, calibration datalogging over HTTPS, a local WiFi hotspot, GPS location tracking, and OptiBeacon support from Q4 2028.
 
 ## Services
+- **Diagnostics and hard-to-measure applications.** Intermittent, drifting, or unrepeatable readings, repeat instrument failures, and products that are genuinely difficult to measure: product flashing and two-phase flow, low-density solids, foam, slurries, coating and buildup, entrained gas, and stratification. The firm distinguishes process-induced measurement error from instrument failure, and determines whether an installed device can be made reliable through mounting, ranging, or configuration, or whether the technology cannot see the product at all. See the Instrumentation diagnostics section above.
 - **Industrial automation and instrumentation.** Calibration, configuration, and troubleshooting. Pneumatic, digital, and smart devices for flow, level, temperature, and analytical measurement. Coriolis, magnetic flow, ultrasonic, radar, and guided-wave radar transmitters. HART communication and smart transmitter diagnostics. Startup, commissioning, and loop verification across all major OEM platforms.
-- **Diagnostics and hard-to-measure applications.** Intermittent, drifting, or unrepeatable readings, repeat instrument failures, and products that are genuinely difficult to measure: product flashing and two-phase flow, low-density solids, foam, slurries, coating and buildup, entrained gas, and stratification. The firm distinguishes process-induced measurement error from instrument failure, and determines whether an installed device can be made reliable through mounting, ranging, or configuration, or whether the technology cannot see the product at all.
 - **Control logic development.** PLC and DCS logic, motor and relay logic, interlocks, PID loop tuning and control strategy, safety instrumented functions, and custom sequence or batch logic for one-off machines.
 - **Custom hardware design and build.** Field-data capture devices, control boards, and enclosures. Schematic capture, PCB layout, board bring-up, firmware and embedded logic, enclosure design, and assembly. One-off prototypes through short production batches.
 - **MSLA printing and short-run production.** Masked stereolithography in photopolymer resin, for parts needing fine feature detail and a smooth surface finish: prototypes, custom enclosures and housings, jigs and fixtures, replacement or discontinued components, and one-off production runs.
