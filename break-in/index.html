@@ -99,7 +99,7 @@
         <div class="bi-expect">
           <div><b>This is intake, not a support line</b><span>If you are an existing customer with an active engagement, use your normal contact so your request is not queued behind new intake.</span></div>
           <div><b>Email response, first</b><span>We are a small operation. A specialist replies by email as soon as they can, in the order requests are received. We do not staff a phone queue and will not pretend otherwise.</span></div>
-          <div><b>Detail gets you a better answer</b><span>What the reading does, when it does it, what changes around it, what has been tried. Symptoms beat conclusions.</span></div>
+          <div><b>Detail gets you a better answer</b><span>What the reading does, when it does it, and what goes on around the equipment. The product itself matters more than people expect, and so does a task one shift runs that another does not. Symptoms beat conclusions.</span></div>
           <div><b>No account, no obligation</b><span>Nothing to sign up for. We use your details to answer you, and we do not sell them.</span></div>
         </div>
       </div>
@@ -153,6 +153,51 @@
           <div class="bi-field" id="biOtherWrap" hidden>
             <label for="biOther">Your sector <span class="req">*</span></label>
             <input id="biOther" name="sectorOther" type="text" maxlength="60" placeholder="Tell us what you run">
+          </div>
+
+          <div class="bi-row">
+            <div class="bi-field">
+              <label for="biMeas">What is it measuring? <span class="req">*</span></label>
+              <select id="biMeas" name="measuring" required>
+                <option value="">Select&hellip;</option>
+                <option>Level</option>
+                <option>Flow</option>
+                <option>Pressure</option>
+                <option>Temperature</option>
+                <option>Analytical (pH, conductivity, analyzer)</option>
+                <option>Weight or density</option>
+                <option>Control logic (PLC / DCS)</option>
+                <option>Not sure</option>
+                <option>Something else</option>
+              </select>
+            </div>
+            <div class="bi-field">
+              <label for="biProduct">Product or medium <span class="req">*</span></label>
+              <input id="biProduct" name="product" type="text" maxlength="80"
+                placeholder="Water, crude, caustic, resin pellets, steam, sludge&hellip;">
+            </div>
+          </div>
+
+          <div class="bi-field">
+            <label for="biWhen">When does it happen? <span class="req">*</span></label>
+            <select id="biWhen" name="when" required>
+              <option value="">Select&hellip;</option>
+              <option>All the time, since it started</option>
+              <option>Only on a certain shift or time of day</option>
+              <option>Only in certain weather or ambient conditions</option>
+              <option>Only at certain process conditions (low level, low flow, startup, high rate)</option>
+              <option>Only after a specific activity (a wash, a transfer, a batch change)</option>
+              <option>Since a specific change (new product, new device, recent work)</option>
+              <option>Intermittent, no pattern found yet</option>
+              <option>Not sure</option>
+            </select>
+          </div>
+
+          <div class="bi-field">
+            <label for="biAround">What happens around this equipment?</label>
+            <input id="biAround" name="around" type="text" maxlength="160"
+              placeholder="Tasks one shift runs and another does not, cleaning, transfers, nearby equipment starting, sun on the housing&hellip;">
+            <div class="bi-hint">Optional, and often the most useful thing you can tell us.</div>
           </div>
 
           <div class="bi-field">
@@ -316,22 +361,34 @@
     var phone   = oneLine(document.getElementById("biPhone").value, 32);
     var sec     = oneLine(sector.value, 60);
     var secOth  = oneLine(other.value, 60);
+    var meas    = oneLine(document.getElementById("biMeas").value, 60);
+    var product = oneLine(document.getElementById("biProduct").value, 80);
+    var when    = oneLine(document.getElementById("biWhen").value, 90);
+    var around  = oneLine(document.getElementById("biAround").value, 160);
     var body    = multiLine(issue.value, 1000);
 
-    [document.getElementById("biName"), document.getElementById("biEmail"), sector, other, issue]
+    [document.getElementById("biName"), document.getElementById("biEmail"), sector, other,
+     document.getElementById("biMeas"), document.getElementById("biProduct"),
+     document.getElementById("biWhen"), issue]
       .forEach(function (el) { flag(el, false); });
 
     if (!name)                      return fail("Please give us a name to reply to.", document.getElementById("biName"));
     if (!looksLikeEmail(email))     return fail("That email address does not look right.", document.getElementById("biEmail"));
     if (!sec)                       return fail("Please choose a sector.", sector);
     if (sec === "Other" && !secOth) return fail("Please tell us your sector.", other);
+    /* the minimum that makes a submission answerable: without the product and the
+       timing, any reply is a guess dressed up as an answer */
+    if (!meas)                      return fail("Please tell us what the instrument is measuring.", document.getElementById("biMeas"));
+    if (!product)                   return fail("Please tell us the product or medium being measured.", document.getElementById("biProduct"));
+    if (!when)                      return fail("Please tell us when it happens.", document.getElementById("biWhen"));
     if (body.length < 20)           return fail("Please describe the issue in a bit more detail.", issue);
 
     var sectorFinal = (sec === "Other") ? secOth : sec;
 
     var payload = {
       name: name, company: company, email: email, phone: phone,
-      sector: sectorFinal, issue: body, source: "break-in"
+      sector: sectorFinal, measuring: meas, product: product, when: when,
+      around: around, issue: body, source: "break-in"
     };
 
     if (ENDPOINT) {
@@ -357,11 +414,18 @@
     var lines = [
       "BREAK-IN SUBMISSION",
       "",
-      "Name:    " + name,
-      "Company: " + (company || "-"),
-      "Email:   " + email,
-      "Phone:   " + (phone || "-"),
-      "Sector:  " + sectorFinal,
+      "Name:      " + name,
+      "Company:   " + (company || "-"),
+      "Email:     " + email,
+      "Phone:     " + (phone || "-"),
+      "Sector:    " + sectorFinal,
+      "",
+      "MEASUREMENT",
+      "-----------",
+      "Measuring: " + meas,
+      "Product:   " + product,
+      "When:      " + when,
+      "Around it: " + (around || "-"),
       "",
       "ISSUE",
       "-----",
