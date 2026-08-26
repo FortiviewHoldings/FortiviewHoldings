@@ -18,7 +18,9 @@ include:
 exclude:
   - _archive             # retired course material, deliberately not published
   - scripts              # IndexNow submitter, runs in CI and not in the browser
-  - LICENSE              # plain text, not markdown; nothing renders it
+# Nothing else is excluded. "LICENSE" was here, and Jekyll matches exclude
+# entries by path prefix, so it silently swallowed LICENSES.md too and the
+# codex could not fetch it. Serving the licence itself is harmless anyway.
 
 # README.md and LICENSES.md are deliberately NOT excluded: /docs/ fetches them
 # over HTTP and renders them, so they have to be served.
