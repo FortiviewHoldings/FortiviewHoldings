@@ -54,7 +54,10 @@
     .legal__sec strong{color:var(--ink)}
     .legal__sec ul{color:var(--ink-2);font-size:.98rem;max-width:70ch;margin:0 0 .9rem;padding-left:1.1rem}
     .legal__sec li{margin-bottom:.45rem}
-    .legal__sec a{color:var(--accent)}
+    /* underline inline prose links: hue alone cannot carry the distinction */
+    .legal__sec p a,.legal__sec li a{color:var(--accent);text-decoration:underline;
+      text-underline-offset:3px;text-decoration-thickness:1px}
+    .legal__sec p a:hover,.legal__sec li a:hover{text-decoration-thickness:2px}
     .legal__updated{font-family:var(--mono);font-size:.72rem;color:var(--muted);letter-spacing:.06em}
     @media(max-width:900px){
       .legal{grid-template-columns:1fr}

@@ -118,7 +118,10 @@
       ctx.globalAlpha = 1;
       if (!reduce) requestAnimationFrame(draw);
     }
-    size(); window.addEventListener("resize", size); draw();
+    size(); draw();
+    /* redraw after resize: size() clears the canvas and, for reduced-motion
+       users, the rAF loop is not running to paint it again */
+    window.addEventListener("resize", function () { size(); draw(); });
   })();
 
   /* ---------- header ---------- */
@@ -139,13 +142,17 @@
       '<nav class="fv-links" aria-label="Primary">' + links("fv-link") +
         '<a class="btn btn--primary btn--sm" href="' + MAIL + '">Work with us</a>' +
       "</nav>" +
-      '<button class="fv-burger" aria-label="Menu"><span></span><span></span><span></span></button>' +
+      '<button class="fv-burger" aria-label="Menu" aria-expanded="false" aria-controls="fv-mobile-menu"><span></span><span></span><span></span></button>' +
     "</div>" +
-    '<div class="fv-mobile">' + links("") +
+    '<div class="fv-mobile" id="fv-mobile-menu">' + links("") +
       '<a class="btn btn--primary" href="' + MAIL + '">Work with us</a>' +
     "</div>";
   document.body.insertBefore(header, document.getElementById("fv-stars").nextSibling);
-  header.querySelector(".fv-burger").addEventListener("click", function () { header.classList.toggle("open"); });
+  var burger = header.querySelector(".fv-burger");
+  burger.addEventListener("click", function () {
+    var open = header.classList.toggle("open");
+    burger.setAttribute("aria-expanded", open ? "true" : "false");
+  });
 
   /* ---------- footer ---------- */
   var li = '<svg viewBox="0 0 24 24"><path d="M4.98 3.5a2.5 2.5 0 11-.02 5 2.5 2.5 0 01.02-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-1 1.83-2.05 3.76-2.05C20.4 8.65 21 11 21 14.1V21h-4v-6.1c0-1.45-.03-3.3-2-3.3-2 0-2.3 1.56-2.3 3.2V21H9z"/></svg>';
@@ -159,14 +166,14 @@
         '<span class="fv-brand__name">Bridges <span>Industrial</span></span></a>' +
         "<p>Industrial automation, technical training, PragOptics technology, and the Idea Lab. Engineered for clarity, accountability, and scale.</p>" +
       "</div>" +
-      '<div class="fv-fcol"><h4>What we do</h4>' +
+      '<div class="fv-fcol"><h3>What we do</h3>' +
         '<a href="/industrial">Industrial Automation &amp; Training</a>' +
         '<a href="/education/">Field Pocket Guide</a>' +
         '<a href="/partnerships">Partnerships</a>' +
         '<a href="/integration">PragOptics</a>' +
         '<a href="/idea-lab/">Idea Lab</a>' +
       "</div>" +
-      '<div class="fv-fcol"><h4>Connect</h4>' +
+      '<div class="fv-fcol"><h3>Connect</h3>' +
         '<a href="' + MAIL + '">support@bridgesindust.com</a>' +
         '<a href="tel:+18324250421">+1 (832) 425-0421</a>' +
         '<div class="fv-social" style="margin-top:12px">' +
