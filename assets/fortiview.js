@@ -28,8 +28,6 @@
         }
       } catch (e) { /* ignore unparseable blocks */ }
     }
-    var SAME = ["https://www.linkedin.com/company/fortiviewholdings", "https://www.instagram.com/fortiviewholdings"];
-
     /* "areaServed: United States" told a local-intent search nothing. On-site work is a
        drive from League City; the advisory and remote half genuinely is nationwide. */
     var AREA = [
@@ -76,8 +74,7 @@
         "logo": "https://bridgesindust.com/images/Logo.png", "email": "support@bridgesindust.com",
         "telephone": "+1-832-425-0421", "areaServed": AREA,
         "knowsAbout": TOPICS,
-        "contactPoint": { "@type": "ContactPoint", "telephone": "+1-832-425-0421", "email": "support@bridgesindust.com", "contactType": "technical support" },
-        "sameAs": SAME
+        "contactPoint": { "@type": "ContactPoint", "telephone": "+1-832-425-0421", "email": "support@bridgesindust.com", "contactType": "technical support" }
       });
       graph.push({
         "@type": "WebSite", "@id": "https://bridgesindust.com/#website", "url": "https://bridgesindust.com",
@@ -93,7 +90,7 @@
         "telephone": "+1-832-425-0421", "email": "support@bridgesindust.com", "priceRange": "$$",
         "address": { "@type": "PostalAddress", "addressLocality": "League City", "addressRegion": "TX", "addressCountry": "US" },
         "geo": { "@type": "GeoCoordinates", "latitude": 29.5075, "longitude": -95.0949 },
-        "areaServed": AREA, "knowsAbout": TOPICS, "hasOfferCatalog": CATALOG, "sameAs": SAME
+        "areaServed": AREA, "knowsAbout": TOPICS, "hasOfferCatalog": CATALOG
       });
     }
     var p = location.pathname.replace(/index\.html$/, "");
@@ -246,10 +243,6 @@
           '<span style="color:var(--muted);font-size:.82rem;display:block;margin:2px 0 6px">Instrument not working? Ask a specialist, free.</span>' +
           '<a href="' + MAIL + '">support@bridgesindust.com</a>' +
           '<a href="tel:+18324250421">+1 (832) 425-0421</a>' +
-          '<div class="fv-social" style="margin-top:12px">' +
-            '<a href="https://www.linkedin.com/company/fortiviewholdings" aria-label="LinkedIn" target="_blank" rel="noopener">' + li + "</a>" +
-            '<a href="https://www.instagram.com/fortiviewholdings" aria-label="Instagram" target="_blank" rel="noopener">' + ig + "</a>" +
-          "</div>" +
         "</div>" +
       "</div>" +
       '<div class="fv-wrap fv-footer__bottom">' +
