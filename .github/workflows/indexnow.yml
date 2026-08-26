@@ -5,14 +5,26 @@ name: IndexNow
 # the fast path into AI answers. Google does not participate in IndexNow —
 # Search Console covers that side.
 #
-# Fires when the sitemap changes, which is the only reliable signal that a
-# page was added or updated. Can also be run by hand from the Actions tab.
+# Fires on any push that touches published content, not just the sitemap.
+# The sitemap only changes when a page is added or removed, so keying off it
+# alone meant an edit to an existing page never got announced, and remembering
+# to run it by hand is not a plan.
+#
+# The weekly run is the backstop: if a push slips through the path filter, or
+# a submission fails while nobody is looking, Sunday picks it up. The script
+# decides what is actually recent, so a no-op week costs one API call.
 
 on:
   push:
     branches: [main]
     paths:
+      - '**/*.html'
       - 'sitemap.xml'
+      - 'llms.txt'
+      - 'robots.txt'
+  schedule:
+    # Sundays, 07:00 UTC. Catches anything a push missed.
+    - cron: '0 7 * * 0'
   workflow_dispatch:
     inputs:
       all:
@@ -48,6 +60,8 @@ jobs:
           INDEXNOW_ATTEMPTS: '20'
           INDEXNOW_GAP_MS: '15000'
         run: |
+          # A scheduled or push run carries no inputs, so both fall through to
+          # --days and the script works out what actually changed recently.
           if [ "${{ github.event.inputs.all }}" = "true" ]; then
             node scripts/indexnow.mjs --all
           else
