@@ -1,306 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Page not found — Bridges Industrial</title>
-  <meta name="robots" content="noindex, follow">
-  <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="color-scheme" content="dark light" />
+  <title>Page not found | Bridges Industrial</title>
+  <meta name="robots" content="noindex, follow">
+  <meta name="color-scheme" content="dark" />
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" href="/images/favicon.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/fortiview.css">
   <style>
-     :root{
-      --bg-deep:#000000cc;
-      --bg-accent:#101625cc;
-      --glass:#d9d9d912;
-      --glass-2:#00000012;
-      --glass-blur:#272727c6;
-      --border:#ffffff1a;
-      --ink:#e7ecff;
-      --muted:#c6d0f0a6;
-      --brand:#1ca490da;      
-      --brand-600:#21bca5;
-      --aura:0 4px 8px rgba(17, 76, 67, 0.678);
-      --radius:16px;
-      --radius-sm:12px;
-      --maxw:1200px;
-      --grad:linear-gradient(135deg,#121b2d 0%,#060e1e 40%,#0f1824 100%);
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0;font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg-deep);color:var(--ink)}
-    a{color:inherit;text-decoration:none}
-
-    /* Background */
-    .bg{
-      position:fixed; inset:0; z-index:-2;
-      background: var(--glass);
-      filter:blur(6px) brightness(.9) saturate(1.05);
-      transform:scale(1.03);
-    }
-    .bg::after{
-      content:""; position:absolute; inset:0;
-      background: var(--glass);
-    }
-  #bg-stars{
-    position:fixed; inset:0; width:100vw; height:100vh; z-index:-1; pointer-events:none;
-  }
-
-    /* Sticky glass header (minimal) */
-    /* Header */
-    header{
-      position:sticky; top:0; z-index:50;
-      backdrop-filter:saturate(140%) blur(10px);
-      background:var(--glass);
-      border-bottom:1px solid var(--border);
-    }
-  .nav{
-    max-width:var(--maxw); margin:0 auto; padding:14px 20px;
-    display:flex; align-items:center; justify-content:space-between; gap:16px;
-  }
-  .brand{display:flex; align-items:center; gap:10px; letter-spacing:.4px}
-  .logo{
-    width:34px; height:34px; border-radius:10px;
-    background-image:url('/images/Logo.png');
-    background-size:cover; background-position:center;
-    box-shadow:0 0 0 2px rgba(92,140,69,.25), 0 10px 20px rgba(92,140,69,.18);
-  }
-    .brand strong{font-weight:800;}
-    .chip{
-      padding:8px 12px;border-radius:999px;color:var(--muted);border:1px solid var(--brand);
-      background:linear-gradient(180deg,var(--glass-blur),var(--glass));
-    }
-    .chip:hover{ transform:translateY(-2px); color:var(--brand)}
-
-    /* Center stage */
-    .stage{
-      min-height:calc(100vh - 64px);
-      display:grid; place-items:center;
-      padding:40px 20px;
-    }
-    .card{
-      width:min(680px, 92vw);
-      background:var(--glass);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding:28px;
-      text-align:center;
-      transform-style:preserve-3d;
-      transition:transform .16s ease, box-shadow .2s ease;
-    }
-    .card:hover{ transform:translateY(-2px); box-shadow:0 24px 60px rgba(0,0,0,.55) }
-    .kicker{
-      display:inline-block; font-size:.8rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase;
-      padding:6px 10px; border-radius:999px; color:#06210c;
-      background:linear-gradient(180deg,var(--brand),var(--brand-600)); border:1px solid var(--aura);
-    }
-    h1{font-size:clamp(1.8rem, 4vw, 2.6rem); margin:12px 0 6px 0; color:#fff}
-    .sub{color:var(--muted); margin:0 0 18px 0}
-
-    /* Countdown */
-    .countdown{
-      display:grid; grid-template-columns:repeat(4, minmax(70px, 1fr)); gap:12px;
-      margin:16px 0 10px 0;
-    }
-    .unit{
-      background:var(--glass-2); border:1px solid var(--border);
-      border-radius:var(--radius-sm); padding:12px 10px;
-    }
-    .num{font-size:1.6rem; font-weight:800; color:#fff}
-    .lbl{font-size:.78rem; color:var(--muted); letter-spacing:.08em; text-transform:uppercase}
-
-    /* Notify form */
-    form{margin-top:16px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap}
-    input[type="email"]{
-      width:min(360px, 80vw);
-      background:#0c1224; color:#fff; border:1px solid #2a355b; outline:none;
-      padding:12px 14px; border-radius:10px; font-size:.98rem;
-      box-shadow: inset 0 0 0 1px #0003;
-    }
-    input[type="email"]::placeholder{color:#a8b3dacc}
-    button{
-      background:linear-gradient(180deg,var(--brand),var(--brand-600));
-      color:var(--bg-deep); border:none; padding:12px 16px; font-weight:800; border-radius:10px;
-      box-shadow:var(--aura); cursor:pointer;
-    }
-    button:hover{filter:brightness(.65)}
-    .note{margin-top:10px; color:#a9b5db; font-size:.9rem}
-
-    /* Footer */
-    footer{color:#8ea0d8; text-align:center; font-size:.9rem; margin:24px 0 26px 0}
-
-    /* Reduced motion */
-    @media (prefers-reduced-motion: reduce){
-      .ring{animation:none}
-      .card:hover{transform:none; box-shadow:var(--shadow)}
-    }
-    
-    @media (max-width: 640px) {
-  .nav {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 8px;
-  }
-  .brand {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 6px;
-  }
-  .nav > .chip {
-    width: 100%;
-    text-align: center;
-  }
-  .nav > .chip a {
-    display: inline-block;
-    width: 100%;
-  }
-}
-
-    /* Responsive */
-    @media (max-width:520px){
-      .countdown{grid-template-columns:repeat(2, minmax(90px, 1fr))}
-    }
+    /* the mistyped path, shown back to the visitor */
+    .nf-path{font-family:var(--mono);font-size:.86rem;color:var(--amber);background:rgba(8,12,22,.6);
+      border:1px solid var(--glass-border);border-radius:var(--radius);padding:.6em .9em;
+      display:inline-block;max-width:100%;overflow-x:auto;white-space:nowrap;margin-bottom:6px}
+    .nf-code{font-family:var(--mono);font-size:clamp(3.4rem,12vw,6rem);line-height:1;font-weight:600;
+      background:var(--cosmic);-webkit-background-clip:text;background-clip:text;color:transparent;
+      display:block;margin-bottom:.2rem}
   </style>
 </head>
-<body data-target="2026-03-01T17:00:00Z">
-  <!-- Background layers -->
-  <div class="bg" aria-hidden="true"></div>
-  <canvas id="bg-stars" aria-hidden="true"></canvas>
+<body>
+<main>
 
-  <!-- Minimal glass header -->
-  <header>
-    <div class="nav">
-      <a class="brand" href="/">
-        <div class="logo" aria-hidden="true"></div>
-        <strong style="color:var(--ink)">Bridges</strong>
-        <span style="color:var(--brand-600)">Industrial</span>
-        <span class="unit" aria-hidden="true">Coming soon</span>
-      </a>
-      <div class="chip" title="Contact">
-        <a href="mailto:support@bridgesindust.com?subject=Coming%20Soon%20Updates">support@bridgesindust.com</a>
+  <section class="fv-hero">
+    <div class="fv-wrap fv-hero__grid">
+      <div class="fv-reveal">
+        <span class="fv-eyebrow"><span class="n">/</span> Error 404</span>
+        <h1>That page is not here.</h1>
+        <p class="fv-lead">The link may be out of date, or the address may have a typo. Everything below is one click away, or head back to the front page and start over.</p>
+        <p id="nfPathWrap" style="display:none"><span class="nf-path" id="nfPath"></span></p>
+        <div class="fv-actions">
+          <a class="btn btn--primary" href="/">Back to the front page</a>
+          <a class="btn btn--ghost" href="mailto:support@bridgesindust.com?subject=Broken%20link%20on%20bridgesindust.com">Report a broken link</a>
+        </div>
       </div>
+      <aside class="fv-spec fv-reveal" aria-label="Error detail">
+        <div class="fv-spec__bar"><i></i>Not found</div>
+        <div style="padding:22px 16px;text-align:center">
+          <span class="nf-code">404</span>
+          <span style="font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;color:var(--muted);text-transform:uppercase">No page at this address</span>
+        </div>
+      </aside>
     </div>
-  </header>
+  </section>
 
-  <!-- Center stage -->
-  <main class="stage">
-    <section class="card" aria-labelledby="title">
-      <span class="kicker">In progress</span>
-      <h1 id="title">We’re building something durable</h1>
-      <p class="sub">Systems-first. Governance-ready. Sign up to be notified when we launch.</p>
-
-      <!-- Countdown -->
-      <div class="countdown" role="timer" aria-live="polite">
-        <div class="unit"><div class="num" id="d">—</div><div class="lbl">Days</div></div>
-        <div class="unit"><div class="num" id="h">—</div><div class="lbl">Hours</div></div>
-        <div class="unit"><div class="num" id="m">—</div><div class="lbl">Minutes</div></div>
-        <div class="unit"><div class="num" id="s">—</div><div class="lbl">Seconds</div></div>
+  <section class="fv-section fv-section--tight">
+    <div class="fv-wrap">
+      <div class="fv-head fv-reveal">
+        <span class="fv-eyebrow"><span class="n">/</span> Try one of these</span>
+        <h2 class="fv-h2">Where you might be headed</h2>
       </div>
+      <div class="fv-grid fv-grid--2">
+        <a class="fv-card fv-reveal" href="/industrial/"><span class="fv-card__no">/ 01</span>
+          <div class="fv-card__ico"><svg viewBox="0 0 24 24"><path d="M4 20h16"/><path d="M6 20V9l6-5 6 5v11"/><path d="M10 20v-5h4v5"/></svg></div>
+          <h3>Industrial Automation &amp; Technical Training</h3>
+          <p>Instrumentation, controls, PLC and DCS, calibration, and safety functions, plus training for the teams who run them.</p>
+        </a>
+        <a class="fv-card fv-reveal" href="/partnerships/"><span class="fv-card__no">/ 02</span>
+          <div class="fv-card__ico"><svg viewBox="0 0 24 24"><circle cx="7" cy="12" r="3"/><circle cx="17" cy="12" r="3"/><path d="M10 12h4"/></svg></div>
+          <h3>Partnerships</h3>
+          <p>A vetted network of vendors, integrators, and specialists, with bulk procurement and co-selling.</p>
+        </a>
+        <a class="fv-card fv-reveal" href="/integration/"><span class="fv-card__no">/ 03</span>
+          <div class="fv-card__ico"><svg viewBox="0 0 24 24"><path d="M9 5l-6 7 6 7"/><path d="M15 5l6 7-6 7"/></svg></div>
+          <h3>PragOptics</h3>
+          <p>The hardware and software group: the Omni product line, custom boards and control logic, and MSLA resin production.</p>
+        </a>
+        <a class="fv-card fv-reveal" href="/idea-lab/"><span class="fv-card__no">/ 04</span>
+          <div class="fv-card__ico"><svg viewBox="0 0 24 24"><path d="M9 3h6"/><path d="M10 3v6.5L5.6 17a2 2 0 001.7 3h9.4a2 2 0 001.7-3L14 9.5V3"/><path d="M8 15h8"/></svg></div>
+          <h3>Idea Lab</h3>
+          <p>A free coding and cybersecurity academy for kids. No accounts, no cost, runs in the browser.</p>
+        </a>
+      </div>
+      <p class="fv-lead fv-reveal" style="margin-top:18px;font-size:.95rem">Looking for the free instrumentation calculators? They live in the <a href="/education/" style="color:var(--accent)">Field Pocket Guide</a>.</p>
+    </div>
+  </section>
 
-      <!-- Notify form -->
-      <form id="notify" aria-label="Notify me form">
-        <label for="email" class="sr-only" style="position:absolute;left:-9999px">Email address</label>
-        <input id="email" name="email" type="email" placeholder="you@domain.com" autocomplete="email" required />
-        <button type="submit">Notify me</button>
-      </form>
-      <div class="note" id="note">We’ll only use your email for this launch.</div>
-    </section>
-  </main>
-
-  <footer>
-    © <span id="y"></span> Bridges Industrial. All rights reserved.
-  </footer>
-
-  <script>
-    // Year
-    document.getElementById('y').textContent = new Date().getFullYear();
-
-    // Countdown (reads target from body[data-target])
-    (function(){
-      const elD = document.getElementById('d');
-      const elH = document.getElementById('h');
-      const elM = document.getElementById('m');
-      const elS = document.getElementById('s');
-      const targetAttr = document.body.getAttribute('data-target');
-      const target = targetAttr ? new Date(targetAttr) : null;
-
-      if(!target || isNaN(target.getTime())){
-        document.querySelector('.countdown').style.display = 'none';
-        return;
-      }
-      function pad(n){ return n.toString().padStart(2,'0'); }
-      function tick(){
-        const now = new Date();
-        let diff = Math.max(0, target - now);
-        const days = Math.floor(diff / (1000*60*60*24)); diff -= days*(1000*60*60*24);
-        const hours = Math.floor(diff / (1000*60*60));   diff -= hours*(1000*60*60);
-        const mins  = Math.floor(diff / (1000*60));      diff -= mins*(1000*60);
-        const secs  = Math.floor(diff / 1000);
-
-        elD.textContent = days;
-        elH.textContent = pad(hours);
-        elM.textContent = pad(mins);
-        elS.textContent = pad(secs);
-        if(target - now <= 0){
-          clearInterval(timer);
-          elD.textContent = '00';
-          elH.textContent = '00';
-          elM.textContent = '00';
-          elS.textContent = '00';
-          document.getElementById('note').textContent = 'We’re live. Refresh to check availability.';
-        }
-      }
-      const timer = setInterval(tick, 1000);
-      tick();
-    })();
-
-    // Notify form (mailto fallback)
-    (function(){
-      const form = document.getElementById('notify');
-      const note = document.getElementById('note');
-      form.addEventListener('submit', (e)=>{
-        e.preventDefault();
-        const email = (document.getElementById('email').value || '').trim();
-        if(!email) return;
-        // Use a mailto fallback so there’s no backend dependency
-        const subject = encodeURIComponent('Notify me about the launch');
-        const body = encodeURIComponent('Please notify me at ' + email + ' when you launch.');
-        window.location.href = `mailto:support@bridgesindust.com?subject=${subject}&body=${body}`;
-        note.textContent = 'Thanks — your mail client will open. If it didn’t, email us directly.';
-      });
-    })();
-       // Fullscreen star-field background
-    function initStarField() {
-      const canvas = document.getElementById('bg-stars');
-      const ctx = canvas.getContext('2d');
-      function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-      resize(); window.addEventListener('resize', resize);
-
-      const stars = Array.from({ length: 120 }, () => ({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        r: Math.random() * 1.6 + 0.4,
-        a: Math.random()
-      }));
-      let frame = 0, reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-      function animate() {
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        for (const s of stars) {
-          ctx.beginPath();
-          ctx.fillStyle = `rgba(255,255,255,${s.a})`;
-          ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
-          ctx.fill();
-          if(!reduce){
-            s.a = 0.25 + Math.abs(Math.sin((frame/60) + s.x*0.001 + s.y*0.001)) * 0.75;
-          }
-        }
-        frame++;
-        requestAnimationFrame(animate);
-      }
-      animate();
+</main>
+<script src="/assets/fortiview.js"></script>
+<script>
+  /* show the address that missed, so a typo is obvious at a glance */
+  (function () {
+    var p = location.pathname + location.search;
+    /* nothing useful to echo when the file is opened directly */
+    if (p && p !== "/" && p !== "/404.html" && p.length < 120) {
+      document.getElementById("nfPath").textContent = p;
+      document.getElementById("nfPathWrap").style.display = "";
     }
-    window.addEventListener('load', initStarField);
-  </script>
+  })();
+</script>
 </body>
 </html>

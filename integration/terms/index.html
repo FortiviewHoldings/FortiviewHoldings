@@ -1,300 +1,214 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bridges Industrial | Terms, Privacy & Communications</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Terms, Privacy &amp; Pricing | Bridges Industrial</title>
   <meta name="description" content="Bridges Industrial LLC provides secure, transparent terms, privacy protections, and communication standards for all clients and partners.">
-  <meta name="color-scheme" content="dark light" />
-
+  <meta name="color-scheme" content="dark" />
   <link rel="canonical" href="https://bridgesindust.com/integration/terms/">
-
-  <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Bridges Industrial">
-  <meta property="og:title" content="Bridges Industrial | Terms, Privacy & Communications">
-  <meta property="og:description" content="Secure, branded backend solutions that empower small businesses with clarity, trust, and scalability.">
+  <meta property="og:title" content="Terms, Privacy &amp; Pricing | Bridges Industrial">
+  <meta property="og:description" content="Terms of service, privacy protections, communication standards, and pricing philosophy.">
   <meta property="og:image" content="https://bridgesindust.com/images/social-preview.png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
   <meta property="og:url" content="https://bridgesindust.com/integration/terms/">
-
-  <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://bridgesindust.com/images/social-preview.png">
-
-  <!-- Icons -->
   <link rel="icon" type="image/x-icon" href="/images/favicon.ico" sizes="48x48">
   <link rel="icon" type="image/png" href="/images/favicon.png" sizes="192x192">
   <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.webmanifest">
-
-  <!-- Preload brand background -->
-  <link rel="preload" as="image" href="/images/bg.png">
-
-  <!-- Structured Data -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/fortiview.css">
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "Bridges Industrial",
-    "url": "https://bridgesindust.com",
-    "logo": "https://bridgesindust.com/images/Logo.png",
-    "image": "https://bridgesindust.com/images/social-preview.png",
-    "sameAs": [
-      "https://www.linkedin.com/company/fortiviewholdings",
-      "https://www.instagram.com/fortiviewholdings"
-    ]
-  }
+  { "@context":"https://schema.org","@type":"WebPage",
+    "name":"Terms, Privacy & Pricing",
+    "description":"Terms of service, privacy protections, communication standards, and pricing philosophy for Bridges Industrial LLC.",
+    "url":"https://bridgesindust.com/integration/terms/",
+    "isPartOf":{"@id":"https://bridgesindust.com/#website"},
+    "publisher":{"@id":"https://bridgesindust.com/#org"},
+    "inLanguage":"en-US" }
   </script>
   <style>
-    :root{
-      --bg-deep:#000000cc;
-      --bg-accent:#101625cc;
-      --glass:#d9d9d912;
-      --glass-2:#00000012;
-      --glass-blur:#272727c6;
-      --border:#ffffff1a;
-      --ink:#e7ecff;
-      --muted:#c6d0f0a6;
-      --brand:#1ca490da;       /* your green-gold */
-      --brand-600:#21bca5;
-      --aura:0 4px 8px rgba(17, 76, 67, 0.678);
-      --radius:16px;
-      --radius-sm:12px;
-      --maxw:1200px;
-      --grad:linear-gradient(135deg,#121b2d 0%,#060e1e 40%,#0f1824 100%);
-    }
-
-    *{box-sizing:border-box}
-    html,body{
-      margin:0; padding:0;
-      font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-      background:var(--bg-deep); color:var(--ink);
-      scroll-behavior:smooth; -webkit-text-size-adjust:100%;
-    }
-    a{color:inherit;text-decoration:none}
-    img{display:block;max-width:100%}
-
-    /* Background */
-    .bg{
-      position:fixed; inset:0; z-index:-2;
-      background: var(--glass);
-      filter:blur(6px) brightness(.9) saturate(1.05);
-      transform:scale(1.03);
-    }
-    .bg::after{
-      content:""; position:absolute; inset:0;
-      background: var(--glass);
-    }
-  #bg-stars{
-    position:fixed; inset:0; width:100vw; height:100vh; z-index:-1; pointer-events:none;
-  }
-    /* Header */
-    header{
-      position:sticky; top:0; z-index:50;
-      backdrop-filter:saturate(140%) blur(10px);
-      background:var(--glass);
-      border-bottom:1px solid var(--border);
-    }
-  .nav{
-    max-width:var(--maxw); margin:0 auto; padding:14px 20px;
-    display:flex; align-items:center; justify-content:space-between; gap:16px;
-  }
-  .brand{display:flex; align-items:center; gap:10px; letter-spacing:.4px}
-  .logo{
-    width:34px; height:34px; border-radius:10px;
-    background-image:url('/images/Logo.png');
-    background-size:cover; background-position:center;
-    box-shadow:0 0 0 2px rgba(92,140,69,.25), 0 10px 20px rgba(92,140,69,.18);
-  }
-    .brand strong{font-weight:800;}
-
-    /* Content */
-    .section{max-width:var(--maxw); margin:36px auto; padding:0 20px}
-    .glass{
-      background:var(--glass); border:1px solid var(--border); border-radius:var(--radius);
-      box-shadow:var(--aura); padding:28px;
-    }
-    .kicker{color:var(--muted); font-size:.95rem; margin:0 0 6px 0}
-    h1{margin:8px 0 10px 0; font-size:clamp(1.6rem,2.2vw,2.2rem)}
-    h2{margin:26px 0 8px 0; color:var(--brand)}
-    p{line-height:1.7; color:var(--ink); margin:12px 0}
-    small,.muted{color:var(--muted)}
-
-    footer{margin:40px 0 30px 0; color:var(--muted); text-align:center; font-size:.9rem}
-
-    @media (max-width: 640px){
-      .nav{flex-direction:column; align-items:stretch}
-      .brand{justify-content:center; margin-bottom:8px}
+    /* long-form legal prose: one readable column, built on the site tokens */
+    .legal{display:grid;grid-template-columns:210px minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:start}
+    .legal__toc{position:sticky;top:88px;align-self:start}
+    .legal__toc h2{font-family:var(--mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;
+      color:var(--muted);font-weight:500;margin-bottom:12px}
+    .legal__toc a{display:block;color:var(--ink-2);font-size:.92rem;padding:6px 0 6px 12px;
+      border-left:1px solid var(--glass-border);transition:color .15s ease,border-color .15s ease}
+    .legal__toc a:hover{color:var(--accent);border-left-color:var(--accent)}
+    .legal__body{min-width:0}
+    .legal__sec{background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+      border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:clamp(20px,3vw,32px);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.06);margin-bottom:18px;scroll-margin-top:96px}
+    .legal__sec h2{font-size:1.35rem;margin-bottom:.2rem}
+    .legal__sec h3{font-family:var(--mono);font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;
+      color:var(--accent);font-weight:500;margin:1.5rem 0 .4rem}
+    .legal__sec h3:first-of-type{margin-top:1.1rem}
+    .legal__sec p{color:var(--ink-2);font-size:.98rem;max-width:70ch;margin-bottom:.9rem}
+    .legal__sec p:last-child{margin-bottom:0}
+    .legal__sec strong{color:var(--ink)}
+    .legal__sec ul{color:var(--ink-2);font-size:.98rem;max-width:70ch;margin:0 0 .9rem;padding-left:1.1rem}
+    .legal__sec li{margin-bottom:.45rem}
+    .legal__sec a{color:var(--accent)}
+    .legal__updated{font-family:var(--mono);font-size:.72rem;color:var(--muted);letter-spacing:.06em}
+    @media(max-width:900px){
+      .legal{grid-template-columns:1fr}
+      .legal__toc{position:static;border-bottom:1px solid var(--glass-border);padding-bottom:14px}
+      .legal__toc div{display:flex;flex-wrap:wrap;gap:6px}
+      .legal__toc a{border-left:0;border:1px solid var(--glass-border-2);border-radius:999px;
+        padding:11px 14px;font-size:.8rem;min-height:44px;display:flex;align-items:center}
+      .legal__toc a:hover{border-color:var(--accent)}
     }
   </style>
 </head>
 <body>
-  <!-- Background -->
-  <div class="bg" aria-hidden="true"></div>
-  <canvas id="bg-stars" aria-hidden="true"></canvas>
+<main>
 
-  <!-- Header -->
-  <header>
-    <div class="nav">
-      <a class="brand" href="/integration">
-        <div class="logo" aria-hidden="true"></div>
-        <strong style="color: var(--ink)">Bridges</strong>
-        <span style="color:var(--brand-600)">Industrial</span>
-        <span style="color:var(--muted)">Integration Terms & Conditions</span>
-      </a>
+  <!-- HERO -->
+  <section class="fv-hero">
+    <div class="fv-wrap">
+      <div class="fv-head fv-reveal" style="margin-bottom:0">
+        <span class="fv-eyebrow"><span class="n">/</span> Legal</span>
+        <h1>Terms, Privacy &amp; Pricing</h1>
+        <p class="fv-lead">The agreements that govern our services, how we handle your data, and how our pricing works. Written to be read, not to hide anything.</p>
+      </div>
     </div>
-  </header>
+  </section>
 
-  <!-- Main -->
-<main class="section">
-  <div class="glass">
-    <h1>Terms of Service, Privacy & Pricing</h1>
+  <section class="fv-section fv-section--tight">
+    <div class="fv-wrap legal">
 
-    <section id="terms">
-      <h2><span style="color:var(--muted)">Terms of</span> <span style="color:var(--brand-600)">Service</span></h2>
-      <h3 style="color:var(--muted)">Scope</h3>
-      <p>These Terms govern your use of Bridges Industrial’ services, including the PragOptics™ platform, system integration, and related offerings. By accessing or using our services, you agree to these Terms.</p>
+      <nav class="legal__toc fv-reveal" aria-label="On this page">
+        <h2>On this page</h2>
+        <div>
+          <a href="#terms">Terms of Service</a>
+          <a href="#privacy">Privacy Policy</a>
+          <a href="#communications">Communications</a>
+          <a href="#cookies">Cookies &amp; Tracking</a>
+          <a href="#security">Data Security</a>
+          <a href="#rights">Rights &amp; Responsibilities</a>
+          <a href="#pricing-policy">Pricing Philosophy</a>
+          <a href="#contact">Contact</a>
+        </div>
+      </nav>
 
-      <h3 style="color:var(--muted)">Eligibility</h3>
-      <p>You must be at least 18 years old and legally able to enter into contracts to use our services.</p>
+      <div class="legal__body">
 
-      <h3 style="color:var(--muted)">Service Agreement</h3>
-      <p>We will provide services with reasonable skill, care, and in good faith. You agree to provide accurate information, maintain necessary access, and use our services only for lawful purposes.</p>
+        <section class="legal__sec fv-reveal" id="terms">
+          <h2>Terms of Service</h2>
+          <h3>Scope</h3>
+          <p>These Terms govern your use of Bridges Industrial's services, including the PragOptics&trade; platform, system integration, and related offerings. By accessing or using our services, you agree to these Terms.</p>
 
-      <h3 style="color:var(--muted)">Acceptable Use</h3>
-      <p>You may not misuse our systems, attempt unauthorized access, or interfere with service integrity.</p>
+          <h3>Eligibility</h3>
+          <p>You must be at least 18 years old and legally able to enter into contracts to use our services.</p>
 
-      <h3 style="color:var(--muted)">Termination</h3>
-      <p>Either party may terminate services with written notice if the other materially breaches these Terms and fails to cure within 30 days. We may suspend or terminate immediately for unlawful use or security risks.</p>
+          <h3>Service Agreement</h3>
+          <p>We will provide services with reasonable skill, care, and in good faith. You agree to provide accurate information, maintain necessary access, and use our services only for lawful purposes.</p>
 
-      <h3 style="color:var(--muted)">Liability</h3>
-      <p>We are not liable for indirect, incidental, or consequential damages. Our total liability is limited to the fees paid for the services in the 12 months preceding the claim.</p>
+          <h3>Acceptable Use</h3>
+          <p>You may not misuse our systems, attempt unauthorized access, or interfere with service integrity.</p>
 
-      <h3 style="color:var(--muted)">Governing Law</h3>
-      <p>These Terms are governed by the laws of the State of Texas, without regard to conflict of law principles.</p>
-    </section>
+          <h3>Termination</h3>
+          <p>Either party may terminate services with written notice if the other materially breaches these Terms and fails to cure within 30 days. We may suspend or terminate immediately for unlawful use or security risks.</p>
 
-    <section id="privacy">
-      <h2><span style="color:var(--muted)">Privacy</span> <span style="color:var(--brand-600)">Policy</span></h2>
-      <h3 style="color:var(--muted)">Information We Collect</h3>
-      <p>Contact details, account and billing information, and technical data such as IP address and usage logs.</p>
+          <h3>Liability</h3>
+          <p>We are not liable for indirect, incidental, or consequential damages. Our total liability is limited to the fees paid for the services in the 12 months preceding the claim.</p>
 
-      <h3 style="color:var(--muted)">How We Use Information</h3>
-      <p>To provide and improve services, communicate with you, and comply with legal obligations.</p>
+          <h3>Governing Law</h3>
+          <p>These Terms are governed by the laws of the State of Texas, without regard to conflict of law principles.</p>
+        </section>
 
-      <h3 style="color:var(--muted)">Sharing</h3>
-      <p>We do not sell your data. We may share with trusted service providers under confidentiality agreements.</p>
+        <section class="legal__sec fv-reveal" id="privacy">
+          <h2>Privacy Policy</h2>
+          <h3>Information We Collect</h3>
+          <p>Contact details, account and billing information, and technical data such as IP address and usage logs.</p>
 
-      <h3 style="color:var(--muted)">Retention</h3>
-      <p>We retain data only as long as necessary for service delivery, legal compliance, or legitimate business purposes.</p>
+          <h3>How We Use Information</h3>
+          <p>To provide and improve services, communicate with you, and comply with legal obligations.</p>
 
-      <h3 style="color:var(--muted)">Your Rights</h3>
-      <p>You may request access, correction, or deletion of your personal data, subject to applicable law.</p>
-    </section>
+          <h3>Sharing</h3>
+          <p>We do not sell your data. We may share with trusted service providers under confidentiality agreements.</p>
 
-    <section id="communications">
-      <h2><span style="color:var(--muted)">Client</span> <span style="color:var(--brand-600)">Communications</span></h2>
-      <p>We may contact you via email, SMS, or phone for service updates, billing, and support. Marketing communications require your opt‑in consent and include an unsubscribe option. You are responsible for keeping your contact information current.</p>
-    </section>
+          <h3>Retention</h3>
+          <p>We retain data only as long as necessary for service delivery, legal compliance, or legitimate business purposes.</p>
 
-    <section id="cookies">
-      <h2><span style="color:var(--muted)">Cookies &</span> <span style="color:var(--brand-600)">Tracking</span></h2>
-      <p>We use cookies and similar technologies to manage sessions, analyze site usage, and improve user experience. You may disable cookies in your browser, but some features may not function properly.</p>
-    </section>
+          <h3>Your Rights</h3>
+          <p>You may request access, correction, or deletion of your personal data, subject to applicable law.</p>
+        </section>
 
-    <section id="security">
-      <h2><span style="color:var(--muted)">Data</span> <span style="color:var(--brand-600)">Security</span></h2>
-      <p>We implement administrative, technical, and physical safeguards to protect your data. While no system is 100% secure, we take reasonable measures to prevent unauthorized access, disclosure, or loss. You are responsible for maintaining the confidentiality of your account credentials. We will notify you of any data breach as required by law.</p>
-    </section>
+        <section class="legal__sec fv-reveal" id="communications">
+          <h2>Client Communications</h2>
+          <p>We may contact you via email, SMS, or phone for service updates, billing, and support. Marketing communications require your opt&#8209;in consent and include an unsubscribe option. You are responsible for keeping your contact information current.</p>
+        </section>
 
-    <section id="rights">
-      <h2><span style="color:var(--muted)">Rights &</span> <span style="color:var(--brand-600)">Responsibilities</span></h2>
-      <p><strong>Your rights:</strong> Access to services as agreed, data protection rights, and the ability to terminate under these Terms.</p>
-      <p><strong>Our rights:</strong> To update services, enforce policies, and protect system integrity.</p>
-      <p><strong>Mutual good faith:</strong> Both parties agree to act honestly, fairly, and in good faith in all dealings.</p>
-    </section>
+        <section class="legal__sec fv-reveal" id="cookies">
+          <h2>Cookies &amp; Tracking</h2>
+          <p>We use cookies and similar technologies to manage sessions, analyze site usage, and improve user experience. You may disable cookies in your browser, but some features may not function properly.</p>
+        </section>
 
-    <section id="pricing-policy">
-      <h2><span style="color:var(--muted)">Pricing</span> <span style="color:var(--brand-600)">Philosophy</span></h2>
+        <section class="legal__sec fv-reveal" id="security">
+          <h2>Data Security</h2>
+          <p>We implement administrative, technical, and physical safeguards to protect your data. While no system is 100% secure, we take reasonable measures to prevent unauthorized access, disclosure, or loss. You are responsible for maintaining the confidentiality of your account credentials. We will notify you of any data breach as required by law.</p>
+        </section>
 
-      <h3 style="color:var(--muted)">One-Time Setup Fee</h3>
-      <p>Our advertised setup fee includes foundational infrastructure and is delivered regardless of usage. This covers:</p>
-      <ul>
-        <li>✅ One full webpage with a singular automation aligned to the selected service tier</li>
-        <li>✅ Additional infrastructure and backend setup not billed ad-hoc</li>
-        <li>✅ No surprise billing - setup is inclusive and transparent</li>
-      </ul>
+        <section class="legal__sec fv-reveal" id="rights">
+          <h2>Rights &amp; Responsibilities</h2>
+          <p><strong>Your rights:</strong> Access to services as agreed, data protection rights, and the ability to terminate under these Terms.</p>
+          <p><strong>Our rights:</strong> To update services, enforce policies, and protect system integrity.</p>
+          <p><strong>Mutual good faith:</strong> Both parties agree to act honestly, fairly, and in good faith in all dealings.</p>
+        </section>
 
-      <h3 style="color:var(--muted)">Additional Web Pages</h3>
-      <p>Clients may request additional functional pages beyond the included setup. Pricing:</p>
-      <ul>
-        <li>💬 Informational-only pages: <strong>$250 minimum</strong> per page</li>
-        <li>⚙️ Pages requiring automation (e.g. eCommerce, dynamic forms): priced based on integration complexity</li>
-      </ul>
-      <p>Integration development is billed at <strong>$125.00/hour</strong>, only after initial setup completion and only for requested services.</p>
+        <section class="legal__sec fv-reveal" id="pricing-policy">
+          <h2>Pricing Philosophy</h2>
 
-    <h3 style="color:var(--brand-600)">Tiered <span style="color: var(--muted)">Service Model</span></h3>
-    <p>Our four-tier system is designed for accessibility, modular growth, and operational transparency:</p>
-    <ul>
-      <li><strong>Email Essentials</strong> – a value-added, hassle-free entry point with branded email, backend support, and SharePoint access</li>
-      <li><strong>Productivity Suite</strong> – includes Office apps, Teams, and advanced SharePoint features for collaborative work</li>
-      <li><strong>Automation Builder</strong> – adds PowerApps Developer and Power Automate Premium licensing, enabling custom automation and app development</li>
-      <li><strong>Super User Suite</strong> – includes all previous tiers plus MS Agent access, Bridges Industrial workflow sharing, and personalized training for high-impact operators</li>
-    </ul>
-    <p>All tiers are priced per user and can be upgraded at any time. Licensing is included, billing is transparent, and each tier is built to scale with your needs.</p>
-    </section>
+          <h3>One-Time Setup Fee</h3>
+          <p>Our advertised setup fee includes foundational infrastructure and is delivered regardless of usage. This covers:</p>
+          <ul>
+            <li>One full webpage with a singular automation aligned to the selected service tier</li>
+            <li>Additional infrastructure and backend setup not billed ad-hoc</li>
+            <li>No surprise billing, setup is inclusive and transparent</li>
+          </ul>
 
-    <section id="contact">
-      <h2><span style="color:var(--muted)">Contact</span> <span style="color:var(--brand-600)">Bridges Industrial</span></h2>
-      <p>If you have questions or concerns about these Terms or our Pricing Policy, please contact us:</p>
-      <p>
-        <strong>Bridges Industrial LLC</strong><br>
-        Email: <a href="mailto:support@bridgesindust.com">support@bridgesindust.com</a><br>
-        Phone: (832) 425-0421
-      </p>
-    </section>
-  </div>
+          <h3>Additional Web Pages</h3>
+          <p>Clients may request additional functional pages beyond the included setup. Pricing:</p>
+          <ul>
+            <li>Informational-only pages: <strong>$250 minimum</strong> per page</li>
+            <li>Pages requiring automation (e.g. eCommerce, dynamic forms): priced based on integration complexity</li>
+          </ul>
+          <p>Integration development is billed at <strong>$125.00/hour</strong>, only after initial setup completion and only for requested services.</p>
+
+          <h3>Tiered Service Model</h3>
+          <p>Our four-tier system is designed for accessibility, modular growth, and operational transparency:</p>
+          <ul>
+            <li><strong>Email Essentials</strong> &ndash; a value-added, hassle-free entry point with branded email, backend support, and SharePoint access</li>
+            <li><strong>Productivity Suite</strong> &ndash; includes Office apps, Teams, and advanced SharePoint features for collaborative work</li>
+            <li><strong>Automation Builder</strong> &ndash; adds PowerApps Developer and Power Automate Premium licensing, enabling custom automation and app development</li>
+            <li><strong>Super User Suite</strong> &ndash; includes all previous tiers plus MS Agent access, Bridges Industrial workflow sharing, and personalized training for high-impact operators</li>
+          </ul>
+          <p>All tiers are priced per user and can be upgraded at any time. Licensing is included, billing is transparent, and each tier is built to scale with your needs.</p>
+        </section>
+
+        <section class="legal__sec fv-reveal" id="contact">
+          <h2>Contact Bridges Industrial</h2>
+          <p>If you have questions or concerns about these Terms or our Pricing Policy, please contact us:</p>
+          <p>
+            <strong>Bridges Industrial LLC</strong><br>
+            Email: <a href="mailto:support@bridgesindust.com">support@bridgesindust.com</a><br>
+            Phone: <a href="tel:+18324250421">(832) 425-0421</a>
+          </p>
+          <p class="legal__updated">Last updated August 2026</p>
+        </section>
+
+      </div>
+    </div>
+  </section>
+
 </main>
-
-  <!-- Footer -->
-  <footer>
-    © 2025 Bridges Industrial LLC - Secure, scalable, and fully managed.
-  </footer>
-<script>
-   // Fullscreen star-field background
-    function initStarField() {
-      const canvas = document.getElementById('bg-stars');
-      const ctx = canvas.getContext('2d');
-      function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-      resize(); window.addEventListener('resize', resize);
-
-      const stars = Array.from({ length: 120 }, () => ({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        r: Math.random() * 1.6 + 0.4,
-        a: Math.random()
-      }));
-      let frame = 0, reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-      function animate() {
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        for (const s of stars) {
-          ctx.beginPath();
-          ctx.fillStyle = `rgba(255,255,255,${s.a})`;
-          ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
-          ctx.fill();
-          if(!reduce){
-            s.a = 0.25 + Math.abs(Math.sin((frame/60) + s.x*0.001 + s.y*0.001)) * 0.75;
-          }
-        }
-        frame++;
-        requestAnimationFrame(animate);
-      }
-      animate();
-    }
-    window.addEventListener('load', initStarField);
-</script>
+<script src="/assets/fortiview.js"></script>
 </body>
 </html>

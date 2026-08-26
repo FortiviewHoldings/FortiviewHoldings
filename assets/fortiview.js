@@ -14,6 +14,10 @@
 
   /* ---- site-wide structured data (SEO + voice search) ---- */
   (function structuredData() {
+    /* a noindex page (the 404) is served AT the address that missed, so emitting a
+       BreadcrumbList there would assert that the missing URL is a real page */
+    var robots = document.querySelector('meta[name="robots"]');
+    if (robots && /noindex/i.test(robots.getAttribute("content") || "")) { return; }
     var ORG = "https://bridgesindust.com/#org";
     var existing = document.querySelectorAll('script[type="application/ld+json"]'), hasOrg = false;
     for (var i = 0; i < existing.length && !hasOrg; i++) {
@@ -71,10 +75,10 @@
 
   /* the shared nav lives here ONCE for the whole site */
   var NAV = [
-    { href: "/industrial",  name: "Industrial Automation" },
-    { href: "/partnerships", name: "Partnerships" },
-    { href: "/integration", name: "PragOptics" },
-    { href: "/idea-lab/",   name: "Idea Lab" }
+    { href: "/industrial/",   name: "Industrial Automation" },
+    { href: "/partnerships/", name: "Partnerships" },
+    { href: "/integration/",  name: "PragOptics" },
+    { href: "/idea-lab/",     name: "Idea Lab" }
   ];
 
   var path = location.pathname.replace(/\/index\.html$/, "/");
