@@ -14,23 +14,14 @@
 }
 .pulse:not(.pulse--compact) { max-height: 560px; }
 
-/* thin, on-theme scrollbars — no default chrome */
+/* scroll works, scrollbar hidden */
 .pulse__log,
 .pulse__input {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(191, 125, 255, .45) transparent;
+  scrollbar-width: none;      /* Firefox */
+  -ms-overflow-style: none;   /* old Edge */
 }
 .pulse__log::-webkit-scrollbar,
-.pulse__input::-webkit-scrollbar { width: 6px; }
-.pulse__log::-webkit-scrollbar-track,
-.pulse__input::-webkit-scrollbar-track { background: transparent; }
-.pulse__log::-webkit-scrollbar-thumb,
-.pulse__input::-webkit-scrollbar-thumb {
-  background: linear-gradient(var(--pulse-p), var(--pulse-s));
-  border-radius: 999px;
-}
-.pulse__log::-webkit-scrollbar-thumb:hover,
-.pulse__input::-webkit-scrollbar-thumb:hover { background: var(--pulse-s); }
+.pulse__input::-webkit-scrollbar { width: 0; height: 0; display: none; }
 
 .pulse__log {
   flex: 1;
