@@ -322,6 +322,10 @@ main[tabindex="-1"]:focus{outline:none}
 /* a class selector outranks the UA [hidden] rule, so a reveal-only field would
    otherwise sit there visible and get validated. This puts it back. */
 .fv-form__field[hidden]{display:none}
+/* same problem for the copy-the-details button: .btn sets display, which beats
+   [hidden], so it showed before there was anything to copy. Keep it hidden
+   until the intake reveals it. */
+.btn[hidden]{display:none}
 .fv-form__field label{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;
   text-transform:uppercase;color:var(--muted)}
 .fv-form__field label .req{color:var(--accent)}

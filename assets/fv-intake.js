@@ -188,6 +188,19 @@
       return lines.join("\n");
     }
 
+    /* Put the composed message on the page as selectable text, so a visitor
+       whose browser blocks the clipboard or has no mail app can still get it
+       out by hand. Written with .value, never markup. */
+    function showDump() {
+      if (form.querySelector(".fv-form__dump")) { return; }
+      var ta = document.createElement("textarea");
+      ta.className = "fv-form__dump";
+      ta.value = lastText;                       /* value, not markup */
+      ta.readOnly = true; ta.rows = 12;
+      status.parentNode.insertBefore(ta, status.nextSibling);
+      ta.focus(); ta.select();
+    }
+
     /* ---------- clipboard fallback, so nothing typed is ever lost ---------- */
     if (copyBtn) {
       copyBtn.addEventListener("click", function () {
@@ -195,13 +208,7 @@
         var done = function () { setStatus("Copied. Paste it into an email to " + TO + ".", "ok"); };
         var reveal = function () {
           setStatus("Your browser would not let us reach the clipboard. Select the text below and send it to " + TO + ".", "bad");
-          if (form.querySelector(".fv-form__dump")) return;
-          var ta = document.createElement("textarea");
-          ta.className = "fv-form__dump";
-          ta.value = lastText;                       /* value, not markup */
-          ta.readOnly = true; ta.rows = 12;
-          status.parentNode.insertBefore(ta, status.nextSibling);
-          ta.focus(); ta.select();
+          showDump();
         };
         var legacy = function () {
           var ta = document.createElement("textarea");
@@ -261,14 +268,40 @@
         return;
       }
 
-      /* mailto fallback */
+      /* ---------- mailto fallback ----------
+         No mailer is wired, so the form hands the visitor a ready-to-send
+         email. This is best-effort by nature: a mailto: only opens if the
+         browser has a mail app registered — often not the case on desktop or
+         in webmail-only setups — and some browsers silently refuse the
+         navigation. None of that is observable from script, so the reliable
+         path (the text, right here) is always put in front of the visitor and
+         the message says plainly why an email app may not have appeared. */
       var subject = subjectOf(got);
       lastText = "To: " + TO + "\nSubject: " + subject + "\n\n" + body;
-      if (copyBtn) copyBtn.hidden = false;
-      window.location.href = "mailto:" + TO +
+      if (copyBtn) { copyBtn.hidden = false; }
+
+      var href = "mailto:" + TO +
         "?subject=" + encodeURIComponent(subject) +
         "&body=" + encodeURIComponent(body);
-      setStatus("Your email client should be opening. If nothing happened, use Copy the details instead and paste them into an email to " + TO + ".", "ok");
+
+      /* Browsers cap how long a URL they will act on (~2 KB on Windows), and a
+         mailto past that arrives truncated or is dropped outright. Do not even
+         try above a safe ceiling — show the text and say why, rather than open
+         a half-empty draft and claim it worked. */
+      if (href.length > 1900) {
+        showDump();
+        setStatus("Your message is long enough that a browser cannot hand the whole thing to an email app. It is ready below — copy it and send it to " + TO + ", or use Copy the details.", "bad");
+        return;
+      }
+
+      try {
+        window.location.href = href;
+      } catch (err) {
+        showDump();
+        setStatus("Your browser would not open an email app. The message is ready below — copy it and send it to " + TO + ".", "bad");
+        return;
+      }
+      setStatus("If your email app did not open — some browsers have none set, or block it — use Copy the details, or send the message to " + TO + " yourself. Nothing was lost.", "ok");
     });
 
     function subjectOf(got) {
