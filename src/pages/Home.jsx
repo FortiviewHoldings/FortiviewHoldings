@@ -1,14 +1,18 @@
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import Html from "./Html.jsx";
+import Reviews from "../reviews/Reviews.jsx";
+import home from "../data/home.json";
 
-// Placeholder. The full homepage gets converted after the pattern is proven.
+// Static hero/about and FAQ are content-as-data; the reviews section is a real
+// component in between.
 export default function Home() {
+  useEffect(() => { document.title = "Bridges Industrial"; }, []);
+
   return (
-    <section className="fv-section">
-      <div className="fv-wrap">
-        <p className="fv-eyebrow">Bridges Industrial</p>
-        <h1 className="fv-h1">Field instrumentation, without the guesswork.</h1>
-        <p className="fv-lead">React conversion in progress. The <Link to="/education">Field Pocket Guide</Link> is the first surface moved over.</p>
-      </div>
-    </section>
+    <>
+      <Html html={home.introHtml} />
+      <Reviews />
+      <Html html={home.faqHtml} />
+    </>
   );
 }

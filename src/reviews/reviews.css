@@ -1,0 +1,550 @@
+/* Scroll lock when the review modal is open */
+    .body-lock{overflow:hidden}
+
+    /* ===========================
+       FAQ SECTION (galactic glass)
+       =========================== */
+    .fv-faq details {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      color: var(--ink-2);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      margin-bottom: 12px;
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .fv-faq details h4 {
+      font-family: var(--display);
+      margin-top: 10px;
+      margin-bottom: 6px;
+      color: var(--ink);
+    }
+
+    .fv-faq details:hover {
+      background: var(--glass-2);
+      border-color: var(--glass-border-2);
+    }
+
+    /* Remove default arrow completely */
+    .fv-faq summary::-webkit-details-marker { display: none; }
+    .fv-faq summary::marker { content: ""; }
+
+    /* Summary text */
+    .fv-faq summary {
+      cursor: pointer;
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 1.02rem;
+      color: var(--ink);
+      outline: none;
+      list-style: none;
+      position: relative;
+      padding-right: 28px; /* space for + icon */
+    }
+
+    /* Custom + icon (accent) */
+    .fv-faq summary::after {
+      content: "+";
+      position: absolute;
+      right: 0;
+      top: 0;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent);
+      transition: transform 0.2s ease, opacity 0.2s ease;
+      opacity: 0.9;
+    }
+
+    /* When open, switch to – */
+    .fv-faq details[open] summary::after {
+      content: "–";
+      transform: rotate(180deg);
+    }
+
+    /* FAQ body text */
+    .fv-faq details p {
+      margin: 10px 0 0;
+      color: var(--ink-2);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    .fv-faq details ul {
+      margin: 10px 0 0;
+      padding-left: 20px;
+      color: var(--ink-2);
+      font-size: 0.94rem;
+      line-height: 1.55;
+    }
+    .fv-faq details li { margin: 3px 0; }
+
+    /* ===========================
+       REVIEW GALLERY (HORIZONTAL CARDS)
+       =========================== */
+
+    /* Horizontal review rail */
+    .review-rail {
+      width: 100%;
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 14px;
+
+      overflow-x: auto;
+      overflow-y: hidden;
+
+      scroll-snap-type: x mandatory;
+      padding: 10px 4px;
+
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .review-rail::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Review card */
+    .review-item {
+      flex: 0 0 260px;
+      min-width: 260px;
+      scroll-snap-align: start;
+
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06), var(--shadow);
+
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+
+      transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease,
+        background 0.25s ease;
+    }
+
+    /* Wiggle animation */
+    @keyframes review-wiggle {
+      0%   { transform: translateY(0px); }
+      20%  { transform: translateY(-6px); }
+      40%  { transform: translateY(0px); }
+      60%  { transform: translateY(-6px); }
+      80%  { transform: translateY(-1px); }
+      100% { transform: translateY(-0px); }
+    }
+
+    .review-item:hover {
+      animation: review-wiggle 1.2s ease;
+      box-shadow: 0 0 14px var(--accent), 0 0 28px rgba(0, 0, 0, 0.6);
+      border-color: var(--accent);
+      background: var(--glass-2);
+    }
+
+    /* Rating (first line) */
+    .review-rating {
+      display: flex;
+      gap: 2px;
+      align-items: center;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    /* Name (second line) */
+    .review-name {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--ink);
+    }
+    /* Review date (third line) */
+    .review-date {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: -2px;
+      margin-bottom: 6px;
+    }
+
+    /* Review text (fourth line) */
+    .review-text {
+      font-size: 0.95rem;
+      color: var(--ink-2);
+      line-height: 1.45;
+    }
+
+    /* Leave a Review button — GALLERY VERSION */
+    .reviews .review-actions {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    /* ===========================
+       REVIEW MODAL
+       =========================== */
+
+    .review-popup {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .review-hidden {
+      display: none;
+    }
+
+    .review-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(4px);
+    }
+
+    .review-card {
+      position: relative;
+      z-index: 2;
+      width: min(420px, 90%);
+      background: var(--panel);
+      border: 1px solid var(--glass-border-2);
+      border-radius: var(--radius-lg);
+      padding: 20px 22px;
+      box-shadow: var(--shadow);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .review-card h2 { font-family: var(--display); color: var(--ink); margin: 0; }
+
+    .review-label {
+      display: flex;
+      flex-direction: column;
+      font-size: 0.9rem;
+      color: var(--ink-2);
+      gap: 6px;
+    }
+
+    .review-input {
+      background: var(--glass-2);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      color: var(--ink);
+      font-family: var(--body);
+      font-size: 0.95rem;
+      backdrop-filter: blur(12px);
+    }
+
+    .review-input:focus {
+      outline: 2px solid var(--accent);
+    }
+
+    /* Modal action buttons — MODAL VERSION ONLY */
+    .review-card .review-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+
+    .review-close-x {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      background: none;
+      border: none;
+      color: var(--ink);
+      font-size: 1.4rem;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s ease;
+    }
+
+    .review-close-x:hover {
+      opacity: 1;
+    }
+
+    .review-slider-wrapper {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .review-slider {
+      position: relative;
+      height: 48px;
+      background: var(--glass-2);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      backdrop-filter: blur(12px);
+      overflow: hidden;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    /* the colored fill that grows under the handle */
+    .review-slider .slider-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 48px;
+      background: linear-gradient(90deg, var(--accent-2), var(--accent));
+      border-radius: var(--radius);
+      box-shadow: 0 6px 18px rgba(47,212,194,0.12);
+      transition: width 120ms ease, border-radius 160ms ease;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* label sits above the fill */
+    .review-slider .slider-label {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--ink);
+      font-weight: 600;
+      pointer-events: none;
+      z-index: 3;
+      transition: color 160ms ease;
+    }
+
+    /* handle sits above the fill and label */
+    .slider-handle {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 48px;
+      height: 48px;
+      background: var(--accent);
+      border-radius: var(--radius);
+      box-shadow: 0 0 12px var(--accent);
+      transition: transform 120ms ease, width 160ms ease, left 160ms ease, border-radius 160ms ease;
+      z-index: 4;
+      touch-action: none;
+    }
+
+    /* when fully filled */
+    .review-slider.filled .slider-fill {
+      width: 100%;
+      border-radius: var(--radius);
+    }
+
+    .review-slider.filled .slider-label {
+      color: #fff;
+    }
+
+    .review-slider.filled .slider-handle {
+      left: 0;
+      transform: translateX(0);
+      width: 100%;
+      border-radius: var(--radius);
+      box-shadow: none;
+      background: linear-gradient(90deg, var(--accent-2), var(--accent));
+      z-index: 5;
+    }
+
+    .review-slider .slider-handle,
+    .review-slider .slider-fill {
+      transition: transform 0.25s ease, width 0.25s ease;
+    }
+
+    .slider-disabled {
+      opacity: 0.45;
+      pointer-events: none;
+      filter: grayscale(0.6);
+    }
+
+    /* Toast container (glass style) */
+    .review-toast {
+      position: absolute;
+      left: 50%;
+      bottom: calc(50% + 20px);
+      transform: translateX(-50%) translateY(8px) scale(0.98);
+      opacity: 0;
+
+      z-index: 10010;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+
+      transition: opacity 220ms ease, transform 220ms ease;
+    }
+
+    .review-toast-hidden { display: none; }
+
+    /* Card */
+    .review-toast-card {
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+
+      background: var(--panel);
+      border: 1px solid var(--glass-border);
+      padding: 16px 18px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      color: var(--ink);
+      min-width: 240px;
+    }
+
+    .toast-title {
+      font-family: var(--display);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--ink);
+      text-align: center;
+    }
+
+    /* ICON WRAPPER */
+    .toast-icon {
+      position: relative;
+      width: 24px;
+      height: 24px;
+    }
+
+    /* Stack spinner + checkmark */
+    .toast-icon .toast-spinner,
+    .toast-icon .toast-checkmark {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transition: opacity 120ms ease;
+    }
+
+    /* Spinner */
+    .toast-spinner {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      border-top-color: var(--accent);
+      animation: toast-spin 900ms linear infinite;
+    }
+
+    @keyframes toast-spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Checkmark */
+    .toast-checkmark {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: none;
+      position: absolute;
+      opacity: 0;
+    }
+    .toast-checkmark.animate {
+      animation: toast-check-spin 0.6s ease forwards;
+    }
+
+    @keyframes toast-check-spin {
+      0%   { transform: rotate(0deg) scale(0.6); opacity: 0; }
+      50%  { transform: rotate(180deg) scale(1.05); opacity: 1; }
+      100% { transform: rotate(360deg) scale(1); opacity: 1; }
+    }
+
+    /* Checkmark stroke */
+    .toast-checkmark::after {
+      content: "";
+      position: absolute;
+      left: 6px;
+      top: 2px;
+      width: 10px;
+      height: 18px;
+      border-right: 3px solid #c2fdff;
+      border-bottom: 3px solid #c2fbff;
+      transform: rotate(45deg) scale(0);
+      transform-origin: center;
+      animation: toast-check-draw 0.35s ease 0.45s forwards;
+    }
+
+    @keyframes toast-check-draw {
+      to { transform: rotate(45deg) scale(1); }
+    }
+
+    /* Toast visible state */
+    .review-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+
+    /* Success / error variants */
+    .review-toast-card.success {
+      border-color: rgba(0,200,120,0.18);
+      background: rgba(10,30,10,0.55);
+      color: #eafff0;
+    }
+
+    .review-toast-card.error {
+      border-color: rgba(255,80,80,0.18);
+      background: rgba(40,10,10,0.55);
+      color: #ffecec;
+    }
+
+    /* small label color change while submitting */
+    .review-slider.filling .slider-label { color: #fff; }
+
+    /* ensure handle z-index while expanding */
+    .review-slider .slider-handle { z-index: 6; }
+
+    /* ===========================
+       FIRE RATING WIDGET
+       =========================== */
+
+    .fire-rating {
+      display: flex;
+      gap: 6px;
+      font-size: 1.8rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .fire-rating span {
+      opacity: 0.35;
+      transition:
+        opacity 0.2s ease,
+        transform 0.15s ease,
+        text-shadow 0.2s ease;
+    }
+    .fire-rating span svg {
+      color: var(--muted); /* default unfilled color */
+      transition: color 0.2s ease;
+    }
+    .fire-rating span:hover {
+      transform: translateY(-2px) rotate(-6deg) scale(1.18);
+      text-shadow: 0 0 8px var(--accent), 0 0 14px var(--accent);
+      opacity: 1;
+    }
+    .fire-rating span:hover svg,
+    .fire-rating span:hover ~ span svg {
+      color: var(--accent);
+    }
+
+    /* Filled state */
+    .fire-rating span.filled {
+      opacity: 1;
+      text-shadow: 0 0 6px var(--accent);
+    }
+    .fire-rating span.filled svg {
+      color: var(--accent);
+    }
