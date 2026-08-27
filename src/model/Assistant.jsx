@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { answerFromGuides } from "./answerFromGuides.js";
 import { ask, engineAvailable } from "./ask.js";
@@ -15,6 +15,10 @@ export default function Assistant({ mode = "guides" }) {
   const [progress, setProgress] = useState("");
   const [answer, setAnswer] = useState(null); // { text, provider, sources }
   const [error, setError] = useState("");
+  // Engine availability reads navigator/WebGPU, absent during prerender — check
+  // after mount so server and client first render agree.
+  const [noEngine, setNoEngine] = useState(false);
+  useEffect(() => { setNoEngine(!engineAvailable()); }, []);
 
   async function run(e) {
     e.preventDefault();
@@ -49,7 +53,7 @@ export default function Assistant({ mode = "guides" }) {
         </button>
       </form>
 
-      {!engineAvailable() && (
+      {noEngine && (
         <p className="pg-ask__note">
           No answer engine is set up yet. Add a free API key in the model config, or open this in a
           browser with WebGPU (Chrome or Edge) to run the on-device model.

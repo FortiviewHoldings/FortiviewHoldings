@@ -1,0 +1,41 @@
+# Preview build for the React conversion. Builds the site (SSG prerender) and
+# uploads it as an artifact for review. It does NOT deploy to the live domain —
+# production still serves from main until an explicit cutover.
+name: preview-build
+
+on:
+  push:
+    branches: [react-conversion]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build (client + SSR + prerender + static)
+        run: npm run build
+
+      - name: Sanity-check the prerender
+        run: |
+          test -f dist/index.html
+          test -f dist/education/four-twenty-ma-loop/index.html
+          grep -q 'pg-tool' dist/education/four-twenty-ma-loop/index.html
+          test -f dist/education/thermocouple/index.html
+          test -f dist/404.html
+          echo "prerender output looks good"
+
+      - name: Upload the built site
+        uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: dist
+          retention-days: 14
