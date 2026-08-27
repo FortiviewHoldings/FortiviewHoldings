@@ -36,13 +36,31 @@ function dp_flow({ ma, dp_percent, flow_percent, flow_max = 100 }) {
   };
 }
 
-// --- calibration error as % of span ---
+// --- calibration error as % of span, reading and reference in the SAME units ---
 function calibration_error({ reading, reference, span_low = 0, span_high = 100 }) {
   const span = span_high - span_low;
   if (!span) return { error: "span_high must differ from span_low." };
   return {
     error_eu: round(reading - reference, 4),
     error_percent_span: round(((reading - reference) / span) * 100, 3)
+  };
+}
+
+// --- error of a 4-20 mA transmitter: give the range, the applied value in
+// engineering units, and the MEASURED mA. Converts internally so mA and
+// engineering units are never mixed. ---
+function transmitter_error({ eu_low = 0, eu_high = 100, applied_eu, measured_ma }) {
+  const span = eu_high - eu_low;
+  if (!span) return { error: "eu_high must differ from eu_low." };
+  const ideal_ma = 4 + ((applied_eu - eu_low) / span) * 16;
+  const measured_eu = eu_low + ((measured_ma - 4) / 16) * span;
+  return {
+    applied_eu,
+    ideal_ma: round(ideal_ma, 3),
+    measured_ma,
+    measured_eu: round(measured_eu, 3),
+    error_eu: round(measured_eu - applied_eu, 4),
+    error_percent_span: round(((measured_ma - ideal_ma) / 16) * 100, 3)
   };
 }
 
@@ -70,7 +88,7 @@ function rtd_resistance({ temp_c, type = "Pt100" }) {
   return { type: R0 === 1000 ? "Pt1000" : "Pt100", temp_c: t, resistance_ohms: round(r, 4) };
 }
 
-const RUN = { scale_4_20ma, dp_flow, calibration_error, number_base, rtd_resistance };
+const RUN = { scale_4_20ma, dp_flow, calibration_error, transmitter_error, number_base, rtd_resistance };
 
 export function runTool(name, args) {
   const fn = RUN[name];
@@ -109,7 +127,7 @@ export const TOOL_DECLARATIONS = [
   },
   {
     name: "calibration_error",
-    description: "Calibration error as percent of span. Give the reading, the reference (ideal) value, and the span_low/span_high.",
+    description: "Calibration error as percent of span. reading and reference MUST be in the SAME units (both mA, or both engineering units). If you have a measured mA against an applied engineering value, use transmitter_error instead.",
     parameters: {
       type: "object",
       properties: {
@@ -119,6 +137,20 @@ export const TOOL_DECLARATIONS = [
         span_high: { type: "number" }
       },
       required: ["reading", "reference"]
+    }
+  },
+  {
+    name: "transmitter_error",
+    description: "Error of a 4-20 mA transmitter as percent of span. Use this when you have the transmitter range, an applied process value in engineering units, and the MEASURED loop current in mA. It converts internally — never pre-convert or mix mA with engineering units. Returns ideal_ma, measured_eu, error_eu, and error_percent_span.",
+    parameters: {
+      type: "object",
+      properties: {
+        eu_low: { type: "number", description: "engineering value at 4 mA" },
+        eu_high: { type: "number", description: "engineering value at 20 mA" },
+        applied_eu: { type: "number", description: "the applied/process value, in engineering units" },
+        measured_ma: { type: "number", description: "the measured loop current in mA" }
+      },
+      required: ["applied_eu", "measured_ma"]
     }
   },
   {
