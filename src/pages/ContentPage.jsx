@@ -8,5 +8,10 @@ export default function ContentPage({ data }) {
     if (data.title) document.title = data.title;
   }, [data.title]);
 
-  return <Html html={data.html} className={data.mainClass} />;
+  return (
+    <>
+      {data.css && <style dangerouslySetInnerHTML={{ __html: data.css }} />}
+      <Html html={data.html} className={data.mainClass} />
+    </>
+  );
 }

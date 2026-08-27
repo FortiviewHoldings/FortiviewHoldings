@@ -26,12 +26,17 @@ function extract(file, route) {
     .map((l) => l.getAttribute("href"))
     .filter((h) => h && !h.includes("fonts.googleapis") && !h.endsWith("fortiview.css"));
 
+  // Page-specific inline <style> (e.g. the pricing-card rules) has to travel
+  // with the content, or those elements render unstyled.
+  const css = doc.querySelectorAll("head style, body style").map((s) => s.innerHTML).join("\n").trim();
+
   return {
     route,
     title: doc.querySelector("title")?.text.trim() ?? "",
     description: attr(doc, 'meta[name="description"]', "content"),
     mainClass: main?.getAttribute("class") ?? "",
     html: main ? main.innerHTML.trim() : "",
+    css,
     extraCss
   };
 }

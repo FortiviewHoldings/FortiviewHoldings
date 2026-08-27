@@ -9,9 +9,17 @@
 // server, no key, no cost — used when the API has no key, is rate-limited, or
 // the visitor is offline.
 export const MODEL = {
+  // The safe path for a PUBLIC site: point this at your own backend endpoint,
+  // which holds the key server-side and forwards to Gemini. The browser never
+  // sees the key. Leave geminiKey empty when proxyUrl is set.
+  proxyUrl: "",
+
+  // Direct-to-Google. Only for local/private use — a key here ships in the
+  // public bundle and gets scraped and revoked. Prefer proxyUrl in production.
   geminiKey: "",
-  geminiModel: "gemini-1.5-flash",
-  // Small enough to download and run in a browser tab; swap for a larger one
-  // where the device can take it.
+  geminiModel: "gemini-3.6-flash",
+
+  // Runs in the browser over WebGPU. Needs a cross-origin-isolated host
+  // (COOP/COEP), which static hosting does not provide.
   webgpuModel: "Llama-3.2-1B-Instruct-q4f32_1-MLC"
 };
