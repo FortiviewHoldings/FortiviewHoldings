@@ -1,9 +1,26 @@
-import { useParams, Link } from "react-router-dom";
+import { useEffect } from "react";
+import { useParams, useLocation, Link } from "react-router-dom";
 import { guide } from "../data/guides.js";
 
 export default function Guide() {
   const { slug } = useParams();
+  const { hash } = useLocation();
   const g = guide(slug);
+
+  // Scroll to the section a search result linked to, after layout settles.
+  useEffect(() => {
+    if (!hash) return;
+    const id = decodeURIComponent(hash.slice(1));
+    let tries = 0;
+    let raf = 0;
+    const go = () => {
+      const el = document.getElementById(id);
+      if (el) { el.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
+      if (tries++ < 20) raf = requestAnimationFrame(go);
+    };
+    raf = requestAnimationFrame(go);
+    return () => cancelAnimationFrame(raf);
+  }, [hash, slug]);
 
   if (!g) {
     return (

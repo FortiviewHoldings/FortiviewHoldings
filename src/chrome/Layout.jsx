@@ -25,10 +25,11 @@ function useReveal(dep) {
 }
 
 export default function Layout({ children }) {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
   const main = useReveal(pathname);
 
-  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  // Top on a new page, but leave anchor navigation (search results) alone.
+  useEffect(() => { if (!hash) window.scrollTo(0, 0); }, [pathname, hash]);
 
   return (
     <>

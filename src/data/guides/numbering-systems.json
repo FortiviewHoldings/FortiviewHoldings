@@ -1,0 +1,17 @@
+{
+  "slug": "numbering-systems",
+  "title": "Numbering Systems",
+  "description": "Interactive lab for binary, octal, hex, BCD, ASCII and two's complement. A master any-base converter that shows every step of the work, plus practice problems.",
+  "lead": [
+    "Every digital instrument — data logger, panel meter, PLC, DMM — speaks in 1s and 0s. This lab teaches the four number systems, and the codes built on them, that let you read what the instrument is saying: work the theory, then prove it to yourself in the calculators. Each tool shows the <em>entire</em> chain of work, the way you'd write it by hand."
+  ],
+  "sections": [
+    {
+      "id": "stuck",
+      "question": "Still not reading right?",
+      "body": "<p>If the numbers here do not match what the loop is doing, the problem is usually the installation, the ranging, or the process itself rather than the device. Describe the symptom and a specialist answers by email, at no charge.</p>\n      <div class=\"fv-actions\"><a class=\"btn btn--primary\" href=\"/break-in/\">Submit Break-In</a> <a class=\"btn btn--ghost\" href=\"/instrument-support/\">Instrument technical support</a></div>",
+      "text": "If the numbers here do not match what the loop is doing, the problem is usually the installation, the ranging, or the process itself rather than the device. Describe the symptom and a specialist answers by email, at no charge. Submit Break-In Instrument technical support"
+    }
+  ],
+  "note": "An interactive study lab for number systems and digital codes. Every calculation runs locally in your browser — nothing leaves your device. A working aid for coursework and the field, not a substitute for either."
+}
