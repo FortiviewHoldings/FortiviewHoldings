@@ -1,0 +1,101 @@
+/* launcher */
+.pulse-launch {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px 8px 8px;
+  background: var(--panel);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  color: var(--ink);
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: .92rem;
+  cursor: pointer;
+  backdrop-filter: var(--blur);
+  box-shadow: 0 12px 34px -12px rgba(0,0,0,.7);
+  transition: transform .16s ease, border-color .16s ease;
+}
+.pulse-launch:hover { transform: translateY(-2px); border-color: rgba(56,255,179,.5); }
+.pulse-launch:focus-visible { outline: 2px solid var(--pulse-p); outline-offset: 2px; }
+.pulse-launch__orb { filter: drop-shadow(0 0 12px rgba(56,255,179,.4)); }
+
+/* slide-out panel */
+.pulse-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 120;
+  height: 100dvh;
+  width: min(420px, 100vw);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  border-left: 1px solid var(--glass-border);
+  box-shadow: -20px 0 60px -20px rgba(0,0,0,.8);
+  transform: translateX(100%);
+  transition: transform .28s cubic-bezier(.22,.61,.36,1);
+}
+.pulse-panel.is-open { transform: translateX(0); }
+
+.pulse-panel__head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--glass-border);
+}
+.pulse-panel__id {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.02rem;
+  color: var(--ink);
+  letter-spacing: .01em;
+}
+.pulse-panel__close {
+  display: grid;
+  place-items: center;
+  width: 34px; height: 34px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass);
+  border-radius: 8px;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: color .14s ease, border-color .14s ease;
+}
+.pulse-panel__close:hover { color: var(--ink); border-color: var(--pulse-s); }
+.pulse-panel__close:focus-visible { outline: 2px solid var(--pulse-p); outline-offset: 2px; }
+
+/* the chat fills the panel */
+.pulse-panel .pulse {
+  flex: 1;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  max-height: none;
+}
+
+.pulse-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  background: rgba(3,5,11,.5);
+  backdrop-filter: blur(2px);
+}
+
+@media (max-width: 480px) {
+  .pulse-launch span { display: none; }
+  .pulse-launch { padding: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pulse-panel { transition: none; }
+}

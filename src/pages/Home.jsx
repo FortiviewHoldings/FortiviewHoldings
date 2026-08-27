@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import Html from "./Html.jsx";
 import Reviews from "../reviews/Reviews.jsx";
+import PulseSidebar from "../pulse/PulseSidebar.jsx";
 import home from "../data/home.json";
 
 // Static hero/about and FAQ are content-as-data; the reviews section is a real
@@ -13,6 +14,7 @@ export default function Home() {
       <Html html={home.introHtml} />
       <Reviews />
       <Html html={home.faqHtml} />
+      <PulseSidebar />
     </>
   );
 }
