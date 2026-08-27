@@ -19,7 +19,7 @@ export default function Education() {
 
         <div className="pg-modes" role="tablist" aria-label="Search or ask Pulse">
           <button role="tab" aria-selected={mode === "search"} className={"pg-mode" + (mode === "search" ? " is-active" : "")} onClick={() => setMode("search")}>Search</button>
-          <button role="tab" aria-selected={mode === "ask"} className={"pg-mode" + (mode === "ask" ? " is-active" : "")} onClick={() => setMode("ask")}>Ask Pulse</button>
+          <button role="tab" aria-selected={mode === "ask"} className={"pg-mode pg-mode--pulse" + (mode === "ask" ? " is-active" : "")} onClick={() => setMode("ask")}>Ask Pulse</button>
         </div>
 
         {mode === "search" ? <SearchBox /> : <Pulse />}

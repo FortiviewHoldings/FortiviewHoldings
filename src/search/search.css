@@ -15,6 +15,17 @@
 .pg-mode:hover { color: var(--ink); border-color: var(--accent); }
 .pg-mode.is-active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 
+/* Pulse tab wears the orb's gradient when idle; stays readable when active. */
+.pg-mode--pulse:not(.is-active) {
+  background: linear-gradient(115deg, #38ffb3 15%, #bf7dff 85%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  border-color: rgba(191,125,255,.35);
+}
+.pg-mode--pulse:not(.is-active):hover { border-color: var(--pulse-s, #bf7dff); }
+
 .pg-search { position: relative; margin: 0 0 28px; }
 
 .pg-search__input {

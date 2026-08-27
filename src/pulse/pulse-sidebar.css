@@ -23,6 +23,13 @@
 .pulse-launch:hover { transform: translateY(-2px); border-color: rgba(56,255,179,.5); }
 .pulse-launch:focus-visible { outline: 2px solid var(--pulse-p); outline-offset: 2px; }
 .pulse-launch__orb { filter: drop-shadow(0 0 12px rgba(56,255,179,.4)); }
+.pulse-launch span {
+  background: linear-gradient(115deg, var(--pulse-p) 15%, var(--pulse-s) 85%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
 
 /* slide-out panel */
 .pulse-panel {
@@ -68,9 +75,15 @@
   gap: 10px;
   font-family: var(--display);
   font-weight: 700;
-  font-size: 1.02rem;
-  color: var(--ink);
-  letter-spacing: .01em;
+  font-size: 1.06rem;
+  letter-spacing: .02em;
+}
+.pulse-panel__id span {
+  background: linear-gradient(115deg, var(--pulse-p) 12%, var(--pulse-s) 88%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 .pulse-panel__close {
   display: grid;
