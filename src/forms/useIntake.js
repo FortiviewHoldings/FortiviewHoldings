@@ -13,8 +13,21 @@ export function useIntake(config, initial = {}) {
   const [copy, setCopy] = useState(false);
   const [dump, setDump] = useState("");
   const [pot, setPot] = useState("");
+  const [textOk, setTextOk] = useState(false);
 
   const set = (name, value) => setValues((v) => ({ ...v, [name]: value }));
+
+  // Body plus the text-consent note when the visitor opted in.
+  function bodyWith() {
+    let b = compose(config, values, shown);
+    if (textOk) {
+      const phone = (values.phone || "").trim();
+      b += "\nRESPONSE PREFERENCE\n-------------------\n" +
+        "Text OK to " + (phone || "(no number given)") +
+        " — permission granted to reply by text; message and data rates may apply, reply STOP to opt out.\n";
+    }
+    return b;
+  }
 
   // A reveal target shows only when its controlling select matches.
   const shown = (f) => {
@@ -46,8 +59,12 @@ export function useIntake(config, initial = {}) {
 
     const bad = validate();
     if (bad) { setError(bad); return; }
+    if (textOk && !(values.phone || "").trim()) {
+      setError({ name: "phone", text: "Add a phone number so we can text you, or uncheck the text option." });
+      return;
+    }
 
-    const body = compose(config, values, shown);
+    const body = bodyWith();
     const subject = subjectOf(config, values, shown);
     const text = "To: " + TO + "\nSubject: " + subject + "\n\n" + body;
     setDump("");
@@ -84,7 +101,7 @@ export function useIntake(config, initial = {}) {
 
   function copyDetails() {
     const subject = subjectOf(config, values, shown);
-    const text = "To: " + TO + "\nSubject: " + subject + "\n\n" + compose(config, values, shown);
+    const text = "To: " + TO + "\nSubject: " + subject + "\n\n" + bodyWith();
     const reveal = () => { setDump(text); setStatus({ text: "Select the text below and send it to " + TO + ".", tone: "bad" }); };
     if (navigator.clipboard?.writeText) {
       navigator.clipboard.writeText(text).then(
@@ -96,5 +113,5 @@ export function useIntake(config, initial = {}) {
     }
   }
 
-  return { values, set, status, error, copy, dump, pot, setPot, shown, submit, copyDetails };
+  return { values, set, status, error, copy, dump, pot, setPot, textOk, setTextOk, shown, submit, copyDetails };
 }

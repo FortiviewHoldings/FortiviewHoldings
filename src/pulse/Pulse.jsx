@@ -29,6 +29,8 @@ export default function Pulse({ compact = false }) {
   useEffect(() => {
     if (scroller.current) scroller.current.scrollTop = scroller.current.scrollHeight;
   }, [turns, thinking]);
+  // keep the textarea sized to its content (one clean line when empty)
+  useEffect(() => { autogrow(); }, [input]);
 
   function autogrow() {
     const el = inputRef.current;

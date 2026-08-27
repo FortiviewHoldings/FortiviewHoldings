@@ -25,12 +25,19 @@ export default function PulseSidebar() {
       panel.style.height = vv.height + "px";
       panel.style.top = vv.offsetTop + "px";
     };
+    // Focusing the input opens the keyboard; re-sync then and once more after it
+    // finishes animating, so the first open lands right, not just reopens.
+    const onFocusIn = () => { sync(); setTimeout(sync, 300); };
     vv.addEventListener("resize", sync);
     vv.addEventListener("scroll", sync);
+    panel.addEventListener("focusin", onFocusIn);
     sync();
+    const settle = setTimeout(sync, 320);
     return () => {
       vv.removeEventListener("resize", sync);
       vv.removeEventListener("scroll", sync);
+      panel.removeEventListener("focusin", onFocusIn);
+      clearTimeout(settle);
       panel.style.height = "";
       panel.style.top = "";
     };

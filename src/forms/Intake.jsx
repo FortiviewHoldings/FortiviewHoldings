@@ -93,6 +93,15 @@ export default function Intake({ config, initial }) {
                value={intake.pot} onChange={(e) => intake.setPot(e.target.value)} />
       </div>
 
+      <label className="fv-form__consent">
+        <input type="checkbox" checked={intake.textOk} onChange={(e) => intake.setTextOk(e.target.checked)} />
+        <span>
+          Text me instead. Check here to give Bridges Industrial permission to reply by text to the number
+          above. Message and data rates may apply, and you can reply STOP to opt out. See our{" "}
+          <a href="/integration/terms/">Terms &amp; Privacy</a>.
+        </span>
+      </label>
+
       {intake.error && <div className="fv-form__err" role="alert">{intake.error.text}</div>}
 
       <div className="fv-form__actions">

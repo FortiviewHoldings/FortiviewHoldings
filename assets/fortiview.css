@@ -354,6 +354,10 @@ main[tabindex="-1"]:focus{outline:none}
 .fv-form__field select:invalid,.fv-form__field select option[value=""]{color:var(--muted)}
 .fv-form__hint{font-family:var(--mono);font-size:.68rem;color:var(--muted)}
 .fv-form__err{font-family:var(--body);font-size:.82rem;color:var(--bad);min-height:1em}
+.fv-form__consent{display:flex;gap:10px;align-items:flex-start;margin:6px 0 16px;
+  font-size:.82rem;line-height:1.5;color:var(--muted);cursor:pointer}
+.fv-form__consent input{flex:0 0 auto;margin-top:2px;width:17px;height:17px;accent-color:var(--accent);cursor:pointer}
+.fv-form__consent a{color:var(--accent)}
 .fv-form__count{font-family:var(--mono);font-size:.68rem;color:var(--muted);text-align:right}
 .fv-form__count.over{color:var(--bad)}
 /* honeypot: off-screen, never shown, bots fill it */
