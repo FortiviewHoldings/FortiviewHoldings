@@ -68,7 +68,9 @@ export default {
       return json({ error: "Prompt too long" }, 413, origin);
     }
 
-    const model = env.GEMINI_MODEL || "gemini-3.6-flash";
+    // Flash-Lite only — the cheapest tier. Overridable by a GEMINI_MODEL var,
+    // but the default never reaches a heavier model.
+    const model = env.GEMINI_MODEL || "gemini-flash-lite-latest";
     const url =
       "https://generativelanguage.googleapis.com/v1beta/models/" +
       model + ":generateContent?key=" + encodeURIComponent(env.GEMINI_API_KEY);

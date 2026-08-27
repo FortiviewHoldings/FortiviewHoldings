@@ -17,7 +17,7 @@ export const MODEL = {
   // Direct-to-Google. Only for local/private use — a key here ships in the
   // public bundle and gets scraped and revoked. Prefer proxyUrl in production.
   geminiKey: "",
-  geminiModel: "gemini-3.6-flash",
+  geminiModel: "gemini-flash-lite-latest",
 
   // Runs in the browser over WebGPU. Needs a cross-origin-isolated host
   // (COOP/COEP), which static hosting does not provide.
