@@ -55,8 +55,8 @@ export default function Assistant({ mode = "guides" }) {
 
       {noEngine && (
         <p className="pg-ask__note">
-          No answer engine is set up yet. Add a free API key in the model config, or open this in a
-          browser with WebGPU (Chrome or Edge) to run the on-device model.
+          Ask needs a free API key to answer — add one in the model config. (The on-device WebGPU model
+          only runs on a cross-origin-isolated host, which this one is not.) Search works without it.
         </p>
       )}
 

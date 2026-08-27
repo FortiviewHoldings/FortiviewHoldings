@@ -9,6 +9,13 @@ export function webgpuSupported() {
   return typeof navigator !== "undefined" && "gpu" in navigator;
 }
 
+// WebLLM's threaded WASM needs cross-origin isolation (COOP/COEP), which a
+// plain static host like GitHub Pages cannot set. Without it the engine stalls
+// instead of erroring, so surface it plainly up front.
+export function webgpuIsolated() {
+  return typeof window !== "undefined" && window.crossOriginIsolated === true;
+}
+
 function getEngine(onProgress) {
   if (!enginePromise) {
     enginePromise = import("@mlc-ai/web-llm").then(({ CreateMLCEngine }) =>
@@ -22,6 +29,12 @@ function getEngine(onProgress) {
 
 export async function webgpuGenerate({ system, prompt, onProgress }) {
   if (!webgpuSupported()) throw new Error("no webgpu");
+  if (!webgpuIsolated()) {
+    throw new Error(
+      "The on-device model cannot start on this host: it needs cross-origin isolation " +
+      "(COOP/COEP headers) that static hosting does not provide. Add a free API key to use the assistant."
+    );
+  }
   const engine = await getEngine(onProgress);
   const messages = [];
   if (system) messages.push({ role: "system", content: system });
