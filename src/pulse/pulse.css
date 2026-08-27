@@ -149,7 +149,7 @@
 .pulse__bar {
   flex: 0 0 auto;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 8px;
   padding: 12px max(16px, env(safe-area-inset-right, 0px))
            max(16px, calc(env(safe-area-inset-bottom, 0px) + 10px)) max(16px, env(safe-area-inset-left, 0px));
@@ -159,13 +159,17 @@
 .pulse__input {
   flex: 1 1 auto;
   min-width: 0;
-  height: 44px;
+  min-height: 44px;
+  max-height: 132px;
+  resize: none;
+  overflow-y: auto;
+  line-height: 1.4;
   font-family: var(--body);
   font-size: .96rem;
   color: var(--ink);
   background: var(--glass);
   border: 1px solid var(--glass-border);
-  border-radius: 999px;
+  border-radius: 18px;
   padding: 11px 16px;
   outline: none;
   transition: border-color .15s ease;

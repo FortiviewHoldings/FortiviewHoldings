@@ -15,6 +15,7 @@ export default function Pulse({ compact = false }) {
   const [thinking, setThinking] = useState(false);
   const [noEngine, setNoEngine] = useState(false);
   const scroller = useRef(null);
+  const inputRef = useRef(null);
   const navigate = useNavigate();
 
   // Pulse suggests a Break-In when the guides did not cover the question.
@@ -29,11 +30,18 @@ export default function Pulse({ compact = false }) {
     if (scroller.current) scroller.current.scrollTop = scroller.current.scrollHeight;
   }, [turns, thinking]);
 
-  async function send(e) {
-    e.preventDefault();
+  function autogrow() {
+    const el = inputRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = Math.min(el.scrollHeight, 132) + "px";
+  }
+
+  async function doSend() {
     const q = input.trim();
     if (!q || thinking) return;
     setInput("");
+    if (inputRef.current) inputRef.current.style.height = "";
     setTurns((t) => [...t, { role: "you", text: q }]);
     setThinking(true);
     try {
@@ -43,6 +51,19 @@ export default function Pulse({ compact = false }) {
       setTurns((t) => [...t, { role: "pulse", text: err.message, error: true }]);
     } finally {
       setThinking(false);
+    }
+  }
+
+  function onSubmit(e) {
+    e.preventDefault();
+    doSend();
+  }
+
+  // Enter sends; Shift+Enter makes a newline.
+  function onInputKey(e) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      doSend();
     }
   }
 
@@ -92,12 +113,15 @@ export default function Pulse({ compact = false }) {
         <p className="pulse__note">Pulse needs its API key set to answer. Search still works.</p>
       )}
 
-      <form className="pulse__bar" onSubmit={send}>
-        <input
+      <form className="pulse__bar" onSubmit={onSubmit}>
+        <textarea
+          ref={inputRef}
           className="pulse__input"
-          type="text"
+          rows={1}
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onInput={autogrow}
+          onKeyDown={onInputKey}
           placeholder="Ask Pulse a question…"
           aria-label="Ask Pulse"
           disabled={thinking}
