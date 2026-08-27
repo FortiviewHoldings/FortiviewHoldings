@@ -12,6 +12,7 @@ import instrumentSupport from "./data/pages/instrument-support.json";
 import partnerships from "./data/pages/partnerships.json";
 import integration from "./data/pages/integration.json";
 import terms from "./data/pages/terms.json";
+import NotFound from "./pages/NotFound.jsx";
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
         <Route path="/partnerships" element={<ContentPage data={partnerships} />} />
         <Route path="/integration" element={<ContentPage data={integration} />} />
         <Route path="/integration/terms" element={<ContentPage data={terms} />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Layout>
   );

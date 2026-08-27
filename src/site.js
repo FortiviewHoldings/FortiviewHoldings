@@ -7,11 +7,13 @@ export const CONTACT = {
   work: "/contact/?topic=work-with-us"
 };
 
+// `static: true` links to a page served outside the React app (a full load),
+// not a React route.
 export const NAV = [
   { href: "/industrial", name: "Industrial Automation" },
   { href: "/partnerships", name: "Partnerships" },
   { href: "/integration", name: "PragOptics" },
-  { href: "/idea-lab", name: "Idea Lab" }
+  { href: "/idea-lab/", name: "Idea Lab", static: true }
 ];
 
 export const FOOTER_LINKS = [

@@ -14,16 +14,20 @@ function Brand() {
 export default function Header() {
   const [open, setOpen] = useState(false);
 
-  const link = (klass) => NAV.map((n) => (
-    <NavLink
-      key={n.href}
-      to={n.href}
-      className={({ isActive }) => klass + (isActive ? " is-active" : "")}
-      onClick={() => setOpen(false)}
-    >
-      {n.name}
-    </NavLink>
-  ));
+  const link = (klass) => NAV.map((n) =>
+    n.static ? (
+      <a key={n.href} className={klass} href={n.href} onClick={() => setOpen(false)}>{n.name}</a>
+    ) : (
+      <NavLink
+        key={n.href}
+        to={n.href}
+        className={({ isActive }) => klass + (isActive ? " is-active" : "")}
+        onClick={() => setOpen(false)}
+      >
+        {n.name}
+      </NavLink>
+    )
+  );
 
   return (
     <header className={"fv-header" + (open ? " open" : "")}>
