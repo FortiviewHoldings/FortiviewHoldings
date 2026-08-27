@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PulseOrb from "./PulseOrb.jsx";
 import { answerFromGuides } from "../model/answerFromGuides.js";
 import { engineAvailable } from "../model/ask.js";
@@ -10,11 +10,19 @@ const GREETING = "Hi, I'm Pulse. Ask me anything about field instrumentation —
 // A small grounded chat. Used inline on the education page and inside the home
 // sidebar. The orb spins faster while an answer is coming.
 export default function Pulse({ compact = false }) {
-  const [turns, setTurns] = useState([]); // { role: "you" | "pulse", text, sources?, provider? }
+  const [turns, setTurns] = useState([]); // { role: "you" | "pulse", text, sources?, provider?, question? }
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
   const [noEngine, setNoEngine] = useState(false);
   const scroller = useRef(null);
+  const navigate = useNavigate();
+
+  // Pulse suggests a Break-In when the guides did not cover the question.
+  const suggestsBreakIn = (t) => t.provider === "none" || /break[\s-]?in/i.test(t.text || "");
+
+  function toBreakIn(question) {
+    navigate("/break-in", { state: { issue: question } });
+  }
 
   useEffect(() => { setNoEngine(!engineAvailable()); }, []);
   useEffect(() => {
@@ -30,7 +38,7 @@ export default function Pulse({ compact = false }) {
     setThinking(true);
     try {
       const { text, provider, sources } = await answerFromGuides(q);
-      setTurns((t) => [...t, { role: "pulse", text, provider, sources }]);
+      setTurns((t) => [...t, { role: "pulse", text, provider, sources, question: q }]);
     } catch (err) {
       setTurns((t) => [...t, { role: "pulse", text: err.message, error: true }]);
     } finally {
@@ -54,6 +62,12 @@ export default function Pulse({ compact = false }) {
               <PulseOrb size={26} className="pulse__avatar" />
               <div className="pulse__bubble">
                 <p className="pulse__text">{t.text}</p>
+                {suggestsBreakIn(t) && (
+                  <button type="button" className="pulse__breakin" onClick={() => toBreakIn(t.question)}>
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" /></svg>
+                    Submit a Break-In
+                  </button>
+                )}
                 {t.sources?.length > 0 && (
                   <div className="pulse__sources">
                     {t.sources.slice(0, 4).map((s) => (

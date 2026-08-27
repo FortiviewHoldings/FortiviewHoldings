@@ -19,7 +19,8 @@
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 22px 20px 6px;
+  /* side padding clears rounded phone corners / notch via safe-area insets */
+  padding: 22px max(20px, env(safe-area-inset-right, 0px)) 6px max(20px, env(safe-area-inset-left, 0px));
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -86,6 +87,26 @@
   line-height: 1.62;
   white-space: pre-wrap;
 }
+/* the actionable Break-In CTA, when Pulse can't answer from the guides */
+.pulse__breakin {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 9px 16px;
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: .9rem;
+  color: var(--accent-ink);
+  background: linear-gradient(135deg, var(--pulse-p), var(--pulse-s));
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform .14s ease, box-shadow .14s ease;
+}
+.pulse__breakin:hover { transform: translateY(-1px); box-shadow: 0 8px 20px -8px rgba(56,255,179,.6); }
+.pulse__breakin:focus-visible { outline: 2px solid var(--pulse-p); outline-offset: 2px; }
+
 .pulse__sources {
   margin-top: 11px;
   padding-top: 10px;
@@ -123,17 +144,22 @@
   color: var(--muted);
 }
 
-/* input */
+/* input — pinned, never shrinks, and its padding clears the phone's home bar /
+   Chrome toolbar via the bottom safe-area inset */
 .pulse__bar {
+  flex: 0 0 auto;
   display: flex;
+  align-items: center;
   gap: 8px;
-  padding: 12px 14px;
+  padding: 12px max(14px, env(safe-area-inset-right, 0px))
+           max(12px, env(safe-area-inset-bottom, 0px)) max(14px, env(safe-area-inset-left, 0px));
   border-top: 1px solid var(--glass-border);
   background: rgba(0,0,0,.14);
 }
 .pulse__input {
-  flex: 1;
+  flex: 1 1 auto;
   min-width: 0;
+  height: 44px;
   font-family: var(--body);
   font-size: .96rem;
   color: var(--ink);
