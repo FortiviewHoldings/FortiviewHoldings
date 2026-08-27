@@ -42,6 +42,17 @@
 }
 .pulse-panel.is-open { transform: translateX(0); }
 
+/* On a phone the panel is full-bleed. Anchor both edges (no 100vw overflow
+   that pushes the send button off-screen) and drop the left border. */
+@media (max-width: 640px) {
+  .pulse-panel {
+    left: 0;
+    right: 0;
+    width: auto;
+    border-left: 0;
+  }
+}
+
 .pulse-panel__head {
   flex: 0 0 auto;
   display: flex;
