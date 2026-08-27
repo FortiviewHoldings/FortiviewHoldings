@@ -12,7 +12,7 @@ export const MODEL = {
   // The safe path for a PUBLIC site: point this at your own backend endpoint,
   // which holds the key server-side and forwards to Gemini. The browser never
   // sees the key. Leave geminiKey empty when proxyUrl is set.
-  proxyUrl: "https://gemini-proxy.bridgecc1028.workers.dev/",
+  proxyUrl: "https://ai.bridgesindust.com/",
 
   // Direct-to-Google. Only for local/private use — a key here ships in the
   // public bundle and gets scraped and revoked. Prefer proxyUrl in production.
