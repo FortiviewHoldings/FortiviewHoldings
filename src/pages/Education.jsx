@@ -1,10 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { GUIDES } from "../data/guides.js";
 import { TOOLS } from "../data/tools.js";
 import SearchBox from "../search/SearchBox.jsx";
+import Assistant from "../model/Assistant.jsx";
 
 export default function Education() {
+  const [mode, setMode] = useState("search");
   useEffect(() => { document.title = "Field Pocket Guide | Bridges Industrial"; }, []);
 
   return (
@@ -12,10 +14,15 @@ export default function Education() {
       <div className="pg-wrap--wide pg-wrap">
         <header className="pg-head">
           <h1 className="fv-h2">The reference that fits in your pocket.</h1>
-          <p className="fv-lead">Plain answers to the instrument questions that come up in the field, plus the calculators worth keeping. Search across every guide, or browse below.</p>
+          <p className="fv-lead">Plain answers to the instrument questions that come up in the field, plus the calculators worth keeping. Search across every guide, ask a question, or browse below.</p>
         </header>
 
-        <SearchBox />
+        <div className="pg-modes" role="tablist" aria-label="Search or ask">
+          <button role="tab" aria-selected={mode === "search"} className={"pg-mode" + (mode === "search" ? " is-active" : "")} onClick={() => setMode("search")}>Search</button>
+          <button role="tab" aria-selected={mode === "ask"} className={"pg-mode" + (mode === "ask" ? " is-active" : "")} onClick={() => setMode("ask")}>Ask</button>
+        </div>
+
+        {mode === "search" ? <SearchBox /> : <Assistant mode="guides" />}
 
         <section className="pg-cards" aria-label="Tools">
           {TOOLS.map((t) => (

@@ -1,3 +1,20 @@
+.pg-modes { display: flex; gap: 6px; margin: 0 0 14px; }
+.pg-mode {
+  font-family: var(--mono);
+  font-size: .68rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass);
+  color: var(--muted);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: color .14s ease, border-color .14s ease, background .14s ease;
+}
+.pg-mode:hover { color: var(--ink); border-color: var(--accent); }
+.pg-mode.is-active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+
 .pg-search { position: relative; margin: 0 0 28px; }
 
 .pg-search__input {
