@@ -1,0 +1,535 @@
+{
+  "intake": "break-in",
+  "subject": "Break-In",
+  "title": "BREAK-IN SUBMISSION",
+  "submitLabel": "Submit Break-In",
+  "pot": "website",
+  "layout": [
+    {
+      "row": true,
+      "fields": [
+        {
+          "tag": "input",
+          "name": "name",
+          "label": "Name",
+          "wrapId": null,
+          "hidden": false,
+          "type": "text",
+          "required": true,
+          "maxlength": 80,
+          "minlength": null,
+          "autocomplete": "name",
+          "inputmode": null,
+          "placeholder": null,
+          "dataLabel": "Name",
+          "dataGroup": null,
+          "dataMsg": "Please give us a name to reply to.",
+          "dataHintFor": null,
+          "dataCountFor": null,
+          "dataReveal": null,
+          "dataRevealWhen": null,
+          "subjectPart": true,
+          "block": false,
+          "pot": false
+        },
+        {
+          "tag": "input",
+          "name": "company",
+          "label": "Company",
+          "wrapId": null,
+          "hidden": false,
+          "type": "text",
+          "required": false,
+          "maxlength": 80,
+          "minlength": null,
+          "autocomplete": "organization",
+          "inputmode": null,
+          "placeholder": null,
+          "dataLabel": "Company",
+          "dataGroup": null,
+          "dataMsg": null,
+          "dataHintFor": null,
+          "dataCountFor": null,
+          "dataReveal": null,
+          "dataRevealWhen": null,
+          "subjectPart": false,
+          "block": false,
+          "pot": false
+        }
+      ]
+    },
+    {
+      "row": true,
+      "fields": [
+        {
+          "tag": "input",
+          "name": "email",
+          "label": "Email",
+          "wrapId": null,
+          "hidden": false,
+          "type": "email",
+          "required": true,
+          "maxlength": 120,
+          "minlength": null,
+          "autocomplete": "email",
+          "inputmode": null,
+          "placeholder": null,
+          "dataLabel": "Email",
+          "dataGroup": null,
+          "dataMsg": "Please give us an email to reply to.",
+          "dataHintFor": null,
+          "dataCountFor": null,
+          "dataReveal": null,
+          "dataRevealWhen": null,
+          "subjectPart": false,
+          "block": false,
+          "pot": false
+        },
+        {
+          "tag": "input",
+          "name": "phone",
+          "label": "Phone",
+          "wrapId": null,
+          "hidden": false,
+          "type": "tel",
+          "required": false,
+          "maxlength": 32,
+          "minlength": null,
+          "autocomplete": "tel",
+          "inputmode": null,
+          "placeholder": null,
+          "dataLabel": "Phone",
+          "dataGroup": null,
+          "dataMsg": null,
+          "dataHintFor": null,
+          "dataCountFor": null,
+          "dataReveal": null,
+          "dataRevealWhen": null,
+          "subjectPart": false,
+          "block": false,
+          "pot": false
+        }
+      ]
+    },
+    {
+      "row": false,
+      "fields": [
+        {
+          "tag": "select",
+          "name": "sector",
+          "label": "Sector",
+          "wrapId": null,
+          "hidden": false,
+          "type": null,
+          "required": true,
+          "maxlength": null,
+          "minlength": null,
+          "autocomplete": null,
+          "inputmode": null,
+          "placeholder": null,
+          "dataLabel": "Sector",
+          "dataGroup": null,
+          "dataMsg": "Please choose a sector.",
+          "dataHintFor": null,
+          "dataCountFor": null,
+          "dataReveal": "#biOtherWrap",
+          "dataRevealWhen": "Other",
+          "subjectPart": true,
+          "block": false,
+          "pot": false,
+          "options": [
+            {
+              "value": "",
+              "text": "Select a sector…",
+              "hint": null,
+              "key": null
+            },
+            {
+              "value": "Oil & Gas — Upstream",
+              "text": "Oil & Gas — Upstream",
+              "hint": null,
+              "key": null
+            },
+            {
+              "value": "Oil & Gas — Midstream",
+              "text": "Oil & Gas — Midstream",
+              "hint": null,
+              "key": null
+            },
+            {
+              "value": "Oil & Gas — Downstream",
+              "text": "Oil & Gas — Downstream",
+              "hint": null,
+              "key": null
+            },
+            {
+              "value": "Refining",
+              "text": "Refining",
+              "hint": null,
+              "key": null
+            },
+            {
+              "value": "Petrochemical & Chemical",
+              "text": "Petrochemical & Chemical",
+              "hint": null,
+              "key": null
+            },
+            {
+              "value": "Power Generation & Utilities",
+              "text": "Power Generation & Utilities",
+              "hint": null,
+              "key": null
+            },
+            {
+              "value": "Water & Wastewater",
+              "text": "Water & Wastewater",
+              "hint": null,
+              "key": null
+            },
+            {
+              "value": "Food & Beverage",
+              "text": "Food & Beverage",
+              "hint": null,
+              "key": null
+            },
+            {
+              "value": "Pharmaceutical & Life Sciences",
+              "text": "Pharmaceutical & Life Sciences",
+              "hint": null,
+              "key": null
+            },
+            {
+              "value": "Pulp & Paper",
+              "text": "Pulp & Paper",
+              "hint": null,
+              "key": null
+            },
+            {
+              "value": "Metals & Mining",
+              "text": "Metals & Mining",
+              "hint": null,
+              "key": null
+            },
+            {
+              "value": "Manufacturing & Discrete",
+              "text": "Manufacturing & Discrete",
+              "hint": null,
+              "key": null
+            },
+            {
+              "value": "Marine & Offshore",
+              "text": "Marine & Offshore",
+              "hint": null,
+              "key": null
+            },
+            {
+              "value": "Agriculture",
+              "text": "Agriculture",
+              "hint": null,
+              "key": null
+            },
+            {
+              "value": "Building & Facilities",
+              "text": "Building & Facilities",
+              "hint": null,
+              "key": null
+            },
+            {
+              "value": "Other",
+              "text": "Other (tell us below)",
+              "hint": null,
+              "key": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": false,
+      "fields": [
+        {
+          "tag": "input",
+          "name": "sectorOther",
+          "label": "Your sector",
+          "wrapId": "biOtherWrap",
+          "hidden": true,
+          "type": "text",
+          "required": true,
+          "maxlength": 60,
+          "minlength": null,
+          "autocomplete": null,
+          "inputmode": null,
+          "placeholder": "Tell us what you run",
+          "dataLabel": "Sector",
+          "dataGroup": null,
+          "dataMsg": "Please tell us your sector.",
+          "dataHintFor": null,
+          "dataCountFor": null,
+          "dataReveal": null,
+          "dataRevealWhen": null,
+          "subjectPart": false,
+          "block": false,
+          "pot": false
+        }
+      ]
+    },
+    {
+      "row": true,
+      "fields": [
+        {
+          "tag": "select",
+          "name": "measuring",
+          "label": "What is it measuring?",
+          "wrapId": null,
+          "hidden": false,
+          "type": null,
+          "required": true,
+          "maxlength": null,
+          "minlength": null,
+          "autocomplete": null,
+          "inputmode": null,
+          "placeholder": null,
+          "dataLabel": "Measuring",
+          "dataGroup": "MEASUREMENT",
+          "dataMsg": "Please tell us what the instrument is measuring.",
+          "dataHintFor": "issue",
+          "dataCountFor": null,
+          "dataReveal": null,
+          "dataRevealWhen": null,
+          "subjectPart": false,
+          "block": false,
+          "pot": false,
+          "options": [
+            {
+              "value": "",
+              "text": "Select…",
+              "hint": null,
+              "key": null
+            },
+            {
+              "value": "Level",
+              "text": "Level",
+              "hint": "What does it read against what is actually in the vessel? Vessel and technology if you know them, and what the surface does: foam, agitation, coating, a light product.",
+              "key": null
+            },
+            {
+              "value": "Flow",
+              "text": "Flow",
+              "hint": "What does it read against what you expect? Meter type and line size if you know them, and whether the line ever runs partly full, flashes, or carries gas.",
+              "key": null
+            },
+            {
+              "value": "Pressure",
+              "text": "Pressure",
+              "hint": "What does it read against what you expect? Whether it is gauge, differential, or absolute, and what the taps and impulse lines look like.",
+              "key": null
+            },
+            {
+              "value": "Temperature",
+              "text": "Temperature",
+              "hint": "What does it read against a reference? Thermowell or direct, immersion depth if you know it, and how fast the process really moves.",
+              "key": null
+            },
+            {
+              "value": "Analytical (pH, conductivity, analyzer)",
+              "text": "Analytical (pH, conductivity, analyzer)",
+              "hint": "What does it read against a lab or grab sample? How often it is cleaned and calibrated, and what the process does to the sensor between cleanings.",
+              "key": null
+            },
+            {
+              "value": "Weight or density",
+              "text": "Weight or density",
+              "hint": "What does it read against what you expect? Load cells or a density meter, and anything touching the vessel that should not be: piping, conduit, a walkway.",
+              "key": null
+            },
+            {
+              "value": "Control logic (PLC / DCS)",
+              "text": "Control logic (PLC / DCS)",
+              "hint": "What platform is it on, what is the logic meant to do, and what does it do instead? Say whether you have the program and the drawings.",
+              "key": null
+            },
+            {
+              "value": "Not sure",
+              "text": "Not sure",
+              "hint": "Describe it however you would say it out loud: what the number does, when it does it and when it does not, and what has already been tried.",
+              "key": null
+            },
+            {
+              "value": "Something else",
+              "text": "Something else",
+              "hint": "Tell us what the device is and what it is doing wrong. Symptoms beat conclusions, and you will not be corrected for the vocabulary.",
+              "key": null
+            }
+          ]
+        },
+        {
+          "tag": "input",
+          "name": "product",
+          "label": "Product or medium",
+          "wrapId": null,
+          "hidden": false,
+          "type": "text",
+          "required": true,
+          "maxlength": 80,
+          "minlength": null,
+          "autocomplete": null,
+          "inputmode": null,
+          "placeholder": "Water, crude, caustic, resin pellets, steam, sludge…",
+          "dataLabel": "Product",
+          "dataGroup": "MEASUREMENT",
+          "dataMsg": "Please tell us the product or medium being measured.",
+          "dataHintFor": null,
+          "dataCountFor": null,
+          "dataReveal": null,
+          "dataRevealWhen": null,
+          "subjectPart": false,
+          "block": false,
+          "pot": false
+        }
+      ]
+    },
+    {
+      "row": false,
+      "fields": [
+        {
+          "tag": "select",
+          "name": "when",
+          "label": "When does it happen?",
+          "wrapId": null,
+          "hidden": false,
+          "type": null,
+          "required": true,
+          "maxlength": null,
+          "minlength": null,
+          "autocomplete": null,
+          "inputmode": null,
+          "placeholder": null,
+          "dataLabel": "When",
+          "dataGroup": "MEASUREMENT",
+          "dataMsg": "Please tell us when it happens.",
+          "dataHintFor": null,
+          "dataCountFor": null,
+          "dataReveal": null,
+          "dataRevealWhen": null,
+          "subjectPart": false,
+          "block": false,
+          "pot": false,
+          "options": [
+            {
+              "value": "",
+              "text": "Select…",
+              "hint": null,
+              "key": null
+            },
+            {
+              "value": "All the time, since it started",
+              "text": "All the time, since it started",
+              "hint": null,
+              "key": null
+            },
+            {
+              "value": "Only on a certain shift or time of day",
+              "text": "Only on a certain shift or time of day",
+              "hint": null,
+              "key": null
+            },
+            {
+              "value": "Only in certain weather or ambient conditions",
+              "text": "Only in certain weather or ambient conditions",
+              "hint": null,
+              "key": null
+            },
+            {
+              "value": "Only at certain process conditions (low level, low flow, startup, high rate)",
+              "text": "Only at certain process conditions (low level, low flow, startup, high rate)",
+              "hint": null,
+              "key": null
+            },
+            {
+              "value": "Only after a specific activity (a wash, a transfer, a batch change)",
+              "text": "Only after a specific activity (a wash, a transfer, a batch change)",
+              "hint": null,
+              "key": null
+            },
+            {
+              "value": "Since a specific change (new product, new device, recent work)",
+              "text": "Since a specific change (new product, new device, recent work)",
+              "hint": null,
+              "key": null
+            },
+            {
+              "value": "Intermittent, no pattern found yet",
+              "text": "Intermittent, no pattern found yet",
+              "hint": null,
+              "key": null
+            },
+            {
+              "value": "Not sure",
+              "text": "Not sure",
+              "hint": null,
+              "key": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": false,
+      "fields": [
+        {
+          "tag": "input",
+          "name": "around",
+          "label": "What happens around this equipment?",
+          "wrapId": null,
+          "hidden": false,
+          "type": "text",
+          "required": false,
+          "maxlength": 160,
+          "minlength": null,
+          "autocomplete": null,
+          "inputmode": null,
+          "placeholder": "Tasks one shift runs and another does not, cleaning, transfers, nearby equipment starting, sun on the housing…",
+          "dataLabel": "Around it",
+          "dataGroup": "MEASUREMENT",
+          "dataMsg": null,
+          "dataHintFor": null,
+          "dataCountFor": null,
+          "dataReveal": null,
+          "dataRevealWhen": null,
+          "subjectPart": false,
+          "block": false,
+          "pot": false
+        }
+      ]
+    },
+    {
+      "row": false,
+      "fields": [
+        {
+          "tag": "textarea",
+          "name": "issue",
+          "label": "The issue",
+          "wrapId": null,
+          "hidden": false,
+          "type": null,
+          "required": true,
+          "maxlength": 1000,
+          "minlength": 20,
+          "autocomplete": null,
+          "inputmode": null,
+          "placeholder": "What is the measurement or system doing? When does it happen, and when does it not? What has already been tried?",
+          "dataLabel": "Issue",
+          "dataGroup": null,
+          "dataMsg": "Please describe the issue in a bit more detail.",
+          "dataHintFor": null,
+          "dataCountFor": null,
+          "dataReveal": null,
+          "dataRevealWhen": null,
+          "subjectPart": false,
+          "block": true,
+          "pot": false
+        }
+      ]
+    }
+  ]
+}

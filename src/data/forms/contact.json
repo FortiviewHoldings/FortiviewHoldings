@@ -1,0 +1,264 @@
+{
+  "intake": "contact",
+  "subject": "Bridges Industrial",
+  "title": "WEBSITE ENQUIRY",
+  "submitLabel": "Send it",
+  "pot": "nickname",
+  "layout": [
+    {
+      "row": true,
+      "fields": [
+        {
+          "tag": "input",
+          "name": "name",
+          "label": "Name",
+          "wrapId": null,
+          "hidden": false,
+          "type": "text",
+          "required": true,
+          "maxlength": 80,
+          "minlength": null,
+          "autocomplete": "name",
+          "inputmode": null,
+          "placeholder": null,
+          "dataLabel": "Name",
+          "dataGroup": null,
+          "dataMsg": "Please give us a name to reply to.",
+          "dataHintFor": null,
+          "dataCountFor": null,
+          "dataReveal": null,
+          "dataRevealWhen": null,
+          "subjectPart": true,
+          "block": false,
+          "pot": false
+        },
+        {
+          "tag": "input",
+          "name": "company",
+          "label": "Company",
+          "wrapId": null,
+          "hidden": false,
+          "type": "text",
+          "required": false,
+          "maxlength": 90,
+          "minlength": null,
+          "autocomplete": "organization",
+          "inputmode": null,
+          "placeholder": "Optional",
+          "dataLabel": "Company",
+          "dataGroup": null,
+          "dataMsg": null,
+          "dataHintFor": null,
+          "dataCountFor": null,
+          "dataReveal": null,
+          "dataRevealWhen": null,
+          "subjectPart": false,
+          "block": false,
+          "pot": false
+        }
+      ]
+    },
+    {
+      "row": true,
+      "fields": [
+        {
+          "tag": "input",
+          "name": "email",
+          "label": "Email",
+          "wrapId": null,
+          "hidden": false,
+          "type": "email",
+          "required": true,
+          "maxlength": 120,
+          "minlength": null,
+          "autocomplete": "email",
+          "inputmode": null,
+          "placeholder": null,
+          "dataLabel": "Email",
+          "dataGroup": null,
+          "dataMsg": "Please give us an email to reply to.",
+          "dataHintFor": null,
+          "dataCountFor": null,
+          "dataReveal": null,
+          "dataRevealWhen": null,
+          "subjectPart": false,
+          "block": false,
+          "pot": false
+        },
+        {
+          "tag": "input",
+          "name": "phone",
+          "label": "Phone",
+          "wrapId": null,
+          "hidden": false,
+          "type": "tel",
+          "required": false,
+          "maxlength": 32,
+          "minlength": null,
+          "autocomplete": "tel",
+          "inputmode": null,
+          "placeholder": null,
+          "dataLabel": "Phone",
+          "dataGroup": null,
+          "dataMsg": null,
+          "dataHintFor": null,
+          "dataCountFor": null,
+          "dataReveal": null,
+          "dataRevealWhen": null,
+          "subjectPart": false,
+          "block": false,
+          "pot": false
+        }
+      ]
+    },
+    {
+      "row": false,
+      "fields": [
+        {
+          "tag": "select",
+          "name": "topic",
+          "label": "What is this about?",
+          "wrapId": null,
+          "hidden": false,
+          "type": null,
+          "required": true,
+          "maxlength": null,
+          "minlength": null,
+          "autocomplete": null,
+          "inputmode": null,
+          "placeholder": null,
+          "dataLabel": "Topic",
+          "dataGroup": null,
+          "dataMsg": "Please tell us what this is about.",
+          "dataHintFor": "message",
+          "dataCountFor": null,
+          "dataReveal": "#ctOtherWrap",
+          "dataRevealWhen": "Something else",
+          "subjectPart": true,
+          "block": false,
+          "pot": false,
+          "options": [
+            {
+              "value": "",
+              "text": "Select…",
+              "hint": null,
+              "key": null
+            },
+            {
+              "value": "Work with us, general",
+              "text": "Work with us, general",
+              "hint": "What is the work, what does it look like today, and what would done look like? Rough timing and any budget range help us tell you quickly whether we are the right fit.",
+              "key": "work-with-us"
+            },
+            {
+              "value": "Instrumentation and field work",
+              "text": "Instrumentation and field work",
+              "hint": "What is being measured, what is the instrument doing wrong, and where is it installed? If it is misbehaving right now, Submit Break-In is the faster door.",
+              "key": "industrial"
+            },
+            {
+              "value": "Technical training",
+              "text": "Technical training",
+              "hint": "Who needs training and how many of them, on what equipment, and where are they starting from? On site, in a classroom, or both?",
+              "key": "training"
+            },
+            {
+              "value": "Control logic, PLC or DCS",
+              "text": "Control logic, PLC or DCS",
+              "hint": "What platform is it running on, what is the logic meant to do, and what is it doing instead? Say whether you have the program and the drawings.",
+              "key": "logic"
+            },
+            {
+              "value": "Custom hardware or a print run",
+              "text": "Custom hardware or a print run",
+              "hint": "What does the part or device need to do, how many, and what has to fit or survive? Any material, size, or environment constraints.",
+              "key": "hardware"
+            },
+            {
+              "value": "Software, APIs, or PragOptics",
+              "text": "Software, APIs, or PragOptics",
+              "hint": "What systems need to talk to each other, what data moves between them, and where should it end up? Say whether you want the API in your own system or hosted.",
+              "key": "software"
+            },
+            {
+              "value": "Refer a project",
+              "text": "Refer a project",
+              "hint": "Who is the client, what do they need, and what is your involvement? Tell us how you would like the introduction handled.",
+              "key": "refer"
+            },
+            {
+              "value": "A problem with this website",
+              "text": "A problem with this website",
+              "hint": "What page were you on, what did you click, and what happened instead of what you expected? Your browser helps too.",
+              "key": "site"
+            },
+            {
+              "value": "Something else",
+              "text": "Something else",
+              "hint": "Tell it however you would say it out loud. We would rather have the messy version than a tidy one that leaves out the important part.",
+              "key": "other"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": false,
+      "fields": [
+        {
+          "tag": "input",
+          "name": "topicOther",
+          "label": "Tell us what it is about",
+          "wrapId": "ctOtherWrap",
+          "hidden": true,
+          "type": "text",
+          "required": true,
+          "maxlength": 80,
+          "minlength": null,
+          "autocomplete": null,
+          "inputmode": null,
+          "placeholder": null,
+          "dataLabel": "Topic detail",
+          "dataGroup": null,
+          "dataMsg": "Please tell us what this is about.",
+          "dataHintFor": null,
+          "dataCountFor": null,
+          "dataReveal": null,
+          "dataRevealWhen": null,
+          "subjectPart": false,
+          "block": false,
+          "pot": false
+        }
+      ]
+    },
+    {
+      "row": false,
+      "fields": [
+        {
+          "tag": "textarea",
+          "name": "message",
+          "label": "What do you need?",
+          "wrapId": null,
+          "hidden": false,
+          "type": null,
+          "required": true,
+          "maxlength": 1500,
+          "minlength": 20,
+          "autocomplete": null,
+          "inputmode": null,
+          "placeholder": "What are you trying to do, what does the situation look like now, and what would a good outcome be?",
+          "dataLabel": "Message",
+          "dataGroup": null,
+          "dataMsg": "Please tell us a bit more about what you need.",
+          "dataHintFor": null,
+          "dataCountFor": null,
+          "dataReveal": null,
+          "dataRevealWhen": null,
+          "subjectPart": false,
+          "block": true,
+          "pot": false
+        }
+      ]
+    }
+  ]
+}

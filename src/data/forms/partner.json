@@ -1,0 +1,282 @@
+{
+  "intake": "partner",
+  "subject": "Partner",
+  "title": "PARTNER INTRODUCTION",
+  "submitLabel": "Send introduction",
+  "pot": "nickname",
+  "layout": [
+    {
+      "row": true,
+      "fields": [
+        {
+          "tag": "input",
+          "name": "name",
+          "label": "Your name",
+          "wrapId": null,
+          "hidden": false,
+          "type": "text",
+          "required": true,
+          "maxlength": 80,
+          "minlength": null,
+          "autocomplete": "name",
+          "inputmode": null,
+          "placeholder": null,
+          "dataLabel": "Name",
+          "dataGroup": null,
+          "dataMsg": "Please give us a name to reply to.",
+          "dataHintFor": null,
+          "dataCountFor": null,
+          "dataReveal": null,
+          "dataRevealWhen": null,
+          "subjectPart": true,
+          "block": false,
+          "pot": false
+        },
+        {
+          "tag": "input",
+          "name": "business",
+          "label": "Business name",
+          "wrapId": null,
+          "hidden": false,
+          "type": "text",
+          "required": false,
+          "maxlength": 90,
+          "minlength": null,
+          "autocomplete": "organization",
+          "inputmode": null,
+          "placeholder": "Optional",
+          "dataLabel": "Business",
+          "dataGroup": null,
+          "dataMsg": null,
+          "dataHintFor": null,
+          "dataCountFor": null,
+          "dataReveal": null,
+          "dataRevealWhen": null,
+          "subjectPart": true,
+          "block": false,
+          "pot": false
+        }
+      ]
+    },
+    {
+      "row": true,
+      "fields": [
+        {
+          "tag": "input",
+          "name": "email",
+          "label": "Email",
+          "wrapId": null,
+          "hidden": false,
+          "type": "email",
+          "required": true,
+          "maxlength": 120,
+          "minlength": null,
+          "autocomplete": "email",
+          "inputmode": null,
+          "placeholder": null,
+          "dataLabel": "Email",
+          "dataGroup": null,
+          "dataMsg": "Please give us an email to reply to.",
+          "dataHintFor": null,
+          "dataCountFor": null,
+          "dataReveal": null,
+          "dataRevealWhen": null,
+          "subjectPart": false,
+          "block": false,
+          "pot": false
+        },
+        {
+          "tag": "input",
+          "name": "phone",
+          "label": "Phone",
+          "wrapId": null,
+          "hidden": false,
+          "type": "tel",
+          "required": false,
+          "maxlength": 32,
+          "minlength": null,
+          "autocomplete": "tel",
+          "inputmode": null,
+          "placeholder": null,
+          "dataLabel": "Phone",
+          "dataGroup": null,
+          "dataMsg": null,
+          "dataHintFor": null,
+          "dataCountFor": null,
+          "dataReveal": null,
+          "dataRevealWhen": null,
+          "subjectPart": false,
+          "block": false,
+          "pot": false
+        }
+      ]
+    },
+    {
+      "row": true,
+      "fields": [
+        {
+          "tag": "input",
+          "name": "site",
+          "label": "Website",
+          "wrapId": null,
+          "hidden": false,
+          "type": "text",
+          "required": false,
+          "maxlength": 120,
+          "minlength": null,
+          "autocomplete": null,
+          "inputmode": "url",
+          "placeholder": "Optional",
+          "dataLabel": "Website",
+          "dataGroup": null,
+          "dataMsg": null,
+          "dataHintFor": null,
+          "dataCountFor": null,
+          "dataReveal": null,
+          "dataRevealWhen": null,
+          "subjectPart": false,
+          "block": false,
+          "pot": false
+        },
+        {
+          "tag": "input",
+          "name": "area",
+          "label": "Where you work",
+          "wrapId": null,
+          "hidden": false,
+          "type": "text",
+          "required": false,
+          "maxlength": 90,
+          "minlength": null,
+          "autocomplete": null,
+          "inputmode": null,
+          "placeholder": "Gulf Coast, Texas, nationwide…",
+          "dataLabel": "Area",
+          "dataGroup": null,
+          "dataMsg": null,
+          "dataHintFor": null,
+          "dataCountFor": null,
+          "dataReveal": null,
+          "dataRevealWhen": null,
+          "subjectPart": false,
+          "block": false,
+          "pot": false
+        }
+      ]
+    },
+    {
+      "row": false,
+      "fields": [
+        {
+          "tag": "select",
+          "name": "type",
+          "label": "What kind of partner are you?",
+          "wrapId": null,
+          "hidden": false,
+          "type": null,
+          "required": true,
+          "maxlength": null,
+          "minlength": null,
+          "autocomplete": null,
+          "inputmode": null,
+          "placeholder": null,
+          "dataLabel": "Type",
+          "dataGroup": null,
+          "dataMsg": "Please tell us what kind of partner you are.",
+          "dataHintFor": "offering",
+          "dataCountFor": null,
+          "dataReveal": null,
+          "dataRevealWhen": null,
+          "subjectPart": true,
+          "block": false,
+          "pot": false,
+          "options": [
+            {
+              "value": "",
+              "text": "Select…",
+              "hint": null,
+              "key": null
+            },
+            {
+              "value": "Vendor or supplier",
+              "text": "Vendor or supplier",
+              "hint": "What do you supply, which lines or brands do you carry, and what are your lead times like? Where do you deliver?",
+              "key": null
+            },
+            {
+              "value": "Distributor or procurement",
+              "text": "Distributor or procurement",
+              "hint": "What do you distribute, which manufacturers, and what does your stocking and pricing look like? Any minimums worth knowing about.",
+              "key": null
+            },
+            {
+              "value": "Manufacturer or manufacturer’s rep",
+              "text": "Manufacturer or manufacturer’s rep",
+              "hint": "What do you make or represent, which territories do you cover, and what does support look like after the sale?",
+              "key": null
+            },
+            {
+              "value": "Integrator or contractor",
+              "text": "Integrator or contractor",
+              "hint": "What kind of work do you take on, what size jobs, and which industries? Where do you work and how big is the crew?",
+              "key": null
+            },
+            {
+              "value": "Specialist trade or service",
+              "text": "Specialist trade or service",
+              "hint": "What is the speciality, who do you normally do it for, and what does your crew look like? Any certifications or site access worth naming.",
+              "key": null
+            },
+            {
+              "value": "Software or technology",
+              "text": "Software or technology",
+              "hint": "What does the product do, who uses it today, and how would it sit alongside field or plant work?",
+              "key": null
+            },
+            {
+              "value": "Referral or co-selling only",
+              "text": "Referral or co-selling only",
+              "hint": "Who are you talking to and what do they need? Tell us how you would like the introduction handled.",
+              "key": null
+            },
+            {
+              "value": "Other",
+              "text": "Other (tell us below)",
+              "hint": "Tell us what you do and how you think the two of us would work together.",
+              "key": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": false,
+      "fields": [
+        {
+          "tag": "textarea",
+          "name": "offering",
+          "label": "What do you offer?",
+          "wrapId": null,
+          "hidden": false,
+          "type": null,
+          "required": true,
+          "maxlength": 1000,
+          "minlength": 20,
+          "autocomplete": null,
+          "inputmode": null,
+          "placeholder": "What you do well, who you serve, and the kind of work you want more of. Specific beats broad.",
+          "dataLabel": "Offering",
+          "dataGroup": null,
+          "dataMsg": "Please tell us a bit more about what you offer.",
+          "dataHintFor": null,
+          "dataCountFor": null,
+          "dataReveal": null,
+          "dataRevealWhen": null,
+          "subjectPart": false,
+          "block": true,
+          "pot": false
+        }
+      ]
+    }
+  ]
+}
