@@ -952,7 +952,7 @@
     <!-- Actions -->
     <div class="review-actions">
       <div class="review-slider-wrapper">
-  <div class="review-slider" id="reviewSlider" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+  <div class="review-slider" id="reviewSlider" role="slider" tabindex="0" aria-label="Slide, or press Enter, to submit your review" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
   <div class="slider-fill" aria-hidden="true"></div>
   <span class="slider-label">Slide to Submit</span>
   <div class="slider-handle" aria-hidden="true"></div>
@@ -1645,6 +1645,26 @@ function showSpinner() {
   });
 
   /* ---------------------------
+     Keyboard submit
+     The drag is pointer sugar; the actual submit is completeSlide(). A
+     keyboard user gets there with Enter, Space, or filling the slider with
+     the arrow / End keys — same gate as the pointer path (not disabled, not
+     already sent). Without this the review cannot be submitted by keyboard.
+     --------------------------- */
+  slider.addEventListener('keydown', e => {
+    if (slider.classList.contains('slider-disabled') || slider.classList.contains('filled')) return;
+
+    const submitKeys = ['Enter', ' ', 'Spacebar', 'ArrowRight', 'ArrowUp', 'End'];
+    if (submitKeys.indexOf(e.key) === -1) return;
+
+    e.preventDefault();
+    fill.style.width = '100%';
+    handle.style.transform = `translateX(${maxX}px)`;
+    slider.setAttribute('aria-valuenow', '100');
+    completeSlide();
+  });
+
+  /* ---------------------------
      Main Submission Flow
      --------------------------- */
   async function completeSlide() {
@@ -1730,6 +1750,7 @@ function showSpinner() {
      --------------------------- */
   function resetSliderVisual() {
     slider.classList.remove('filled', 'filling');
+    slider.setAttribute('aria-valuenow', '0');
 
       // Temporarily disable transitions
     handle.style.transition = 'none';
