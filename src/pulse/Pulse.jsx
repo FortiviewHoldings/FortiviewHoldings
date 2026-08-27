@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import PulseOrb from "./PulseOrb.jsx";
-import { answerFromGuides } from "../model/answerFromGuides.js";
+import { pulseAnswer } from "../model/pulseAnswer.js";
 import { engineAvailable } from "../model/ask.js";
 import "./pulse.css";
 
@@ -37,7 +37,7 @@ export default function Pulse({ compact = false }) {
     setTurns((t) => [...t, { role: "you", text: q }]);
     setThinking(true);
     try {
-      const { text, provider, sources } = await answerFromGuides(q);
+      const { text, provider, sources } = await pulseAnswer(q);
       setTurns((t) => [...t, { role: "pulse", text, provider, sources, question: q }]);
     } catch (err) {
       setTurns((t) => [...t, { role: "pulse", text: err.message, error: true }]);

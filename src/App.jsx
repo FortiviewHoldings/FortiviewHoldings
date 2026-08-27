@@ -13,6 +13,7 @@ import partnerships from "./data/pages/partnerships.json";
 import integration from "./data/pages/integration.json";
 import terms from "./data/pages/terms.json";
 import NotFound from "./pages/NotFound.jsx";
+import PulseSidebar from "./pulse/PulseSidebar.jsx";
 
 export default function App() {
   return (
@@ -24,7 +25,7 @@ export default function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/break-in" element={<BreakIn />} />
         <Route path="/partnerships/apply" element={<PartnerApply />} />
-        <Route path="/industrial" element={<ContentPage data={industrial} />} />
+        <Route path="/industrial" element={<><ContentPage data={industrial} /><PulseSidebar /></>} />
         <Route path="/instrument-support" element={<ContentPage data={instrumentSupport} />} />
         <Route path="/partnerships" element={<ContentPage data={partnerships} />} />
         <Route path="/integration" element={<ContentPage data={integration} />} />

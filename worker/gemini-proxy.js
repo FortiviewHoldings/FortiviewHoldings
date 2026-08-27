@@ -61,10 +61,14 @@ export default {
 
     const prompt = typeof payload.prompt === "string" ? payload.prompt.trim() : "";
     const system = typeof payload.system === "string" ? payload.system.trim() : "";
-    if (!prompt) {
+    // Advanced path: a full conversation and tool declarations, for Pulse's
+    // calculator function-calling. Simple path: a single prompt.
+    const contents = Array.isArray(payload.contents) ? payload.contents : null;
+    const tools = Array.isArray(payload.tools) ? payload.tools : null;
+    if (!contents && !prompt) {
       return json({ error: "No prompt provided" }, 400, origin);
     }
-    if (prompt.length > MAX_PROMPT) {
+    if (prompt && prompt.length > MAX_PROMPT) {
       return json({ error: "Prompt too long" }, 413, origin);
     }
 
@@ -76,12 +80,11 @@ export default {
       model + ":generateContent?key=" + encodeURIComponent(env.GEMINI_API_KEY);
 
     const body = {
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      contents: contents || [{ role: "user", parts: [{ text: prompt }] }],
       generationConfig: { temperature: 0.2, maxOutputTokens: 800 }
     };
-    if (system) {
-      body.systemInstruction = { parts: [{ text: system }] };
-    }
+    if (system) body.systemInstruction = { parts: [{ text: system }] };
+    if (tools) body.tools = [{ functionDeclarations: tools }];
 
     let res;
     try {
@@ -101,12 +104,16 @@ export default {
       return json({ error: data?.error?.message || "Gemini error" }, res.status, origin);
     }
 
-    const text =
-      data?.candidates?.[0]?.content?.parts?.map((p) => p.text).join("") ?? "";
-    if (!text) {
+    const content = data?.candidates?.[0]?.content ?? null;
+    if (!content) {
       return json({ error: "Empty response from model" }, 502, origin);
     }
+    const parts = content.parts || [];
+    const functionCall = parts.find((p) => p.functionCall)?.functionCall || null;
+    const text = parts.map((p) => p.text).filter(Boolean).join("");
 
-    return json({ text }, 200, origin);
+    // `text` keeps the simple client working; `content`/`functionCall` drive the
+    // tool loop.
+    return json({ content, functionCall, text }, 200, origin);
   }
 };
