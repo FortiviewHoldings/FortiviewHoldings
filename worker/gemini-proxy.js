@@ -19,7 +19,9 @@ const ALLOWED_ORIGINS = new Set([
   "http://127.0.0.1:5180"
 ]);
 
-const MAX_PROMPT = 8000;
+// Character-count abuse guard on the simple `prompt` path (NOT a model limit —
+// Flash-Lite's window is ~1M tokens). Just stops giant payloads burning quota.
+const MAX_PROMPT = 24000;
 
 function corsHeaders(origin) {
   const allow = ALLOWED_ORIGINS.has(origin) ? origin : "https://bridgesindust.com";
