@@ -24,6 +24,48 @@ const FORMS = {
 
 const CONTENT = [industrial, instrumentSupport, partnerships, integration, terms];
 
+// --- Derived structured data -------------------------------------------------
+// The guide JSON is the single source. Everything below is regenerated from it
+// at build time, so adding a guide adds its FAQ schema with no second edit.
+
+function htmlText(html) {
+  return String(html || "")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function capText(s, n = 340) {
+  if (s.length <= n) return s;
+  const cut = s.slice(0, n);
+  return cut.slice(0, cut.lastIndexOf(" ")).trim() + "…";
+}
+
+// The bold lead of a section is written as its concise answer — use it, and
+// fall back to the section text if a section has no lead.
+function leadAnswer(section) {
+  const strong = (section.body || "").match(/<strong>([\s\S]*?)<\/strong>/i);
+  return capText(htmlText(strong ? strong[1] : section.text));
+}
+
+function guideFaqJsonld(g) {
+  const qa = (g.sections || [])
+    .map((s) => ({ q: s.question, a: leadAnswer(s) }))
+    .filter((x) => x.q && x.a);
+  if (!qa.length) return null;
+  return JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: qa.map((x) => ({
+      "@type": "Question",
+      name: x.q,
+      acceptedAnswer: { "@type": "Answer", text: x.a }
+    }))
+  });
+}
+
 function head({ title, description, path, jsonld }) {
   const canonical = SITE + (path === "/" ? "/" : path + "/");
   return {
@@ -58,7 +100,10 @@ export function headFor(path) {
   const guideSlug = clean.startsWith("/education/") ? clean.slice("/education/".length) : null;
   if (guideSlug) {
     const g = GUIDES.find((x) => x.slug === guideSlug);
-    if (g) return head({ title: g.title + " | Field Pocket Guide", description: g.description, path: clean });
+    if (g) {
+      const faq = guideFaqJsonld(g);
+      return head({ title: g.title + " | Field Pocket Guide", description: g.description, path: clean, jsonld: faq ? [faq] : [] });
+    }
   }
 
   if (FORMS[clean]) return head({ ...FORMS[clean], path: clean });
