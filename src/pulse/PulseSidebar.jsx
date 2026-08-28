@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import PulseOrb from "./PulseOrb.jsx";
 import Pulse from "./Pulse.jsx";
 import "./pulse-sidebar.css";
@@ -6,6 +6,7 @@ import "./pulse-sidebar.css";
 // A launcher orb that expands into a Pulse chat sidebar. Collapsed by default.
 export default function PulseSidebar() {
   const [open, setOpen] = useState(false);
+  const panelRef = useRef(null);
 
   useEffect(() => {
     if (!open) return;
@@ -14,10 +15,26 @@ export default function PulseSidebar() {
     return () => document.removeEventListener("keydown", onKey);
   }, [open]);
 
-  // No manual viewport juggling for the on-screen keyboard: the page sets
-  // interactive-widget=resizes-content, so the browser resizes the viewport and
-  // the fixed panel sits above the keyboard and its accessory bar on its own.
-  // Moving the panel by hand fought that and dragged the keyboard's own buttons.
+  // Fit the panel to the visible area so the browser's top URL bar can't cover
+  // the header and the keyboard can't cover the input. Only react to real size
+  // changes — syncing on scroll/focus/timers is what dragged the keyboard's own
+  // accessory bar last time. resize fires for both the URL bar and the keyboard.
+  useEffect(() => {
+    const vv = window.visualViewport;
+    const panel = panelRef.current;
+    if (!open || !vv || !panel) return;
+    const fit = () => {
+      panel.style.top = vv.offsetTop + "px";
+      panel.style.height = vv.height + "px";
+    };
+    fit();
+    vv.addEventListener("resize", fit);
+    return () => {
+      vv.removeEventListener("resize", fit);
+      panel.style.top = "";
+      panel.style.height = "";
+    };
+  }, [open]);
 
   return (
     <>
