@@ -1,12 +1,11 @@
-# Deploy the React build (SSG) to GitHub Pages from the react-conversion branch.
-# main is untouched: to roll back, set Pages back to "Deploy from branch: main"
-# (or: gh api -X PUT repos/OWNER/REPO/pages -f build_type=legacy
-#  -f source[branch]=main -f source[path]=/) and the old site rebuilds.
+# Deploy the React build (SSG) to GitHub Pages from main.
+# The old static site is preserved on the `pre-react` tag: to roll back,
+# `git checkout pre-react` and redeploy, or point Pages at that ref.
 name: deploy
 
 on:
   push:
-    branches: [react-conversion]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
