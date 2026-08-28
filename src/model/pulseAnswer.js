@@ -35,7 +35,11 @@ const SYSTEM =
   "When a guide excerpt carries the answer, name the guide. Never mention the " +
   "calculators or tools by name — just give the numbers. Never invent part " +
   "numbers, model specifics, or figures; if you are not sure of an exact spec, " +
-  "say so instead of guessing.";
+  "say so instead of guessing. " +
+  "Write plain prose — no Markdown and no LaTeX: no asterisks for emphasis, no " +
+  "headings, no dollar-sign math, no backslash commands. If a formula helps, " +
+  "write it inline in plain text, like: error % of span = (actual − ideal) ÷ " +
+  "span × 100. Refer to a guide by its name, never as a bracketed number.";
 
 export function relevantSections(question, k = 5) {
   return search(index, question, k);
@@ -48,6 +52,30 @@ function trimSources(hits) {
   if (hits.length < 2) return hits;
   const top = hits[0].score || 0;
   return hits.filter((h) => h.score >= top * 0.4).slice(0, 4);
+}
+
+// The model sometimes formats with Markdown or LaTeX, but the chat renders
+// plain text — so convert it to something readable instead of showing raw
+// $$\frac. Order matters: resolve \text and symbols before \frac, and \frac
+// before the catch-all backslash strip.
+function toPlainText(s) {
+  return String(s || "")
+    .replace(/\\times/g, "×").replace(/\\cdot/g, "·").replace(/\\div/g, "÷")
+    .replace(/\\pm/g, "±").replace(/\\leq?/g, "≤").replace(/\\geq?/g, "≥")
+    .replace(/\\approx/g, "≈").replace(/\\Delta/g, "Δ").replace(/\\%/g, "%")
+    .replace(/\\(?:text|mathrm|mathbf|operatorname)\s*\{([^{}]*)\}/g, "$1")
+    .replace(/\\left|\\right/g, "")
+    .replace(/\\[dt]?frac\s*\{([^{}]*)\}\s*\{([^{}]*)\}/g, "($1) / ($2)")
+    .replace(/\\[,;:!]/g, " ").replace(/\\\\/g, " ")
+    .replace(/\\([a-zA-Z]+)/g, "$1")
+    .replace(/\${1,2}/g, "")
+    .replace(/\*\*([^*]+)\*\*/g, "$1").replace(/\*([^*]+)\*/g, "$1")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/[ \t]*\[\d+\]/g, "")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
 }
 
 // `prompt` is sent too so a not-yet-upgraded worker (which only reads prompt)
@@ -94,7 +122,7 @@ export async function pulseAnswer(question) {
 
     // An older proxy returns only { text } — no tool support. Use it directly.
     if (!res.content) {
-      return { text: res.text || "", provider: "api", sources };
+      return { text: toPlainText(res.text), provider: "api", sources };
     }
 
     contents.push(res.content); // the model's turn
