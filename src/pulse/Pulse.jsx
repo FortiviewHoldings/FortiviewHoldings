@@ -18,8 +18,10 @@ export default function Pulse({ compact = false }) {
   const inputRef = useRef(null);
   const navigate = useNavigate();
 
-  // Pulse suggests a Break-In when the guides did not cover the question.
-  const suggestsBreakIn = (t) => t.provider === "none" || /break[\s-]?in/i.test(t.text || "");
+  // Pulse always offers a Break-In as the escalation path. It only prefills the
+  // question when Pulse could not cover it — a real problem — not after a plain
+  // concept answer, where a prefilled "what is a transmitter" would read wrong.
+  const punted = (t) => t.provider === "none" || /break[\s-]?in/i.test(t.text || "");
 
   function toBreakIn(question) {
     navigate("/break-in", { state: { issue: question } });
@@ -85,8 +87,12 @@ export default function Pulse({ compact = false }) {
               <PulseOrb size={26} className="pulse__avatar" />
               <div className="pulse__bubble">
                 <p className="pulse__text">{t.text}</p>
-                {suggestsBreakIn(t) && (
-                  <button type="button" className="pulse__breakin" onClick={() => toBreakIn(t.question)}>
+                {!t.error && (
+                  <button
+                    type="button"
+                    className={"pulse__breakin" + (punted(t) ? "" : " pulse__breakin--quiet")}
+                    onClick={() => toBreakIn(punted(t) ? t.question : undefined)}
+                  >
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" /></svg>
                     Submit a Break-In
                   </button>
