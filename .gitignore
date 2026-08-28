@@ -7,3 +7,6 @@ idea-lab/IDEA_LAB_DESIGN.md
 node_modules/
 dist/
 .vite/
+
+# Claude Code local tooling (dev-server launch config, session data)
+.claude/
