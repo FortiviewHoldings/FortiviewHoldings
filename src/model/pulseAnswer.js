@@ -10,22 +10,44 @@ const index = buildIndex(GUIDES);
 
 const SYSTEM =
   "You are Pulse, the field-reference assistant for Bridges Industrial, an " +
-  "industrial instrumentation consultancy. Answer from the provided guide " +
-  "excerpts for facts, and USE THE CALCULATORS for any arithmetic — never do it " +
-  "in your head, and report exactly the numbers the tool returns. " +
-  "Units matter: a loop current in mA and a process value in engineering units " +
-  "are NOT the same number. For the accuracy or error of a 4-20 mA transmitter " +
-  "when you have an applied engineering value and a measured mA, call " +
-  "transmitter_error with the range, applied_eu, and measured_ma — do not convert " +
-  "by hand and do not pass mA and engineering units into calibration_error " +
-  "together. Be concise and practical for a technician. Never mention the " +
-  "calculators or tools by name — just give the numbers. Point to the guide by " +
-  "name when you use it. If the excerpts do not cover the question and no " +
-  "calculator applies, say so plainly and suggest submitting a Break-In. Never " +
-  "invent part numbers or figures.";
+  "industrial instrumentation and automation consultancy. Talk like an " +
+  "experienced instrument tech: concise, plain, practical. You cover field " +
+  "instrumentation, calibration, control, and industrial measurement; if a " +
+  "question is outside that world, say it is not your area. " +
+
+  "Answer in tiers. " +
+  "(1) General concepts and definitions — what a transmitter is, what 4-20 mA " +
+  "means, how a device works — just explain them clearly from what you know. " +
+  "The guide excerpts below are supporting context, not a cage: lean on them " +
+  "when they fit, ignore them when they do not. " +
+  "(2) Anything with arithmetic — error, scaling, flow, resistance, base " +
+  "conversion — USE THE CALCULATORS, never do the math in your head, and report " +
+  "exactly the numbers the tool returns. Units matter: a loop current in mA and " +
+  "a process value in engineering units are NOT the same number. For the " +
+  "accuracy or error of a 4-20 mA transmitter given an applied engineering value " +
+  "and a measured mA, call transmitter_error with the range, applied_eu, and " +
+  "measured_ma — do not convert by hand and do not pass mA and engineering units " +
+  "into calibration_error together. " +
+  "(3) A specific plant problem you cannot resolve from concepts or the guides, " +
+  "or anything that needs a human to look at the actual setup — point them to a " +
+  "Break-In. Do not reach for Break-In on a question you can simply answer. " +
+
+  "When a guide excerpt carries the answer, name the guide. Never mention the " +
+  "calculators or tools by name — just give the numbers. Never invent part " +
+  "numbers, model specifics, or figures; if you are not sure of an exact spec, " +
+  "say so instead of guessing.";
 
 export function relevantSections(question, k = 5) {
   return search(index, question, k);
+}
+
+// Show only guide links close to the best match, so a plain concept answer does
+// not trail three barely-related sections. The model still sees every hit as
+// context; this only trims what we surface as sources.
+function trimSources(hits) {
+  if (hits.length < 2) return hits;
+  const top = hits[0].score || 0;
+  return hits.filter((h) => h.score >= top * 0.4).slice(0, 4);
 }
 
 // `prompt` is sent too so a not-yet-upgraded worker (which only reads prompt)
@@ -51,6 +73,7 @@ async function callProxy(contents, prompt) {
 
 export async function pulseAnswer(question) {
   const hits = relevantSections(question);
+  const sources = trimSources(hits);
   const context = hits.length
     ? hits.map((h, i) => `[${i + 1}] ${h.guide} — ${h.question}\n${h.snippet}`).join("\n\n")
     : "(no matching guide excerpts)";
@@ -59,11 +82,11 @@ export async function pulseAnswer(question) {
     return {
       text: "Pulse needs its API key set to answer. Search still works.",
       provider: "none",
-      sources: hits
+      sources
     };
   }
 
-  const ragPrompt = `Guide excerpts:\n\n${context}\n\nQuestion: ${question}`;
+  const ragPrompt = `Guide excerpts (may or may not be relevant):\n\n${context}\n\nQuestion: ${question}`;
   const contents = [{ role: "user", parts: [{ text: ragPrompt }] }];
 
   for (let step = 0; step < 4; step++) {
@@ -71,7 +94,7 @@ export async function pulseAnswer(question) {
 
     // An older proxy returns only { text } — no tool support. Use it directly.
     if (!res.content) {
-      return { text: res.text || "", provider: "api", sources: hits };
+      return { text: res.text || "", provider: "api", sources };
     }
 
     contents.push(res.content); // the model's turn
@@ -85,8 +108,8 @@ export async function pulseAnswer(question) {
       continue; // let the model read the result and reply
     }
 
-    return { text: res.text || "", provider: "api", sources: hits };
+    return { text: res.text || "", provider: "api", sources };
   }
 
-  return { text: "That took too many steps — try rephrasing.", provider: "api", sources: hits };
+  return { text: "That took too many steps — try rephrasing.", provider: "api", sources };
 }
