@@ -90,7 +90,7 @@ export default function Pulse({ compact = false }) {
                 {!t.error && (
                   <button
                     type="button"
-                    className={"pulse__breakin" + (punted(t) ? "" : " pulse__breakin--quiet")}
+                    className="pulse__breakin"
                     onClick={() => toBreakIn(punted(t) ? t.question : undefined)}
                   >
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" /></svg>

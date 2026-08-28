@@ -96,8 +96,7 @@
   line-height: 1.62;
   white-space: pre-wrap;
 }
-/* the Break-In escalation: a loud CTA when Pulse can't answer, a quiet ghost
-   (the --quiet modifier) that stays available alongside a real answer */
+/* the Break-In escalation CTA, shown under every Pulse answer */
 .pulse__breakin {
   display: inline-flex;
   align-items: center;
@@ -116,23 +115,6 @@
 }
 .pulse__breakin:hover { transform: translateY(-1px); box-shadow: 0 8px 20px -8px rgba(56,255,179,.6); }
 .pulse__breakin:focus-visible { outline: 2px solid var(--pulse-p); outline-offset: 2px; }
-
-/* quiet variant: available after a real answer without competing with it */
-.pulse__breakin--quiet {
-  margin-top: 10px;
-  padding: 6px 13px;
-  font-weight: 500;
-  font-size: .82rem;
-  color: var(--pulse-p);
-  background: transparent;
-  border: 1px solid rgba(56,255,179,.32);
-}
-.pulse__breakin--quiet:hover {
-  transform: none;
-  box-shadow: none;
-  background: rgba(56,255,179,.08);
-  border-color: rgba(56,255,179,.7);
-}
 
 .pulse__sources {
   margin-top: 11px;

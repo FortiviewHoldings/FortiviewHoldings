@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import PulseOrb from "./PulseOrb.jsx";
 import Pulse from "./Pulse.jsx";
 import "./pulse-sidebar.css";
@@ -6,7 +6,6 @@ import "./pulse-sidebar.css";
 // A launcher orb that expands into a Pulse chat sidebar. Collapsed by default.
 export default function PulseSidebar() {
   const [open, setOpen] = useState(false);
-  const panelRef = useRef(null);
 
   useEffect(() => {
     if (!open) return;
@@ -15,33 +14,10 @@ export default function PulseSidebar() {
     return () => document.removeEventListener("keydown", onKey);
   }, [open]);
 
-  // Keep the panel inside the visual viewport so the on-screen keyboard cannot
-  // cover the input while typing.
-  useEffect(() => {
-    const vv = window.visualViewport;
-    const panel = panelRef.current;
-    if (!open || !vv || !panel) return;
-    const sync = () => {
-      panel.style.height = vv.height + "px";
-      panel.style.top = vv.offsetTop + "px";
-    };
-    // Focusing the input opens the keyboard; re-sync then and once more after it
-    // finishes animating, so the first open lands right, not just reopens.
-    const onFocusIn = () => { sync(); setTimeout(sync, 300); };
-    vv.addEventListener("resize", sync);
-    vv.addEventListener("scroll", sync);
-    panel.addEventListener("focusin", onFocusIn);
-    sync();
-    const settle = setTimeout(sync, 320);
-    return () => {
-      vv.removeEventListener("resize", sync);
-      vv.removeEventListener("scroll", sync);
-      panel.removeEventListener("focusin", onFocusIn);
-      clearTimeout(settle);
-      panel.style.height = "";
-      panel.style.top = "";
-    };
-  }, [open]);
+  // No manual viewport juggling for the on-screen keyboard: the page sets
+  // interactive-widget=resizes-content, so the browser resizes the viewport and
+  // the fixed panel sits above the keyboard and its accessory bar on its own.
+  // Moving the panel by hand fought that and dragged the keyboard's own buttons.
 
   return (
     <>
@@ -52,7 +28,7 @@ export default function PulseSidebar() {
         </button>
       )}
 
-      <aside ref={panelRef} className={"pulse-panel" + (open ? " is-open" : "")} aria-hidden={!open} aria-label="Pulse assistant">
+      <aside className={"pulse-panel" + (open ? " is-open" : "")} aria-hidden={!open} aria-label="Pulse assistant">
         <header className="pulse-panel__head">
           <div className="pulse-panel__id">
             <PulseOrb size={30} thinking={false} />
