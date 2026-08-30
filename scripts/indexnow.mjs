@@ -53,18 +53,34 @@ if (key !== path.basename(keyFile, '.txt')) {
   process.exit(1)
 }
 
-/* ---------- read the sitemap ---------- */
-const sitemapPath = path.join(ROOT, 'sitemap.xml')
-if (!fs.existsSync(sitemapPath)) {
-  console.error('sitemap.xml not found at the repo root.')
+/* ---------- read the sitemap ----------
+   The sitemap is generated at build time and only exists on the live site,
+   so fetch it from there — it is the single source of what is published.
+   Every URL carries the deploy date as lastmod, so --days effectively means
+   "everything from deploys in the window", which is what we want to announce. */
+async function liveSitemap() {
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const res = await fetch(`https://${HOST}/sitemap.xml?cb=${Date.now()}`, {
+        redirect: 'follow',
+        headers: { 'Cache-Control': 'no-cache' },
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      return await res.text()
+    } catch (err) {
+      console.error(`sitemap fetch attempt ${attempt}/3: ${err.message}`)
+      if (attempt < 3) await new Promise((r) => setTimeout(r, 5000))
+    }
+  }
+  console.error(`Could not fetch https://${HOST}/sitemap.xml`)
   process.exit(1)
 }
-const xml = fs.readFileSync(sitemapPath, 'utf8')
+const xml = await liveSitemap()
 const entries = [...xml.matchAll(/<url>\s*<loc>([^<]+)<\/loc>(?:\s*<lastmod>([^<]*)<\/lastmod>)?/g)]
   .map((m) => ({ loc: m[1].trim(), lastmod: (m[2] || '').trim() }))
 
 if (!entries.length) {
-  console.error('No <url><loc> entries parsed from sitemap.xml.')
+  console.error('No <url><loc> entries parsed from the live sitemap.')
   process.exit(1)
 }
 

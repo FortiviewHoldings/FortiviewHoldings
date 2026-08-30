@@ -5,23 +5,18 @@ name: IndexNow
 # the fast path into AI answers. Google does not participate in IndexNow —
 # Search Console covers that side.
 #
-# Fires on any push that touches published content, not just the sitemap.
-# The sitemap only changes when a page is added or removed, so keying off it
-# alone meant an edit to an existing page never got announced, and remembering
-# to run it by hand is not a plan.
+# Fires after each successful deploy, because the sitemap is generated at
+# build time and only exists on the live site — announcing before the deploy
+# lands would submit the previous deploy's URL list.
 #
-# The weekly run is the backstop: if a push slips through the path filter, or
-# a submission fails while nobody is looking, Sunday picks it up. The script
-# decides what is actually recent, so a no-op week costs one API call.
+# The weekly run is the backstop: if a submission fails while nobody is
+# looking, Sunday picks it up. The script reads the live sitemap, so a
+# no-op week costs one API call.
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '**/*.html'
-      - 'sitemap.xml'
-      - 'llms.txt'
-      - 'robots.txt'
+  workflow_run:
+    workflows: [deploy]
+    types: [completed]
   schedule:
     # Sundays, 07:00 UTC. Catches anything a push missed.
     - cron: '0 7 * * 0'
@@ -45,6 +40,8 @@ concurrency:
 
 jobs:
   submit:
+    # Skip when the deploy it rode in on failed; scheduled/manual runs pass.
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
