@@ -1,0 +1,2262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Signals &amp; Switches Lab (Logic Levels, Clocks, Serial Data, HART FSK, Diodes, Relays) | Field Pocket Guide</title>
+  <meta name="description" content="An interactive bench for digital electronics — logic levels, clocks, serial data, ASCII, HART FSK on the 4–20 mA loop, diodes, transistors, and relays.">
+  <meta name="color-scheme" content="dark" />
+  <link rel="canonical" href="https://bridgesindust.com/education/signals-switches/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Signals &amp; Switches Lab | Field Pocket Guide">
+  <meta property="og:description" content="A working bench for digital electronics: shape a clock, stream a byte, ride a HART frame on the 4–20 mA loop, bias a diode to breakdown, energize a relay.">
+  <meta property="og:image" content="https://bridgesindust.com/images/social-preview.png">
+  <meta property="og:site_name" content="Bridges Industrial">
+  <meta property="og:url" content="https://bridgesindust.com/education/signals-switches/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://bridgesindust.com/images/social-preview.png">
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico" sizes="48x48">
+  <link rel="icon" type="image/png" href="/images/favicon.png" sizes="192x192">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/fortiview.css">
+  <link rel="stylesheet" href="/education/assets/pocketguide.css">
+  <style>
+    /* ============================================================
+       Signals & Switches lab — page styles.
+       Rides on fortiview.css tokens (galactic glass). The lab's
+       instrument states map onto the cosmic palette: teal = ON /
+       conducting, red = OFF / blocked, amber = signal / energized.
+       ============================================================ */
+    :root{
+      --surface:#0d1220;                 /* opaque fills for SVG frames & knobs */
+      --surface-2:rgba(8,12,22,.55);
+      --line:rgba(255,255,255,.12);
+      --line-strong:rgba(255,255,255,.24);
+      --grid:rgba(255,255,255,.05);
+      --faint:#7a8499;
+      --on:#2fd4c2;      --on-soft:rgba(47,212,194,.15);
+      --off:#ff6b6b;     --off-soft:rgba(255,107,107,.14);
+      --sig:#f2b24c;     --sig-soft:rgba(242,178,76,.16);  --sig-ink:#201203;
+      --coil:#a08bff;
+      --copper:#d98f52;
+      --wire:#66738c;
+      /* instrument screens stay dark — retinted to the site's blue-black */
+      --scope-bg:#070b14;
+      --scope-face:#0a1019;
+      --scope-grid:#1a2436;
+      --scope-a:#ff6b6b;
+      --scope-b:#f2b24c;
+      --scope-dim:#54627e;
+      --lcd-bg:#081019;
+      --lcd-ink:#3ee0ff;
+    }
+
+    .ss :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+    .ss .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+    .ss .disp{font-family:var(--display)}
+    .ss .fv-lead b{color:var(--ink)}
+    .ss sub,.ss sup{line-height:0}
+    .hidden{display:none!important}
+
+    /* ---------- section jump rail (same pattern as the numbering lab) ---------- */
+    .rail{position:sticky;top:64px;z-index:40;display:flex;gap:6px;overflow-x:auto;white-space:nowrap;align-items:center;
+      margin:0 0 8px;padding:10px 2px;background:linear-gradient(180deg,rgba(5,7,14,.94),rgba(5,7,14,.8));
+      backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-bottom:1px solid var(--glass-border);
+      scrollbar-width:none;overscroll-behavior-x:contain}
+    .rail::-webkit-scrollbar{display:none}
+    .rail.can-right{-webkit-mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 36px),transparent 100%);
+                            mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 36px),transparent 100%)}
+    .rail.can-left{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 36px,#000 100%);
+                           mask-image:linear-gradient(90deg,transparent 0,#000 36px,#000 100%)}
+    .rail.can-left.can-right{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 36px,#000 calc(100% - 36px),transparent 100%);
+                                     mask-image:linear-gradient(90deg,transparent 0,#000 36px,#000 calc(100% - 36px),transparent 100%)}
+    @media (min-width:900px){
+      .rail{flex-wrap:wrap;overflow-x:visible;white-space:normal;row-gap:6px}
+      .rail.can-left,.rail.can-right,.rail.can-left.can-right{-webkit-mask-image:none;mask-image:none}
+    }
+    .rail a{flex:none;font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);
+      border:1px solid var(--glass-border-2);border-radius:999px;padding:6px 12px}
+    .rail a:hover{color:var(--ink);border-color:var(--accent)}
+    .rail a.active{color:var(--accent);border-color:rgba(47,212,194,.5);background:var(--accent-soft)}
+
+    /* ---------- hero scope + stats ---------- */
+    .ss .hero__scope{margin-top:26px;border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--glass-border);
+      box-shadow:var(--shadow);background:var(--scope-bg)}
+    .ss .hero__scope canvas{width:100%;height:170px;display:block}
+    .ss .hero__stats{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+    .ss .stat{border:1px solid var(--glass-border);border-radius:10px;padding:11px 15px;background:var(--glass);
+      display:flex;flex-direction:column;gap:2px;min-width:118px}
+    .ss .stat b{font-family:var(--display);font-size:1.16rem;color:var(--ink)}
+    .ss .stat span{font-size:.62rem;color:var(--muted);font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase}
+
+    /* ---------- sections ---------- */
+    .ss .sect{padding:50px 0;border-top:1px solid var(--line);scroll-margin-top:132px}
+    .ss .sect__head{display:flex;flex-direction:column;gap:2px;margin-bottom:8px}
+    .ss .sect__head h2{font-family:var(--display);color:var(--ink);font-size:clamp(1.32rem,2.6vw,1.65rem);
+      letter-spacing:-.005em;margin:.35rem 0 0;text-wrap:balance}
+    .ss .sect__lead{color:var(--ink-2);max-width:66ch;font-size:.98rem;margin:6px 0 22px}
+    .ss .prose{max-width:70ch;color:var(--ink-2);font-size:.98rem}
+    .ss .prose p{margin:0 0 14px}
+    .ss .prose b,.ss .prose strong{color:var(--ink)}
+    .ss .prose p .k{font-weight:600;color:var(--ink);border-bottom:2px solid rgba(47,212,194,.4)}
+    .ss ul.prose{list-style:none;padding:0}
+    .ss .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    @media (max-width:720px){.ss .grid2{grid-template-columns:1fr}}
+
+    /* callouts */
+    .ss .callout{border:1px solid var(--glass-border);border-left:3px solid var(--sig);background:var(--surface-2);
+      padding:13px 16px;border-radius:0 10px 10px 0;margin:16px 0;font-size:.9rem;color:var(--ink-2)}
+    .ss .callout b{color:var(--ink)}
+    .ss .callout.rule{border-left-color:var(--on)}
+    .ss .callout.warn{border-left-color:var(--off)}
+
+    /* ---------- bench panels (glass instruments) ---------- */
+    .ss .bench{margin-top:26px;background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+      border:1px solid var(--glass-border);border-radius:var(--radius-lg);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.06),var(--shadow);overflow:hidden}
+    .ss .bench__bar{display:flex;align-items:center;gap:10px;padding:11px 16px;
+      border-bottom:1px solid var(--glass-border);background:rgba(8,12,22,.35)}
+    .ss .bench__dot{width:9px;height:9px;border-radius:50%;background:var(--sig);box-shadow:0 0 10px rgba(242,178,76,.55)}
+    .ss .bench__label{font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+    .ss .bench__hint{margin-left:auto;font-size:.66rem;color:var(--muted);font-family:var(--mono)}
+    .ss .bench__body{padding:20px}
+    .ss .bench__grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:22px}
+    @media (max-width:820px){.ss .bench__grid{grid-template-columns:1fr}}
+    .ss .bench--full .bench__grid{grid-template-columns:1fr}
+    .ss .bench--full .controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:14px 20px;align-items:end}
+    .ss .bench--full .readouts{grid-column:1/-1;grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+
+    .ss .stage{background:
+        linear-gradient(var(--grid) 1px,transparent 1px) 0 0/22px 22px,
+        linear-gradient(90deg,var(--grid) 1px,transparent 1px) 0 0/22px 22px,
+        rgba(8,12,22,.45);
+      border:1px solid var(--glass-border);border-radius:10px;
+      padding:14px;display:flex;align-items:center;justify-content:center;min-height:230px}
+    .ss .stage svg{width:100%;height:auto;display:block;max-width:100%}
+
+    /* ---------- controls ---------- */
+    .ss .controls{display:flex;flex-direction:column;gap:16px}
+    .ss .ctl{display:flex;flex-direction:column;gap:7px}
+    .ss .ctl__label{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:.7rem;color:var(--muted);
+      font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase}
+    .ss .ctl__label .v{color:var(--ink);font-weight:600;text-transform:none;letter-spacing:0;font-size:.8rem}
+    .ss input[type=range]{accent-color:var(--sig);min-height:30px;width:100%}
+
+    .ss .seg{display:inline-flex;background:rgba(8,12,22,.6);border:1px solid var(--glass-border);border-radius:8px;padding:3px;gap:3px;flex-wrap:wrap}
+    .ss .seg button{font-family:var(--body);padding:7px 13px;border-radius:6px;font-size:.82rem;color:var(--ink-2);font-weight:600;
+      background:none;border:0;cursor:pointer;transition:.15s;min-height:36px}
+    .ss .seg button:hover{color:var(--ink)}
+    .ss .seg button[aria-pressed="true"]{background:var(--sig);color:var(--sig-ink)}
+    .ss .seg.on button[aria-pressed="true"]{background:var(--on);color:#03140f}
+
+    .ss .bbtn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--glass-border-2);border-radius:8px;
+      padding:9px 15px;font-family:var(--body);font-size:.85rem;font-weight:600;color:var(--ink);
+      background:rgba(8,12,22,.5);cursor:pointer;transition:.15s}
+    .ss .bbtn:hover{border-color:var(--sig);color:var(--sig)}
+    .ss .bbtn.primary{background:var(--sig);color:var(--sig-ink);border-color:var(--sig)}
+    .ss .bbtn.primary:hover{filter:brightness(1.06);color:var(--sig-ink)}
+
+    .ss .selinput{background:rgba(8,12,22,.6);border:1px solid var(--glass-border);border-radius:8px;padding:9px 12px;
+      color:var(--ink);font-size:.88rem;font-family:var(--body);width:100%;min-height:42px;color-scheme:dark}
+    .ss .selinput:focus{border-color:var(--accent);outline:none}
+    .ss select.selinput option{background:#0d1220;color:var(--ink)}
+
+    /* big lever switch */
+    .ss .lever{display:inline-flex;flex-direction:column;align-items:center;gap:6px;user-select:none;cursor:pointer}
+    .ss .lever__track{width:60px;height:30px;border-radius:20px;background:rgba(255,255,255,.1);border:1px solid var(--glass-border-2);
+      position:relative;transition:background .18s}
+    .ss .lever__knob{position:absolute;top:2px;left:2px;width:24px;height:24px;border-radius:50%;background:var(--ink);
+      box-shadow:0 1px 3px rgba(0,0,0,.45);transition:transform .18s}
+    .ss .lever[data-on="1"] .lever__track{background:var(--on)}
+    .ss .lever[data-on="1"] .lever__knob{transform:translateX(30px)}
+    .ss .lever__cap{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+    /* readouts */
+    .ss .readouts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .ss .ro{background:rgba(8,12,22,.5);border:1px solid var(--glass-border);border-radius:10px;padding:10px 12px;
+      display:flex;flex-direction:column;gap:3px;min-width:0}
+    .ss .ro span{font-size:.58rem;font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .ss .ro b{font-family:var(--display);font-size:1.08rem;line-height:1.15;color:var(--ink);overflow-wrap:anywhere}
+    .ss .ro b small{font-size:.72rem;color:var(--muted);font-weight:500}
+    .ss .lcd{background:var(--lcd-bg);border:1px solid rgba(62,224,255,.15);border-radius:10px;padding:10px 12px}
+    .ss .lcd span{color:rgba(62,224,255,.45)}
+    .ss .lcd b{color:var(--lcd-ink);font-family:var(--mono);letter-spacing:.02em}
+
+    /* state chips */
+    .ss .chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:600;
+      font-family:var(--mono);letter-spacing:.03em;border:1px solid transparent}
+    .ss .chip::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+    .ss .chip.on{color:var(--on);background:var(--on-soft);border-color:rgba(47,212,194,.3)}
+    .ss .chip.off{color:var(--off);background:var(--off-soft);border-color:rgba(255,107,107,.3)}
+    .ss .chip.sig{color:var(--sig);background:var(--sig-soft);border-color:rgba(242,178,76,.3)}
+    .ss .chip.neutral{color:var(--ink-2);background:rgba(8,12,22,.5);border-color:var(--glass-border)}
+
+    /* scope screens inside benches */
+    .ss .scope{background:var(--scope-face);border:1px solid rgba(62,224,255,.1);border-radius:10px;padding:8px}
+    .ss .scope canvas{width:100%;height:130px;display:block;border-radius:4px}
+    .ss .scope__legend{display:flex;gap:16px;padding:6px 4px 0;font-family:var(--mono);font-size:.66rem;color:var(--scope-dim);flex-wrap:wrap}
+    .ss .scope__legend i{width:16px;height:3px;border-radius:2px;display:inline-block;vertical-align:middle;margin-right:6px}
+
+    /* explainer that updates */
+    .ss .explain{margin-top:14px;padding:13px 15px;border:1px dashed var(--glass-border-2);border-radius:10px;
+      background:rgba(8,12,22,.4);font-size:.88rem;color:var(--ink-2);min-height:54px}
+    .ss .explain b{color:var(--ink)}
+
+    /* schematic element states */
+    .ss .wire{stroke:var(--wire);stroke-width:2.4;fill:none;stroke-linecap:round;transition:stroke .2s}
+    .ss .wire.live{stroke:var(--sig)}
+    .ss .wire.hot{stroke:var(--on)}
+    .ss .wire.dead{stroke:var(--wire);opacity:.5}
+    .ss .ink{stroke:var(--ink);fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+    .ss .fillink{fill:var(--ink)}
+    .ss .node{fill:var(--ink)}
+    .ss .lbl{fill:var(--muted);font-family:var(--mono);font-size:12px}
+    .ss .lbl.b{fill:var(--ink);font-weight:600}
+    .ss .flow{stroke-dasharray:5 7;animation:ssflow 1s linear infinite}
+    @keyframes ssflow{to{stroke-dashoffset:-24}}
+    @media (prefers-reduced-motion:reduce){.ss .flow{animation:none}}
+
+    /* tables */
+    .ss .tbl{width:100%;border-collapse:collapse;font-size:.86rem;margin-top:6px;color:var(--ink-2)}
+    .ss .tbl th,.ss .tbl td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line)}
+    .ss .tbl th{font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500}
+    .ss .tbl td.mono,.ss .tbl th.mono{font-family:var(--mono)}
+    .ss .tbl tr.hit td{background:var(--sig-soft);color:var(--ink)}
+
+    /* truth table lights */
+    .ss .tt td .bit{display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center;border-radius:6px;
+      font-family:var(--mono);font-weight:600;font-size:.8rem;background:rgba(8,12,22,.55);border:1px solid var(--glass-border);color:var(--ink-2)}
+    .ss .tt td .bit.hi{background:var(--on-soft);color:var(--on);border-color:rgba(47,212,194,.35)}
+
+    /* byte map (HART frame) */
+    .ss .bytemap{display:flex;flex-wrap:wrap;gap:6px}
+    .ss .bchip{display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 11px;border:1px solid var(--glass-border-2);
+      border-radius:9px;background:rgba(8,12,22,.5);transition:.15s;cursor:pointer}
+    .ss .bchip span{font-family:var(--mono);font-size:.56rem;letter-spacing:.08em;color:var(--muted)}
+    .ss .bchip b{font-family:var(--mono);font-size:.85rem;color:var(--ink)}
+    .ss .bchip.pre{opacity:.55}
+    .ss .bchip:hover{border-color:var(--sig)}
+    .ss .bchip.sel{border-color:var(--sig);background:var(--sig-soft);opacity:1}
+    .ss .bchip.sel b{color:var(--sig)}
+
+    /* bit cells (UART framing / place values) */
+    .ss .bitrow{display:flex;flex-wrap:wrap;gap:4px}
+    .ss .bitcell{width:38px;padding:5px 0 4px;display:flex;flex-direction:column;align-items:center;gap:1px;
+      border:1px solid var(--glass-border);border-radius:8px;font-family:var(--mono);font-size:.8rem;font-weight:600;
+      color:var(--ink-2);background:rgba(8,12,22,.5)}
+    .ss .bitcell small{font-size:.53rem;font-weight:500;color:var(--muted);letter-spacing:.04em}
+    .ss .bitcell.hi{background:var(--on-soft);border-color:rgba(47,212,194,.35);color:var(--on)}
+    .ss .bitcell.lo{background:rgba(8,12,22,.65)}
+    .ss .bitcell.frame{background:rgba(8,12,22,.35);border-style:dashed;color:var(--muted)}
+    .ss button.bitcell{cursor:pointer}
+    .ss button.bitcell:hover{border-color:var(--sig)}
+
+    /* glossary */
+    .ss .gloss{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+    @media (max-width:720px){.ss .gloss{grid-template-columns:1fr}}
+    .ss .gloss dt{font-family:var(--display);font-weight:600;font-size:.92rem;color:var(--ink);margin-bottom:2px}
+    .ss .gloss dd{color:var(--ink-2);font-size:.85rem;margin:0}
+    .ss .gcard{border:1px solid var(--glass-border);border-radius:11px;padding:14px 16px;background:var(--glass)}
+
+    /* footer note */
+    .ss .foot{border-top:1px solid var(--line);margin-top:50px;padding-top:26px;color:var(--muted);font-size:.8rem}
+    .ss .foot .src{background:var(--glass);border:1px solid var(--glass-border);border-radius:11px;padding:14px 16px;color:var(--ink-2);margin-bottom:18px}
+    .ss .foot .src b{color:var(--ink)}
+  </style>
+</head>
+<body>
+<main class="pg-main">
+  <div class="pg-wrap--wide pg-wrap pg-lab ss">
+
+    <!-- ================= MASTHEAD ================= -->
+    <header class="pg-head" id="s-top">
+      <a class="pg-back" href="/education/">Field Pocket Guide</a>
+      <h1 class="fv-h2">Signals &amp; Switches</h1>
+      <p class="fv-lead">Digital electronics is built from just two things — a <b>1</b> and a <b>0</b>, carried as a high or low voltage. This is a working bench for the fundamentals: shape a clock, stream a byte, ride a HART frame on a 4–20&nbsp;mA loop, bias a diode the wrong way, energize a relay — and watch every output respond in real time.</p>
+      <div class="hero__scope"><canvas id="heroScope"></canvas></div>
+      <div class="hero__stats">
+        <div class="stat"><b>1 = 5&nbsp;V</b><span>logic high</span></div>
+        <div class="stat"><b>0 = 0&nbsp;V</b><span>logic low</span></div>
+        <div class="stat"><b>f = 1/t<sub>p</sub></b><span>freq · period</span></div>
+        <div class="stat"><b>0.7&nbsp;V</b><span>diode drop</span></div>
+        <div class="stat"><b>±0.5&nbsp;mA</b><span>hart fsk</span></div>
+        <div class="stat" id="statInteractive"><b>12</b><span>live modules</span></div>
+      </div>
+    </header>
+
+    <!-- ================= NAV RAIL ================= -->
+    <nav class="rail" id="rail" aria-label="Sections"></nav>
+
+    <!-- Sections are injected by JS -->
+    <div id="sections"></div>
+
+    <footer class="foot">
+      <div class="src">
+        <b>Signals &amp; Switches Lab.</b> A self-contained interactive reference on digital signals and the switches that carry them — from logic levels and clock math to serial data, ASCII, HART on the 4–20&nbsp;mA loop, diodes, transistors, and relays. Every module runs on real formulas, so what you read on the instruments is what the circuit would actually do.
+      </div>
+      <div>Runs entirely in your browser · no data leaves it.</div>
+    </footer>
+
+  </div>
+</main>
+<script>
+
+const $=(s,el=document)=>el.querySelector(s);
+const $$=(s,el=document)=>[...el.querySelectorAll(s)];
+const SVGNS="http://www.w3.org/2000/svg";
+function h(tag,attrs={},...kids){
+  const e=document.createElement(tag);
+  for(const k in attrs){
+    if(k==="class")e.className=attrs[k];
+    else if(k==="html")e.innerHTML=attrs[k];
+    else if(k.startsWith("on")&&typeof attrs[k]==="function")e.addEventListener(k.slice(2),attrs[k]);
+    else if(attrs[k]!==false&&attrs[k]!=null)e.setAttribute(k,attrs[k]);
+  }
+  for(const kid of kids.flat()){if(kid==null||kid===false)continue;e.append(kid.nodeType?kid:document.createTextNode(kid));}
+  return e;
+}
+function s(tag,attrs={},...kids){
+  const e=document.createElementNS(SVGNS,tag);
+  for(const k in attrs){if(attrs[k]!==false&&attrs[k]!=null)e.setAttribute(k,attrs[k]);}
+  for(const kid of kids.flat()){if(kid==null||kid===false)continue;e.append(kid);}
+  return e;
+}
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const prefersReduced=window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+
+// engineering-notation formatter
+function eng(value,unit){
+  if(value===0)return "0 "+unit;
+  const neg=value<0;value=Math.abs(value);
+  const pref=[["T",1e12],["G",1e9],["M",1e6],["k",1e3],["",1],["m",1e-3],["µ",1e-6],["n",1e-9],["p",1e-12]];
+  let chosen=pref[pref.length-1];
+  for(const p of pref){if(value>=p[1]){chosen=p;break;}}
+  const scaled=value/chosen[1];
+  const str=scaled>=100?scaled.toFixed(0):scaled>=10?scaled.toFixed(1):scaled.toFixed(2);
+  // strip trailing zeros ONLY after a decimal point (never from whole numbers like 500 -> 5)
+  const clean=str.indexOf(".")>=0?str.replace(/0+$/,"").replace(/\.$/,""):str;
+  return (neg?"-":"")+clean+" "+chosen[0]+unit;
+}
+
+/* ==================================================================
+   Section framework
+   ================================================================== */
+const SECTIONS=[]; // {id,num,title,lead,build(bodyEl)}
+function section(cfg){SECTIONS.push(cfg);}
+
+/* colour read helper for canvas (resolves CSS vars) */
+function cvar(name){return getComputedStyle(document.documentElement).getPropertyValue(name).trim();}
+/* safe canvas width (never 0 -> avoids divide-by-zero grid loops) */
+function cw(cv){return Math.max(1, cv.clientWidth || (cv.parentElement&&cv.parentElement.clientWidth) || 600);}
+/* draw a scope grid with guarded step (step<=0 draws nothing instead of looping forever) */
+function scopeGrid(ctx,w,ht,cols,rows){
+  ctx.strokeStyle=cvar("--scope-grid");ctx.lineWidth=1;
+  const sx=w/cols;if(sx>0)for(let x=0;x<=w+0.5;x+=sx){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,ht);ctx.stroke();}
+  const sy=ht/rows;if(sy>0)for(let y=0;y<=ht+0.5;y+=sy){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();}
+}
+
+/* ==================================================================
+   MODULE 1 — Logic levels
+   ================================================================== */
+section({id:"logic",num:"01",title:"Signals &amp; Logic Levels",
+lead:"Everything in digital electronics is a 1 or a 0 — carried by a high or a low voltage. Move the probe and watch the bit decide.",
+build(body){
+  body.append(
+    prose(`<p>A digital circuit only ever deals in <span class="k">1s and 0s</span>. Those logic states are represented physically by two voltage levels — conventionally <b>1&nbsp;=&nbsp;5&nbsp;V</b> (HIGH) and <b>0&nbsp;=&nbsp;0&nbsp;V</b> (LOW). On an oscilloscope a digital signal is just <b>voltage on the y-axis, time on the x-axis</b>.</p>
+    <p>Real gates can't switch at an exact midpoint, so a logic family reserves a <b>valid-HIGH band</b>, a <b>valid-LOW band</b>, and a forbidden zone between them. The probe below shows both the ideal 5&nbsp;V/0&nbsp;V view and the real TTL bands.</p>`)
+  );
+  const bench=makeBench("PROBE-01 · VOLTAGE → LOGIC","drag the probe");
+  body.append(bench.el);
+
+  // stage: vertical voltage column
+  const W=330,H=250;
+  const svg=s("svg",{viewBox:`0 0 ${W} ${H}`});
+  const barX=116,barW=76,top=22,bot=222,barH=bot-top;
+  const vToY=v=>bot-(v/5)*barH;
+  // frame
+  svg.append(s("rect",{x:barX,y:top,width:barW,height:barH,rx:7,fill:"var(--surface)",stroke:"var(--line-strong)","stroke-width":1.5}));
+  // TTL bands — persistent background (always visible in TTL mode)
+  const bandsTTL=s("g",{},
+    s("rect",{x:barX+2,width:barW-4,y:vToY(5),height:vToY(2.0)-vToY(5),fill:"var(--on-soft)"}),
+    s("rect",{x:barX+2,width:barW-4,y:vToY(2.0),height:vToY(0.8)-vToY(2.0),fill:"var(--off-soft)"}),
+    s("rect",{x:barX+2,width:barW-4,y:vToY(0.8),height:vToY(0)-vToY(0.8),fill:"var(--surface-2)"}));
+  const bandsIdeal=s("g",{},
+    s("rect",{x:barX+2,width:barW-4,y:vToY(5),height:vToY(2.5)-vToY(5),fill:"var(--on-soft)"}),
+    s("rect",{x:barX+2,width:barW-4,y:vToY(2.5),height:vToY(0)-vToY(2.5),fill:"var(--surface-2)"}));
+  svg.append(bandsTTL,bandsIdeal);
+  // boundary lines
+  const bLine=(v,col)=>s("line",{x1:barX+2,x2:barX+barW-2,y1:vToY(v),y2:vToY(v),stroke:col,"stroke-width":1.4,"stroke-dasharray":"3 3",opacity:.85});
+  const bndTTL=s("g",{},bLine(2.0,"var(--on)"),bLine(0.8,"var(--off)"));
+  const bndIdeal=s("g",{},bLine(2.5,"var(--sig)"));
+  svg.append(bndTTL,bndIdeal);
+  // translucent voltage fill (bands show through)
+  const fill=s("rect",{x:barX+2,width:barW-4,rx:5,fill:"var(--sig)",opacity:.18});
+  svg.append(fill);
+  // the reading — a bold level line across the bar
+  const levelLine=s("line",{x1:barX-3,x2:barX+barW+3,stroke:"var(--ink)","stroke-width":3.4,"stroke-linecap":"round"});
+  svg.append(levelLine);
+  // ticks
+  for(let v=0;v<=5;v++){
+    svg.append(s("line",{x1:barX-8,x2:barX,y1:vToY(v),y2:vToY(v),stroke:"var(--line-strong)","stroke-width":1.5}));
+    svg.append(s("text",{x:barX-12,y:vToY(v)+4,"text-anchor":"end",class:"lbl"},v+"V"));
+  }
+  // probe arrow on the right, pointing at the level
+  const probe=s("g",{});
+  const pTri=s("path",{d:"M0,0 L18,-9 L18,9 Z",fill:"var(--ink)"});
+  const pLine=s("line",{x1:18,x2:38,y1:0,y2:0,stroke:"var(--ink)","stroke-width":2.6,"stroke-linecap":"round"});
+  probe.append(pLine,pTri);
+  svg.append(probe);
+  // zone labels
+  const hiLbl=s("text",{x:barX+barW+44,class:"lbl b",fill:"var(--on)"},"HIGH");
+  const midLbl=s("text",{x:barX+barW+44,class:"lbl b",fill:"var(--off)"},"forbidden");
+  const loLbl=s("text",{x:barX+barW+44,class:"lbl b",fill:"var(--muted)"},"LOW");
+  hiLbl.setAttribute("y",vToY(3.5));midLbl.setAttribute("y",vToY(1.4));loLbl.setAttribute("y",vToY(0.35));
+  svg.append(hiLbl,midLbl,loLbl);
+  bench.stage.append(svg);
+
+  // controls
+  let voltage=5,mode="ttl";
+  const vLab=h("span",{class:"v mono"},"5.00 V");
+  const slider=h("input",{type:"range",min:0,max:5,step:0.01,value:5,"aria-label":"Probe voltage",
+    oninput:e=>{voltage=+e.target.value;update();}});
+  const modeSeg=seg(["Ideal 5V/0V","TTL bands"],1,i=>{mode=i?"ttl":"ideal";update();});
+  bench.controls.append(
+    ctl("Probe voltage",vLab,slider),
+    ctl("Threshold model",null,modeSeg),
+    readouts([["logic bit","roBit"],["logic level","roLvl"],["state","roState"],["reads as","roRead"]],bench)
+  );
+  const ex=explain(bench);
+
+  function update(){
+    const y=vToY(voltage);
+    fill.setAttribute("y",y);
+    fill.setAttribute("height",bot-y);
+    levelLine.setAttribute("y1",y);levelLine.setAttribute("y2",y);
+    probe.setAttribute("transform",`translate(${barX+barW+4},${y})`);
+    vLab.textContent=voltage.toFixed(2)+" V";
+    const ttl=mode==="ttl";
+    bandsTTL.style.display=ttl?"":"none";
+    bndTTL.style.display=ttl?"":"none";
+    bandsIdeal.style.display=ttl?"none":"";
+    bndIdeal.style.display=ttl?"none":"";
+    midLbl.style.display=ttl?"":"none";
+    let bit,lvl,state,cls,read,why;
+    if(mode==="ideal"){
+      bit=voltage>=2.5?"1":"0";lvl=bit==="1"?"HIGH":"LOW";
+      state=lvl;cls=bit==="1"?"on":"off";
+      read=bit;why=`In the idealized model any voltage above the midpoint reads HIGH. ${voltage.toFixed(2)}&nbsp;V → logic <b>${bit}</b>.`;
+    }else{
+      if(voltage>=2.0){bit="1";lvl="HIGH";state="valid HIGH";cls="on";read="1";why=`At ${voltage.toFixed(2)}&nbsp;V the input sits in the valid-HIGH band (≥&nbsp;2.0&nbsp;V), so the gate reads a solid <b>1</b>.`;}
+      else if(voltage<=0.8){bit="0";lvl="LOW";state="valid LOW";cls="off";read="0";why=`At ${voltage.toFixed(2)}&nbsp;V the input is in the valid-LOW band (≤&nbsp;0.8&nbsp;V), a solid <b>0</b>.`;}
+      else{bit="?";lvl="INVALID";state="forbidden zone";cls="sig";read="undefined";why=`${voltage.toFixed(2)}&nbsp;V lands in the <b>forbidden zone</b> (0.8–2.0&nbsp;V). A TTL gate's output here is unpredictable — this is why digital signals switch fast, to spend as little time as possible in this band.`;}
+    }
+    bench.ro.roBit.innerHTML=bit;
+    bench.ro.roBit.style.color=cls==="on"?"var(--on)":cls==="off"?"var(--off)":"var(--sig)";
+    bench.ro.roLvl.textContent=lvl;
+    bench.ro.roState.innerHTML=`<span class="chip ${cls}">${state}</span>`;
+    bench.ro.roRead.innerHTML=read;
+    ex.innerHTML=why;
+    const col=cls==="on"?"var(--on)":cls==="off"?"var(--off)":"var(--sig)";
+    fill.setAttribute("fill",col);
+    levelLine.setAttribute("stroke",col);
+    pTri.setAttribute("fill",col);pLine.setAttribute("stroke",col);
+  }
+  update();
+}});
+
+/* ==================================================================
+   MODULE 2 — Clock, period & frequency
+   ================================================================== */
+section({id:"clock",num:"02",title:"Clock, Period &amp; Frequency",
+lead:"A clock is a square wave that never stops. This screen is locked to exactly one unit of time — so the frequency you dial in is literally the number of pulses you can count.",
+build(body){
+  body.append(prose(`<p>A <span class="k">clock</span> (C<sub>p</sub>) is a repeating pulse train that paces every digital system. Its <b>period</b> t<sub>p</sub> is the time for one complete cycle — measured rising-edge to rising-edge (or falling to falling), <b>not</b> just the width of the high pulse. Its <b>frequency</b> f is how many of those cycles fit into one second, in <b>hertz (Hz)</b>. The two are reciprocals of each other:</p>`));
+  body.append(formula("f = 1 / tₚ","tₚ = 1 / f"));
+
+  const bench=makeBench("CLOCK-02 · ONE-UNIT SCREEN","count the pulses",true);
+  body.append(bench.el);
+
+  const scope=h("div",{class:"scope"});
+  const cv=h("canvas",{style:"height:224px"});scope.append(cv);
+  scope.append(h("div",{class:"scope__legend"},
+     h("span",{},h("i",{style:"background:var(--scope-a)"}),"Cp"),
+     h("span",{},h("i",{style:"background:var(--scope-b)"}),"tₚ marker"),
+     h("span",{id:"clkWin",style:"margin-left:auto"},"")));
+  bench.stage.style.padding="10px";bench.stage.style.background="none";bench.stage.style.border="none";
+  bench.stage.append(scope);
+
+  let fb=4, mult=1e3, duty=50, running=true, phase=0, last=0;
+  // [frequency unit, screen-width label, time-axis unit]
+  const UNITS={1:["Hz","1 s","s"],1e3:["kHz","1 ms","ms"],1e6:["MHz","1 µs","µs"]};
+
+  const fLab=h("span",{class:"v mono"},"4.0 kHz");
+  const fSlider=h("input",{type:"range",min:1,max:10,step:0.1,value:4,"aria-label":"Frequency",
+    oninput:e=>{fb=+e.target.value;update();}});
+  const unitSeg=seg(["Hz","kHz","MHz"],1,i=>{mult=[1,1e3,1e6][i];update();});
+  const dLab=h("span",{class:"v mono"},"50 %");
+  const dSlider=h("input",{type:"range",min:10,max:90,step:1,value:50,"aria-label":"Duty cycle",
+    oninput:e=>{duty=+e.target.value;update();}});
+  const runBtn=h("button",{class:"bbtn",onclick:()=>{running=!running;runBtn.innerHTML=running?"⏸ Pause":"▶ Run";}},"⏸ Pause");
+  bench.controls.append(
+    ctl("Frequency",fLab,fSlider),
+    ctl("Unit — the screen scales with it",null,unitSeg),
+    ctl("Duty cycle",dLab,dSlider),
+    h("div",{},runBtn),
+    readouts([["frequency","roF"],["period tₚ","roT"],["high time","roHi"],["pulses on screen","roCyc"]],bench)
+  );
+  const ex=explain(bench);
+
+  function update(){
+    const [fu,winLabel]=UNITS[mult];
+    const f=fb*mult, tp=1/f;
+    fLab.textContent=fb.toFixed(1)+" "+fu;
+    dLab.textContent=duty+" %";
+    bench.ro.roF.innerHTML=eng(f,"Hz");
+    bench.ro.roT.innerHTML=eng(tp,"s");
+    bench.ro.roHi.innerHTML=eng(tp*duty/100,"s");
+    bench.ro.roCyc.innerHTML=fb.toFixed(1)+' <small>per '+winLabel+'</small>';
+    $("#clkWin",bench.el).textContent="screen = "+winLabel;
+    ex.innerHTML=`At <b>${fb.toFixed(1)} ${fu}</b> each cycle takes t<sub>p</sub> = 1/f = <b>${eng(tp,"s")}</b>, so exactly <b>${fb.toFixed(1)}</b> cycles fit on this ${winLabel} screen. Switch the unit and the picture doesn't move — only the labels scale: ${fb.toFixed(1)}&nbsp;kHz across 1&nbsp;ms looks identical to ${fb.toFixed(1)}&nbsp;MHz across 1&nbsp;µs. That symmetry <i>is</i> f&nbsp;=&nbsp;1/tₚ.`;
+  }
+  update();
+
+  function draw(ts){
+    const dt=last?(ts-last)/1000:0;last=ts;
+    if(running&&!prefersReduced)phase=(phase+dt*0.35)%1;
+    const dpr=Math.min(2,window.devicePixelRatio||1);
+    const w=cw(cv),ht=224;
+    cv.width=w*dpr;cv.height=ht*dpr;const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,ht);
+    const plotB=ht-24;                        // reserve the bottom strip for the time axis
+    ctx.strokeStyle=cvar("--scope-grid");ctx.lineWidth=1;
+    for(let i=0;i<=10;i++){const x=i*w/10;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,plotB);ctx.stroke();}
+    for(let j=0;j<=4;j++){const y=j*plotB/4;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();}
+    // time axis — the unit lives ON the graph
+    const winUnit=UNITS[mult][2];
+    ctx.fillStyle=cvar("--scope-dim");ctx.font="10px 'IBM Plex Mono',monospace";ctx.textAlign="center";
+    for(let i=0;i<=10;i+=2){ctx.fillText((i/10).toFixed(1)+" "+winUnit,clamp(i*w/10,22,w-26),ht-8);}
+    ctx.textAlign="left";
+    // waveform — exactly fb cycles across the screen
+    const hi=plotB*0.2, lo=plotB*0.8, per=w/fb, dc=duty/100, off=phase*per;
+    ctx.strokeStyle=cvar("--scope-a");ctx.lineWidth=2.6;ctx.lineJoin="round";ctx.beginPath();
+    let started=false;
+    for(let c=-1;c<=fb+1;c++){
+      const x0=c*per-off,xh=x0+per*dc,x1=x0+per;
+      for(const[px,py]of[[x0,lo],[x0,hi],[xh,hi],[xh,lo],[x1,lo]]){
+        if(!started){ctx.moveTo(px,py);started=true;}else ctx.lineTo(px,py);}
+    }
+    ctx.stroke();
+    // tp bracket between two successive rising edges, labeled with its value
+    const mx0=per-off,mx1=2*per-off;
+    ctx.strokeStyle=cvar("--scope-b");ctx.setLineDash([4,4]);ctx.lineWidth=1.3;
+    [mx0,mx1].forEach(mx=>{ctx.beginPath();ctx.moveTo(mx,8);ctx.lineTo(mx,plotB-4);ctx.stroke();});
+    ctx.setLineDash([]);
+    ctx.beginPath();ctx.moveTo(mx0,16);ctx.lineTo(mx1,16);ctx.stroke();
+    ctx.fillStyle=cvar("--scope-b");ctx.font="11px 'IBM Plex Mono',monospace";
+    ctx.fillText("tₚ = "+eng(1/(fb*mult),"s"),Math.max(mx0+6,4),30);
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+
+  // ---- the math, worked cleanly ----
+  const extra=h("div",{class:"grid2",style:"margin-top:24px"});
+  const tbl=h("table",{class:"tbl"});
+  tbl.innerHTML=`<thead><tr><th>Prefix</th><th>Abbr.</th><th class="mono">Power of 10</th></tr></thead><tbody>
+   <tr><td>Tera</td><td class="mono">T</td><td class="mono">10¹²</td></tr>
+   <tr><td>Giga</td><td class="mono">G</td><td class="mono">10⁹</td></tr>
+   <tr><td>Mega</td><td class="mono">M</td><td class="mono">10⁶</td></tr>
+   <tr><td>Kilo</td><td class="mono">k</td><td class="mono">10³</td></tr>
+   <tr><td>Milli</td><td class="mono">m</td><td class="mono">10⁻³</td></tr>
+   <tr><td>Micro</td><td class="mono">µ</td><td class="mono">10⁻⁶</td></tr>
+   <tr><td>Nano</td><td class="mono">n</td><td class="mono">10⁻⁹</td></tr>
+   <tr><td>Pico</td><td class="mono">p</td><td class="mono">10⁻¹²</td></tr></tbody>`;
+  extra.append(
+    h("div",{class:"gcard"},
+      h("div",{class:"bench__label",style:"margin-bottom:8px;color:var(--muted)"},"ENGINEERING PREFIXES"),tbl,
+      h("div",{class:"callout",style:"margin-top:14px;margin-bottom:0"},h("span",{html:"<b>Shortcut:</b> reciprocal prefixes flip — 1/milli&nbsp;=&nbsp;kilo, 1/micro&nbsp;=&nbsp;mega, 1/nano&nbsp;=&nbsp;giga. So 50&nbsp;ns&nbsp;→&nbsp;20&nbsp;MHz in your head."}))),
+    h("div",{style:"display:flex;flex-direction:column;gap:12px"},
+      mathSteps("Given f = 8 MHz — find tₚ",["tₚ = 1 / f","tₚ = 1 / (8 × 10⁶ Hz)","tₚ = 0.125 × 10⁻⁶ s","tₚ = 125 ns"]),
+      mathSteps("Given tₚ = 50 ns — find f",["f = 1 / tₚ","f = 1 / (50 × 10⁻⁹ s)","f = 0.02 × 10⁹ Hz","f = 20 MHz"]),
+      mathSteps("Given f = 2.6 GHz — find tₚ",["tₚ = 1 / (2.6 × 10⁹ Hz)","tₚ = 0.3846 × 10⁻⁹ s","tₚ ≈ 385 ps"])));
+  body.append(extra);
+}});
+function mathSteps(title,lines){
+  return h("div",{class:"gcard"},
+    h("div",{class:"bench__label",style:"margin-bottom:8px;color:var(--muted)"},title),
+    ...lines.map((l,i)=>h("div",{class:"mono",style:`font-size:13.5px;padding:2.5px 0;${i===lines.length-1?"color:var(--sig);font-weight:600":"color:var(--muted)"}`},l)));
+}
+
+/* ==================================================================
+   MODULE 3 — Serial vs Parallel
+   ================================================================== */
+section({id:"serial",num:"03",title:"Serial vs. Parallel",
+lead:"The same byte can travel down one wire, one bit at a time, or down eight wires all at once. Send it both ways and time the race.",
+build(body){
+  body.append(prose(`<p>Bits are transmitted at a rate measured in <b>bits-per-second (bps)</b>. There are two ways to move a multi-bit number:</p>
+  <p><b>Serial</b> sends the bits one after another on a <b>single line</b> — an 8-bit byte takes 8 clock periods. <b>Parallel</b> puts every bit on its <b>own wire</b>, so the whole byte crosses in a <b>single</b> clock period. Parallel is faster; serial needs fewer wires. If t<sub>p</sub> = 2&nbsp;µs, a byte is 16&nbsp;µs serial but only 2&nbsp;µs parallel.</p>`));
+
+  const bench=makeBench("XMIT-03 · SEND A BYTE","serial vs parallel");
+  body.append(bench.el);
+
+  let bits=[0,1,1,0,1,1,0,0]; // MSB..LSB
+  let baud=9600, tp=1/9600, playing=false, t0=0, raf=null;
+
+  // stage: ONE scope with a shared time axis — serial lane on top, eight parallel lanes below
+  const box=h("div",{class:"scope",style:"padding:8px"});
+  const cv=h("canvas",{style:"width:100%;height:360px;display:block"});
+  box.append(h("div",{class:"scope__legend",style:"padding-bottom:6px"},
+    h("span",{},h("i",{style:"background:var(--scope-a)"}),"Serial — 1 line"),
+    h("span",{},h("i",{style:"background:var(--scope-b)"}),"Parallel — 8 lines"),
+    h("span",{style:"margin-left:auto"},"shared time axis · 8 bit periods")),cv);
+  bench.stage.style.padding="0";bench.stage.style.background="none";bench.stage.style.border="none";bench.stage.append(box);
+
+  // controls: 8 bit toggles + presets + period + transmit
+  const bitRow=h("div",{style:"display:flex;gap:5px;flex-wrap:wrap"});
+  function renderBits(){
+    bitRow.innerHTML="";
+    bits.forEach((b,i)=>{
+      bitRow.append(h("button",{class:"bbtn",style:`padding:8px 0;width:34px;justify-content:center;${b?"background:var(--on);color:#fff;border-color:var(--on)":""}`,
+        onclick:()=>{bits[i]^=1;renderBits();drawStatic();}},String(b)));
+    });
+  }
+  renderBits();
+  const presets=h("div",{style:"display:flex;gap:6px;flex-wrap:wrap"},
+    h("button",{class:"bbtn",onclick:()=>{setByte(0b01101100);}},"01101100"),
+    h("button",{class:"bbtn",onclick:()=>{setByte(0x4D);}},"'M' 0x4D"),
+    h("button",{class:"bbtn",onclick:()=>{setByte(Math.floor(Math.random()*256));}},"↻ Random"));
+  function setByte(v){bits=[7,6,5,4,3,2,1,0].map(i=>(v>>i)&1);renderBits();drawStatic();}
+  const baudSeg=seg(["300","1200","9600","115200"],2,i=>{baud=[300,1200,9600,115200][i];tp=1/baud;upTimes();drawStatic(1);});
+  const txBtn=h("button",{class:"bbtn primary",onclick:()=>transmit()},"▶ Transmit");
+  bench.controls.append(
+    ctl("Byte (MSB → LSB)",null,bitRow),
+    h("div",{},presets),
+    ctl("Line rate (bps)",null,baudSeg),
+    h("div",{},txBtn),
+    readouts([["bit time","roBt"],["serial byte (8 bits)","roSer"],["parallel transfer","roPar"],["byte value","roVal"]],bench)
+  );
+  const ex=explain(bench);
+  ex.innerHTML="Set a byte, then press <b>Transmit</b> to watch it stream serially on one line versus arriving all-at-once in parallel.";
+
+  function upTimes(){
+    bench.ro.roBt.innerHTML=eng(tp,"s");
+    bench.ro.roSer.innerHTML=eng(tp*8,"s");
+    bench.ro.roPar.innerHTML=eng(tp,"s");
+    const val=bits.reduce((a,b)=>a*2+b,0);
+    bench.ro.roVal.innerHTML=val+" <small>0x"+val.toString(16).toUpperCase().padStart(2,"0")+"</small>";
+  }
+  upTimes();
+
+  const SUPS=["⁰","¹","²","³","⁴","⁵","⁶","⁷"];
+  function drawStatic(prog=1){
+    upTimes();
+    const dpr=Math.min(2,window.devicePixelRatio||1);const w=cw(cv),ht=360;
+    cv.width=w*dpr;cv.height=ht*dpr;const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,ht);
+    const mL=42, mR=88, plotW=w-mL-mR, cellW=plotW/8, axisY=ht-18;
+    const t=prog*8;                                     // elapsed time in bit periods
+    const laneH=(axisY-10)/9;                           // lane 0 = serial, 1..8 = parallel
+    // shared bit-period gridlines
+    ctx.strokeStyle=cvar("--scope-grid");ctx.lineWidth=1;
+    for(let i=0;i<=8;i++){const x=mL+i*cellW;ctx.beginPath();ctx.moveTo(x,6);ctx.lineTo(x,axisY-2);ctx.stroke();}
+    // separator under the serial lane
+    ctx.beginPath();ctx.moveTo(mL,10+laneH);ctx.lineTo(mL+plotW,10+laneH);ctx.stroke();
+    // time axis labels — the same clock for both
+    ctx.fillStyle=cvar("--scope-dim");ctx.font="9.5px 'IBM Plex Mono',monospace";ctx.textAlign="center";
+    for(let i=0;i<=8;i++)ctx.fillText(i===0?"0":i+"·tₚ",mL+i*cellW,ht-6);
+    ctx.textAlign="left";
+    // ---- lane 0: serial ----
+    const sy=10, sHi=sy+laneH*0.14, sLo=sy+laneH*0.68;
+    ctx.fillStyle=cvar("--scope-dim");ctx.font="10px 'IBM Plex Mono',monospace";
+    ctx.fillText("Sₒ",mL-32,sy+laneH*0.48);
+    const upto=Math.min(t,8);
+    ctx.strokeStyle=cvar("--scope-a");ctx.lineWidth=2.4;ctx.lineJoin="round";ctx.beginPath();
+    let first=true,py=0;
+    for(let i=0;i<8;i++){
+      if(i>upto)break;
+      const x0=mL+i*cellW,y=bits[i]?sHi:sLo;
+      if(first){ctx.moveTo(x0,y);first=false;}else{ctx.lineTo(x0,py);ctx.lineTo(x0,y);}
+      ctx.lineTo(mL+Math.min(i+1,upto)*cellW,y);py=y;
+    }
+    ctx.stroke();
+    ctx.textAlign="center";ctx.font="10px 'IBM Plex Mono',monospace";
+    for(let i=0;i<8;i++){
+      if(i+0.5>upto)break;
+      ctx.fillStyle=bits[i]?cvar("--on"):cvar("--scope-dim");
+      ctx.fillText(String(bits[i]),mL+(i+0.5)*cellW,sy+laneH*0.94);
+    }
+    ctx.textAlign="left";
+    if(upto>=8){ctx.fillStyle=cvar("--on");ctx.fillText("✓ 8·tₚ",mL+plotW+6,sy+laneH*0.5);}
+    // ---- lanes 1..8: parallel — every line switches on the FIRST clock edge ----
+    for(let r=0;r<8;r++){
+      const v=bits[r];                                   // bits[0] = 2⁷ (top row)
+      const ly=10+(r+1)*laneH, yh=ly+laneH*0.2, yl=ly+laneH*0.74;
+      ctx.fillStyle=cvar("--scope-dim");ctx.font="9px 'IBM Plex Mono',monospace";
+      ctx.fillText("2"+SUPS[7-r],mL-32,ly+laneH*0.55);
+      ctx.strokeStyle=cvar("--scope-b");ctx.lineWidth=2;
+      ctx.globalAlpha=t>0?1:.5;
+      ctx.beginPath();ctx.moveTo(mL,yl);
+      if(t>0){
+        const edge=mL+cellW*0.12, xe=mL+Math.min(t,8)*cellW;
+        ctx.lineTo(Math.min(edge,xe),yl);
+        if(xe>edge){ctx.lineTo(edge,v?yh:yl);ctx.lineTo(xe,v?yh:yl);}
+      }else ctx.lineTo(mL+plotW,yl);
+      ctx.stroke();ctx.globalAlpha=1;
+      if(t>=1){ctx.fillStyle=v?cvar("--on"):cvar("--scope-dim");ctx.fillText(String(v),mL+plotW+8,ly+laneH*0.6);}
+    }
+    // parallel completion marker at 1·tₚ
+    if(t>=1){
+      ctx.strokeStyle=cvar("--on");ctx.setLineDash([4,4]);ctx.lineWidth=1.4;
+      ctx.beginPath();ctx.moveTo(mL+cellW,10+laneH);ctx.lineTo(mL+cellW,axisY-2);ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle=cvar("--on");ctx.font="10px 'IBM Plex Mono',monospace";
+      ctx.fillText("✓ whole byte at 1·tₚ",mL+cellW+6,10+laneH+13);
+    }
+    // sweep cursor
+    if(prog>0&&prog<1){
+      ctx.strokeStyle=cvar("--sig");ctx.lineWidth=1.6;
+      ctx.beginPath();ctx.moveTo(mL+t*cellW,6);ctx.lineTo(mL+t*cellW,axisY-2);ctx.stroke();
+    }
+  }
+  requestAnimationFrame(()=>drawStatic(1));
+  window.addEventListener("resize",()=>drawStatic(1));
+
+  function transmit(){
+    if(playing)return;playing=true;txBtn.textContent="… sending";
+    const dur=prefersReduced?200:2600;const start=performance.now();
+    ex.innerHTML=`Watch the shared time axis: the parallel bus latches every line on the first clock edge and is <b>finished at 1·tₚ</b>, while the serial line keeps shifting until <b>8·tₚ</b>.`;
+    function step(now){
+      const p=clamp((now-start)/dur,0,1);drawStatic(p);
+      if(p<1){raf=requestAnimationFrame(step);}else{playing=false;txBtn.innerHTML="▶ Transmit";
+        ex.innerHTML=`Done. Serial took <b>${eng(tp*8,"s")}</b> (8&nbsp;×&nbsp;t<sub>p</sub>); parallel finished in <b>${eng(tp,"s")}</b> — an <b>8×</b> speed-up for 8× the wires.`;}
+    }
+    raf=requestAnimationFrame(step);
+  }
+
+  // ---- baud rates, bps and Hz ----
+  const extra=h("div",{class:"grid2",style:"margin-top:24px"});
+  const btbl=h("table",{class:"tbl"});
+  btbl.innerHTML=`<thead><tr><th>Rate</th><th>Bit time</th><th class="mono">Chars/sec (8N1)</th></tr></thead><tbody>
+   <tr><td class="mono">300 bps</td><td class="mono">3.33 ms</td><td class="mono">30</td></tr>
+   <tr><td class="mono">1200 bps</td><td class="mono">833 µs</td><td class="mono">120</td></tr>
+   <tr><td class="mono">9600 bps</td><td class="mono">104 µs</td><td class="mono">960</td></tr>
+   <tr><td class="mono">19200 bps</td><td class="mono">52.1 µs</td><td class="mono">1 920</td></tr>
+   <tr><td class="mono">115200 bps</td><td class="mono">8.68 µs</td><td class="mono">11 520</td></tr></tbody>`;
+  extra.append(
+    h("div",{class:"gcard"},
+      h("div",{class:"bench__label",style:"margin-bottom:8px;color:var(--muted)"},"COMMON BAUD RATES"),btbl,
+      h("p",{style:"font-size:13px;color:var(--muted);margin-top:10px",html:"Real UART links wrap each byte in a start and a stop bit — 10 bits per character — so 9600 baud moves ≈ 960 characters/second."})),
+    h("div",{style:"display:flex;flex-direction:column;gap:0"},
+      h("div",{class:"callout"},h("span",{html:"<b>bps vs. Hz.</b> Hertz counts waveform <i>cycles</i> per second; bps counts <i>bits</i>. The fastest pattern (1010…) completes one full high-low cycle every <b>two</b> bits — so a 9600 bps line's fastest square wave is only 4 800 Hz."})),
+      h("div",{class:"callout rule"},h("span",{html:"<b>Baud vs. bps.</b> Baud counts <i>symbol changes</i> per second. With two-level signaling one symbol carries one bit, so 9600 baud = 9600 bps — the terms are interchangeable on simple serial links. (Modems that pack several bits into each symbol are where the two diverge.)"}))));
+  body.append(extra);
+}});
+
+/* ==================================================================
+   MODULE 4 — Binary ↔ ASCII
+   ================================================================== */
+section({id:"ascii",num:"04",title:"Binary ↔ ASCII",
+lead:"Text is numbers. Every character has an 8-bit code — and those eight bits are exactly what travels down the serial line or across the parallel bus.",
+build(body){
+  body.append(prose(`<p><span class="k">ASCII</span> assigns every character a number: <b>'A' = 65</b>, <b>'a' = 97</b>, <b>'0' = 48</b>. Write that number in base-2 and you have the eight bits a link actually carries. On a serial line the code leaves <b>LSB first</b>; on a parallel bus all eight bits land on their own wires in a single clock. Multi-character text just repeats the process — sending <b>"MP3"</b> streams the codes 0x4D, 0x50, 0x33 one after another. Strict ASCII is <b>7-bit</b> (codes 0–127) — the eighth bit was classically used for parity, and codes above 127 belong to extended character sets.</p>`));
+
+  const bench=makeBench("ASCII-04 · CHARACTER → CODE → WIRES","edit the bits",true);
+  body.append(bench.el);
+
+  const SUP=["⁰","¹","²","³","⁴","⁵","⁶","⁷"];
+  let code=65;
+  const printable=c=>c>=32&&c<127;
+
+  // ---- stage: character + place-value bit editor + both wire views ----
+  const wrap=h("div",{style:"width:100%;display:flex;flex-direction:column;gap:14px"});
+  const topRow=h("div",{style:"display:flex;gap:20px;align-items:center;flex-wrap:wrap"});
+  const charBox=h("div",{class:"disp",style:"font-size:52px;font-weight:700;min-width:86px;text-align:center;border:1px solid var(--line);border-radius:12px;padding:4px 12px;background:var(--surface);line-height:1.3"},"A");
+  const bitsBox=h("div",{});
+  topRow.append(charBox,bitsBox);
+  const serBox=h("div",{class:"scope",style:"padding:8px"});
+  const serCv=h("canvas",{style:"height:108px"});
+  serBox.append(h("div",{class:"scope__legend",style:"padding-bottom:6px"},h("span",{},h("i",{style:"background:var(--scope-a)"}),"Serial — one line, LSB first")),serCv);
+  const parBox=h("div",{class:"scope",style:"padding:8px"});
+  const parCv=h("canvas",{style:"height:150px"});
+  parBox.append(h("div",{class:"scope__legend",style:"padding-bottom:6px"},h("span",{},h("i",{style:"background:var(--scope-b)"}),"Parallel — eight lines, one clock")),parCv);
+  wrap.append(topRow,serBox,parBox);
+  bench.stage.style.padding="0";bench.stage.style.background="none";bench.stage.style.border="none";
+  bench.stage.append(wrap);
+
+  // ---- controls ----
+  const input=h("input",{type:"text",maxlength:"1",value:"A",class:"selinput","aria-label":"Character",
+     style:"font-family:'IBM Plex Mono',monospace;font-size:16px;text-align:center",
+     oninput:e=>{const v=e.target.value;if(v.length){code=v.charCodeAt(0)&0xFF;render();}}});
+  const presets=h("div",{style:"display:flex;gap:6px;flex-wrap:wrap"},
+    ..."AMz3%".split("").map(chn=>h("button",{class:"bbtn",style:"padding:8px 13px",
+      onclick:()=>{code=chn.charCodeAt(0);input.value=chn;render();}},chn)));
+  bench.controls.append(
+    ctl("Type a character",null,input),
+    ctl("Presets",null,presets),
+    readouts([["character","roCh"],["decimal","roDec"],["hex","roHex"],["binary (MSB→LSB)","roBin"]],bench)
+  );
+  const ex=explain(bench);
+
+  const bitsArr=()=>[7,6,5,4,3,2,1,0].map(i=>(code>>i)&1);
+
+  function renderBits(){
+    bitsBox.innerHTML="";
+    const hdr=h("div",{class:"bitrow"});
+    const row=h("div",{class:"bitrow"});
+    [7,6,5,4,3,2,1,0].forEach(i=>{
+      hdr.append(h("div",{class:"bitcell frame",style:"border:none;background:none"},
+        h("small",{style:"font-size:10px;color:var(--muted)"},"2"+SUP[i]),h("small",{},String(1<<i))));
+      const v=(code>>i)&1;
+      row.append(h("button",{class:"bitcell "+(v?"hi":"lo"),"aria-label":"Toggle bit "+i,
+        onclick:()=>{code^=(1<<i);input.value=printable(code)?String.fromCharCode(code):"";render();}},String(v)));
+    });
+    bitsBox.append(hdr,row);
+  }
+
+  function drawSerial(){
+    const dpr=Math.min(2,window.devicePixelRatio||1);const w=cw(serCv),ht=108;
+    serCv.width=w*dpr;serCv.height=ht*dpr;const ctx=serCv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,ht);scopeGrid(ctx,w,ht-30,8,1);
+    const cell=w/8,hi=(ht-30)*0.2,lo=(ht-30)*0.8;
+    const order=[0,1,2,3,4,5,6,7].map(i=>(code>>i)&1);   // LSB first on the wire
+    ctx.strokeStyle=cvar("--scope-a");ctx.lineWidth=2.4;ctx.lineJoin="round";ctx.beginPath();
+    let py=order[0]?hi:lo;ctx.moveTo(0,py);
+    order.forEach((b,i)=>{const y=b?hi:lo;ctx.lineTo(i*cell,py);ctx.lineTo(i*cell,y);ctx.lineTo((i+1)*cell,y);py=y;});
+    ctx.stroke();
+    ctx.font="10px 'IBM Plex Mono',monospace";ctx.textAlign="center";
+    order.forEach((b,i)=>{
+      ctx.fillStyle=b?cvar("--on"):cvar("--scope-dim");
+      ctx.fillText(String(b),(i+0.5)*cell,ht-18);
+      ctx.fillStyle=cvar("--scope-dim");
+      ctx.fillText("2"+SUP[i],(i+0.5)*cell,ht-5);
+    });
+    ctx.textAlign="left";
+    ctx.fillStyle=cvar("--scope-dim");ctx.fillText("first →",4,11);
+  }
+
+  function drawParallel(){
+    const dpr=Math.min(2,window.devicePixelRatio||1);const w=cw(parCv),ht=150;
+    parCv.width=w*dpr;parCv.height=ht*dpr;const ctx=parCv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,ht);scopeGrid(ctx,w,ht,8,1);
+    const rows=8,rh=ht/rows,sw=w*0.3;
+    for(let i=0;i<8;i++){
+      const bitIdx=7-i, v=(code>>bitIdx)&1;
+      const yh=i*rh+rh*0.22, yl=i*rh+rh*0.78;
+      ctx.strokeStyle=cvar("--scope-b");ctx.lineWidth=2;ctx.beginPath();
+      ctx.moveTo(24,yl);ctx.lineTo(sw,yl);ctx.lineTo(sw,v?yh:yl);ctx.lineTo(w-26,v?yh:yl);ctx.stroke();
+      ctx.font="9px 'IBM Plex Mono',monospace";
+      ctx.fillStyle=cvar("--scope-dim");ctx.fillText("2"+SUP[bitIdx],4,i*rh+rh/2+3);
+      ctx.fillStyle=v?cvar("--on"):cvar("--scope-dim");ctx.fillText(String(v),w-16,i*rh+rh/2+3);
+    }
+  }
+
+  const CTRL=["NUL","SOH","STX","ETX","EOT","ENQ","ACK","BEL","BS","TAB","LF","VT","FF","CR","SO","SI","DLE","DC1","DC2","DC3","DC4","NAK","SYN","ETB","CAN","EM","SUB","ESC","FS","GS","RS","US"];
+  const CTRLFULL={NUL:"null",BEL:"bell",BS:"backspace",TAB:"tab",LF:"line feed",CR:"carriage return",ESC:"escape",DEL:"delete"};
+  function charInfo(c){
+    if(c>=32&&c<127)return{big:String.fromCharCode(c),name:"'"+String.fromCharCode(c)+"'",kind:"print"};
+    if(c<32)return{big:CTRL[c],name:CTRL[c]+(CTRLFULL[CTRL[c]]?" · "+CTRLFULL[CTRL[c]]:""),kind:"ctrl"};
+    if(c===127)return{big:"DEL",name:"DEL · delete",kind:"ctrl"};
+    return{big:"EXT",name:"code "+c+" · beyond 7-bit ASCII",kind:"ext"};
+  }
+  function render(){
+    const info=charInfo(code);
+    charBox.textContent=info.big;
+    charBox.style.fontSize=info.kind==="print"?"52px":"22px";
+    charBox.style.color=info.kind==="print"?"var(--ink)":"var(--sig)";
+    renderBits();drawSerial();drawParallel();
+    bench.ro.roCh.textContent=info.name;
+    bench.ro.roDec.textContent=code;
+    bench.ro.roHex.textContent="0x"+code.toString(16).toUpperCase().padStart(2,"0");
+    bench.ro.roBin.innerHTML=bitsArr().join("");
+    const set=[7,6,5,4,3,2,1,0].filter(i=>(code>>i)&1);
+    const base=`= <b>${code}</b>${set.length?" = "+set.map(i=>"2"+SUP[i]).join(" + "):""} = <b>0b${bitsArr().join("")}</b>. Serially, the LSB (${code&1}) leaves first; in parallel, ${set.length?"line"+(set.length>1?"s ":" ")+set.map(i=>"2"+SUP[i]).join(", ")+" sit"+(set.length>1?"":"s")+" HIGH":"every line sits LOW"} for one clock.`;
+    if(info.kind==="print")ex.innerHTML=`'<b>${info.big}</b>' ${base}`;
+    else if(info.kind==="ctrl")ex.innerHTML=`<b>${info.name}</b> ${base} Codes 0–31 are <b>control characters</b> — they steer the terminal (line feed, carriage return, escape…) instead of printing, but every bit pattern still means something.`;
+    else ex.innerHTML=`<b>Code ${code}</b> ${base} ASCII proper is <b>7-bit</b> (0–127); with bit 2⁷ set you're in the extended range, where different code pages assign different symbols.`;
+  }
+  render();
+  window.addEventListener("resize",render);
+}});
+
+/* ==================================================================
+   MODULE 5 — HART on the 4–20 mA loop
+   ================================================================== */
+section({id:"hart",num:"05",title:"HART on the 4–20 mA Loop",
+lead:"A process transmitter reports one measurement as a smooth DC current, 4 to 20 mA. HART superimposes a tiny FSK tone on the same two wires — digital questions and answers that never disturb the analog reading.",
+build(body){
+  body.append(prose(`<p>In a <span class="k">4–20 mA current loop</span> the transmitter regulates the loop current in proportion to its measurement: <b>4&nbsp;mA = 0%</b> of range, <b>20&nbsp;mA = 100%</b>. Current is used because it survives long cable runs — wire resistance and induced noise don't change it the way they change a voltage.</p>
+  <p><span class="k">HART</span> adds digital communication on top using <b>Bell&nbsp;202 FSK</b>: a <b>±0.5&nbsp;mA</b> tone rides on the DC current at <b>1200&nbsp;bps</b> — <b>1200&nbsp;Hz for a 1 (mark)</b>, <b>2200&nbsp;Hz for a 0 (space)</b>, phase-continuous at every bit boundary. Because the tone is symmetric, its average is zero and the analog reading is untouched; between messages the loop is pure DC. Each byte travels as a UART character — start bit, 8 data bits LSB-first, odd parity, stop bit — <b>11&nbsp;bits ≈ 9.17&nbsp;ms per byte</b>.</p>`));
+  body.append(h("div",{class:"callout rule"},h("span",{html:"<b>Master request frame:</b> Preamble (0xFF&nbsp;×&nbsp;5) → Start Delimiter → Address → Command → Byte Count → Checksum (XOR of delimiter through data). The field device answers over the same loop, the same way."})));
+
+  const bench=makeBench("HART-05 · FRAME → UART → LOOP CURRENT","click a byte",true);
+  body.append(bench.el);
+
+  const CMDS=[
+    {n:0,name:"Read Unique Identifier",why:"asks the device for its type, revision and unique ID — the ID later used for long-frame addressing."},
+    {n:1,name:"Read Primary Variable",why:"asks for the primary variable — the measurement itself, returned with its units code."},
+    {n:2,name:"Read Loop Current & % of Range",why:"asks for the loop current in mA and the equivalent percent of range."},
+    {n:3,name:"Read Dynamic Variables & Loop Current",why:"asks for the loop current plus up to four dynamic variables."},
+  ];
+  let cmdI=1, poll=0, dc=12, amp=0.5, sel=7;   // sel = selected byte (default: the command byte)
+  const MARK=1200, SPACE=2200, BIT_T=1/1200;
+
+  function frame(){
+    const cmd=CMDS[cmdI].n, dlm=0x02, adr=0x80|(poll&0x0F), cnt=0;
+    const chk=dlm^adr^cmd^cnt;                 // XOR longitudinal parity, delimiter through data
+    const bs=[];
+    for(let i=0;i<5;i++)bs.push({role:"PRE",v:0xFF,cls:"pre"});
+    bs.push({role:"DLM",v:dlm},{role:"ADR",v:adr},{role:"CMD",v:cmd},{role:"CNT",v:cnt},{role:"CHK",v:chk});
+    return bs;
+  }
+  function uart(v){
+    const b=[{t:"ST",v:0}];
+    let ones=0;
+    for(let i=0;i<8;i++){const bit=(v>>i)&1;ones+=bit;b.push({t:"D"+i,v:bit});}
+    b.push({t:"P",v:ones%2===0?1:0});          // odd parity
+    b.push({t:"SP",v:1});
+    return b;
+  }
+
+  // ---- stage: frame chips → UART bits → loop-current scope → full-frame strip ----
+  const stageCol=h("div",{style:"width:100%;display:flex;flex-direction:column;gap:11px"});
+  const lbl=t=>h("div",{class:"bench__label",style:"color:var(--muted)"},t);
+  const byteMap=h("div",{class:"bytemap"});
+  const bitRow=h("div",{class:"bitrow"});
+  const scope=h("div",{class:"scope"});
+  const cvB=h("canvas",{style:"height:200px"});scope.append(cvB);
+  scope.append(h("div",{class:"scope__legend"},
+    h("span",{},h("i",{style:"background:var(--scope-b)"}),"loop current"),
+    h("span",{},h("i",{style:"background:var(--scope-dim)"}),"DC (analog value)"),
+    h("span",{id:"hartByteCap",style:"margin-left:auto"},"")));
+  const mini=h("div",{class:"scope",style:"padding:6px"});
+  const cvF=h("canvas",{style:"height:60px;cursor:pointer"});mini.append(cvF);
+  stageCol.append(
+    lbl("1 · THE FRAME — 10 BYTES"),byteMap,
+    lbl("2 · SELECTED BYTE AS A UART CHARACTER — 11 BITS · 9.17 ms"),bitRow,
+    lbl("3 · WHAT THE LOOP CURRENT DOES"),scope,mini);
+  bench.stage.style.padding="0";bench.stage.style.background="none";bench.stage.style.border="none";
+  bench.stage.append(stageCol);
+
+  // ---- controls ----
+  const cmdSel=h("select",{class:"selinput","aria-label":"HART command",onchange:e=>{cmdI=+e.target.value;update();}},
+    ...CMDS.map((c,i)=>h("option",{value:i},`Cmd ${c.n} · ${c.name}`)));
+  cmdSel.value="1";
+  const pollSel=h("select",{class:"selinput","aria-label":"Polling address",onchange:e=>{poll=+e.target.value;update();}},
+    ...Array.from({length:16},(_,i)=>h("option",{value:i},"Polling address "+i)));
+  const dcLab=h("span",{class:"v mono"},"12.0 mA · 50%");
+  const dcSlider=h("input",{type:"range",min:4,max:20,step:0.1,value:12,"aria-label":"DC loop current",
+    oninput:e=>{dc=+e.target.value;update();}});
+  const ampLab=h("span",{class:"v mono"},"±0.50 mA");
+  const ampSlider=h("input",{type:"range",min:0.2,max:1,step:0.05,value:0.5,"aria-label":"FSK amplitude",
+    oninput:e=>{amp=+e.target.value;update();}});
+  bench.controls.append(
+    ctl("HART command (master request)",null,cmdSel),
+    ctl("Device address",null,pollSel),
+    ctl("DC loop current (analog value)",dcLab,dcSlider),
+    ctl("FSK amplitude",ampLab,ampSlider),
+    readouts([["loop current","roDC"],["instantaneous","roRng"],["bit / byte time","roBit"],["frame","roFrm"]],bench)
+  );
+  const ex=explain(bench);
+
+  const hex=v=>"0x"+v.toString(16).toUpperCase().padStart(2,"0");
+  function descFor(i,f){
+    const b=f[i];
+    switch(b.role){
+      case "PRE":return `<b>Preamble ${hex(0xFF)}</b> — five bytes of 0xFF (nearly all mark bits) that give the receiving modem time to lock onto the carrier before the frame begins.`;
+      case "DLM":return `<b>Start delimiter ${hex(b.v)}</b> — announces a short-frame (polling-address) request from the master to the field device.`;
+      case "ADR":return `<b>Address ${hex(b.v)}</b> — bit 7 set = the primary master is talking; the low nibble is polling address ${poll}.${poll===0?" Address 0 is point-to-point mode, where the 4–20 mA analog signal stays active.":" (Non-zero polling addresses were classically multidrop mode, with the analog current parked at 4 mA.)"}`;
+      case "CMD":return `<b>Command ${hex(b.v)}</b> — “${CMDS[cmdI].name}” ${CMDS[cmdI].why}`;
+      case "CNT":return `<b>Byte count ${hex(b.v)}</b> — how many data bytes follow. This request carries none, so it's zero.`;
+      case "CHK":return `<b>Checksum ${hex(b.v)}</b> — the XOR of every byte from the delimiter through the data (${f.slice(5,9).map(x=>hex(x.v)).join(" ⊕ ")} = ${hex(b.v)}). The receiver recomputes it and discards the frame on a mismatch.`;
+    }
+  }
+
+  function startPhase(f,idx){
+    let ph=0;
+    for(let i=0;i<idx;i++)for(const b of uart(f[i].v))ph+=2*Math.PI*(b.v?MARK:SPACE)/1200;
+    return ph%(2*Math.PI);
+  }
+
+  function drawByte(f){
+    const bits=uart(f[sel].v);
+    const dpr=Math.min(2,window.devicePixelRatio||1);const w=cw(cvB),ht=200;
+    cvB.width=w*dpr;cvB.height=ht*dpr;const ctx=cvB.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,ht);
+    const mL=46,plotT=8,plotB=ht-34,bw=(w-mL-6)/11;
+    const yOf=mA=>plotB-((mA-(dc-amp*1.5))/(3*amp))*(plotB-plotT);
+    // alternating bit tints + boundaries
+    for(let i=0;i<11;i++){
+      ctx.fillStyle=i%2?"rgba(127,127,127,0.055)":"rgba(127,127,127,0.02)";
+      ctx.fillRect(mL+i*bw,plotT,bw,plotB-plotT);
+    }
+    ctx.strokeStyle=cvar("--scope-grid");ctx.lineWidth=1;
+    for(let i=0;i<=11;i++){const x=mL+i*bw;ctx.beginPath();ctx.moveTo(x,plotT);ctx.lineTo(x,plotB);ctx.stroke();}
+    // mA gridlines
+    ctx.font="9.5px 'IBM Plex Mono',monospace";ctx.textAlign="right";
+    [dc-amp,dc,dc+amp].forEach(mA=>{
+      const y=yOf(mA);
+      ctx.strokeStyle=cvar("--scope-grid");ctx.setLineDash([2,3]);ctx.beginPath();ctx.moveTo(mL,y);ctx.lineTo(w-6,y);ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle=cvar("--scope-dim");ctx.fillText(mA.toFixed(2),mL-5,y+3);
+    });
+    ctx.fillStyle=cvar("--scope-dim");ctx.fillText("mA",mL-5,plotT+3);
+    // DC centerline
+    ctx.strokeStyle=cvar("--scope-dim");ctx.setLineDash([7,5]);ctx.lineWidth=1.6;
+    ctx.beginPath();ctx.moveTo(mL,yOf(dc));ctx.lineTo(w-6,yOf(dc));ctx.stroke();ctx.setLineDash([]);
+    // phase-continuous FSK from the start of the frame
+    let ph=startPhase(f,sel);
+    ctx.strokeStyle=cvar("--scope-b");ctx.lineWidth=2.2;ctx.lineJoin="round";ctx.beginPath();
+    const SPB=200;
+    for(let i=0;i<11;i++){
+      const fq=bits[i].v?MARK:SPACE, inc=2*Math.PI*fq*(BIT_T/SPB);
+      for(let s2=0;s2<SPB;s2++){
+        const x=mL+(i+s2/SPB)*bw, y=yOf(dc+amp*Math.sin(ph));
+        (i===0&&s2===0)?ctx.moveTo(x,y):ctx.lineTo(x,y);
+        ph+=inc;
+      }
+    }
+    ctx.stroke();
+    // per-bit value + tone labels
+    ctx.textAlign="center";
+    bits.forEach((b,i)=>{
+      const x=mL+(i+0.5)*bw;
+      ctx.fillStyle=b.v?cvar("--on"):cvar("--scope-a");
+      ctx.font="bold 12px 'IBM Plex Mono',monospace";
+      ctx.fillText(String(b.v),x,plotB+13);
+      ctx.fillStyle=cvar("--scope-dim");ctx.font="8.5px 'IBM Plex Mono',monospace";
+      ctx.fillText(b.t+"·"+(b.v?"1200":"2200"),x,plotB+25);
+    });
+    ctx.textAlign="left";
+    $("#hartByteCap",bench.el).textContent=f[sel].role+" "+hex(f[sel].v);
+  }
+
+  function drawFrame(f){
+    const dpr=Math.min(2,window.devicePixelRatio||1);const w=cw(cvF),ht=60;
+    cvF.width=w*dpr;cvF.height=ht*dpr;const ctx=cvF.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,ht);
+    const bitsAll=f.flatMap(b=>uart(b.v)); // 110 bits
+    const n=bitsAll.length;
+    // selected byte highlight
+    ctx.fillStyle="rgba(245,178,61,0.18)";
+    ctx.fillRect((sel*11/n)*w,0,(11/n)*w,ht);
+    // compressed FSK trace
+    let ph=0;const spb=14, mid=ht*0.56, a=ht*0.3;
+    ctx.strokeStyle=cvar("--scope-b");ctx.lineWidth=1;ctx.globalAlpha=.8;ctx.beginPath();
+    bitsAll.forEach((b,i)=>{
+      const fq=b.v?MARK:SPACE, inc=2*Math.PI*fq*(BIT_T/spb);
+      for(let s2=0;s2<spb;s2++){
+        const x=((i+s2/spb)/n)*w, y=mid-a*Math.sin(ph);
+        (i===0&&s2===0)?ctx.moveTo(x,y):ctx.lineTo(x,y);ph+=inc;
+      }});
+    ctx.stroke();ctx.globalAlpha=1;
+    // byte boundaries
+    ctx.strokeStyle=cvar("--scope-grid");
+    for(let bI=0;bI<=10;bI++){const x=(bI*11/n)*w;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,ht);ctx.stroke();}
+    ctx.fillStyle=cvar("--scope-dim");ctx.font="9px 'IBM Plex Mono',monospace";
+    ctx.fillText("full frame · 10 bytes · 110 bits · 91.7 ms — click to select a byte",6,10);
+  }
+  cvF.addEventListener("click",e=>{
+    const r=cvF.getBoundingClientRect();
+    sel=clamp(Math.floor((e.clientX-r.left)/r.width*10),0,9);update();
+  });
+
+  function renderMaps(f){
+    byteMap.innerHTML="";
+    f.forEach((b,i)=>{
+      byteMap.append(h("button",{class:"bchip"+(b.cls?" "+b.cls:"")+(i===sel?" sel":""),
+        onclick:()=>{sel=i;update();}},
+        h("span",{},b.role),h("b",{},b.v.toString(16).toUpperCase().padStart(2,"0"))));
+    });
+    bitRow.innerHTML="";
+    uart(f[sel].v).forEach(b=>{
+      const cls=(b.t==="ST"||b.t==="SP"||b.t==="P")?"frame":(b.v?"hi":"lo");
+      bitRow.append(h("div",{class:"bitcell "+cls},String(b.v),h("small",{},b.t)));
+    });
+  }
+
+  function update(){
+    const f=frame();
+    dcLab.textContent=dc.toFixed(1)+" mA · "+(((dc-4)/16)*100).toFixed(0)+"%";
+    ampLab.textContent="±"+amp.toFixed(2)+" mA";
+    renderMaps(f);drawByte(f);drawFrame(f);
+    bench.ro.roDC.innerHTML=dc.toFixed(1)+' <small>mA · '+(((dc-4)/16)*100).toFixed(0)+'% of range</small>';
+    bench.ro.roRng.innerHTML=(dc-amp).toFixed(2)+"–"+(dc+amp).toFixed(2)+' <small>mA</small>';
+    bench.ro.roBit.innerHTML='833 µs <small>/ 9.17 ms per byte</small>';
+    bench.ro.roFrm.innerHTML='10 B <small>· 110 bits · 91.7 ms</small>';
+    ex.innerHTML=descFor(sel,f)+` <span style="color:var(--faint)">Every byte rides the loop LSB-first at 1200 bps — mark = 1200 Hz, space = 2200 Hz, ±${amp.toFixed(2)} mA around ${dc.toFixed(1)} mA.</span>`;
+  }
+  update();
+  window.addEventListener("resize",()=>update());
+}});
+
+/* ==================================================================
+   MODULE 4 — Switches & continuity
+   ================================================================== */
+section({id:"switches",num:"06",title:"Switches &amp; Continuity",
+lead:"The simplest switch is a mechanical one: a piece of metal that either bridges a gap or doesn't. Test it with an ohmmeter.",
+build(body){
+  body.append(prose(`<p>A <span class="k">mechanical switch</span> makes or breaks a path. <b>Closed</b> = a solid connection, near <b>0&nbsp;Ω</b>. <b>Open</b> = a broken path, <b>infinite</b> resistance (an ohmmeter shows <b>OL</b>, over-limit).</p>
+  <p>An <b>SPST</b> (single-pole single-throw) is a plain on/off. An <b>SPDT</b> (single-pole double-throw) is a selector — the common pole connects to one of two throws. Flip the switch and watch the ohmmeter and the current path.</p>`));
+
+  const bench=makeBench("SW-06 · CONTINUITY TEST","flip the switch");
+  body.append(bench.el);
+
+  let type="spst",closed=false,throwB=false;
+  const svg=s("svg",{viewBox:"0 0 340 200"});
+  bench.stage.append(svg);
+
+  function render(){
+    svg.innerHTML="";
+    const hot=pathHot();
+    const meter=meterSVG(56,100,32);
+    const [tx1,ty1]=meter.top,[tx2,ty2]=meter.bot;
+    const poleX=168,poleY=64,throwX=262;
+    // meter drawn first, then wiring on top, then contacts/arm
+    svg.append(meter.g);
+    // top lead: meter top terminal -> up -> pole (final approach horizontal, clear of the dial)
+    svg.append(s("path",{class:"wire"+(hot?" hot":""),d:`M${tx1},${ty1} L128,${ty1} L128,${poleY} L${poleX},${poleY}`}));
+    if(type==="spst"){
+      const angle=closed?0:-27;
+      const ex2=poleX+Math.cos(angle*Math.PI/180)*(throwX-poleX);
+      const ey2=poleY+Math.sin(angle*Math.PI/180)*(throwX-poleX);
+      // return lead: throw -> down -> back to meter bottom terminal
+      svg.append(s("path",{class:"wire"+(hot?" hot":" dead"),d:`M${throwX},${poleY} L${throwX},152 L128,152 L128,${ty2} L${tx2},${ty2}`}));
+      svg.append(s("circle",{cx:poleX,cy:poleY,r:4,class:"node"}));
+      svg.append(s("circle",{cx:throwX,cy:poleY,r:4,class:"node"}));
+      const arm=s("line",{class:"ink",x1:poleX,y1:poleY,x2:ex2,y2:ey2,"stroke-width":3.6,"stroke-linecap":"round"});
+      arm.style.transition="all .2s";svg.append(arm);
+      svg.append(s("text",{x:poleX-4,y:poleY+34,class:"lbl b"},"SPST"));
+    }else{
+      const tUpY=poleY-30,tDnY=poleY+34,selY=throwB?tDnY:tUpY,othY=throwB?tUpY:tDnY;
+      // return from selected throw down to meter bottom terminal
+      svg.append(s("path",{class:"wire hot",d:`M${throwX},${selY} L304,${selY} L304,152 L128,152 L128,${ty2} L${tx2},${ty2}`}));
+      // open stub on the other throw
+      svg.append(s("path",{class:"wire dead",d:`M${throwX},${othY} L294,${othY}`}));
+      svg.append(s("circle",{cx:poleX,cy:poleY,r:4,class:"node"}));
+      svg.append(s("circle",{cx:throwX,cy:tUpY,r:4,class:"node"}));
+      svg.append(s("circle",{cx:throwX,cy:tDnY,r:4,class:"node"}));
+      const arm=s("line",{class:"ink",x1:poleX,y1:poleY,x2:throwX,y2:selY,"stroke-width":3.6,"stroke-linecap":"round"});
+      arm.style.transition="all .2s";svg.append(arm);
+      svg.append(s("text",{x:throwX+10,y:tUpY+4,class:"lbl b"},"A"));
+      svg.append(s("text",{x:throwX+10,y:tDnY+4,class:"lbl b"},"B"));
+      svg.append(s("text",{x:poleX-4,y:poleY+44,class:"lbl b"},"SPDT"));
+    }
+    meter.set(hot?"0.0":"O.L");
+  }
+  function pathHot(){return type==="spst"?closed:true;}
+
+  const typeSeg=seg(["SPST","SPDT"],0,i=>{type=i?"spdt":"spst";render();updateOut();});
+  const lever=leverSwitch(closed,v=>{closed=v;render();updateOut();});
+  const throwSeg=seg(["Throw A","Throw B"],0,i=>{throwB=!!i;render();updateOut();});
+  const throwWrap=h("div",{},throwSeg);
+  bench.controls.append(
+    ctl("Switch type",null,typeSeg),
+    ctl("Position",null,h("div",{id:"swPos"},lever.el)),
+    ctl("Selector (SPDT)",null,throwWrap),
+    readouts([["ohmmeter","roOhm"],["path","roPath"]],bench)
+  );
+  const ex=explain(bench);
+  function updateOut(){
+    const swPos=$("#swPos",bench.el);
+    swPos.style.display=type==="spst"?"":"none";
+    throwWrap.style.display=type==="spdt"?"":"none";
+    const hot=pathHot();
+    bench.ro.roOhm.innerHTML=hot?'~0.0 <small>Ω</small>':'O.L <small>∞</small>';
+    bench.ro.roOhm.style.color=hot?"var(--on)":"var(--off)";
+    bench.ro.roPath.innerHTML=hot?'<span class="chip on">closed</span>':'<span class="chip off">open</span>';
+    if(type==="spst"){
+      ex.innerHTML=closed?`The blade bridges the gap: a continuous path, so the ohmmeter reads about <b>0&nbsp;Ω</b>.`:`The blade is lifted — the circuit is broken. Resistance is effectively <b>infinite</b>, shown as <b>OL</b>.`;
+    }else{
+      ex.innerHTML=`The common pole is thrown to contact <b>${throwB?"B":"A"}</b>. An SPDT never fully opens — it just <b>selects</b> which of two paths is live.`;
+    }
+    render();
+  }
+  updateOut();
+}});
+
+/* ==================================================================
+   MODULE 5 — Diodes: forward & reverse bias  (KEY)
+   ================================================================== */
+section({id:"diode",num:"07",title:"Diodes — Forward, Reverse &amp; Breakdown",
+lead:"A diode is a one-way valve for current — but its full story has three regions: it conducts forward past the knee, blocks in reverse with only a whisper of leakage, and finally breaks down if you push the reverse voltage past its rating.",
+build(body){
+  body.append(prose(`<p>A <span class="k">diode</span> lets current flow in one direction only, from <b>anode</b> (the triangle) to <b>cathode</b> (the bar) — a check valve for electricity. Its characteristic curve has <b>three regions</b>:</p>
+  <p><b>1 · Forward conduction.</b> With the anode positive, almost nothing flows until the source can cover the <b>~0.7&nbsp;V knee</b> (silicon; germanium is ~0.3&nbsp;V). Past it, current rises steeply and the junction holds close to 0.7&nbsp;V.</p>
+  <p><b>2 · Reverse blocking.</b> Flip the polarity and the junction seals. A tiny <b>leakage current</b> still flows — nanoamps for a small-signal diode like the 1N4148, a few microamps for a rectifier — which is why the curve sits just barely below the axis rather than exactly on it.</p>
+  <p><b>3 · Reverse breakdown.</b> Every diode has a limit. At the breakdown voltage <b>V<sub>BR</sub></b> (−50&nbsp;V for a 1N4001-class rectifier) the junction avalanches and conducts heavily <i>in reverse</i> — current limited only by the external resistance. Datasheets publish this limit as the <b>PIV / PRV rating</b>; a rectifier must never reach it, while a <b>Zener diode</b> is built to live there and turns breakdown into a voltage regulator.</p>`));
+  body.append(h("div",{class:"callout rule"},h("span",{html:"<b>0.7 V model:</b> forward = an ideal switch in series with a 0.7&nbsp;V battery; reverse = an open switch. It ignores leakage and breakdown — a fine simplification, as long as the circuit stays inside the diode's ratings."})));
+
+  const bench=makeBench("DIODE-07 · BIAS LAB","push it to breakdown");
+  body.append(bench.el);
+
+  const R=220, VBR=50, ILEAK=5e-6;          // 1N4001-class: V_BR ≈ 50 V, I_R ≈ 5 µA
+  let vsrc=3, showModel=false;
+  const svg=s("svg",{viewBox:"0 0 360 200"});
+  bench.stage.append(svg);
+
+  const leg=(c,t)=>h("span",{},h("i",{style:`display:inline-block;width:15px;height:3px;border-radius:2px;background:${c};vertical-align:middle;margin-right:5px`}),t);
+  const ivWrap=h("div",{style:"margin-top:12px"});
+  const ivCv=h("canvas",{style:"width:100%;height:190px;display:block;border-radius:8px;background:var(--scope-face)"});
+  ivWrap.append(
+    h("div",{class:"bench__label",style:"margin:0 0 6px;color:var(--muted)"},"I–V CHARACTERISTIC — THREE REGIONS"),
+    ivCv,
+    h("div",{style:"display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--muted)"},
+      leg("var(--scope-a)","characteristic — active solid, other ghosted"),leg("var(--on)","operating point"),
+      h("span",{style:"color:var(--faint)"},"schematic scales — forward i in mA, reverse leakage µA")));
+  bench.stage.parentElement.append(ivWrap);
+
+  // slider: two-segment travel — left 40% covers −60…0 V, right 60% covers 0…+6 V
+  const sliderToV=t=>t<=40?(-60+(t/40)*60):((t-40)/60)*6;
+  const vToSlider=v=>v<0?((v+60)/60)*40:40+(v/6)*60;
+  const vLab=h("span",{class:"v mono"},"+3.00 V");
+  const vSlider=h("input",{type:"range",min:0,max:100,step:0.25,value:vToSlider(3),"aria-label":"Source voltage",
+     oninput:e=>{vsrc=sliderToV(+e.target.value);update();}});
+  const setV=v=>{vsrc=v;vSlider.value=vToSlider(v);update();};
+  const fwdBtn=h("button",{class:"bbtn",onclick:()=>setV(3)},"Forward +3 V ▶");
+  const revBtn=h("button",{class:"bbtn",onclick:()=>setV(-3)},"◀ Reverse −3 V");
+  const brkBtn=h("button",{class:"bbtn",style:"color:var(--off);border-color:var(--off)",onclick:()=>setV(-55)},"⚡ Breakdown −55 V");
+  const modelSeg=seg(["Real diode","0.7 V model"],0,i=>{showModel=!!i;update();});
+  bench.controls.append(
+    ctl("Source voltage (anode − cathode)",vLab,vSlider),
+    h("div",{style:"display:flex;gap:8px;flex-wrap:wrap"},revBtn,fwdBtn,brkBtn),
+    ctl("View",null,modelSeg),
+    readouts([["region","roBias"],["diode drop","roVd"],["current","roI"],["lamp","roLamp"]],bench)
+  );
+  const ex=explain(bench);
+
+  // Real junction (display model: ~0.7 V at 10 mA, n≈2) + avalanche clamp at −V_BR
+  const Is=1.4e-8, nVt=0.052;
+  const diodeI=Vd=>Vd<0?-ILEAK:Is*(Math.exp(Vd/nVt)-1);
+  function opReal(){
+    if(vsrc<=-VBR)return{Vd:-VBR,I:(vsrc+VBR)/R};        // avalanche: junction clamps near −V_BR
+    if(vsrc<=0)return{Vd:vsrc,I:-ILEAK};                  // blocking: µA-scale leakage
+    let lo=0,hi=Math.min(vsrc,1.2);
+    for(let k=0;k<80;k++){const m=(lo+hi)/2;(diodeI(m)<(vsrc-m)/R)?lo=m:hi=m;}
+    const Vd=(lo+hi)/2;return{Vd,I:(vsrc-Vd)/R};
+  }
+  function opModel(){
+    if(vsrc>=0.7)return{Vd:0.7,I:(vsrc-0.7)/R};
+    if(vsrc<=-VBR)return{Vd:-VBR,I:(vsrc+VBR)/R};         // even the simple model must respect ratings
+    return{Vd:vsrc,I:0};
+  }
+  function regionOf(){return vsrc<=-VBR?"breakdown":(vsrc>0?"forward":"reverse");}
+  function calc(){
+    const real=opReal(), model=opModel();
+    const act=showModel?model:real;
+    return{state:regionOf(),Vd:act.Vd,I:act.I,real,model};
+  }
+
+  function drawCircuit(st){
+    svg.innerHTML="";
+    const conducting=Math.abs(st.I)>1e-3;
+    const brk=st.state==="breakdown";
+    const wc="wire"+(conducting?" hot flow":"");
+    const bx=52,by=116;
+    svg.append(batterySVG(bx,by,vsrc>=0));
+    svg.append(s("path",{class:wc,d:`M${bx},92 L${bx},52 L96,52`}));
+    if(showModel){
+      const dc=conducting?"var(--on)":"var(--ink)";
+      svg.append(s("rect",{x:94,y:34,width:98,height:36,rx:7,fill:"var(--sig-soft)",stroke:"var(--sig)","stroke-width":1.3}));
+      svg.append(s("text",{x:118,y:29,class:"lbl b",fill:"var(--sig)"},"ideal + 0.7 V"));
+      svg.append(s("path",{d:"M108,44 L108,60 L126,52 Z",fill:conducting?"var(--on)":"none",stroke:dc,"stroke-width":2.2,"stroke-linejoin":"round"}));
+      svg.append(s("line",{x1:126,y1:44,x2:126,y2:60,stroke:dc,"stroke-width":2.6}));
+      svg.append(s("path",{class:wc,d:"M96,52 L108,52 M126,52 L142,52"}));
+      svg.append(s("line",{class:"ink",x1:148,y1:43,x2:148,y2:61,"stroke-width":3}));
+      svg.append(s("line",{class:"ink",x1:156,y1:47,x2:156,y2:57,"stroke-width":3}));
+      svg.append(s("path",{class:wc,d:"M142,52 L148,52 M156,52 L192,52"}));
+    }else{
+      svg.append(diodeSVG(110,52,conducting&&!brk,false));
+      svg.append(s("path",{class:wc,d:"M154,52 L192,52"}));
+      svg.append(s("text",{x:102,y:76,class:"lbl"},"anode"));
+      svg.append(s("text",{x:148,y:76,class:"lbl"},"cathode"));
+    }
+    svg.append(s("path",{class:wc,d:"M192,52 L312,52 L312,62"}));
+    svg.append(resistorV(312,62,312,96));
+    svg.append(s("text",{x:322,y:83,class:"lbl"},"220 Ω"));
+    svg.append(s("path",{class:wc,d:"M312,96 L312,112"}));
+    svg.append(lampSVG(312,130,conducting,Math.min(1,Math.abs(st.I)/((6-0.7)/R))));
+    svg.append(s("path",{class:wc,d:`M312,148 L312,182 L${bx},182 L${bx},140`}));
+    if(brk)svg.append(s("text",{x:118,y:176,class:"lbl b",fill:"var(--off)"},"⚡ I ► (reverse!)"));
+    else if(conducting)svg.append(s("text",{x:150,y:176,class:"lbl b",fill:"var(--on)"},"◄ I"));
+    else svg.append(s("text",{x:140,y:176,class:"lbl b",fill:"var(--off)"},"blocked ✕"));
+  }
+
+  function drawIV(st){
+    const dpr=Math.min(2,window.devicePixelRatio||1);const w=cw(ivCv),ht=190;
+    ivCv.width=w*dpr;ivCv.height=ht*dpr;const ctx=ivCv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,ht);
+    // Canonical textbook layout: three tinted bands, centered axes, one continuous curve.
+    const y0=ht*0.55, plotTop=26, plotBot=ht-10;
+    const xBR=w*0.16, x0=w*0.46;                    // band edges: breakdown | reverse | forward
+    const V2X=v=>v>=0 ? x0+(v/1.05)*(w-10-x0)
+               : v>=-50 ? x0+(v/50)*(x0-xBR)
+               : xBR-((-v-50)/13)*(xBR-8);
+    const leakY=v=>y0+4+9*(-v/50);                  // leakage dips gently below the axis (µA, exaggerated)
+    const fwdY=I=>y0-clamp(I/0.03,0,1.04)*(y0-plotTop);
+    const brkY=I=>y0+clamp(-I/0.025,0,1)*(plotBot-y0-2);
+    // region bands + header labels
+    ctx.fillStyle="rgba(242,88,95,0.10)";ctx.fillRect(0,0,xBR,ht);
+    ctx.fillStyle="rgba(110,140,170,0.10)";ctx.fillRect(xBR,0,x0-xBR,ht);
+    ctx.fillStyle="rgba(67,224,138,0.08)";ctx.fillRect(x0,0,w-x0,ht);
+    ctx.font="9.5px 'IBM Plex Mono',monospace";ctx.textAlign="center";
+    ctx.fillStyle=cvar("--off");ctx.fillText("BREAKDOWN",xBR/2,14);
+    ctx.fillStyle=cvar("--scope-dim");ctx.fillText("REVERSE",(xBR+x0)/2,14);
+    ctx.fillStyle=cvar("--on");ctx.fillText("FORWARD",(x0+w)/2,14);
+    // axes with arrowheads
+    ctx.strokeStyle=cvar("--scope-dim");ctx.lineWidth=1.3;
+    ctx.beginPath();ctx.moveTo(0,y0);ctx.lineTo(w-5,y0);ctx.moveTo(x0,ht-4);ctx.lineTo(x0,21);ctx.stroke();
+    ctx.fillStyle=cvar("--scope-dim");
+    ctx.beginPath();ctx.moveTo(w-3,y0);ctx.lineTo(w-11,y0-4);ctx.lineTo(w-11,y0+4);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.moveTo(x0,19);ctx.lineTo(x0-4,27);ctx.lineTo(x0+4,27);ctx.closePath();ctx.fill();
+    ctx.textAlign="left";
+    ctx.fillText("i (mA)",x0+8,28);ctx.fillText("v",w-14,y0+15);
+    // dashed guides: v_br and the 0.7 V knee
+    ctx.setLineDash([4,4]);ctx.lineWidth=1.2;
+    ctx.strokeStyle=cvar("--off");ctx.beginPath();ctx.moveTo(xBR,20);ctx.lineTo(xBR,plotBot);ctx.stroke();
+    ctx.strokeStyle=cvar("--scope-b");ctx.beginPath();ctx.moveTo(V2X(0.7),22);ctx.lineTo(V2X(0.7),y0+16);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.textAlign="right";ctx.fillStyle=cvar("--off");ctx.fillText("v_br −50 V",xBR-4,y0-7);
+    ctx.textAlign="left";ctx.fillStyle=cvar("--scope-b");ctx.fillText("0.7 V",V2X(0.7)+5,y0+15);
+    // scale hints (forward current in mA; reverse leakage is µA-scale, drawn exaggerated)
+    ctx.fillStyle=cvar("--scope-dim");
+    ctx.fillText("µA (exaggerated)",xBR+6,y0+26);
+    // ---- characteristics: active solid, other ghosted ----
+    const realA=showModel?0.25:1, modelA=showModel?1:0.25;
+    // REAL — one continuous curve through all three regions
+    ctx.globalAlpha=realA;ctx.strokeStyle=cvar("--scope-a");ctx.lineWidth=2.6;ctx.lineJoin="round";ctx.lineCap="round";
+    ctx.beginPath();
+    ctx.moveTo(xBR-4,plotBot);
+    ctx.quadraticCurveTo(xBR,leakY(-50)+14,xBR+3,leakY(-48));
+    for(let v=-48;v<0;v+=2)ctx.lineTo(V2X(v),leakY(v));
+    ctx.lineTo(x0,y0);
+    for(let v=0.02;v<=1.02;v+=0.01){const y=fwdY(diodeI(v));ctx.lineTo(V2X(v),y);if(y<=plotTop)break;}
+    ctx.stroke();
+    // 0.7 V MODEL — open switch everywhere, then vertical at the knee (no leakage, no breakdown)
+    ctx.globalAlpha=modelA;ctx.beginPath();
+    ctx.moveTo(8,y0);ctx.lineTo(V2X(0.7),y0);ctx.lineTo(V2X(0.7),plotTop);
+    ctx.stroke();ctx.globalAlpha=1;
+    // ---- operating point rides the active curve ----
+    const brk=st.state==="breakdown";
+    let opx,opy;
+    if(brk){opx=xBR-1;opy=brkY(st.I);}
+    else if(st.state==="reverse"){opx=V2X(vsrc);opy=showModel?y0:leakY(vsrc);}
+    else{opx=V2X(st.Vd);opy=st.I>1e-4?fwdY(st.I):(showModel?y0:fwdY(diodeI(st.Vd)));}
+    const conducting=Math.abs(st.I)>1e-3;
+    ctx.fillStyle=brk?cvar("--off"):(conducting?cvar("--on"):cvar("--off"));
+    ctx.globalAlpha=.3;ctx.beginPath();ctx.arc(opx,opy,10,0,7);ctx.fill();ctx.globalAlpha=1;
+    ctx.beginPath();ctx.arc(opx,opy,5,0,7);ctx.fill();
+  }
+  function update(){
+    const st=calc();
+    vLab.textContent=(vsrc>=0?"+":"")+vsrc.toFixed(2)+" V";
+    drawCircuit(st);drawIV(st);
+    const conducting=Math.abs(st.I)>1e-3, brk=st.state==="breakdown";
+    bench.ro.roBias.innerHTML=brk?'<span class="chip off">⚡ breakdown</span>'
+      :(st.state==="forward"?'<span class="chip on">forward</span>':'<span class="chip off">reverse</span>');
+    bench.ro.roVd.innerHTML=(st.Vd<0?"−":"")+Math.abs(st.Vd).toFixed(brk?0:2)+' <small>V</small>';
+    bench.ro.roI.innerHTML=conducting?eng(Math.abs(st.I),"A")+(brk?' <small>reverse</small>':'')
+      :(st.state==="reverse"?(showModel?'0 <small>(open)</small>':'≈ '+eng(ILEAK,"A")+' <small>leak</small>')
+                            :(st.I>1e-9?eng(st.I,"A"):'≈ 0 A'));
+    bench.ro.roLamp.innerHTML=conducting?'<span class="chip on">lit</span>':'<span class="chip off">dark</span>';
+    const pctErr=st.real.I>1e-3?Math.abs(st.model.I-st.real.I)/st.real.I*100:0;
+    if(brk){
+      ex.innerHTML=`<b>⚡ Reverse breakdown.</b> Past V<sub>BR</sub> ≈ −${VBR} V the junction avalanches and conducts <i>in reverse</i> — the diode clamps near −${VBR} V and the resistor sets the current: I = (${vsrc.toFixed(1)} + ${VBR}) / ${R} Ω = <b>${eng(Math.abs(st.I),"A")}</b> backwards through the lamp. A rectifier here usually cooks itself; a <b>Zener diode</b> is built for this exact region and uses the stable clamp voltage as a regulator (e.g. a 1N4733A holds 5.1 V). Datasheets call the safe limit the <b>PIV rating</b>.`;
+    }else if(conducting&&!showModel){
+      ex.innerHTML=`<b>Forward conduction:</b> the junction settles on its curve at V<sub>D</sub> = <b>${st.real.Vd.toFixed(2)}&nbsp;V</b>, I = <b>${eng(st.real.I,"A")}</b>. The 0.7&nbsp;V model (ghosted) predicts ${eng(st.model.I,"A")} — off by just ${pctErr.toFixed(1)}%, which is why the shortcut is standard.`;
+    }else if(conducting&&showModel){
+      ex.innerHTML=`<b>0.7&nbsp;V model:</b> the drop is pinned at 0.70&nbsp;V, so <b>I = (${vsrc.toFixed(2)} − 0.70) / ${R}&nbsp;Ω = ${eng(st.model.I,"A")}</b> — one line of algebra. The ghosted real curve gives ${st.real.Vd.toFixed(2)}&nbsp;V / ${eng(st.real.I,"A")} — nearly identical.`;
+    }else if(st.state==="forward"){
+      ex.innerHTML=showModel
+        ?`Below the knee the model is an <b>open switch</b> — zero current until the source covers 0.70&nbsp;V.`
+        :`Below the knee the real junction passes only <b>${eng(Math.max(st.real.I,1e-12),"A")}</b> — orders of magnitude too little to light the lamp. The exponential means conduction fades in, it doesn't snap.`;
+    }else{
+      ex.innerHTML=showModel
+        ?`<b>Reverse blocking — model:</b> an open switch, exactly zero. The real diode (ghosted) actually leaks ≈ ${eng(ILEAK,"A")} — close enough to zero to ignore.`
+        :`<b>Reverse blocking:</b> the junction holds off the full ${Math.abs(vsrc).toFixed(1)}&nbsp;V, passing only ≈ <b>${eng(ILEAK,"A")}</b> of leakage — that's the near-flat line just below the axis (a 1N4148 leaks mere nanoamps; rectifiers a few µA, more when hot). Keep pushing toward −${VBR}&nbsp;V to find the edge of the blocking region.`;
+    }
+  }
+  update();
+  requestAnimationFrame(update);
+  window.addEventListener("resize",update);
+}});
+
+/* ==================================================================
+   MODULE 6 — Diode logic gate
+   ================================================================== */
+section({id:"diodelogic",num:"08",title:"Diode Logic",
+lead:"Point a couple of diodes the same way, add one resistor, and you've built a logic gate out of one-way valves.",
+build(body){
+  body.append(prose(`<p>Because diodes steer current, two of them plus a resistor make a simple gate. In a <b>diode-OR</b>, the output is pulled HIGH if <b>either</b> input is HIGH. In a <b>diode-AND</b>, the output is HIGH only when <b>both</b> inputs are HIGH. Toggle the inputs and watch the output and truth table.</p>`));
+  const bench=makeBench("GATE-08 · DIODE GATE","toggle A and B");
+  body.append(bench.el);
+  let gate="or",A=0,B=0;
+  const svg=s("svg",{viewBox:"0 0 320 220"});bench.stage.append(svg);
+  function out(){return gate==="or"?(A|B):(A&B);}
+  function render(){
+    svg.innerHTML="";
+    const o=out();
+    // inputs
+    [[0,70,A,"A"],[1,150,B,"B"]].forEach(([idx,y,val,name])=>{
+      svg.append(s("text",{x:12,y:y+4,class:"lbl b"},name));
+      svg.append(s("circle",{cx:34,cy:y,r:4,class:"node"}));
+      svg.append(s("text",{x:24,y:y-10,class:"lbl",fill:val?"var(--on)":"var(--muted)"},val?"5V":"0V"));
+      const live=gate==="or"?val:( !val );// OR: hot input drives; AND: low input pulls down
+      svg.append(s("path",{class:"wire"+(val?" hot":""),d:`M40,${y} L110,${y}`}));
+      // diode pointing toward common node (OR) or away (AND)
+      if(gate==="or"){svg.append(diodeSVG(110,y,val,false));svg.append(s("path",{class:"wire"+(val?" hot":""),d:`M140,${y} L200,${y} L200,110`}));}
+      else{svg.append(diodeSVGLeft(110,y,!val));svg.append(s("path",{class:"wire"+(!val?" hot":""),d:`M110,${y} L200,${y} L200,110`}));}
+    });
+    // common node + resistor
+    svg.append(s("circle",{cx:200,cy:110,r:4,class:"node"}));
+    if(gate==="or"){
+      // pull-down resistor to ground
+      svg.append(resistorV(200,130,200,180));
+      svg.append(groundSVG(200,192));
+      svg.append(s("text",{x:210,y:160,class:"lbl"},"R↓"));
+    }else{
+      // pull-up resistor to +5
+      svg.append(resistorV(200,90,200,40));
+      svg.append(s("path",{class:"wire",d:"M200,40 L200,28"}));
+      svg.append(s("text",{x:210,y:24,class:"lbl b",fill:"var(--on)"},"+5V"));
+      svg.append(s("text",{x:210,y:70,class:"lbl"},"R↑"));
+    }
+    // output
+    svg.append(s("path",{class:"wire"+(o?" hot":""),d:"M200,110 L280,110"}));
+    svg.append(s("circle",{cx:284,cy:110,r:5,fill:o?"var(--on)":"var(--surface)",stroke:o?"var(--on)":"var(--line-strong)","stroke-width":2}));
+    svg.append(s("text",{x:262,y:96,class:"lbl b",fill:o?"var(--on)":"var(--muted)"},"OUT "+(o?"1":"0")));
+  }
+  const gateSeg=seg(["Diode-OR","Diode-AND"],0,i=>{gate=i?"and":"or";render();upTT();});
+  const aLever=leverSwitch(false,v=>{A=v?1:0;render();upTT();});
+  const bLever=leverSwitch(false,v=>{B=v?1:0;render();upTT();});
+  bench.controls.append(
+    ctl("Gate type",null,gateSeg),
+    h("div",{style:"display:flex;gap:26px"},labeledLever("Input A",aLever),labeledLever("Input B",bLever)),
+    truthTable(["A","B","OUT"],()=> {
+      const rows=[];for(const a of[0,1])for(const b of[0,1])rows.push([a,b,gate==="or"?(a|b):(a&b)]);return rows;
+    },()=>[A,B,out()],bench)
+  );
+  const ex=explain(bench);
+  function upTT(){
+    bench.refreshTT&&bench.refreshTT();
+    ex.innerHTML=gate==="or"
+      ?`<b>OR:</b> any HIGH input forward-biases its diode and pulls the output up through to the node. Output = A OR B = <b>${out()}</b>.`
+      :`<b>AND:</b> the pull-up tries to hold the node HIGH; any LOW input forward-biases its diode and drags the node down. Output = A AND B = <b>${out()}</b>.`;
+  }
+  render();upTT();
+}});
+
+/* ==================================================================
+   MODULE 7 — Transistor switch / inverter
+   ================================================================== */
+section({id:"transistor",num:"09",title:"The Transistor Switch",
+lead:"A transistor is a switch with no moving parts: a small signal on the base decides whether the collector-to-emitter path is a short or an open.",
+build(body){
+  body.append(prose(`<p>In a circuit the input (1 or 0) goes to the <b>base</b>. For an <b>NPN</b> transistor:</p>`));
+  body.append(h("ul",{class:"prose",style:"list-style:none;margin:0 0 14px"},
+    h("li",{style:"margin-bottom:8px"},h("span",{html:"<b style='color:var(--on)'>Base positive vs. emitter → ON.</b> The collector-to-emitter path becomes a <b>short</b>."})),
+    h("li",{},h("span",{html:"<b style='color:var(--off)'>Base at 0 V (or negative) → OFF.</b> Collector-to-emitter becomes an <b>open</b>."}))));
+  body.append(prose(`<p>Wired with a pull-up resistor R<sub>C</sub>, this makes an <b>inverter</b>: a HIGH in yanks the output to ground (LOW), a LOW in lets R<sub>C</sub> pull the output up to +5&nbsp;V (HIGH). A <b>PNP</b> works the same way with every polarity reversed.</p>`));
+  body.append(h("div",{class:"callout"},h("span",{html:"A tiny base current (≈&nbsp;0.5&nbsp;mA) controls a much larger collector current (≈&nbsp;10&nbsp;mA to an LED) — that current gain is why a logic gate can drive a load it couldn't power directly."})));
+
+  const bench=makeBench("BJT-09 · SWITCH / INVERTER","toggle the base");
+  body.append(bench.el);
+  let inHigh=false, kind="npn";
+  const svg=s("svg",{viewBox:"0 0 320 250"});bench.stage.append(svg);
+  function on(){return kind==="npn"?inHigh:!inHigh;}
+  function render(){
+    svg.innerHTML="";
+    const ON=on(),vout=ON?0:5;
+    const tx=172,ty=132;
+    const colX=tx+14,colY=ty-30, emX=tx+14,emY=ty+30, baseX=tx-24,baseY=ty; // transistor terminals
+    // +5 rail -> R_C -> collector (aligned to the collector terminal)
+    svg.append(s("text",{x:colX-8,y:24,class:"lbl b",fill:"var(--on)"},"+5V"));
+    svg.append(s("path",{class:"wire"+(ON?" hot flow":""),d:`M${colX},30 L${colX},46`}));
+    svg.append(resistorV(colX,46,colX,82));
+    svg.append(s("text",{x:colX+10,y:66,class:"lbl"},"R_C"));
+    svg.append(s("path",{class:"wire"+(ON?" hot flow":""),d:`M${colX},82 L${colX},${colY}`}));
+    // collector node + Vout tap
+    svg.append(s("circle",{cx:colX,cy:colY,r:4,class:"node"}));
+    svg.append(s("path",{class:"wire",d:`M${colX},${colY} L280,${colY}`}));
+    svg.append(s("text",{x:246,y:colY-9,class:"lbl b",fill:vout?"var(--on)":"var(--off)"},"Vout"));
+    svg.append(s("circle",{cx:284,cy:colY,r:5,fill:vout?"var(--on)":"var(--off)",stroke:"none"}));
+    // transistor symbol
+    svg.append(transistorSVG(tx,ty,ON,kind));
+    // base <- R_B <- input (aligned to the base terminal)
+    svg.append(s("path",{class:"wire"+((kind==="npn"?inHigh:!inHigh)?" live":""),d:`M${baseX},${baseY} L122,${baseY}`}));
+    svg.append(resistorH(72,baseY,122,baseY));
+    svg.append(s("text",{x:84,y:baseY-9,class:"lbl"},"R_B"));
+    svg.append(s("path",{class:"wire"+(inHigh?" live":""),d:`M40,${baseY} L72,${baseY}`}));
+    svg.append(s("circle",{cx:34,cy:baseY,r:4,class:"node"}));
+    svg.append(s("text",{x:14,y:baseY+4,class:"lbl b",fill:inHigh?"var(--on)":"var(--muted)"},inHigh?"1":"0"));
+    // emitter -> ground (aligned to the emitter terminal)
+    svg.append(s("path",{class:"wire"+(ON?" hot flow":""),d:`M${emX},${emY} L${emX},206`}));
+    svg.append(groundSVG(emX,212));
+    if(ON)svg.append(s("text",{x:emX+9,y:192,class:"lbl b",fill:"var(--on)"},"I"));
+  }
+  const kindSeg=seg(["NPN","PNP"],0,i=>{kind=i?"pnp":"npn";render();upOut();});
+  const inLever=leverSwitch(false,v=>{inHigh=v;render();upOut();});
+  bench.controls.append(
+    ctl("Transistor",null,kindSeg),
+    ctl("Base input",null,labeledLever("Input signal",inLever)),
+    readouts([["transistor","roT"],["C–E path","roCE"],["Vout","roV"],["as inverter","roInv"]],bench)
+  );
+  const ex=explain(bench);
+  function upOut(){
+    const ON=on(),vout=ON?0:5;
+    bench.ro.roT.innerHTML=ON?'<span class="chip on">ON</span>':'<span class="chip off">OFF</span>';
+    bench.ro.roCE.innerHTML=ON?"short":"open";
+    bench.ro.roV.innerHTML=vout+" <small>V</small>";
+    bench.ro.roV.style.color=vout?"var(--on)":"var(--off)";
+    bench.ro.roInv.innerHTML=`${inHigh?1:0} → ${vout?1:0}`;
+    ex.innerHTML=ON
+      ?`Base is driven so the transistor turns <b>ON</b>: collector-to-emitter is a <b>short</b>, dropping V<sub>out</sub> to <b>0&nbsp;V</b>. Note the input was ${inHigh?"HIGH":"LOW"} — the output is the opposite.`
+      :`Transistor is <b>OFF</b>: collector-to-emitter is <b>open</b>, so no current flows and R<sub>C</sub> pulls V<sub>out</sub> up to <b>+5&nbsp;V</b>. Input ${inHigh?"HIGH":"LOW"} → output ${vout?"HIGH":"LOW"}.`;
+    render();
+  }
+  render();upOut();
+}});
+
+/* ==================================================================
+   MODULE 8 — Relay (KEY)
+   ================================================================== */
+section({id:"relay",num:"10",title:"The Relay — an Electromechanical Switch",
+lead:"A relay is a switch thrown by a magnet. A small current in a coil pulls an armature that flips heavy-duty contacts — and, driven by a clock, it inverts.",
+build(body){
+  body.append(prose(`<p>A <span class="k">relay</span> has three parts: a <b>coil</b> (terminals C1, C2), a movable iron <b>armature</b>, and a set of <b>contacts</b> (X1, X2). Energize the coil and its <b>magnetic attraction</b> pulls the armature over, throwing the contacts. Remove power and a spring releases it.</p>
+  <p>Contacts come as <b>normally-open (NO)</b> — closed only while energized — or <b>normally-closed (NC)</b> — open only while energized. Because the coil circuit and the contact circuit are separate, a relay lets a small signal switch a big, isolated load.</p>`));
+  body.append(h("div",{class:"callout rule"},h("span",{html:"<b>The classic demo:</b> drive the coil with a clock C<sub>p</sub> and take the output from a divider the contacts switch — <b>a HIGH C<sub>p</sub> produces a LOW V<sub>out</sub></b>. The relay is acting as an inverter."})));
+
+  const bench=makeBench("RELAY-10 · COIL → ARMATURE → CONTACTS","energize the coil");
+  body.append(bench.el);
+
+  let energized=false, mode="NO", running=false;
+  const svg=s("svg",{viewBox:"0 0 360 240"});bench.stage.append(svg);
+
+  // scope for inverter view
+  const scope=h("div",{class:"scope",style:"margin-top:12px"});
+  const cv=h("canvas");scope.append(cv);
+  scope.append(h("div",{class:"scope__legend"},
+     h("span",{},h("i",{style:"background:var(--scope-a)"}),"Cp (coil)"),
+     h("span",{},h("i",{style:"background:var(--scope-b)"}),"Vout")));
+  bench.stage.parentElement.append(scope);
+
+  function render(){
+    svg.innerHTML="";
+    const e=energized;
+    const closed=(mode==="NO")?e:!e;   // is the load circuit complete?
+    // ===================== COIL CIRCUIT (left, isolated) =====================
+    svg.append(s("text",{x:44,y:32,class:"lbl b"},"Cp"));
+    svg.append(s("circle",{cx:66,cy:42,r:4,class:"node"}));
+    svg.append(s("path",{class:"wire"+(e?" live flow":""),d:"M66,42 L66,70"}));
+    // coil body
+    svg.append(s("rect",{x:40,y:70,width:54,height:74,rx:9,fill:e?"var(--sig-soft)":"var(--surface)",stroke:e?"var(--coil)":"var(--line-strong)","stroke-width":2}));
+    for(let i=0;i<4;i++)svg.append(s("path",{d:`M50,${82+i*16} q17,-10 34,0`,fill:"none",stroke:e?"var(--coil)":"var(--wire)","stroke-width":2.2}));
+    svg.append(s("text",{x:22,y:68,class:"lbl"},"C1"));
+    svg.append(s("text",{x:22,y:156,class:"lbl"},"C2"));
+    svg.append(s("path",{class:"wire"+(e?" live":""),d:"M66,144 L66,176"}));
+    svg.append(groundSVG(66,182));
+    svg.append(s("text",{x:34,y:206,class:"lbl b",fill:e?"var(--coil)":"var(--faint)"},e?"ENERGIZED":"off"));
+    // ===================== MECHANICAL LINK (armature) =====================
+    svg.append(s("line",{x1:94,y1:107,x2:172,y2:107,stroke:"var(--coil)","stroke-width":1.8,"stroke-dasharray":"5 4",opacity:e?1:.45}));
+    svg.append(s("text",{x:100,y:99,class:"lbl",fill:"var(--coil)"},"armature"));
+    // ===================== SPDT CONTACTS (right) =====================
+    const pvX=180,pvY=107,contX=252,ncY=76,noY=138;
+    // fixed contacts
+    svg.append(s("circle",{cx:contX,cy:ncY,r:4,class:"node"}));
+    svg.append(s("circle",{cx:contX,cy:noY,r:4,class:"node"}));
+    svg.append(s("text",{x:contX+9,y:ncY+4,class:"lbl b"},"NC"));
+    svg.append(s("text",{x:contX+9,y:noY+4,class:"lbl b"},"NO"));
+    // moving blade (down when energized)
+    const bladeY=e?noY:ncY;
+    const blade=s("line",{x1:pvX,y1:pvY,x2:contX,y2:bladeY,class:"ink","stroke-width":3.6,"stroke-linecap":"round"});
+    blade.style.transition="all .22s cubic-bezier(.34,1.3,.6,1)";
+    svg.append(s("circle",{cx:pvX,cy:pvY,r:4,class:"node"}),blade);
+    svg.append(s("text",{x:pvX-18,y:pvY+20,class:"lbl b"},"X1"));
+    // common pole to ground
+    svg.append(s("path",{class:"wire"+(closed?" hot":""),d:`M${pvX},${pvY} L${pvX},176`}));
+    svg.append(groundSVG(pvX,182));
+    // ===================== LOAD: +V -> R -> lamp -> selected contact =====================
+    const selY=(mode==="NO")?noY:ncY;
+    svg.append(s("text",{x:302,y:34,class:"lbl b",fill:"var(--on)"},"+V"));
+    svg.append(s("path",{class:"wire hot",d:"M314,40 L314,58"}));
+    svg.append(resistorV(314,58,314,92));
+    svg.append(lampSVG(314,116,closed,closed?1:0));
+    svg.append(s("path",{class:"wire"+(closed?" hot flow":" dead"),d:`M314,138 L314,${selY} L${contX},${selY}`}));
+    svg.append(s("text",{x:250,y:206,"text-anchor":"middle",class:"lbl b",fill:closed?"var(--on)":"var(--off)"},closed?"load ON":"load OFF"));
+  }
+
+  const coilLever=leverSwitch(false,v=>{energized=v;render();upOut();});
+  const modeSeg=seg(["Normally-open","Normally-closed"],0,i=>{mode=i?"NC":"NO";render();upOut();});
+  const runBtn=h("button",{class:"bbtn",onclick:()=>{running=!running;runBtn.innerHTML=running?"⏸ Stop clock":"▶ Run as inverter";if(running)tick();else if(window.__relayStatic)window.__relayStatic();}},"▶ Run as inverter");
+  bench.controls.append(
+    ctl("Coil (Cp)",null,labeledLever("Energize",coilLever)),
+    ctl("Contact type",null,modeSeg),
+    h("div",{},runBtn),
+    readouts([["coil","roCoil"],["armature","roArm"],["load lamp","roLoad"]],bench)
+  );
+  const ex=explain(bench);
+  function upOut(){
+    const contactClosed=(mode==="NO")?energized:!energized;
+    bench.ro.roCoil.innerHTML=energized?'<span class="chip sig">energized</span>':'<span class="chip neutral">off</span>';
+    bench.ro.roArm.innerHTML=energized?"pulled in":"released";
+    bench.ro.roLoad.innerHTML=contactClosed?'<span class="chip on">ON</span>':'<span class="chip off">OFF</span>';
+    ex.innerHTML=energized
+      ? `Coil energized → magnetic attraction pulls the armature in → the <b>${mode}</b> contact ${contactClosed?"closes, so the load is <b>ON</b>":"opens, so the load is <b>OFF</b>"}.`
+      : `Coil off → spring releases the armature → the <b>${mode}</b> contact ${contactClosed?"stays closed (load <b>ON</b>)":"is open (load <b>OFF</b>)"}.`;
+    if(mode==="NO"){ex.innerHTML+=` That's the inverter action: a HIGH on C<sub>p</sub> drives V<sub>out</sub> LOW.`;}
+    render();
+    if(!running && window.__relayStatic) window.__relayStatic();
+  }
+  render();upOut();
+
+  // scope for the inverter demo — always shows the present Cp/Vout, scrolls while running
+  let hist=[],t=0,last=0;
+  // Scope shows the inverter wiring: Vout is the INVERSE of Cp (HIGH Cp → LOW Vout)
+  const curState=()=>[energized?1:0,energized?0:1];
+  function tick(){if(running){last=0;t=0;requestAnimationFrame(drawScope);}}
+  function staticScope(){
+    const w=Math.max(2,Math.floor(cw(cv)));
+    const st=curState();hist=Array.from({length:w},()=>st.slice());
+    paint();
+  }
+  function paint(){
+    const dpr=Math.min(2,window.devicePixelRatio||1);const w=cw(cv),ht=120;
+    cv.width=w*dpr;cv.height=ht*dpr;const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,ht);
+    scopeGrid(ctx,w,ht,8,4);
+    const aHi=ht*0.18,aLo=ht*0.40,bHi=ht*0.60,bLo=ht*0.82;
+    ctx.font="10px 'IBM Plex Mono',monospace";ctx.fillStyle=cvar("--scope-dim");
+    ctx.fillText("Cp",4,aLo-4);ctx.fillText("Vout",4,bLo-4);
+    ctx.lineWidth=2.4;ctx.lineJoin="round";
+    ctx.strokeStyle=cvar("--scope-a");ctx.beginPath();
+    hist.forEach((p,i)=>{const y=p[0]?aHi:aLo;i===0?ctx.moveTo(i,y):(ctx.lineTo(i,hist[i-1][0]?aHi:aLo),ctx.lineTo(i,y));});ctx.stroke();
+    ctx.strokeStyle=cvar("--scope-b");ctx.beginPath();
+    hist.forEach((p,i)=>{const y=p[1]?bHi:bLo;i===0?ctx.moveTo(i,y):(ctx.lineTo(i,hist[i-1][1]?bHi:bLo),ctx.lineTo(i,y));});ctx.stroke();
+  }
+  function drawScope(ts){
+    if(!running)return;
+    const dt=last?(ts-last)/1000:0;last=ts;t+=dt;
+    const clk=Math.floor(t/0.85)%2===0;
+    if(clk!==energized){energized=clk;coilLever.set(clk);upOut();}
+    const w=Math.max(2,Math.floor(cw(cv)));
+    hist.push(curState());while(hist.length>w)hist.shift();
+    paint();
+    requestAnimationFrame(drawScope);
+  }
+  // expose staticScope to upOut via closure flag
+  window.__relayStatic=staticScope;
+  requestAnimationFrame(staticScope);
+}});
+
+/* ==================================================================
+   MODULE 11 — Four ways to light an LED
+   ================================================================== */
+section({id:"led",num:"11",title:"Four Ways to Light an LED",
+lead:"An LED is a diode that glows when forward biased. Four ways to drive one — a switch, a selector, a transistor, and a logic gate — each a step up in capability.",
+build(body){
+  body.append(prose(`<p>A <span class="k">light-emitting diode (LED)</span> illuminates when forward biased, so it's the standard way to show a HIGH/LOW logic level. There are increasingly capable ways to drive one:</p>`));
+  const bench=makeBench("LED-11 · DRIVE METHODS","pick a method");
+  body.append(bench.el);
+
+  let method=0; // 0 SPST,1 SPDT,2 transistor,3 inverter
+  let sw=false, sel=false, vin=3.75;
+  const svg=s("svg",{viewBox:"0 0 340 220"});bench.stage.append(svg);
+
+  function ledOn(){
+    if(method===0)return sw;                 // SPST closed -> on
+    if(method===1)return true;               // SPDT: one of two always on (which one)
+    if(method===2)return sw;                 // switch turns transistor on
+    if(method===3)return vin>=2.5;           // HIGH in -> inverter LOW out -> LED4 on
+    return false;
+  }
+  function render(){
+    svg.innerHTML="";
+    const on=ledOn();
+    if(method===0){
+      // ---- (a) SPST switch in series with R and the LED ----
+      svg.append(batterySVG(46,120,true));
+      svg.append(s("path",{class:"wire"+(sw?" hot flow":""),d:"M46,96 L46,58 L118,58"}));
+      const bx=190;
+      svg.append(s("circle",{cx:118,cy:58,r:4,class:"node"}),s("circle",{cx:bx,cy:58,r:4,class:"node"}));
+      const arm=s("line",{class:"ink",x1:118,y1:58,x2:sw?bx:bx-8,y2:sw?58:38,"stroke-width":3.4,"stroke-linecap":"round"});arm.style.transition="all .2s";
+      svg.append(arm);
+      svg.append(s("text",{x:130,y:82,class:"lbl b"},"SPST"));
+      svg.append(s("path",{class:"wire"+(sw?" hot flow":""),d:`M${bx},58 L260,58 L260,80`}));
+      svg.append(resistorV(260,80,260,112));svg.append(s("text",{x:270,y:100,class:"lbl"},"330Ω"));
+      svg.append(s("path",{class:"wire"+(sw?" hot flow":""),d:"M260,112 L260,127"}));
+      svg.append(ledSVG(260,140,on));
+      svg.append(s("path",{class:"wire"+(sw?" hot flow":""),d:"M260,153 L260,192 L46,192 L46,144"}));
+    }else if(method===1){
+      // ---- (b) SPDT selects which of two LEDs lights ----
+      svg.append(s("text",{x:34,y:24,class:"lbl b",fill:"var(--on)"},"+5V"));
+      svg.append(s("path",{class:"wire hot",d:"M46,30 L46,46"}));
+      svg.append(resistorV(46,46,46,80));
+      svg.append(s("path",{class:"wire hot",d:"M46,80 L46,100"}));
+      svg.append(s("circle",{cx:46,cy:100,r:4,class:"node"}));   // SPDT pole
+      const tUpY=76,tDnY=124;
+      svg.append(s("circle",{cx:108,cy:tUpY,r:4,class:"node"}),s("circle",{cx:108,cy:tDnY,r:4,class:"node"}));
+      const bl=s("line",{class:"ink",x1:46,y1:100,x2:108,y2:sel?tDnY:tUpY,"stroke-width":3.4,"stroke-linecap":"round"});bl.style.transition="all .2s";
+      svg.append(bl);
+      svg.append(s("text",{x:30,y:150,class:"lbl b"},"SPDT"));
+      // upper branch -> LED1
+      svg.append(s("path",{class:"wire"+(!sel?" hot flow":" dead"),d:"M108,76 L200,76 L200,89"}));
+      svg.append(ledSVG(200,102,!sel));
+      svg.append(s("text",{x:186,y:132,class:"lbl b"},"LED1"));
+      svg.append(s("path",{class:"wire"+(!sel?" hot flow":" dead"),d:"M200,115 L200,186"}));
+      // lower branch -> LED2
+      svg.append(s("path",{class:"wire"+(sel?" hot flow":" dead"),d:"M108,124 L270,124 L270,137"}));
+      svg.append(ledSVG(270,150,sel));
+      svg.append(s("text",{x:256,y:180,class:"lbl b"},"LED2"));
+      svg.append(s("path",{class:"wire"+(sel?" hot flow":" dead"),d:"M270,163 L270,186"}));
+      // shared ground rail
+      svg.append(s("path",{class:"wire",d:"M150,186 L270,186"}));
+      svg.append(groundSVG(150,192));
+    }else if(method===2){
+      // ---- (c) switch turns on a transistor that sinks the LED current ----
+      const tx=158,ty=150,colX=tx+14,colY=ty-30,emX=tx+14,emY=ty+30,baseX=tx-24,baseY=ty;
+      svg.append(s("text",{x:colX-8,y:22,class:"lbl b",fill:"var(--on)"},"+5V"));
+      svg.append(s("path",{class:"wire"+(on?" hot flow":""),d:`M${colX},28 L${colX},44`}));
+      svg.append(resistorV(colX,44,colX,72));
+      svg.append(s("path",{class:"wire"+(on?" hot flow":""),d:`M${colX},72 L${colX},87`}));
+      svg.append(ledSVG(colX,100,on));
+      svg.append(s("path",{class:"wire"+(on?" hot flow":""),d:`M${colX},113 L${colX},${colY}`}));
+      svg.append(transistorSVG(tx,ty,on,"npn"));
+      // base <- R_B <- switch <- input
+      svg.append(s("circle",{cx:34,cy:baseY,r:4,class:"node"}));
+      svg.append(s("text",{x:14,y:baseY+4,class:"lbl b",fill:sw?"var(--on)":"var(--muted)"},sw?"1":"0"));
+      const pX=52,thX=82;
+      svg.append(s("circle",{cx:pX,cy:baseY,r:4,class:"node"}),s("circle",{cx:thX,cy:baseY,r:4,class:"node"}));
+      svg.append(s("path",{class:"wire"+(sw?" live":""),d:`M40,${baseY} L${pX},${baseY}`}));
+      const sarm=s("line",{class:"ink",x1:pX,y1:baseY,x2:sw?thX:thX-6,y2:sw?baseY:baseY-16,"stroke-width":3.2,"stroke-linecap":"round"});sarm.style.transition="all .2s";svg.append(sarm);
+      svg.append(resistorH(thX,baseY,thX+40,baseY));
+      svg.append(s("text",{x:thX+8,y:baseY-9,class:"lbl"},"R_B"));
+      svg.append(s("path",{class:"wire"+(sw?" live":""),d:`M${thX+40},${baseY} L${baseX},${baseY}`}));
+      svg.append(s("text",{x:pX-4,y:baseY+22,class:"lbl"},"switch"));
+      // emitter -> ground
+      svg.append(s("path",{class:"wire"+(on?" hot flow":""),d:`M${emX},${emY} L${emX},202`}));
+      svg.append(groundSVG(emX,208));
+    }else{
+      // ---- (d) inverter output goes LOW and sinks the LED ----
+      svg.append(s("text",{x:22,y:100,class:"lbl b"},"Vin"));
+      svg.append(s("circle",{cx:42,cy:112,r:4,class:"node"}));
+      svg.append(s("path",{class:"wire"+(vin>=2.5?" live":""),d:"M42,112 L92,112"}));
+      svg.append(inverterSVG(92,112));
+      svg.append(s("text",{x:100,y:94,class:"lbl"},"7404"));
+      // +5 -> R -> LED -> (cathode) inverter output
+      svg.append(s("text",{x:224,y:24,class:"lbl b",fill:"var(--on)"},"+5V"));
+      svg.append(s("path",{class:"wire hot",d:"M236,30 L236,48"}));
+      svg.append(resistorV(236,48,236,80));
+      svg.append(s("path",{class:"wire"+(on?" hot flow":""),d:"M236,80 L236,95"}));
+      svg.append(ledSVG(236,108,on));
+      svg.append(s("path",{class:"wire"+(on?" hot flow":""),d:"M236,121 L236,172 L146,172 L146,112"}));
+      svg.append(s("text",{x:110,y:200,class:"lbl",fill:"var(--muted)"},"HIGH in → LOW out → LED on"));
+    }
+  }
+  const methodSeg=seg(["a · SPST","b · SPDT","c · Transistor","d · Inverter"],0,i=>{method=i;syncCtrls();render();upOut();});
+  const swLever=leverSwitch(false,v=>{sw=v;render();upOut();});
+  const selSeg=seg(["LED 1","LED 2"],0,i=>{sel=!!i;render();upOut();});
+  const vinSlider=h("input",{type:"range",min:0,max:5,step:0.05,value:3.75,oninput:e=>{vin=+e.target.value;vinLab.textContent=vin.toFixed(2)+" V";render();upOut();}});
+  const vinLab=h("span",{class:"v mono"},"3.75 V");
+  const swWrap=ctl("Switch",null,labeledLever("Press",swLever));
+  const selWrap=ctl("SPDT selector",null,selSeg);
+  const vinWrap=ctl("Input voltage",vinLab,vinSlider);
+  bench.controls.append(ctl("Drive method",null,methodSeg),swWrap,selWrap,vinWrap,
+    readouts([["LED","roLed"],["how","roHow"]],bench));
+  const ex=explain(bench);
+  function syncCtrls(){
+    swWrap.style.display=(method===0||method===2)?"":"none";
+    selWrap.style.display=method===1?"":"none";
+    vinWrap.style.display=method===3?"":"none";
+  }
+  function upOut(){
+    const on=ledOn();
+    bench.ro.roLed.innerHTML=on?'<span class="chip on">lit</span>':'<span class="chip off">dark</span>';
+    const how=["closed switch passes LED current","SPDT routes current through one LED","transistor sinks the LED current","inverter output goes LOW, sinking LED"][method];
+    bench.ro.roHow.innerHTML=how;
+    const notes=[
+      sw?`The SPST is closed: 5&nbsp;V forward-biases the LED through the 330&nbsp;Ω resistor — <b>lit</b>.`:`SPST open — no path, LED <b>dark</b>. All the LED current has to flow through the switch here.`,
+      `The SPDT sends current through <b>LED&nbsp;${sel?2:1}</b>; the other stays dark. The switch simply <b>selects</b> which LED lights.`,
+      sw?`The switch turns the <b>transistor ON</b>, giving the LED current a collector-to-emitter path to ground. The switch only carries ≈&nbsp;0.5&nbsp;mA of base current, not the LED's 10&nbsp;mA.`:`Switch open → transistor <b>OFF</b> → no path → LED dark.`,
+      vin>=2.5?`V<sub>in</sub>=${vin.toFixed(2)}&nbsp;V looks <b>HIGH</b> to the inverter, so its output goes <b>LOW</b> and sinks the LED current — <b>lit</b>. A HIGH into an inverter always gives a LOW out.`:`V<sub>in</sub>=${vin.toFixed(2)}&nbsp;V looks <b>LOW</b>; the inverter outputs <b>HIGH</b>, so there's no voltage across the LED — dark.`
+    ];
+    ex.innerHTML=notes[method];
+    render();
+  }
+  syncCtrls();render();upOut();
+}});
+
+/* ==================================================================
+   MODULE 12 — Capacitors & the RC time constant
+   ================================================================== */
+section({id:"capacitor",num:"12",title:"Capacitors &amp; the RC Time Constant",
+lead:"A capacitor is two plates that store charge. It can't change its voltage instantly — and the time it takes is set by one number: τ = R·C.",
+build(body){
+  body.append(prose(`<p>A <span class="k">capacitor</span> stores energy as charge on two parallel plates (its symbol is two <b>equal-length</b> plates — unlike a battery's long-and-short pair). Because the plates must physically accumulate charge, a capacitor <b>opposes sudden voltage change</b>: once charged it blocks steady DC, but it passes every <i>change</i> — which is exactly why capacitors filter, smooth, and couple signals.</p>
+  <p>Charge one through a resistor and the voltage follows an exponential: after one <b>time constant τ = R·C</b> it reaches <b>63%</b> of the source; after <b>5τ</b> it's ≈99% — effectively full. Discharge is the mirror image: down to <b>37%</b> at 1τ.</p>`));
+  body.append(h("div",{class:"callout rule"},h("span",{html:"<b>τ = R × C.</b> 10&nbsp;kΩ × 100&nbsp;µF = 1.0&nbsp;s. Charging: 63% at 1τ, ≈99% at 5τ. Discharging: 37% at 1τ."})));
+
+  const bench=makeBench("CAP-12 · RC BENCH","charge & discharge");
+  body.append(bench.el);
+
+  let V=5, C=100, Ri=1, mode="charge";          // C in µF; R options below
+  const RVALS=[1e3,1e4,1e5], RNAMES=["1 kΩ","10 kΩ","100 kΩ"];
+  const tau=()=>RVALS[Ri]*C*1e-6;
+
+  // ---- stage: circuit sketch + charging-curve canvas ----
+  const svg=s("svg",{viewBox:"0 0 360 150"});
+  bench.stage.append(svg);
+  const cvWrap=h("div",{style:"margin-top:12px"});
+  const cv=h("canvas",{style:"width:100%;height:196px;display:block;border-radius:8px;background:var(--scope-face)"});
+  cvWrap.append(h("div",{class:"bench__label",style:"margin:0 0 6px;color:var(--muted)"},"CAPACITOR VOLTAGE vs TIME"),cv);
+  bench.stage.parentElement.append(cvWrap);
+
+  function drawCircuit(){
+    svg.innerHTML="";
+    const chg=mode==="charge";
+    const wc="wire hot flow";
+    // battery (idle during discharge)
+    svg.append(batterySVG(36,96,true));
+    svg.append(s("path",{class:chg?wc:"wire dead",d:"M36,72 L36,30 L80,30"}));
+    svg.append(s("path",{class:chg?wc:"wire dead",d:"M36,120 L36,130"}));
+    svg.append(groundSVG(36,136));
+    // SPDT throws: up = charge (battery), down = discharge (to ground)
+    svg.append(s("circle",{cx:84,cy:30,r:4,class:"node"}));
+    svg.append(s("text",{x:54,y:18,class:"lbl"},"charge"));
+    svg.append(s("circle",{cx:84,cy:58,r:4,class:"node"}));
+    svg.append(s("text",{x:96,y:76,class:"lbl"},"disch."));
+    svg.append(s("path",{class:chg?"wire dead":wc,d:"M84,58 L66,58 L66,102"}));
+    svg.append(groundSVG(66,108));
+    const arm=s("line",{class:"ink",x1:138,y1:44,x2:84,y2:chg?30:58,"stroke-width":3.4,"stroke-linecap":"round"});
+    arm.style.transition="all .2s";
+    svg.append(s("circle",{cx:138,cy:44,r:4,class:"node"}),arm);
+    // series resistor on the top rail
+    svg.append(s("path",{class:wc,d:"M138,44 L158,44"}));
+    svg.append(resistorH(158,44,208,44));
+    svg.append(s("text",{x:166,y:32,class:"lbl"},RNAMES[Ri]));
+    svg.append(s("path",{class:wc,d:"M208,44 L290,44 L290,62"}));
+    // capacitor: two EQUAL plates (a battery's are long + short)
+    svg.append(s("line",{x1:272,y1:62,x2:308,y2:62,class:"ink","stroke-width":3}));
+    svg.append(s("line",{x1:272,y1:74,x2:308,y2:74,class:"ink","stroke-width":3}));
+    svg.append(s("text",{x:314,y:72,class:"lbl"},C+" µF"));
+    svg.append(s("path",{class:wc,d:"M290,74 L290,100"}));
+    svg.append(groundSVG(290,106));
+    svg.append(s("text",{x:200,y:134,class:"lbl b",fill:chg?"var(--on)":"var(--off)"},chg?"charging →":"← discharging"));
+  }
+  // ---- controls ----
+  const vLab=h("span",{class:"v mono"},"5.0 V");
+  const vSlider=h("input",{type:"range",min:1,max:10,step:0.1,value:5,"aria-label":"Source voltage",
+    oninput:e=>{V=+e.target.value;update();}});
+  const cLab=h("span",{class:"v mono"},"100 µF");
+  const cSlider=h("input",{type:"range",min:0,max:100,step:1,value:67,"aria-label":"Capacitance",
+    oninput:e=>{C=Math.round(Math.pow(10,(+e.target.value/100)*3));update();}}); // 1..1000 µF, log
+  const rSeg=seg(RNAMES,1,i=>{Ri=i;update();});
+  const modeSeg=seg(["Charge","Discharge"],0,i=>{mode=i?"discharge":"charge";phase=0;update();});
+  bench.controls.append(
+    ctl("Source voltage",vLab,vSlider),
+    ctl("Capacitance (log scale)",cLab,cSlider),
+    ctl("Series resistance",null,rSeg),
+    ctl("Switch position",null,modeSeg),
+    readouts([["time constant τ","roTau"],["63% / 37% at 1τ","ro63"],["≈ full at 5τ","ro5"],["initial current","roI0"]],bench)
+  );
+  const ex=explain(bench);
+
+  function update(){
+    const T=tau(), chg=mode==="charge";
+    vLab.textContent=V.toFixed(1)+" V";
+    cLab.textContent=C+" µF";
+    bench.ro.roTau.innerHTML=eng(T,"s");
+    bench.ro.ro63.innerHTML=(chg?(V*0.632):(V*0.368)).toFixed(2)+' <small>V at '+eng(T,"s")+'</small>';
+    bench.ro.ro5.innerHTML=eng(5*T,"s");
+    bench.ro.roI0.innerHTML=eng(V/RVALS[Ri],"A");
+    drawCircuit();
+    ex.innerHTML=chg
+      ?`<b>Charging:</b> τ = ${RNAMES[Ri].replace(" ","&nbsp;")} × ${C}&nbsp;µF = <b>${eng(T,"s")}</b>. The capacitor follows V<sub>C</sub> = ${V.toFixed(1)}·(1&nbsp;−&nbsp;e<sup>−t/τ</sup>): it climbs fastest at the start (initial current ${eng(V/RVALS[Ri],"A")} through the resistor), reaches <b>${(V*0.632).toFixed(2)}&nbsp;V (63%)</b> at 1τ, and is essentially full (≈99%) by <b>${eng(5*T,"s")}</b>. Once full, current stops — a charged capacitor blocks DC.`
+      :`<b>Discharging:</b> the switch disconnects the source and the capacitor drives its stored charge back through the same resistor: V<sub>C</sub> = ${V.toFixed(1)}·e<sup>−t/τ</sup>. It falls to <b>${(V*0.368).toFixed(2)}&nbsp;V (37%)</b> at 1τ = ${eng(T,"s")} and is nearly empty by 5τ. Same τ, mirrored curve.`;
+  }
+  update();
+
+  // ---- curve canvas: static exponential + sweeping dot (display time is normalized to 5τ) ----
+  let phase=0,last=0;
+  function draw(ts){
+    const dt=last?(ts-last)/1000:0;last=ts;
+    if(!prefersReduced)phase=(phase+dt/3.2)%1;
+    const dpr=Math.min(2,window.devicePixelRatio||1);const w=cw(cv),ht=196;
+    cv.width=w*dpr;cv.height=ht*dpr;const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,ht);
+    const T=tau(), chg=mode==="charge";
+    const mL=44,mB=ht-24,mT=12,plotW=w-mL-10;
+    const X=f=>mL+f*plotW, Y=v=>mB-(v/V)*(mB-mT);
+    // grid: verticals at each τ
+    ctx.strokeStyle=cvar("--scope-grid");ctx.lineWidth=1;
+    for(let k=0;k<=5;k++){const x=X(k/5);ctx.beginPath();ctx.moveTo(x,mT);ctx.lineTo(x,mB);ctx.stroke();}
+    ctx.beginPath();ctx.moveTo(mL,mT);ctx.lineTo(mL,mB);ctx.lineTo(w-6,mB);ctx.strokeStyle=cvar("--scope-dim");ctx.stroke();
+    // axis labels
+    ctx.font="9.5px 'IBM Plex Mono',monospace";ctx.fillStyle=cvar("--scope-dim");
+    ctx.textAlign="center";
+    for(let k=1;k<=4;k++)ctx.fillText(k+"τ"+(k===1?" · "+eng(T,"s"):""),X(k/5),ht-8);
+    ctx.textAlign="right";ctx.fillText("5τ · "+eng(5*T,"s"),w-8,ht-8);ctx.textAlign="center";
+    ctx.textAlign="right";
+    ctx.fillText(V.toFixed(1)+" V",mL-4,Y(V)+3);
+    ctx.fillText("0",mL-4,Y(0)+3);
+    // 63% / 37% marker
+    const mk=chg?0.632:0.368;
+    ctx.setLineDash([3,3]);ctx.strokeStyle=cvar("--scope-b");
+    ctx.beginPath();ctx.moveTo(mL,Y(mk*V));ctx.lineTo(X(1/5),Y(mk*V));ctx.lineTo(X(1/5),mB);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=cvar("--scope-b");
+    ctx.fillText((mk*100).toFixed(0)+"%",mL+34,Y(mk*V)-4);
+    ctx.textAlign="left";
+    // curve
+    const vc=f=>chg?V*(1-Math.exp(-5*f)):V*Math.exp(-5*f);   // f = t/5τ
+    ctx.strokeStyle=cvar("--scope-b");ctx.lineWidth=2.6;ctx.lineJoin="round";ctx.beginPath();
+    for(let i=0;i<=220;i++){const f=i/220;const x=X(f),y=Y(vc(f));i?ctx.lineTo(x,y):ctx.moveTo(x,y);}
+    ctx.stroke();
+    // sweeping dot with live Vc
+    const f=phase, x=X(f), y=Y(vc(f));
+    ctx.fillStyle=cvar("--on");
+    ctx.globalAlpha=.3;ctx.beginPath();ctx.arc(x,y,9,0,7);ctx.fill();ctx.globalAlpha=1;
+    ctx.beginPath();ctx.arc(x,y,4.5,0,7);ctx.fill();
+    ctx.font="10px 'IBM Plex Mono',monospace";
+    ctx.fillText(vc(f).toFixed(2)+" V",Math.min(x+8,w-58),Math.max(y-8,20));
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+  window.addEventListener("resize",update);
+}});
+
+/* ==================================================================
+   MODULE 10 — Glossary
+   ================================================================== */
+section({id:"glossary",num:"13",title:"Key Terms",
+lead:"The vocabulary, in one place.",
+build(body){
+  const terms=[
+    ["Logic level","A 1 or 0 represented by a voltage — ideally 5 V (HIGH) and 0 V (LOW)."],
+    ["Period (tₚ)","Time for one full clock cycle, edge to matching edge. tₚ = 1/f."],
+    ["Frequency (f)","Cycles per second, in hertz. f = 1/tₚ."],
+    ["Serial / Parallel","One bit per wire over time, vs. all bits on separate wires at once."],
+    ["SPST / SPDT","Single-pole single-throw (on/off) vs. single-pole double-throw (selector)."],
+    ["Forward bias","Anode positive; above ~0.7 V the diode conducts."],
+    ["Reverse bias","Polarity flipped; the diode blocks all but tiny leakage."],
+    ["Anode / Cathode","Diode's positive (triangle) and negative (bar) terminals."],
+    ["0.7 V model","A forward diode ≈ ideal switch + 0.7 V drop."],
+    ["NPN / PNP","Bipolar transistor types; base signal shorts or opens collector-emitter."],
+    ["Inverter","Output is the logical opposite of the input (HIGH→LOW)."],
+    ["Relay","Coil-driven electromechanical switch; isolates and switches large loads."],
+    ["NO / NC contact","Normally-open (closes when energized) / normally-closed (opens when energized)."],
+    ["LED","Light-emitting diode; glows when forward biased, shows logic state."],
+    ["ASCII","The standard code assigning each character a number ('A' = 65 = 0x41)."],
+    ["Baud / bps","Symbols per second vs. bits per second — equal on two-level serial links."],
+    ["4–20 mA loop","Industrial analog standard: 4 mA = 0% of range, 20 mA = 100%, immune to line resistance."],
+    ["HART","Digital protocol superimposed on a 4–20 mA loop as ±0.5 mA Bell 202 FSK at 1200 bps."],
+    ["Mark / Space","The two FSK tones for 1 and 0 — in HART, 1200 Hz and 2200 Hz."],
+    ["Checksum","XOR of the frame's bytes, appended so the receiver can detect corruption."],
+    ["Capacitor","Two equal plates storing charge; opposes sudden voltage change — blocks DC, passes changes."],
+    ["Time constant (τ)","τ = R·C — the time to charge to 63% (or discharge to 37%); ≈ full in 5τ."]
+  ];
+  const g=h("dl",{class:"gloss"});
+  terms.forEach(([t,d])=>g.append(h("div",{class:"gcard"},h("dt",{html:t}),h("dd",{html:d}))));
+  body.append(g);
+}});
+
+/* ==================================================================
+   SVG component factories
+   ================================================================== */
+function diodeSVG(x,y,live,small){
+  const g=s("g",{});const w=small?22:30,hh=11;
+  g.append(s("path",{class:"wire"+(live?" hot":""),d:`M${x-14},${y} L${x},${y}`}));
+  g.append(s("path",{d:`M${x},${y-hh} L${x},${y+hh} L${x+w},${y} Z`,fill:live?"var(--on)":"none",stroke:live?"var(--on)":"var(--ink)","stroke-width":2.4,"stroke-linejoin":"round"}));
+  g.append(s("line",{x1:x+w,y1:y-hh,x2:x+w,y2:y+hh,stroke:live?"var(--on)":"var(--ink)","stroke-width":2.8,"stroke-linecap":"round"}));
+  g.append(s("path",{class:"wire"+(live?" hot":""),d:`M${x+w},${y} L${x+w+14},${y}`}));
+  return g;
+}
+function diodeSVGLeft(x,y,live){ // points left (cathode bar on left)
+  const g=s("g",{});const w=30,hh=11;
+  g.append(s("path",{d:`M${x+w},${y-hh} L${x+w},${y+hh} L${x},${y} Z`,fill:live?"var(--on)":"none",stroke:live?"var(--on)":"var(--ink)","stroke-width":2.4,"stroke-linejoin":"round"}));
+  g.append(s("line",{x1:x,y1:y-hh,x2:x,y2:y+hh,stroke:live?"var(--on)":"var(--ink)","stroke-width":2.8}));
+  return g;
+}
+function ledSVG(x,y,on){ // vertical LED, current down
+  const g=s("g",{});const hh=13,w=22;
+  g.append(s("path",{d:`M${x-w/2},${y-hh} L${x+w/2},${y-hh} L${x},${y+hh} Z`,fill:on?"var(--sig)":"none",stroke:on?"var(--sig)":"var(--ink)","stroke-width":2.4,"stroke-linejoin":"round"}));
+  g.append(s("line",{x1:x-w/2,y1:y+hh,x2:x+w/2,y2:y+hh,stroke:on?"var(--sig)":"var(--ink)","stroke-width":2.8}));
+  // two clean emission arrows off the right edge (identifies it as an LED), bright when lit
+  const ec=on?"var(--sig)":"var(--faint)";
+  for(let i=0;i<2;i++){const sx=x+w/2+4+i*7,sy=y-3+i*5;
+    g.append(s("line",{x1:sx,y1:sy,x2:sx+11,y2:sy-11,stroke:ec,"stroke-width":1.8,"stroke-linecap":"round"}));
+    g.append(s("path",{d:`M${sx+11},${sy-11} l-5,0.5 l0.5,-5 z`,fill:ec}));}
+  return g;
+}
+function ledSVGh(x,y,on){ // horizontal LED pointing right
+  const g=s("g",{});const hh=13,w=22;
+  g.append(s("path",{d:`M${x},${y-hh} L${x},${y+hh} L${x+w},${y} Z`,fill:on?"var(--sig)":"none",stroke:on?"var(--sig)":"var(--ink)","stroke-width":2.4,"stroke-linejoin":"round"}));
+  g.append(s("line",{x1:x+w,y1:y-hh,x2:x+w,y2:y+hh,stroke:on?"var(--sig)":"var(--ink)","stroke-width":2.8}));
+  // two emission arrows above the body, pointing up-right
+  const ec=on?"var(--sig)":"var(--faint)";
+  for(let i=0;i<2;i++){const sx=x+4+i*7,sy=y-hh-3-i*1;
+    g.append(s("line",{x1:sx,y1:sy,x2:sx+11,y2:sy-11,stroke:ec,"stroke-width":1.8,"stroke-linecap":"round"}));
+    g.append(s("path",{d:`M${sx+11},${sy-11} l-5,0.5 l0.5,-5 z`,fill:ec}));}
+  return g;
+}
+function batterySVG(x,y,posTop){
+  const g=s("g",{});
+  // two plates
+  const yl=y-24,ys=y-8,ys2=y+8,yl2=y+24;
+  g.append(s("line",{x1:x-14,y1:posTop?yl:ys,x2:x+14,y2:posTop?yl:ys,class:"ink","stroke-width":3}));
+  g.append(s("line",{x1:x-8,y1:posTop?ys:yl,x2:x+8,y2:posTop?ys:yl,class:"ink","stroke-width":3}));
+  g.append(s("line",{x1:x-14,y1:posTop?ys2:yl2,x2:x+14,y2:posTop?ys2:yl2,class:"ink","stroke-width":3}));
+  g.append(s("line",{x1:x-8,y1:posTop?yl2:ys2,x2:x+8,y2:posTop?yl2:ys2,class:"ink","stroke-width":3}));
+  g.append(s("text",{x:x+18,y:posTop?y-18:y+24,class:"lbl b",fill:"var(--on)"},"+"));
+  g.append(s("text",{x:x+18,y:posTop?y+28:y-14,class:"lbl b",fill:"var(--off)"},"−"));
+  return g;
+}
+function lampSVG(x,y,on,bright){
+  const g=s("g",{});
+  if(on){
+    g.append(s("circle",{cx:x,cy:y,r:26,fill:"var(--sig)",opacity:.1+.1*(bright||1)}));
+    g.append(s("circle",{cx:x,cy:y,r:18,fill:"var(--sig)","fill-opacity":.9,stroke:"var(--sig)","stroke-width":2.4}));
+    for(let i=0;i<8;i++){const a=i*Math.PI/4;g.append(s("line",{x1:x+22*Math.cos(a),y1:y+22*Math.sin(a),x2:x+30*Math.cos(a),y2:y+30*Math.sin(a),stroke:"var(--sig)","stroke-width":2,"stroke-linecap":"round",opacity:.75}));}
+  }else{
+    g.append(s("circle",{cx:x,cy:y,r:18,fill:"var(--surface)",stroke:"var(--ink)","stroke-width":2.4}));
+    g.append(s("path",{d:`M${x-9},${y-9} L${x+9},${y+9} M${x-9},${y+9} L${x+9},${y-9}`,stroke:"var(--ink)","stroke-width":2}));
+  }
+  return g;
+}function resistorV(x1,y1,x2,y2){
+  const g=s("g",{});const n=6,dx=7;let d=`M${x1},${y1}`;const dy=(y2-y1)/n;
+  for(let i=0;i<n;i++){d+=` L${x1+(i%2?-dx:dx)},${y1+dy*(i+0.5)}`;}
+  d+=` L${x2},${y2}`;g.append(s("path",{class:"ink",d}));return g;
+}
+function resistorH(x1,y1,x2,y2){
+  const g=s("g",{});const n=6,dy=7;let d=`M${x1},${y1}`;const dx=(x2-x1)/n;
+  for(let i=0;i<n;i++){d+=` L${x1+dx*(i+0.5)},${y1+(i%2?-dy:dy)}`;}
+  d+=` L${x2},${y2}`;g.append(s("path",{class:"ink",d}));return g;
+}
+function groundSVG(x,y){
+  const g=s("g",{});
+  g.append(s("line",{x1:x,y1:y-6,x2:x,y2:y,class:"ink"}));
+  g.append(s("line",{x1:x-12,y1:y,x2:x+12,y2:y,class:"ink","stroke-width":2.6}));
+  g.append(s("line",{x1:x-7,y1:y+5,x2:x+7,y2:y+5,class:"ink","stroke-width":2.4}));
+  g.append(s("line",{x1:x-3,y1:y+10,x2:x+3,y2:y+10,class:"ink","stroke-width":2.2}));
+  return g;
+}
+function coilSVG(x,y,on){
+  const g=s("g",{});
+  const col=on?"var(--coil)":"var(--ink)";
+  let d=`M${x+10},${y}`;
+  for(let i=0;i<5;i++){d+=` a7,7 0 1,1 0,14`;}
+  g.append(s("path",{d,stroke:col,"stroke-width":2.6,fill:"none"}));
+  if(on)g.append(s("rect",{x:x-2,y:y-4,width:24,height:82,fill:"var(--coil)",opacity:.08,rx:6}));
+  return g;
+}
+function transistorSVG(x,y,on,kind){
+  // vertical base bar at x-12, collector up, emitter down
+  const g=s("g",{});const col=on?"var(--on)":"var(--ink)";
+  g.append(s("circle",{cx:x+6,cy:y,r:26,fill:"none",stroke:"var(--line-strong)","stroke-width":1,opacity:.5}));
+  g.append(s("line",{x1:x-12,y1:y-16,x2:x-12,y2:y+16,stroke:col,"stroke-width":3.4}));       // base bar
+  g.append(s("line",{x1:x-24,y1:y,x2:x-12,y2:y,class:"ink"}));                                // base lead
+  g.append(s("line",{x1:x-12,y1:y-10,x2:x+14,y2:y-26,stroke:col,"stroke-width":2.6}));        // collector
+  g.append(s("line",{x1:x-12,y1:y+10,x2:x+14,y2:y+26,stroke:col,"stroke-width":2.6}));        // emitter
+  // emitter arrow
+  const npn=kind!=="pnp";
+  if(npn)g.append(s("path",{d:`M${x+6},${y+21} l8,5 l-9,1 Z`,fill:col}));
+  else g.append(s("path",{d:`M${x-6},${y+13} l-8,-5 l9,-1 Z`,fill:col}));
+  g.append(s("line",{x1:x+14,y1:y-26,x2:x+14,y2:y-30,class:"ink"}));
+  g.append(s("line",{x1:x+14,y1:y+26,x2:x+14,y2:y+30,class:"ink"}));
+  g.append(s("text",{x:x+20,y:y-24,class:"lbl"},"C"));
+  g.append(s("text",{x:x+20,y:y+30,class:"lbl"},"E"));
+  g.append(s("text",{x:x-34,y:y-6,class:"lbl"},"B"));
+  return g;
+}
+function inverterSVG(x,y){
+  const g=s("g",{});
+  g.append(s("path",{d:`M${x},${y-16} L${x},${y+16} L${x+30},${y} Z`,fill:"var(--surface)",stroke:"var(--ink)","stroke-width":2.4,"stroke-linejoin":"round"}));
+  g.append(s("circle",{cx:x+35,cy:y,r:5,fill:"var(--surface)",stroke:"var(--ink)","stroke-width":2}));
+  g.append(s("line",{x1:x+40,y1:y,x2:x+54,y2:y,class:"ink"}));
+  return g;
+}
+function meterSVG(cx,cy,r){
+  const g=s("g",{});
+  g.append(s("circle",{cx,cy,r:r+3,fill:"none",stroke:"var(--line-strong)","stroke-width":1.4,opacity:.5}));
+  g.append(s("circle",{cx,cy,r,fill:"var(--lcd-bg)",stroke:"var(--ink)","stroke-width":2}));
+  const txt=s("text",{x:cx,y:cy+1,"text-anchor":"middle",fill:"var(--lcd-ink)","font-family":"'IBM Plex Mono',monospace","font-size":17,"font-weight":600},"0.0");
+  g.append(txt);
+  g.append(s("text",{x:cx,y:cy+17,"text-anchor":"middle","font-family":"'IBM Plex Mono',monospace","font-size":9,fill:"var(--scope-dim)"},"Ω OHMS"));
+  const tx=cx+r-1;
+  g.append(s("circle",{cx:tx,cy:cy-14,r:3.5,class:"node"}));
+  g.append(s("circle",{cx:tx,cy:cy+14,r:3.5,class:"node"}));
+  return {g,set:v=>{txt.textContent=v;txt.setAttribute("fill",v==="O.L"?"var(--off)":"var(--lcd-ink)");},top:[tx,cy-14],bot:[tx,cy+14]};
+}
+
+/* ==================================================================
+   UI factories
+   ================================================================== */
+function prose(html){return h("div",{class:"prose",html});}
+function formula(...parts){
+  return h("div",{style:"display:flex;gap:26px;flex-wrap:wrap;justify-content:center;margin:20px 0;padding:18px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px"},
+    ...parts.map(p=>h("div",{class:"disp",style:"font-size:26px;color:var(--ink)"},p)));
+}
+function makeBench(label,hint,full){
+  const stage=h("div",{class:"stage"});
+  const controls=h("div",{class:"controls"});
+  const bodyGrid=h("div",{class:"bench__grid"},h("div",{style:"display:flex;flex-direction:column"},stage),controls);
+  const el=h("div",{class:"bench"+(full?" bench--full":"")},
+    h("div",{class:"bench__bar"},h("span",{class:"bench__dot"}),h("span",{class:"bench__label"},label),h("span",{class:"bench__hint"},hint||"")),
+    h("div",{class:"bench__body"},bodyGrid));
+  return {el,stage,controls,ro:{}};
+}
+function ctl(label,valueEl,control){
+  const lab=h("div",{class:"ctl__label"},h("span",{},label));
+  if(valueEl)lab.append(valueEl);
+  return h("div",{class:"ctl"},lab,control);
+}
+function seg(labels,initial,onchange){
+  const wrap=h("div",{class:"seg"});
+  labels.forEach((l,i)=>{
+    const b=h("button",{"aria-pressed":i===initial?"true":"false",onclick:()=>{
+      $$(".seg>button",wrap).forEach(x=>x.setAttribute("aria-pressed","false"));
+      b.setAttribute("aria-pressed","true");onchange(i);}},l);
+    wrap.append(b);
+  });
+  return wrap;
+}
+function leverSwitch(initial,onchange){
+  const track=h("div",{class:"lever__track"},h("div",{class:"lever__knob"}));
+  const el=h("div",{class:"lever",tabindex:"0",role:"switch","aria-checked":initial?"true":"false","data-on":initial?"1":"0"},track,h("span",{class:"lever__cap"},"OFF / ON"));
+  function toggle(){const on=el.dataset.on==="1";set(!on);onchange(!on);}
+  el.addEventListener("click",toggle);
+  el.addEventListener("keydown",e=>{if(e.key===" "||e.key==="Enter"){e.preventDefault();toggle();}});
+  function set(on){el.dataset.on=on?"1":"0";el.setAttribute("aria-checked",on?"true":"false");}
+  return {el,set};
+}
+function labeledLever(label,lever){
+  return h("div",{style:"display:flex;flex-direction:column;gap:6px;align-items:flex-start"},
+    h("span",{class:"ctl__label",style:"display:block"},label),lever.el);
+}
+function readouts(items,bench){
+  const wrap=h("div",{class:"readouts"});
+  items.forEach(([label,key])=>{
+    const b=h("b",{},"–");bench.ro[key]=b;
+    wrap.append(h("div",{class:"ro"},h("span",{},label),b));
+  });
+  return wrap;
+}
+function explain(bench){
+  const e=h("div",{class:"explain"});bench.el.querySelector(".bench__body").append(e);return e;
+}
+function truthTable(headers,rowsFn,activeFn,bench){
+  const table=h("table",{class:"tbl tt"});
+  const thead=h("thead",{});const tr=h("tr",{});headers.forEach(hd=>tr.append(h("th",{},hd)));thead.append(tr);
+  const tbody=h("tbody",{});
+  table.append(thead,tbody);
+  function refresh(){
+    tbody.innerHTML="";
+    const rows=rowsFn();const act=activeFn();
+    rows.forEach(r=>{
+      const isAct=r.slice(0,act.length-1).every((v,i)=>v===act[i]);
+      const trr=h("tr",{class:isAct?"hit":""});
+      r.forEach((v,i)=>{
+        const cls=i===r.length-1?(v?"bit hi":"bit lo"):(v?"bit hi":"bit lo");
+        trr.append(h("td",{},h("span",{class:cls},String(v))));
+      });
+      tbody.append(trr);
+    });
+  }
+  bench.refreshTT=refresh;refresh();
+  return h("div",{},h("div",{class:"bench__label",style:"margin:4px 0 8px;color:var(--muted)"},"TRUTH TABLE"),table);
+}
+
+
+/* ==================================================================
+   Boot: render sections, rail nav, scrollspy, hero scope
+   ================================================================== */
+const SHORT={logic:"Logic Levels",clock:"Clock & Freq",serial:"Serial vs Parallel",ascii:"ASCII",
+  hart:"HART FSK",switches:"Switches",diode:"Diodes",diodelogic:"Diode Logic",
+  transistor:"Transistor",relay:"Relay",led:"LED Drives",capacitor:"RC Timing",glossary:"Key Terms"};
+
+function boot(){
+  const host=$("#sections"),rail=$("#rail");
+  rail.append(h("a",{href:"#s-top"},"Top"));
+
+  SECTIONS.forEach(sec=>{
+    const secEl=h("section",{class:"sect",id:"sec-"+sec.id},
+      h("div",{class:"sect__head"},
+        h("span",{class:"fv-eyebrow"},h("span",{class:"n"},sec.num)," ",sec.id==="glossary"?"Reference":"Interactive bench"),
+        h("h2",{html:sec.title})),
+      sec.lead?h("p",{class:"sect__lead"},sec.lead):null);
+    const bodyEl=h("div",{});
+    secEl.append(bodyEl);
+    try{sec.build(bodyEl);}catch(err){bodyEl.append(h("div",{class:"callout warn"},"Module failed to load: "+err.message));console.error(err);}
+    host.append(secEl);
+    const a=h("a",{href:"#sec-"+sec.id},SHORT[sec.id]||sec.title.replace(/&amp;/g,"&"));
+    a.dataset.target="sec-"+sec.id;
+    rail.append(a);
+  });
+  $("#statInteractive").querySelector("b").textContent=SECTIONS.filter(x=>x.id!=="glossary").length;
+
+  // rail: edge fades while the strip overflows, and keep the active chip in view
+  const links=$$("#rail a[data-target]");
+  const byId={};links.forEach(l=>byId[l.dataset.target]=l);
+  const overflowing=()=>rail.scrollWidth>rail.clientWidth+4;
+  function edges(){
+    rail.classList.toggle("can-left",overflowing()&&rail.scrollLeft>8);
+    rail.classList.toggle("can-right",overflowing()&&rail.scrollLeft<rail.scrollWidth-rail.clientWidth-8);
+  }
+  function follow(a){
+    if(!overflowing())return;
+    const r=a.getBoundingClientRect(),b=rail.getBoundingClientRect();
+    if(r.left<b.left+8)rail.scrollLeft-=(b.left+8-r.left);
+    else if(r.right>b.right-8)rail.scrollLeft+=(r.right-b.right+8);
+  }
+  rail.addEventListener("scroll",edges,{passive:true});
+  window.addEventListener("resize",edges);
+  edges();
+
+  // scrollspy
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        links.forEach(l=>l.classList.remove("active"));
+        const a=byId[e.target.id];
+        if(a){a.classList.add("active");follow(a);}
+      }
+    });
+  },{rootMargin:"-15% 0px -70% 0px",threshold:0});
+  $$(".sect").forEach(x=>obs.observe(x));
+
+  heroScope();
+}
+
+function heroScope(){
+  const cv=$("#heroScope");if(!cv)return;
+  let t=0,last=0;
+  function draw(ts){
+    const dt=last?(ts-last)/1000:0;last=ts;if(!prefersReduced)t+=dt;
+    const dpr=Math.min(2,window.devicePixelRatio||1);const w=cw(cv),ht=170;
+    cv.width=w*dpr;cv.height=ht*dpr;const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,ht);
+    scopeGrid(ctx,w,ht,16,6);
+    // clock trace (A) top
+    drawSquare(ctx,w,ht*0.33,w/10,t*1.5,0.5,cvar("--scope-a"),ht*0.14);
+    // inverted-ish output (B) bottom, different duty
+    drawSquare(ctx,w,ht*0.72,w/10,t*1.5+0.5,0.5,cvar("--scope-b"),ht*0.14,true);
+    requestAnimationFrame(draw);
+  }
+  function drawSquare(ctx,w,mid,per,phase,dc,color,amp,invert){
+    ctx.strokeStyle=color;ctx.lineWidth=2.4;ctx.lineJoin="round";ctx.beginPath();
+    const off=(phase%1)*per;let started=false;
+    for(let c=-1;c<=Math.ceil(w/per)+1;c++){
+      const x0=c*per-off,xh=x0+per*dc,x1=x0+per;
+      let hi=mid-amp,lo=mid+amp;if(invert){[hi,lo]=[lo,hi];}
+      const pts=[[x0,lo],[x0,hi],[xh,hi],[xh,lo],[x1,lo]];
+      for(const[px,py]of pts){if(!started){ctx.moveTo(px,py);started=true;}else ctx.lineTo(px,py);}
+    }
+    ctx.stroke();
+  }
+  requestAnimationFrame(draw);
+}
+
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot();
+</script>
+<footer class="fv-footer"><div class="fv-wrap fv-footer__top"><div class="fv-footer__brand"><a class="fv-brand" href="/"><span class="fv-brand__mark fv-brand__mark--plain" style="background-image:url(/images/Logo.png)"></span><span class="fv-brand__name">Bridges <span>Industrial</span></span></a><p>Hands-on field instrumentation and analytical measurement, technical training, PragOptics hardware and software, and the Idea Lab. Engineered for clarity, accountability, and scale.</p><p>On site across the Texas Gulf Coast from League City, including Houston, Texas City, Pasadena, Baytown, Clear Lake, and Galveston. Remote and advisory work anywhere in the US.</p></div><div class="fv-fcol"><h3>What we do</h3><a href="/instrument-support/">Instrument Technical Support</a><a href="/industrial">Industrial Automation &amp; Training</a><a href="/education/">Field Pocket Guide</a><a href="/partnerships">Partnerships</a><a href="/integration">PragOptics</a><a href="/idea-lab/">Idea Lab</a></div><div class="fv-fcol"><h3>Connect</h3><a href="/break-in/" style="color:var(--accent)">Submit Break-In</a><span style="color:var(--muted);font-size:.82rem;display:block;margin:2px 0 6px">Instrument not working? Ask a specialist, free.</span><a href="mailto:support@bridgesindust.com">support@bridgesindust.com</a><a href="tel:+18324250421">+1 (832) 425-0421</a></div></div><div class="fv-wrap fv-footer__bottom"><span>&copy; <span id="fv-year">2026</span> Bridges Industrial LLC. All rights reserved.</span><a href="/integration/terms/" style="color:var(--muted)">Terms &amp; Privacy</a></div></footer>
+<script src="/assets/fortiview.js"></script>
+</body>
+</html>

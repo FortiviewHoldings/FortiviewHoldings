@@ -7,5 +7,6 @@ export const TOOLS = [
   { href: "/education/rtd/", name: "RTD Tables", cta: "Open tool", desc: "Pt100 and Pt1000 resistance against temperature, IEC 60751. Generate a table." },
   { href: "/education/thermocouple/", name: "Thermocouple Tables", cta: "Open tool", desc: "Types J, K, T, E, N, R, S, B. Millivolts against temperature, ITS-90." },
   { href: "/education/formulas/", name: "Field Formulas", cta: "Open reference", desc: "The working set. mA and percent, scaling, square root, turndown, RTD and thermocouple." },
-  { href: "/education/numbering-systems/", name: "Numbering Systems", cta: "Open reference", desc: "The full lab: binary, octal, hex, BCD, ASCII, and two's complement." }
+  { href: "/education/numbering-systems/", name: "Numbering Systems", cta: "Open reference", desc: "The full lab: binary, octal, hex, BCD, ASCII, and two's complement." },
+  { href: "/education/signals-switches/", name: "Signals & Switches", cta: "Open lab", desc: "Digital electronics on a live bench: logic levels, clocks, serial data, HART FSK on the loop, diodes, transistors, and relays." }
 ];
