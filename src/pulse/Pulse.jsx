@@ -100,7 +100,7 @@ export default function Pulse({ compact = false }) {
                 {t.sources?.length > 0 && (
                   <div className="pulse__sources">
                     {t.sources.slice(0, 4).map((s) => (
-                      <Link key={s.slug + s.sectionId} to={`/education/${s.slug}#${s.sectionId}`}>{s.question}</Link>
+                      <Link key={s.slug + s.sectionId} to={`/education/${s.slug}/#${s.sectionId}`}>{s.question}</Link>
                     ))}
                   </div>
                 )}

@@ -25,7 +25,7 @@ export default function Guide() {
   if (!g) {
     return (
       <div className="pg-wrap pg-wrap--wide">
-        <p className="fv-lead">That guide does not exist. <Link to="/education">Back to the Field Pocket Guide</Link>.</p>
+        <p className="fv-lead">That guide does not exist. <Link to="/education/">Back to the Field Pocket Guide</Link>.</p>
       </div>
     );
   }
@@ -34,7 +34,7 @@ export default function Guide() {
     <div className="pg-main">
       <div className="pg-wrap--wide pg-wrap">
         <header className="pg-head">
-          <Link className="pg-back" to="/education">Field Pocket Guide</Link>
+          <Link className="pg-back" to="/education/">Field Pocket Guide</Link>
           <h1 className="fv-h2">{g.title}</h1>
           {g.lead.map((html, i) => (
             <p key={i} className={i === 0 ? "fv-lead" : undefined} dangerouslySetInnerHTML={{ __html: html }} />

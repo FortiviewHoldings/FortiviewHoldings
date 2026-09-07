@@ -43,7 +43,7 @@ export default function Education() {
           </div>
           <div className="pg-lib__grid">
             {GUIDES.map((g) => (
-              <Link to={"/education/" + g.slug} key={g.slug}>
+              <Link to={"/education/" + g.slug + "/"} key={g.slug}>
                 <span className="pg-lib__t">
                   <b>{g.title}</b>
                   <span>{g.sections.length} questions</span>

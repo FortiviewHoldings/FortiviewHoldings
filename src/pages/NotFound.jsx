@@ -12,8 +12,8 @@ export default function NotFound() {
         <p className="fv-lead">The link may be old, or the page moved. Start from the homepage, or tell us what you were after.</p>
         <div className="fv-actions" style={{ justifyContent: "center", marginTop: "18px" }}>
           <Link className="btn btn--primary" to="/">Home</Link>
-          <Link className="btn btn--ghost" to="/education">Field Pocket Guide</Link>
-          <Link className="btn btn--ghost" to="/break-in">Submit a Break-In</Link>
+          <Link className="btn btn--ghost" to="/education/">Field Pocket Guide</Link>
+          <Link className="btn btn--ghost" to="/break-in/">Submit a Break-In</Link>
         </div>
       </div>
     </section>
