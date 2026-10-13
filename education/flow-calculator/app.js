@@ -104,25 +104,53 @@ function renderWork(r,c){
  }
 }
 function conversions(r){$('conversionRows').replaceChildren();for(const kind of ['actual','standard','normal','mass']){const rows=Object.entries(F.UNITS).filter(([id,u])=>u.kind===kind&&id in r.values);if(!rows.length)continue;const tr=document.createElement('tr'),th=document.createElement('td');tr.className='group-row';th.colSpan=2;th.textContent=kind==='standard'?'Selected reference · '+r.state.refBasis:kind==='normal'?'Normal · 0 °C / 101.325 kPa abs':kind==='mass'?'Total stream mass':'Actual volume · flowing conditions';tr.append(th);$('conversionRows').append(tr);for(const[id,u]of rows){const tr=document.createElement('tr'),a=document.createElement('td'),b=document.createElement('td');a.textContent=u.label;b.textContent=fmt(r.values[id],10);b.className='value';tr.append(a,b);$('conversionRows').append(tr);}}txt('tableBasis',basis(r.state));}
-function specField(label,value,wide){const d=document.createElement('div');d.className='spec-field'+(wide?' spec-field--wide':'');const k=document.createElement('span'),x=document.createElement('span');k.className='spec-field__k';x.className='spec-field__v';k.textContent=label;x.textContent=value;d.append(k,x);$('specGrid').append(d);}
-function populateSpecSheet(r,c){
- txt('specMeter',F.MODES[c.element].name+' · '+(c.fluid==='gas'?'gas':'liquid'));
- txt('specResultLabel',$('resultLabel').textContent);txt('specResultValue',$('resultValue').textContent+' '+$('resultUnit').textContent);
- $('specGrid').replaceChildren();const du=$('dpUnit').selectedOptions[0].textContent;
- specField('Fluid',c.fluid==='gas'?'Gas · single phase':'Liquid');
- if(c.fluid==='gas'){specField('Line pressure',fmt(r.state.P/1000,7)+' kPa abs');specField('Flowing temperature',fmt(r.state.T-273.15,6)+' °C · '+fmt(F.temperatureFromK(r.state.T,'F'),6)+' °F');}
- specField('Flowing density',fmt(r.state.rho,7)+' kg/m³');
- if(r.dp!=null)specField('Differential pressure',fmt(r.dp/F.PRESSURE[v('dpUnit')],7)+' '+du);
- if(r.dp!=null&&c.maxDP!=null)specField('Documented DP limit',fmt(c.maxDP/F.PRESSURE[v('dpUnit')],7)+' '+du);
- if(r.beta!=null||r.K!=null||(c.element==='velocity'&&c.areaMode==='circle'))specField('Pipe internal diameter',fmt(c.D/F.LENGTH[v('dUnit')],6)+' '+v('dUnit'));
- else if(r.area!=null)specField('Flow area',fmt(r.area,6)+' m²');
- if(r.beta!=null){specField('Beta ratio β',fmt(r.beta,6));specField(c.element==='cone'?'Cone diameter dc':c.element==='wedge'?'Opening h':'Bore / throat d',fmt(dimForBeta(c.element,r.beta,c.D)/F.LENGTH[v('dUnit')],6)+' '+v('dUnit'));specField('Discharge coefficient C',fmt(r.Cd,6));}
- if(r.K!=null)specField('Flow coefficient K',fmt(r.K,6));
- if(r.Re!=null)specField('Pipe Reynolds number',fmt(r.Re,6));
- if(r.epsilon!=null)specField('Gas expansion ε / Y',fmt(r.epsilon,6));
- specField('Reference basis',basis(r.state),true);
- if(c.sourceNote)specField('Source note',c.sourceNote,true);
- specField('Generated',new Date().toLocaleString(),true);
+// ---- Print documents. Built fresh on beforeprint from the current result,
+//      not by printing the live form. Spec sheet = head + specs + graph + data
+//      points; Full report adds conversions, state, equations and sources.
+function specRows(r,c){
+ const du=$('dpUnit').selectedOptions[0].textContent,dU=v('dUnit'),rows=[],add=(k,x,wide)=>rows.push({k,x,wide});
+ add('Fluid',c.fluid==='gas'?'Gas · single phase':'Liquid');
+ if(c.fluid==='gas'){add('Line pressure',fmt(r.state.P/1000,7)+' kPa abs');add('Flowing temperature',fmt(r.state.T-273.15,6)+' °C · '+fmt(F.temperatureFromK(r.state.T,'F'),6)+' °F');}
+ add('Flowing density',fmt(r.state.rho,7)+' kg/m³');
+ if(r.dp!=null)add('Differential pressure',fmt(r.dp/F.PRESSURE[v('dpUnit')],7)+' '+du);
+ if(r.dp!=null&&c.maxDP!=null)add('Documented DP limit',fmt(c.maxDP/F.PRESSURE[v('dpUnit')],7)+' '+du);
+ if(r.beta!=null||r.K!=null||(c.element==='velocity'&&c.areaMode==='circle'))add('Pipe internal diameter',fmt(c.D/F.LENGTH[dU],6)+' '+dU);
+ else if(r.area!=null)add('Flow area',fmt(r.area,6)+' m²');
+ if(r.beta!=null){add('Beta ratio β',fmt(r.beta,6));add(c.element==='cone'?'Cone diameter dc':c.element==='wedge'?'Opening h':'Bore / throat d',fmt(dimForBeta(c.element,r.beta,c.D)/F.LENGTH[dU],6)+' '+dU);add('Discharge coefficient C',fmt(r.Cd,6));}
+ if(r.K!=null)add('Flow coefficient K',fmt(r.K,6));
+ if(r.Re!=null)add('Pipe Reynolds number',fmt(r.Re,6));
+ if(r.epsilon!=null)add('Gas expansion ε / Y',fmt(r.epsilon,6));
+ add('Reference basis',basis(r.state),true);
+ if(c.sourceNote)add('Source note',c.sourceNote,true);
+ add('Generated',new Date().toLocaleString(),true);
+ return rows;
+}
+function psSection(title,cls){const s=document.createElement('section');s.className='ps-section'+(cls?' '+cls:'');if(title){const h=document.createElement('h2');h.className='ps-h';h.textContent=title;s.append(h);}return s;}
+function psTable(headings,rows){const w=document.createElement('div');w.className='ps-tablewrap';const t=document.createElement('table');t.className='ps-table';const thead=document.createElement('thead'),htr=document.createElement('tr');for(const h of headings){const th=document.createElement('th');th.textContent=h;htr.append(th);}thead.append(htr);const tb=document.createElement('tbody');for(const row of rows){const tr=document.createElement('tr');row.forEach((val,i)=>{const td=document.createElement('td');if(i>0)td.className='num';td.textContent=val;tr.append(td);});tb.append(tr);}t.append(thead,tb);w.append(t);return w;}
+function buildPrintSheet(){
+ const host=$('printSheet');host.replaceChildren();
+ if(!last){const p=document.createElement('p');p.className='ps-note';p.textContent='No valid calculation to print — correct the inputs and try again.';host.append(p);return;}
+ const r=last,c=config;
+ const head=document.createElement('header');head.className='ps-head';
+ const brand=document.createElement('div');brand.innerHTML='<div class="ps-title">Flow Calculator</div><div class="ps-sub"></div>';
+ brand.querySelector('.ps-sub').textContent=F.MODES[c.element].name+' · '+(c.fluid==='gas'?'gas':'liquid');
+ const res=document.createElement('div');res.className='ps-result';res.innerHTML='<div class="ps-result__l"></div><div class="ps-result__v"></div>';
+ res.querySelector('.ps-result__l').textContent=$('resultLabel').textContent;res.querySelector('.ps-result__v').textContent=$('resultValue').textContent+' '+$('resultUnit').textContent;
+ head.append(brand,res);host.append(head);
+ const specs=psSection('Specifications'),grid=document.createElement('div');grid.className='ps-grid';
+ for(const row of specRows(r,c)){const d=document.createElement('div');d.className='ps-field'+(row.wide?' ps-field--wide':'');const k=document.createElement('span'),x=document.createElement('span');k.className='ps-field__k';x.className='ps-field__v';k.textContent=row.k;x.textContent=row.x;d.append(k,x);grid.append(d);}
+ specs.append(grid);host.append(specs);
+ const gs=psSection('Flow response curve','ps-graph'),g=$('flowGraph').cloneNode(true);g.removeAttribute('id');gs.append(g);
+ const cap=$('dpLimitNote').textContent;if(cap){const p=document.createElement('p');p.className='ps-note';p.textContent=cap;gs.append(p);}
+ host.append(gs);
+ const cd=psSection('Curve data points','ps-curve');const xh=$('curveXHeading').textContent,yh=$('curveYHeading').textContent;
+ const crows=[];for(let i=0;i<curveRows.length;i+=8){const d=curveRows[i];crows.push([fmt(d.x,7),d.y==null?'excluded':fmt(d.y,7),d.y==null?(d.status||''):'']);}
+ cd.append(psTable([xh,yh,'Note'],crows));host.append(cd);
+ const conv=psSection('Flow conversions · actual / standard / normal / mass','ps-full');const ct=$('conversionRows').closest('table').cloneNode(true);ct.className='ps-table';const cw=document.createElement('div');cw.className='ps-tablewrap';if($('tableBasis').textContent){const cap2=document.createElement('p');cap2.className='ps-cap';cap2.textContent=$('tableBasis').textContent;conv.append(cap2);}cw.append(ct);conv.append(cw);host.append(conv);
+ const diag=psSection('Calculated state & diagnostics','ps-full');diag.append($('stateNumbers').cloneNode(true));host.append(diag);
+ const work=psSection('Calculation · equations & substitutions','ps-full');work.append($('workContent').cloneNode(true));host.append(work);
+ const warn=psSection('Assumptions & applicability','ps-full warnings');warn.append($('warningContent').cloneNode(true));host.append(warn);
+ const sg=$('sourceDetails').querySelector('.source-grid');if(sg){const src=psSection('Standards & sources','ps-full');src.append(sg.cloneNode(true));host.append(src);}
 }
 function update(draw=true){
  visibility();
@@ -144,11 +172,11 @@ function update(draw=true){
   $('stateNumbers').replaceChildren();datum('Flowing density',fmt(r.state.rho,9)+' kg/m³');if(c.fluid==='gas'){datum('Line absolute pressure',fmt(r.state.P/1000,9)+' kPa abs');datum('Flowing absolute temperature',fmt(r.state.T,9)+' K');datum('Flowing Z',fmt(r.state.Z,9));datum('Standard / actual factor',fmt(r.state.standardFactor,9));datum('Reference density',fmt(r.state.rhoRef,9)+' kg/m³');}
   if(r.dp!=null){datum('Differential pressure',fmt(r.dp/F.PRESSURE[v('dpUnit')],9)+' '+$('dpUnit').selectedOptions[0].textContent);if(c.maxDP!=null)datum('User-entered DP limit',fmt(c.maxDP/F.PRESSURE[v('dpUnit')])+' '+$('dpUnit').selectedOptions[0].textContent);}
   for(const[key,title,unit]of [['Re','Pipe Reynolds number',''],['Cd','Discharge coefficient C',''],['K','Dimensionless coefficient K',''],['epsilon','Gas expansion ε / Y',''],['velocity','Mean velocity',' m/s'],['frequency','Frequency',' Hz'],['signal','Analog signal',''],['mach','Estimated pipe Mach',''],['throatMach','Estimated throat Mach','']])if(r[key]!=null)datum(title,fmt(r[key],9)+unit);
-  renderWork(r,c);conversions(r);populateSpecSheet(r,c);$('warningContent').replaceChildren();for(const w of r.warnings){const p=document.createElement('p');p.textContent=w;$('warningContent').append(p);}if(!r.warnings.length){const p=document.createElement('p');p.textContent='Verify the original measurement and input properties. Unit conversion is not instrument calibration.';$('warningContent').append(p);}
+  renderWork(r,c);conversions(r);$('warningContent').replaceChildren();for(const w of r.warnings){const p=document.createElement('p');p.textContent=w;$('warningContent').append(p);}if(!r.warnings.length){const p=document.createElement('p');p.textContent='Verify the original measurement and input properties. Unit conversion is not instrument calibration.';$('warningContent').append(p);}
   for(const id of ['csvButton','jsonButton','pinButton'])$(id).disabled=false;
  }catch(e){
   last=null;config=null;show('errorPanel',true);txt('errorText',e.message);txt('statusPill','NO CURRENT RESULT');txt('resultValue','—');txt('resultUnit','');txt('resultCaption','Correct the highlighted calculation inputs.');txt('resultBasis','Previous results and curves are cleared.');txt('referencePreview','No valid calculation.');
-  for(const id of ['kpi1','kpi2','kpi3'])txt(id,'—');for(const id of ['stateNumbers','workContent','conversionRows','warningContent','specGrid'])$(id).replaceChildren();txt('geometryResult','No valid result.');txt('specMeter','');txt('specResultLabel','No valid result');txt('specResultValue','—');
+  for(const id of ['kpi1','kpi2','kpi3'])txt(id,'—');for(const id of ['stateNumbers','workContent','conversionRows','warningContent'])$(id).replaceChildren();txt('geometryResult','No valid result.');
   for(const id of ['Q','dp','beta','probeK','Cd','velocity','frequency','signal','rhoGas','lineZ'])if($(id).readOnly)put(id,'');
   for(const id of ['csvButton','jsonButton','pinButton'])$(id).disabled=true;
  }
@@ -290,9 +318,8 @@ function runChecks(open=false){lastChecks=runAllFlowChecks();txt('testButton','C
 $('testButton').addEventListener('click',()=>runChecks(true));
 $('printButton').addEventListener('click',()=>window.print());
 $('specSheetButton').addEventListener('click',()=>{if(update()){document.body.classList.add('print-spec');window.print();}});
-let printState=[];
-window.addEventListener('beforeprint',()=>{printState=[...document.querySelectorAll('details')].map(d=>[d,d.open]);for(const[d]of printState)if(d.id!=='checksDetails')d.open=true;});
-window.addEventListener('afterprint',()=>{for(const[d,open]of printState)d.open=open;document.body.classList.remove('print-spec');});
+window.addEventListener('beforeprint',buildPrintSheet);
+window.addEventListener('afterprint',()=>{$('printSheet').replaceChildren();document.body.classList.remove('print-spec');});
 setupMode(true);const defaults=snapshot();
 function loadExample(name){put('element','venturi');put('fluid','gas');setupMode(true);for(const id of ['qUnit','rangeUnit','converterUnit'])fillUnits(id);restore(defaults);pins=[];put('curveType','response');
  if(name==='water'){put('fluid','liquid');fillUnits('qUnit');fillUnits('rangeUnit');fillUnits('converterUnit');put('converterUnit','m3h');put('qUnit','gpm');put('rangeUnit','gpm');put('D',8.071);put('Cd',.995);put('coefficientSource','LIQUID DEMONSTRATION — entered density/viscosity, not an automatic water-property model.');}

@@ -220,67 +220,71 @@
   .fc .numbers{gap:5px 13px}
 }
 
-/* ---- spec sheet (hidden on screen; shown only when printing a spec sheet) ---- */
-.fc .spec-sheet{display:none}
-.fc .spec-head{display:flex;justify-content:space-between;gap:24px;align-items:flex-start;border-bottom:2px solid #111;padding-bottom:12px;margin-bottom:16px}
-.fc .spec-title{font-family:var(--display);font-size:18px;font-weight:700}
-.fc .spec-sub{font-size:13px;color:#333;margin-top:3px;text-transform:capitalize}
-.fc .spec-result{text-align:right;white-space:nowrap}
-.fc .spec-result__label{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#555}
-.fc .spec-result__value{font-family:var(--display);font-size:20px;font-weight:700}
-.fc .spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 28px}
-.fc .spec-field{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #d7d7d7;padding:5px 0;font-size:12px}
-.fc .spec-field--wide{grid-column:1/-1;flex-direction:column;align-items:stretch;gap:2px}
-.fc .spec-field__k{color:#555}
-.fc .spec-field__v{font-family:var(--mono);text-align:right}
-.fc .spec-field--wide .spec-field__v{text-align:left}
-.fc .spec-flow-title{font-family:var(--display);font-weight:700;font-size:14px;margin:18px 0 6px}
+/* ---- print document (built on beforeprint; hidden on screen) ----
+   Both reports render from a dedicated #printSheet, not from the live form.
+   Spec sheet = head + specs + graph + curve data. Full report adds the
+   .ps-full sections (conversions, diagnostics, equations, sources). */
+.fc .print-sheet{display:none}
 
-/* ---- print: Full report is the base (and the Ctrl+P default); Spec sheet overrides ---- */
 @media print{
-  :root{--ink:#111;--ink-2:#2a2a2a;--muted:#555;--glass:#fff;--glass-2:#fff;--glass-strong:#fff;--glass-border:#cfcfcf;--glass-border-2:#bbb;--accent:#0a6b63;--accent-2:#0a6b63;--accent-soft:#eef6f5;--panel:#fff;--blur:none;--shadow:none}
+  :root{--ink:#111;--ink-2:#333;--muted:#666;--accent:#0a6b63;--accent-2:#0a6b63;--amber:#8a5a12}
   html,body{background:#fff!important}
-  @page{margin:14mm}
-  .fv-skip,#fv-stars,.fv-header,.fv-footer,.pg-back,.fv-lead,
-  .fc .toolbar,.fc .note-bar,.fc .toast,.fc .report-note,
-  #checksDetails,#curveReadout,.fc .chart-controls,#overlayLine,.fc .tools-row,#pinButton,#curveNote{display:none!important}
+  @page{margin:16mm 14mm}
+  .fv-skip,#fv-stars,.fv-header,.fv-footer,.pg-head{display:none!important}
   .pg-main{padding:0!important}
-  .pg-wrap--wide{width:100%!important}
-  .fc{color:#111;font-size:11px}
-  .fc .card,.fc details,.fc .result-hero,.fc .kpi{background:#fff!important;border:1px solid #cfcfcf!important;box-shadow:none!important;backdrop-filter:none!important;break-inside:avoid}
-  .fc .layout,.fc .stack,.fc .results-stack,.fc .result-top{display:block!important}
-  .fc .card,.fc details{margin-bottom:10px}
-  .fc .result-hero{background:#f4f4f4!important}
-  .fc .result-number,.fc .kpi .k-value,.fc h2,.fc h3,.fc .datum span,.fc td.value{color:#111!important}
-  .fc .result-unit,.fc .status-pill,.fc .reference-strip .ref-title,.fc .metric-label,.fc .check-pass{color:#0a6b63!important}
-  .fc .formula{background:#f6f6f6!important;color:#111!important;border-color:#ddd!important}
-  .fc .warnings p,.fc .warning-inline{background:#fdf3e0!important;color:#7a4e00!important;border-color:#e3b770!important}
-  .fc .dp-limit-note{color:#7a4e00!important}
-  .fc input,.fc select{background:#fff!important;color:#111!important;border-color:#ccc!important}
-  .fc input[readonly]{background:#eef6f5!important;color:#0a5f58!important}
-  .fc .graph{background:#fff!important;border-color:#ccc!important}
-  .fc .graph text{fill:#333!important}
-  .fc .graph .grid{stroke:#e2e2e2!important}
-  .fc .graph .axis{stroke:#888!important}
-  .fc .graph .line{stroke:#0a6b63!important}
-  .fc .graph .alt{stroke:#7a6fd0!important}
-  .fc .kpis{grid-template-columns:repeat(3,1fr)!important}
-  .fc table{font-size:10px}
-  .fc th{background:#f0f0f0!important;color:#333!important;position:static}
+  .pg-wrap,.pg-wrap--wide{width:100%!important;max-width:none!important}
+  .fc>*:not(.print-sheet){display:none!important}
+  .fc .print-sheet{display:block!important;color:#111;font-family:var(--body);font-size:11px;line-height:1.5}
 
-  /* ===== Spec sheet: header + graph + table only ===== */
-  body.print-spec .spec-sheet{display:block!important}
-  body.print-spec .pg-head,
-  body.print-spec form#calcForm,
-  body.print-spec .result-top,
-  body.print-spec #stateDetails,
-  body.print-spec #workDetails,
-  body.print-spec #warningDetails,
-  body.print-spec #sourceDetails,
-  body.print-spec #curveCard .card-head,
-  body.print-spec #curveCard>.card-body>details,
-  body.print-spec .fc>footer{display:none!important}
-  body.print-spec #curveCard{border:0!important;margin:0!important}
-  body.print-spec #curveCard>.card-body{padding:0!important}
-  body.print-spec .spec-sheet,body.print-spec #curveCard,body.print-spec #conversionDetails{break-inside:avoid}
+  .fc .ps-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:14px;break-inside:avoid}
+  .fc .ps-title{font-family:var(--display);font-size:19px;font-weight:700}
+  .fc .ps-sub{font-size:12px;color:#444;margin-top:2px;text-transform:capitalize}
+  .fc .ps-result{text-align:right}
+  .fc .ps-result__l{font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#666}
+  .fc .ps-result__v{font-family:var(--display);font-size:17px;font-weight:700;color:#0a6b63}
+
+  .fc .ps-section{margin:0 0 14px}
+  .fc .ps-h{font-family:var(--display);font-size:12px;font-weight:700;letter-spacing:.02em;margin:0 0 7px;padding-bottom:3px;border-bottom:1px solid #ccc;color:#111;break-after:avoid}
+
+  .fc .ps-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px 26px}
+  .fc .ps-field{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #e3e3e3;padding:3px 0;font-size:11px;break-inside:avoid}
+  .fc .ps-field--wide{grid-column:1/-1;flex-direction:column;align-items:stretch;gap:1px;border-bottom:0}
+  .fc .ps-field__k{color:#555}
+  .fc .ps-field__v{font-family:var(--mono);text-align:right;color:#111}
+  .fc .ps-field--wide .ps-field__v{text-align:left}
+
+  .fc .ps-graph{break-inside:avoid}
+  .fc .ps-graph svg{width:100%;height:auto;max-height:330px;background:#fff!important;border:1px solid #ccc;border-radius:4px}
+  .fc .ps-graph text{fill:#333!important}
+  .fc .ps-graph .grid{stroke:#e4e4e4!important}
+  .fc .ps-graph .axis{stroke:#999!important}
+  .fc .ps-graph .line{fill:none;stroke:#0a6b63!important}
+  .fc .ps-graph .alt{stroke:#7a6fd0!important}
+  .fc .ps-note{font-size:10px;color:#7a4e00;margin:6px 0 0}
+  .fc .ps-cap{font-size:10px;color:#666;margin:0 0 6px}
+
+  .fc .ps-table{border-collapse:collapse;width:100%;font-size:10px}
+  .fc .ps-table thead{display:table-header-group}
+  .fc .ps-table th{text-align:left;background:#f0f0f0;color:#333;padding:5px 7px;border-bottom:1px solid #bbb;font-size:9px;text-transform:uppercase;letter-spacing:.03em}
+  .fc .ps-table td{padding:4px 7px;border-bottom:1px solid #e6e6e6;color:#222}
+  .fc .ps-table tr{break-inside:avoid}
+  .fc .ps-table td.num,.fc .ps-table td.value{text-align:right;font-family:var(--mono);white-space:nowrap;color:#111}
+  .fc .ps-table .group-row td{background:#eef4f3;color:#0a6b63;font-weight:700;text-transform:uppercase;font-size:9px}
+
+  .fc .ps-full .numbers{display:grid;grid-template-columns:1fr 1fr;gap:2px 22px}
+  .fc .ps-full .datum{border-bottom:1px solid #e6e6e6;padding:3px 0;font-size:10px;break-inside:avoid}
+  .fc .ps-full .datum small{display:block;color:#666}
+  .fc .ps-full .datum span{font-family:var(--mono);color:#111}
+  .fc .ps-full .work-step{margin-bottom:9px;break-inside:avoid}
+  .fc .ps-full .work-step strong{font-size:11px;display:block;margin-bottom:3px}
+  .fc .ps-full .work-step p{font-size:9px;color:#666;margin:3px 0 0}
+  .fc .ps-full .formula{white-space:pre-wrap;font-family:var(--mono);font-size:9px;line-height:1.6;background:#f6f6f6;border:1px solid #e0e0e0;border-radius:4px;padding:6px 8px;color:#111;overflow-wrap:anywhere}
+  .fc .ps-full.warnings p{background:#fdf3e0;border-left:2px solid #d9a441;color:#7a4e00;font-size:9px;padding:5px 8px;border-radius:3px;margin:0 0 5px}
+  .fc .ps-full .source-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;font-size:9px}
+  .fc .ps-full .source{break-inside:avoid}
+  .fc .ps-full .source strong{display:block;font-size:10px;color:#111}
+  .fc .ps-full .source p{margin:2px 0;color:#444}
+  .fc .ps-full .source a{color:#0a6b63}
+
+  body.print-spec .ps-full{display:none!important}
 }
