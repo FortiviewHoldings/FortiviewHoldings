@@ -1,9 +1,10 @@
 // Copy the files the React build does not own into dist: the interactive tool
 // pages, the Idea Lab subsystem, the shared assets those need, and the SEO and
 // meta files. React owns the converted routes; everything here is served as-is.
-import { cpSync, existsSync } from "node:fs";
+import { cpSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createHash } from "node:crypto";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const DIST = join(ROOT, "dist");
@@ -47,5 +48,25 @@ function copy(rel, filter) {
 for (const d of DIRS) copy(d, d === "idea-lab" ? skipMarkdownInIdeaLab : undefined);
 for (const t of TOOLS) copy("education/" + t);
 for (const f of [...FILES, KEYFILE]) copy(f);
+
+// Cache-bust each tool page's own ./*.js and ./*.css with a content hash. The
+// assets carry a long (4h) browser/CDN cache, so without this a coupled HTML/JS
+// change can serve fresh HTML against a stale script. Hashing the content means
+// the query changes only when the file does; unchanged files keep their cache.
+function stampAssets(tool) {
+  const page = join(DIST, "education", tool, "index.html");
+  if (!existsSync(page)) return;
+  const html = readFileSync(page, "utf8").replace(
+    /(src|href)="\.\/([\w.-]+\.(?:js|css))"/g,
+    (m, attr, file) => {
+      const asset = join(DIST, "education", tool, file);
+      if (!existsSync(asset)) return m;
+      const h = createHash("sha1").update(readFileSync(asset)).digest("hex").slice(0, 8);
+      return `${attr}="./${file}?v=${h}"`;
+    }
+  );
+  writeFileSync(page, html);
+}
+for (const t of TOOLS) stampAssets(t);
 
 console.log(`  staged ${n} static paths into dist`);
