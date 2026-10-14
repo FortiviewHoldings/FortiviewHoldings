@@ -328,4 +328,5 @@ function loadExample(name){put('element','venturi');put('fluid','gas');setupMode
 for(const b of document.querySelectorAll('[data-example]'))b.addEventListener('click',()=>loadExample(b.dataset.example));
 window.FlowCalcUI={getConfig:()=>config,getResult:()=>last,refresh:update,loadExample,runChecks,drawCurve,getCurve:()=>curveRows.map(({result,...r})=>r),getPins:()=>pins,autoRange,snapshot};
 loadExample('air');runChecks();
+if(/[?&](report|print)=spec\b/.test(location.search))document.body.classList.add('print-spec');
 })();

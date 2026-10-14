@@ -220,6 +220,21 @@
   .fc .numbers{gap:5px 13px}
 }
 
+/* ---- form hierarchy: required / compensation / optional ---- */
+.fc .form-guide{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:0 0 18px;font-size:11.5px;color:var(--ink-2);background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius);padding:11px 14px}
+.fc .form-guide b{color:var(--ink);font-weight:600;margin-right:2px}
+.fc .form-guide .fg-item{display:inline-flex;align-items:center;gap:6px}
+.fc .req-tag{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:20px;border:1px solid currentColor;white-space:nowrap;font-weight:500;flex:0 0 auto}
+.fc .req-tag::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.fc .req-tag--req{color:var(--accent);background:var(--accent-soft)}
+.fc .req-tag--comp{color:var(--amber);background:rgba(242,178,76,.1)}
+.fc .req-tag--opt{color:var(--muted);background:transparent}
+.fc .card-head:has(.card-head__text){align-items:flex-start}
+.fc .card-head__text{display:flex;flex-direction:column;gap:3px;min-width:0}
+.fc .card-head__row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.fc .card-sub{font-size:11.5px;color:var(--muted);line-height:1.45;margin:0}
+.fc label .req-tag{margin-left:7px;vertical-align:middle}
+
 /* ---- print document (built on beforeprint; hidden on screen) ----
    Both reports render from a dedicated #printSheet, not from the live form.
    Spec sheet = head + specs + graph + curve data. Full report adds the
@@ -227,14 +242,18 @@
 .fc .print-sheet{display:none}
 
 @media print{
+  /* Page box follows the paper the user selects; margins are fixed. */
+  @page{size:auto;margin:13mm}
   :root{--ink:#111;--ink-2:#333;--muted:#666;--accent:#0a6b63;--accent-2:#0a6b63;--amber:#8a5a12}
-  html,body{background:#fff!important}
-  @page{margin:16mm 14mm}
-  .fv-skip,#fv-stars,.fv-header,.fv-footer,.pg-head{display:none!important}
-  .pg-main{padding:0!important}
-  .pg-wrap,.pg-wrap--wide{width:100%!important;max-width:none!important}
+  /* Strip the whole dark app shell to a plain white document so nothing dark
+     prints and the content box is exactly the page content width (paper minus
+     margins) — deterministic regardless of screen zoom or print scale. */
+  html,body{background:#fff!important;margin:0!important;padding:0!important;width:auto!important;min-width:0!important;max-width:none!important;overflow:visible!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body::before,body::after{display:none!important;content:none!important;background:none!important}
+  #fv-stars,.fv-skip,.fv-header,.fv-footer,.pg-head{display:none!important}
+  main,#fv-main,.pg-main,.pg-wrap,.pg-wrap--wide,.fc{display:block!important;width:auto!important;max-width:none!important;min-width:0!important;margin:0!important;padding:0!important;background:#fff!important;border:0!important;box-shadow:none!important}
   .fc>*:not(.print-sheet){display:none!important}
-  .fc .print-sheet{display:block!important;color:#111;font-family:var(--body);font-size:11px;line-height:1.5}
+  .fc .print-sheet{display:block!important;width:auto!important;background:#fff!important;color:#111;font-family:var(--body);font-size:11px;line-height:1.5}
 
   .fc .ps-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:14px;break-inside:avoid}
   .fc .ps-title{font-family:var(--display);font-size:19px;font-weight:700}
