@@ -242,8 +242,10 @@
 .fc .print-sheet{display:none}
 
 @media print{
-  /* Page box follows the paper the user selects; margins are fixed. */
-  @page{size:auto;margin:13mm}
+  /* Page box follows the paper the user selects. @page gives per-page margins
+     when the print dialog is on "Default"; the .print-sheet padding below is a
+     safety margin that survives even a "Margins: None" dialog setting. */
+  @page{size:auto;margin:11mm}
   :root{--ink:#111;--ink-2:#333;--muted:#666;--accent:#0a6b63;--accent-2:#0a6b63;--amber:#8a5a12}
   /* Strip the whole dark app shell to a plain white document so nothing dark
      prints and the content box is exactly the page content width (paper minus
@@ -253,7 +255,7 @@
   #fv-stars,.fv-skip,.fv-header,.fv-footer,.pg-head{display:none!important}
   main,#fv-main,.pg-main,.pg-wrap,.pg-wrap--wide,.fc{display:block!important;width:auto!important;max-width:none!important;min-width:0!important;margin:0!important;padding:0!important;background:#fff!important;border:0!important;box-shadow:none!important}
   .fc>*:not(.print-sheet){display:none!important}
-  .fc .print-sheet{display:block!important;width:auto!important;background:#fff!important;color:#111;font-family:var(--body);font-size:11px;line-height:1.5}
+  .fc .print-sheet{display:block!important;width:auto!important;background:#fff!important;color:#111;font-family:var(--body);font-size:11px;line-height:1.5;padding:7mm 8mm;box-sizing:border-box}
 
   .fc .ps-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:14px;break-inside:avoid}
   .fc .ps-title{font-family:var(--display);font-size:19px;font-weight:700}
