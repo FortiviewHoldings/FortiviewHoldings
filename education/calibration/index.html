@@ -338,23 +338,25 @@
   var P = window.PG, N = function (v, d) { var n = parseFloat(v); return isFinite(n) ? n : d; };
   var SYSTEM =
     "You are the Calibration Worksheet wizard for Bridges Industrial. You help a field tech build a multi-point loop calibration by talking, one thing at a time. " +
-    "First the loop setup: the input range (low, high, units applied to the device), the output range (low, high, units measured), the tolerance in percent of span, and how many test points (3, 5, or 11; default 5 at 0/25/50/75/100 percent). " +
-    "Then walk the test points: for each point tell the user the nominal input to apply and collect the As-Found reading (before any adjustment). After the As-Found pass, ask whether an adjustment was made; if yes, collect the As-Left readings (after adjustment), otherwise As-Left equals As-Found. " +
-    "Then CALL solve_calibration ONCE with the full setup and every row. Error is percent of span: (measured minus expected) divided by the output span times 100, graded against the tolerance. " +
-    "Never do the arithmetic yourself: the tool returns per-point errors, the max errors, and the PASS or FAIL verdict, and the worksheet table appears in the chat. Report the verdict and the worst error plainly. Plain text only, no Markdown.";
+    "Capture EVERY required value before you compute: the input range (low, high, and the units you apply), the output range (low, high, and the units you measure), the tolerance in percent of span, the number of test points (3, 5, or 11), and the As-Found reading at each point, plus the As-Left reading if the device was adjusted. " +
+    "You may SUGGEST a common value, for example a 4 to 20 mA output or a half percent tolerance, but you must get the user's explicit confirmation; never assume one silently. Do NOT call solve_calibration until every required value is captured. If the tool replies that inputs are missing, ask the user for exactly those and report no numbers. " +
+    "Walk the test points one at a time: tell the user the nominal input to apply and collect the As-Found reading. After the As-Found pass, ask whether an adjustment was made; if yes, collect the As-Left readings, otherwise As-Left equals As-Found. " +
+    "Then CALL solve_calibration ONCE with the full setup and every row. Error is percent of span: (measured minus expected) divided by the output span times 100, graded against the tolerance. Never do the arithmetic yourself; the tool returns the per-point errors, the max errors, and the verdict, and the worksheet appears in the chat. " +
+    "When the user asks for a report, spec sheet, or printout, CALL make_report to open a clean printable worksheet they can save as a PDF. " +
+    "Report the verdict and the worst error plainly. Plain text only, no Markdown.";
   var TOOLS = [{
     name: "solve_calibration",
-    description: "Grade a multi-point loop calibration with the deterministic percent-of-span engine. Returns per-point expected output and As-Found / As-Left error, the signed max errors, and the pass/fail verdict.",
+    description: "Grade a multi-point loop calibration with the deterministic percent-of-span engine. Only call this once every required input has been captured from the user. Returns per-point expected output and As-Found / As-Left error, the signed max errors, and the verdict.",
     parameters: {
       type: "object",
       properties: {
-        in_low: { type: "number", description: "input range low (LRV); default 0" },
-        in_high: { type: "number", description: "input range high (URV); default 100" },
-        in_unit: { type: "string", description: "input units, e.g. inH2O" },
-        out_low: { type: "number", description: "output range low; default 4" },
-        out_high: { type: "number", description: "output range high; default 20" },
+        in_low: { type: "number", description: "input range low (LRV) you apply" },
+        in_high: { type: "number", description: "input range high (URV) you apply" },
+        in_unit: { type: "string", description: "input units, e.g. inH2O, psi, degC" },
+        out_low: { type: "number", description: "output range low you measure" },
+        out_high: { type: "number", description: "output range high you measure" },
         out_unit: { type: "string", description: "output units, e.g. mA" },
-        tol: { type: "number", description: "tolerance, percent of span; default 0.5" },
+        tol: { type: "number", description: "tolerance, percent of span" },
         rows: {
           type: "array",
           description: "one entry per test point, in order",
@@ -369,15 +371,19 @@
           }
         }
       },
-      required: ["rows"]
+      required: ["in_low", "in_high", "in_unit", "out_low", "out_high", "out_unit", "tol", "rows"]
     }
   }];
   function run(name, a) {
-    var inLo = N(a.in_low, 0), inHi = N(a.in_high, 100), outLo = N(a.out_low, 4), outHi = N(a.out_high, 20);
-    var inU = a.in_unit || "", outU = a.out_unit || "mA", tol = N(a.tol, 0.5);
-    var rows = a.rows || [];
-    if (!rows.length) return { error: "Give me the test-point readings." };
-    if (!P.ok(inLo, inHi, outLo, outHi) || inHi === inLo || outHi === outLo) return { error: "Check the input and output ranges; low and high must differ." };
+    var req = [];
+    ["in_low", "in_high", "in_unit", "out_low", "out_high", "out_unit", "tol"].forEach(function (k) { if (a[k] == null || a[k] === "") req.push(k); });
+    if (!Array.isArray(a.rows) || !a.rows.length) req.push("rows");
+    if (req.length) return { error: "Missing required inputs: " + req.join(", ") + ". Ask the user for these and do not compute until all are captured.", missing: req };
+    var inLo = N(a.in_low), inHi = N(a.in_high), outLo = N(a.out_low), outHi = N(a.out_high);
+    var inU = a.in_unit || "", outU = a.out_unit || "", tol = N(a.tol);
+    var rows = a.rows;
+    if (!P.ok(inLo, inHi, outLo, outHi, tol)) return { error: "The ranges and tolerance must all be numbers." };
+    if (inHi === inLo || outHi === outLo) return { error: "Check the input and output ranges; low and high must each differ." };
     var maxAF = 0, maxAL = 0, haveAF = false, haveAL = false;
     function grade(err) { var x = Math.abs(err); return x <= tol ? "ok" : (x <= tol * 2 ? "warn" : "bad"); }
     var out = rows.map(function (r) {
@@ -409,26 +415,52 @@
       max_found: haveAF ? P.fmt(maxAF, 3) : "—", max_left: haveAL ? P.fmt(maxAL, 3) : "—", verdict: verdict
     };
   }
-  function render(r) {
-    var heads = ["Applied", "%", "Expected", "As-Found", "Found err", "As-Left", "Left err"];
-    var rows = r.rows.map(function (x) {
+  function worksheetRows(r) {
+    return r.rows.map(function (x) {
       return [x.applied, x.pct, x.exp + (x.sat ? " (sat)" : ""), x.af, x.afErr + "%", x.al, x.alErr + "%"];
     });
+  }
+  var HEADS = ["Applied", "%", "Expected", "As-Found", "Found err", "As-Left", "Left err"];
+  function render(r) {
     return {
       label: "Verdict", value: r.verdict,
       tables: [
-        { caption: r.setup, headings: heads, rows: rows },
+        { caption: r.setup, headings: HEADS, rows: worksheetRows(r) },
         { caption: "Max error (percent of span)", rows: [["As-Found max", r.max_found + " %"], ["As-Left max", r.max_left + " %"]] }
+      ]
+    };
+  }
+  function report(r, inp) {
+    return {
+      title: "Calibration Worksheet",
+      subtitle: r.setup,
+      result: { label: "Verdict", value: r.verdict },
+      sections: [
+        { title: "Loop setup", grid: [
+          { k: "Input range", v: inp.in_low + " to " + inp.in_high + " " + (inp.in_unit || "") },
+          { k: "Output range", v: inp.out_low + " to " + inp.out_high + " " + (inp.out_unit || "") },
+          { k: "Tolerance", v: inp.tol + " % of span" },
+          { k: "Test points", v: String(r.rows.length) }
+        ] },
+        { title: "Worksheet", table: { headings: HEADS, rows: worksheetRows(r) } },
+        { title: "Result", grid: [
+          { k: "As-Found max error", v: r.max_found + " % of span" },
+          { k: "As-Left max error", v: r.max_left + " % of span" },
+          { k: "Verdict", v: r.verdict, wide: true },
+          { k: "Generated", v: new Date().toLocaleString(), wide: true }
+        ] },
+        { note: "Error is percent of span: (measured minus expected) divided by the output span times 100. Bridges Industrial Field Pocket Guide. A calculation aid, not a calibration certificate; verify inputs before relying on the result." }
       ]
     };
   }
   PGWizard.mount({
     root: ".pgw",
-    greeting: "Hi, I'll build the calibration worksheet with you. First the loop: the input range you apply, the output range you measure, the tolerance in percent of span, and how many points (3, 5, or 11). Then I'll walk the points for the As-Found readings, and the As-Left if you adjusted. For example: \"0 to 100 inH2O in, 4 to 20 mA out, half a percent tolerance, 5 points.\"",
-    system: SYSTEM, tools: TOOLS, run: run, render: render
+    greeting: "Hi, I'll build the calibration worksheet with you. First the loop: the input range you apply, the output range you measure, the tolerance in percent of span, and how many points (3, 5, or 11). Then I'll walk the points for the As-Found readings, and the As-Left if you adjusted. When it is done you can ask me for a printable report. For example: \"0 to 100 inH2O in, 4 to 20 mA out, half a percent tolerance, 5 points.\"",
+    system: SYSTEM, tools: TOOLS, run: run, render: render, report: report
   });
 })();
 </script>
+<section id="pgwPrintSheet" class="pgw-print" aria-hidden="true"></section>
 <footer class="fv-footer"><div class="fv-wrap fv-footer__top"><div class="fv-footer__brand"><a class="fv-brand" href="/"><span class="fv-brand__mark fv-brand__mark--plain" style="background-image:url(/images/Logo.png)"></span><span class="fv-brand__name">Bridges <span>Industrial</span></span></a><p>Hands-on field instrumentation and analytical measurement, technical training, PragOptics hardware and software, and the Idea Lab. Engineered for clarity, accountability, and scale.</p><p>On site across the Texas Gulf Coast from League City, including Houston, Texas City, Pasadena, Baytown, Clear Lake, and Galveston. Remote and advisory work anywhere in the US.</p></div><div class="fv-fcol"><h3>What we do</h3><a href="/instrument-support/">Instrument Technical Support</a><a href="/industrial">Industrial Automation &amp; Training</a><a href="/education/">Field Pocket Guide</a><a href="/partnerships">Partnerships</a><a href="/integration">PragOptics</a><a href="/idea-lab/">Idea Lab</a></div><div class="fv-fcol"><h3>Connect</h3><a href="/break-in/" style="color:var(--accent)">Submit Break-In</a><span style="color:var(--muted);font-size:.82rem;display:block;margin:2px 0 6px">Instrument not working? Ask a specialist, free.</span><a href="mailto:support@bridgesindust.com">support@bridgesindust.com</a><a href="tel:+18324250421">+1 (832) 425-0421</a></div></div><div class="fv-wrap fv-footer__bottom"><span>&copy; <span id="fv-year">2026</span> Bridges Industrial LLC. All rights reserved.</span><a href="/integration/terms/" style="color:var(--muted)">Terms &amp; Privacy</a></div></footer>
 <script src="/assets/fortiview.js"></script>
 </body>

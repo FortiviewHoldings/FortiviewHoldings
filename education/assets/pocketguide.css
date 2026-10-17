@@ -257,3 +257,35 @@ body.pg-pad-open .pg-main{padding-bottom:320px}
 .pgw-table th{text-align:left;color:var(--muted);font-size:.6rem;text-transform:uppercase;letter-spacing:.04em;padding:4px 8px;border-bottom:1px solid var(--glass-border)}
 .pgw-table td{padding:5px 8px;border-bottom:1px solid var(--glass-border);color:var(--ink-2)}
 .pgw-table td.num{text-align:right;color:var(--ink);white-space:nowrap}
+
+/* ---- Printable report (wizard.js builds it into a body-level #pgwPrintSheet
+   and adds body.pgw-printing while the print dialog is open). All rules are
+   scoped to that class so they never touch the flow calculator's own print. ---- */
+.pgw-print{display:none}
+@media print{
+  body.pgw-printing{background:#fff!important}
+  body.pgw-printing::before,body.pgw-printing::after{display:none!important;content:none!important}
+  body.pgw-printing>*{display:none!important}
+  body.pgw-printing>.pgw-print{display:block!important;color:#111;font-family:Inter,system-ui,sans-serif}
+  @page{margin:12mm}
+  body.pgw-printing .pgwps-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;border-bottom:2px solid #111;padding-bottom:8px;margin-bottom:12px}
+  body.pgw-printing .pgwps-title{font-size:18px;font-weight:700}
+  body.pgw-printing .pgwps-sub{font-size:11px;color:#555;margin-top:2px}
+  body.pgw-printing .pgwps-result{text-align:right;white-space:nowrap}
+  body.pgw-printing .pgwps-result__l{font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#555}
+  body.pgw-printing .pgwps-result__v{font-size:16px;font-weight:700}
+  body.pgw-printing .pgwps-section{margin:0 0 13px;break-inside:avoid}
+  body.pgw-printing .pgwps-h{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#555;border-bottom:1px solid #bbb;padding-bottom:3px;margin:0 0 6px}
+  body.pgw-printing .pgwps-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px 20px}
+  body.pgw-printing .pgwps-field{display:flex;justify-content:space-between;gap:10px;font-size:11px;padding:2px 0;border-bottom:1px solid #eee}
+  body.pgw-printing .pgwps-field--wide{grid-column:1 / -1}
+  body.pgw-printing .pgwps-field__k{color:#555}
+  body.pgw-printing .pgwps-field__v{font-weight:600;text-align:right}
+  body.pgw-printing .pgwps-tablewrap{width:100%}
+  body.pgw-printing .pgwps-table{width:100%;border-collapse:collapse;font-size:10.5px}
+  body.pgw-printing .pgwps-table th{text-align:left;border-bottom:1.5px solid #111;padding:4px 6px;font-size:9px;text-transform:uppercase;letter-spacing:.04em;color:#111}
+  body.pgw-printing .pgwps-table th:not(:first-child){text-align:right}
+  body.pgw-printing .pgwps-table td{padding:3px 6px;border-bottom:1px solid #ddd}
+  body.pgw-printing .pgwps-table td.num{text-align:right;font-variant-numeric:tabular-nums}
+  body.pgw-printing .pgwps-note{font-size:9px;color:#555;margin-top:8px;line-height:1.45}
+}

@@ -90,7 +90,50 @@ function rtd_resistance({ temp_c, type = "Pt100" }) {
   return { type: R0 === 1000 ? "Pt1000" : "Pt100", temp_c: t, resistance_ohms: round(r, 4) };
 }
 
-const RUN = { scale_4_20ma, dp_flow, calibration_error, transmitter_error, number_base, rtd_resistance, solve_flow: solveFlow };
+// --- multi-point calibration worksheet (As-Found / As-Left, percent of span) ---
+// Same math as the on-page worksheet: expected = linear scale of the applied
+// input clamped to the output limits; error = (measured - expected) / span * 100.
+function solve_calibration(a = {}) {
+  const { in_low, in_high, in_unit, out_low, out_high, out_unit, tol, rows } = a;
+  const req = [];
+  for (const k of ["in_low", "in_high", "in_unit", "out_low", "out_high", "out_unit", "tol"])
+    if (a[k] == null || a[k] === "") req.push(k);
+  if (!Array.isArray(rows) || !rows.length) req.push("rows");
+  if (req.length) return { error: `Missing required inputs: ${req.join(", ")}. Ask the user for these; do not compute until all are captured.`, missing: req };
+  const iLo = +in_low, iHi = +in_high, oLo = +out_low, oHi = +out_high, t = +tol, span = oHi - oLo;
+  if (![iLo, iHi, oLo, oHi, t].every(Number.isFinite)) return { error: "Ranges and tolerance must be numbers." };
+  if (iHi === iLo || span === 0) return { error: "Input and output ranges must each have a nonzero span." };
+  const clampv = (v, a, b) => { const lo = Math.min(a, b), hi = Math.max(a, b); return v < lo ? lo : v > hi ? hi : v; };
+  const scaleLin = (x) => oLo + (x - iLo) * (oHi - oLo) / (iHi - iLo);
+  let maxAF = 0, maxAL = 0, haveAF = false, haveAL = false;
+  const out = rows.map((r) => {
+    const applied = +r.applied, rawExp = scaleLin(applied), exp = clampv(rawExp, oLo, oHi);
+    const af = (r.as_found == null || r.as_found === "") ? null : +r.as_found;
+    const al = (r.as_left == null || r.as_left === "") ? null : +r.as_left;
+    const afErr = af == null ? null : (af - exp) / span * 100;
+    const alErr = al == null ? null : (al - exp) / span * 100;
+    if (afErr != null && Number.isFinite(afErr)) { haveAF = true; if (Math.abs(afErr) > Math.abs(maxAF)) maxAF = afErr; }
+    if (alErr != null && Number.isFinite(alErr)) { haveAL = true; if (Math.abs(alErr) > Math.abs(maxAL)) maxAL = alErr; }
+    return {
+      applied: round(applied), percent: round((applied - iLo) / (iHi - iLo) * 100, 2),
+      expected: round(exp), saturated: Math.abs(rawExp - exp) > 1e-9,
+      as_found: af == null ? null : round(af), found_err_pct_span: afErr == null ? null : round(afErr, 3),
+      as_left: al == null ? null : round(al), left_err_pct_span: alErr == null ? null : round(alErr, 3)
+    };
+  });
+  let verdict;
+  if (!(t > 0)) verdict = "Set a tolerance";
+  else if (haveAL) verdict = Math.abs(maxAL) <= t ? "PASS, left in tolerance" : "FAIL, out of tolerance";
+  else if (haveAF) verdict = Math.abs(maxAF) <= t ? "Found in tolerance" : "Found out of tolerance, needs adjustment";
+  else verdict = "Enter readings";
+  return {
+    setup: `${iLo} to ${iHi} ${in_unit} -> ${oLo} to ${oHi} ${out_unit}, +/-${t}% span, ${rows.length} points`,
+    rows: out, as_found_max_pct_span: haveAF ? round(maxAF, 3) : null, as_left_max_pct_span: haveAL ? round(maxAL, 3) : null,
+    verdict, full_tool: "/education/calibration/ (open to print the worksheet report)"
+  };
+}
+
+const RUN = { scale_4_20ma, dp_flow, calibration_error, transmitter_error, number_base, rtd_resistance, solve_flow: solveFlow, solve_calibration };
 
 export function runTool(name, args) {
   const fn = RUN[name];
@@ -101,6 +144,36 @@ export function runTool(name, args) {
 // Gemini function declarations.
 export const TOOL_DECLARATIONS = [
   FLOW_TOOL,
+  {
+    name: "solve_calibration",
+    description: "Grade a multi-point loop calibration (As-Found / As-Left) as error in percent of span, with a pass/fail verdict. ONLY call this once every required input has been collected from the user: the input range and units applied, the output range and units measured, the tolerance in percent of span, and the As-Found reading at each test point (plus As-Left if the device was adjusted). You may suggest a common value such as a 4-20 mA output but must confirm it; never assume one. If it replies that inputs are missing, ask the user for exactly those.",
+    parameters: {
+      type: "object",
+      properties: {
+        in_low: { type: "number", description: "input range low (LRV) applied" },
+        in_high: { type: "number", description: "input range high (URV) applied" },
+        in_unit: { type: "string", description: "input units, e.g. inH2O, psi, degC" },
+        out_low: { type: "number", description: "output range low measured" },
+        out_high: { type: "number", description: "output range high measured" },
+        out_unit: { type: "string", description: "output units, e.g. mA" },
+        tol: { type: "number", description: "tolerance, percent of span" },
+        rows: {
+          type: "array",
+          description: "one entry per test point, in order",
+          items: {
+            type: "object",
+            properties: {
+              applied: { type: "number", description: "input actually applied at this point" },
+              as_found: { type: "number", description: "output reading before adjustment" },
+              as_left: { type: "number", description: "output reading after adjustment; omit if no adjustment was made" }
+            },
+            required: ["applied", "as_found"]
+          }
+        }
+      },
+      required: ["in_low", "in_high", "in_unit", "out_low", "out_high", "out_unit", "tol", "rows"]
+    }
+  },
   {
     name: "scale_4_20ma",
     description: "Linear 4-20 mA scaling. Given one of ma, percent, or eu (engineering units) with the eu_low/eu_high range, return all three.",
