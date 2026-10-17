@@ -25,13 +25,25 @@
 </head>
 <body>
 <main class="pg-main">
-  <div class="pg-wrap--wide pg-wrap">
+  <div class="pg-wrap--wide pg-wrap pgw pgw--chat">
 
     <header class="pg-head">
       <a class="pg-back" href="/education/">Field Pocket Guide</a>
       <h1 class="fv-h2">Thermocouple Tables</h1>
       <p class="fv-lead">Eight letter types, ITS-90, reference junction at 0 °C. Convert temperature to millivolts and back with cold-junction compensation, or generate a reference table at any interval. Built straight from the NIST reference functions.</p>
     </header>
+
+    <div class="pgw-modes" role="tablist" aria-label="Tool mode">
+      <button id="pgwModeChat" class="pgw-mode is-active" type="button" role="tab" aria-selected="true"><span class="pgw-mode__ic">&#8620;</span> AI wizard</button>
+      <button id="pgwModeForm" class="pgw-mode" type="button" role="tab" aria-selected="false"><span class="pgw-mode__ic">&#8862;</span> Manual form</button>
+    </div>
+    <section class="pgw-card" aria-label="Guided wizard">
+      <h2 class="pg-tool__title"><span class="pg-dot"></span> Guided setup</h2>
+      <p class="pg-tool__sub">Tell me the type, the direction, your reading, and the cold-junction reference. The wizard runs the exact same ITS-90 math as the form, and it will confirm the reference since 0 &deg;C versus ambient changes the answer.</p>
+      <div id="pgwLog" class="pgw-log" aria-live="polite"></div>
+      <form id="pgwForm" class="pgw-bar"><textarea id="pgwInput" class="pgw-input" rows="1" placeholder="Describe the type and reading, or answer the wizard&hellip;" aria-label="Message the wizard"></textarea><button id="pgwSend" class="pgw-send" type="submit">Send</button></form>
+      <p class="pgw-note">The wizard only asks questions and runs the calculator. Every number comes from the deterministic engine, not the AI.</p>
+    </section>
 
     <!-- TYPE PICKER -->
     <section class="pg-tool">
@@ -202,6 +214,69 @@
 
   document.addEventListener("input", function () { convert(); table(); });
   if (document.readyState !== "loading") refresh(); else document.addEventListener("DOMContentLoaded", refresh);
+})();
+</script>
+<script src="/education/assets/wizard.js"></script>
+<script>
+(function () {
+  var P = window.PG, N = function (v, d) { var n = parseFloat(v); return isFinite(n) ? n : d; };
+  var SYSTEM =
+    "You are the Thermocouple wizard for Bridges Industrial, for ITS-90 thermocouples (types J, K, T, E, N, R, S, B). Help a field tech by talking, one thing at a time. " +
+    "Collect: the type letter, the direction (a hot-junction temperature converted to meter millivolts, or a measured millivolt reading converted to temperature), the value, and the cold-junction / reference temperature. " +
+    "CRITICAL: always CONFIRM the cold-junction reference temperature, because 0 C (an ice bath) versus the terminal-block ambient moves the answer; do not assume it. " +
+    "Translate plain speech into fields (e.g. 'type K hot junction 300 C, cold junction 25' gives type=K, direction=c2mv, value=300, ref_c=25; 'type K meter reads 12.2 millivolts, ambient 25' gives direction=mv2c, value=12.2, ref_c=25). " +
+    "When you have the type, direction, value, and reference, CALL tc_convert. Never do the arithmetic yourself: the tool returns the exact numbers and a card appears in the chat. Report the returned numbers plainly. Plain text only, no Markdown.";
+  var TOOLS = [{
+    name: "tc_convert",
+    description: "Convert a thermocouple reading either direction with the deterministic ITS-90 engine and cold-junction compensation. Returns the meter millivolts (or hot-junction temperature) plus E(hot), E(reference), and the type range.",
+    parameters: {
+      type: "object",
+      properties: {
+        type: { type: "string", enum: ["J", "K", "T", "E", "N", "R", "S", "B"], description: "thermocouple letter type" },
+        direction: { type: "string", enum: ["c2mv", "mv2c"], description: "c2mv = temperature to meter mV; mv2c = measured mV to temperature" },
+        value: { type: "number", description: "hot-junction temperature in C (c2mv) or measured mV at the meter (mv2c)" },
+        ref_c: { type: "number", description: "cold-junction / reference temperature in C; confirm it, do not assume" }
+      },
+      required: ["type", "value"]
+    }
+  }];
+  function run(name, a) {
+    var type = (a.type || "").toUpperCase(), dir = a.direction === "mv2c" ? "mv2c" : "c2mv";
+    var val = N(a.value, NaN), ref = N(a.ref_c, 0);
+    var d = (P.TC_DATA || {})[type];
+    if (!d) return { error: "Pick a thermocouple type: J, K, T, E, N, R, S, or B." };
+    if (!isFinite(val)) return { error: "Tell me the value to convert." };
+    var eRef = P.TC.emf(type, ref);
+    if (!isFinite(eRef)) return { error: "The reference temperature is outside the " + d.name + " range (" + d.range + ")." };
+    if (dir === "c2mv") {
+      var eHot = P.TC.emf(type, val);
+      if (!isFinite(eHot)) return { error: "That hot-junction temperature is outside the " + d.name + " range (" + d.range + ")." };
+      var meter = eHot - eRef;
+      return { ok: true, direction: dir, type_name: d.name, ref_c: ref, range: d.range,
+        main_value: P.fmt(meter, 3), main_unit: "mV", main_label: "Meter reads, reference applied",
+        e_hot: P.fmt(eHot, 3), e_ref: P.fmt(eRef, 3), meter: P.fmt(meter, 3) };
+    }
+    var eAbs = val + eRef, hot = P.TC.temp(type, eAbs);
+    if (!isFinite(hot)) return { error: "That reading is outside the " + d.name + " range with this reference." };
+    return { ok: true, direction: dir, type_name: d.name, ref_c: ref, range: d.range,
+      main_value: P.fmt(hot, 2), main_unit: "degrees C", main_label: "Hot junction, reference applied",
+      e_hot: P.fmt(eAbs, 3), e_ref: P.fmt(eRef, 3), meter: P.fmt(val, 3) };
+  }
+  function render(r) {
+    return { label: r.type_name + " - " + r.main_label, value: r.main_value, unit: r.main_unit,
+      tables: [{ caption: "Detail", rows: [
+        ["E(hot), ref 0 C", r.e_hot + " mV"],
+        ["E(reference)", r.e_ref + " mV"],
+        ["Meter = E(hot) - E(ref)", r.meter + " mV"],
+        ["Reference junction", r.ref_c + " C"],
+        ["Type range", r.range]
+      ] }] };
+  }
+  PGWizard.mount({
+    root: ".pgw",
+    greeting: "Hi, I'll work the thermocouple conversion with you. Tell me the type, the direction, your reading, and the cold-junction reference. For example: \"type K, hot junction 300 C, cold junction 25.\" I'll confirm the reference, since 0 C versus ambient changes the answer.",
+    system: SYSTEM, tools: TOOLS, run: run, render: render
+  });
 })();
 </script>
 <footer class="fv-footer"><div class="fv-wrap fv-footer__top"><div class="fv-footer__brand"><a class="fv-brand" href="/"><span class="fv-brand__mark fv-brand__mark--plain" style="background-image:url(/images/Logo.png)"></span><span class="fv-brand__name">Bridges <span>Industrial</span></span></a><p>Hands-on field instrumentation and analytical measurement, technical training, PragOptics hardware and software, and the Idea Lab. Engineered for clarity, accountability, and scale.</p><p>On site across the Texas Gulf Coast from League City, including Houston, Texas City, Pasadena, Baytown, Clear Lake, and Galveston. Remote and advisory work anywhere in the US.</p></div><div class="fv-fcol"><h3>What we do</h3><a href="/instrument-support/">Instrument Technical Support</a><a href="/industrial">Industrial Automation &amp; Training</a><a href="/education/">Field Pocket Guide</a><a href="/partnerships">Partnerships</a><a href="/integration">PragOptics</a><a href="/idea-lab/">Idea Lab</a></div><div class="fv-fcol"><h3>Connect</h3><a href="/break-in/" style="color:var(--accent)">Submit Break-In</a><span style="color:var(--muted);font-size:.82rem;display:block;margin:2px 0 6px">Instrument not working? Ask a specialist, free.</span><a href="mailto:support@bridgesindust.com">support@bridgesindust.com</a><a href="tel:+18324250421">+1 (832) 425-0421</a></div></div><div class="fv-wrap fv-footer__bottom"><span>&copy; <span id="fv-year">2026</span> Bridges Industrial LLC. All rights reserved.</span><a href="/integration/terms/" style="color:var(--muted)">Terms &amp; Privacy</a></div></footer>

@@ -25,13 +25,25 @@
 </head>
 <body>
 <main class="pg-main">
-  <div class="pg-wrap--wide pg-wrap">
+  <div class="pg-wrap--wide pg-wrap pgw pgw--chat">
 
     <header class="pg-head">
       <a class="pg-back" href="/education/">Field Pocket Guide</a>
       <h1 class="fv-h2">Calibration Error</h1>
       <p class="fv-lead">Apply your standard, record the output. The worksheet returns error as <b>percent of span</b>, not percent of reading, with the sign handled for you. You only ever key in the magnitude you read.</p>
     </header>
+
+    <div class="pgw-modes" role="tablist" aria-label="Tool mode">
+      <button id="pgwModeChat" class="pgw-mode is-active" type="button" role="tab" aria-selected="true"><span class="pgw-mode__ic">&#8620;</span> AI wizard</button>
+      <button id="pgwModeForm" class="pgw-mode" type="button" role="tab" aria-selected="false"><span class="pgw-mode__ic">&#8862;</span> Manual form</button>
+    </div>
+    <section class="pgw-card" aria-label="Guided wizard">
+      <h2 class="pg-tool__title"><span class="pg-dot"></span> Guided setup</h2>
+      <p class="pg-tool__sub">Build a multi-point calibration by talking it through &mdash; the loop range, the tolerance, then the As-Found and As-Left readings. The wizard runs the exact same percent-of-span math as the worksheet and grades it with a verdict right here.</p>
+      <div id="pgwLog" class="pgw-log" aria-live="polite"></div>
+      <form id="pgwForm" class="pgw-bar"><textarea id="pgwInput" class="pgw-input" rows="1" placeholder="Describe the loop and readings, or answer the wizard&hellip;" aria-label="Message the wizard"></textarea><button id="pgwSend" class="pgw-send" type="submit">Send</button></form>
+      <p class="pgw-note">The wizard only asks questions and runs the calculator. Every number comes from the deterministic engine, not the AI.</p>
+    </section>
 
     <!-- LOOP SETUP -->
     <section class="pg-tool">
@@ -318,6 +330,103 @@
 
   document.addEventListener("input", compute);
   if (document.readyState !== "loading") build(); else document.addEventListener("DOMContentLoaded", build);
+})();
+</script>
+<script src="/education/assets/wizard.js"></script>
+<script>
+(function () {
+  var P = window.PG, N = function (v, d) { var n = parseFloat(v); return isFinite(n) ? n : d; };
+  var SYSTEM =
+    "You are the Calibration Worksheet wizard for Bridges Industrial. You help a field tech build a multi-point loop calibration by talking, one thing at a time. " +
+    "First the loop setup: the input range (low, high, units applied to the device), the output range (low, high, units measured), the tolerance in percent of span, and how many test points (3, 5, or 11; default 5 at 0/25/50/75/100 percent). " +
+    "Then walk the test points: for each point tell the user the nominal input to apply and collect the As-Found reading (before any adjustment). After the As-Found pass, ask whether an adjustment was made; if yes, collect the As-Left readings (after adjustment), otherwise As-Left equals As-Found. " +
+    "Then CALL solve_calibration ONCE with the full setup and every row. Error is percent of span: (measured minus expected) divided by the output span times 100, graded against the tolerance. " +
+    "Never do the arithmetic yourself: the tool returns per-point errors, the max errors, and the PASS or FAIL verdict, and the worksheet table appears in the chat. Report the verdict and the worst error plainly. Plain text only, no Markdown.";
+  var TOOLS = [{
+    name: "solve_calibration",
+    description: "Grade a multi-point loop calibration with the deterministic percent-of-span engine. Returns per-point expected output and As-Found / As-Left error, the signed max errors, and the pass/fail verdict.",
+    parameters: {
+      type: "object",
+      properties: {
+        in_low: { type: "number", description: "input range low (LRV); default 0" },
+        in_high: { type: "number", description: "input range high (URV); default 100" },
+        in_unit: { type: "string", description: "input units, e.g. inH2O" },
+        out_low: { type: "number", description: "output range low; default 4" },
+        out_high: { type: "number", description: "output range high; default 20" },
+        out_unit: { type: "string", description: "output units, e.g. mA" },
+        tol: { type: "number", description: "tolerance, percent of span; default 0.5" },
+        rows: {
+          type: "array",
+          description: "one entry per test point, in order",
+          items: {
+            type: "object",
+            properties: {
+              applied: { type: "number", description: "the input actually applied at this point" },
+              as_found: { type: "number", description: "output reading before adjustment" },
+              as_left: { type: "number", description: "output reading after adjustment; omit if no adjustment was made" }
+            },
+            required: ["applied", "as_found"]
+          }
+        }
+      },
+      required: ["rows"]
+    }
+  }];
+  function run(name, a) {
+    var inLo = N(a.in_low, 0), inHi = N(a.in_high, 100), outLo = N(a.out_low, 4), outHi = N(a.out_high, 20);
+    var inU = a.in_unit || "", outU = a.out_unit || "mA", tol = N(a.tol, 0.5);
+    var rows = a.rows || [];
+    if (!rows.length) return { error: "Give me the test-point readings." };
+    if (!P.ok(inLo, inHi, outLo, outHi) || inHi === inLo || outHi === outLo) return { error: "Check the input and output ranges; low and high must differ." };
+    var maxAF = 0, maxAL = 0, haveAF = false, haveAL = false;
+    function grade(err) { var x = Math.abs(err); return x <= tol ? "ok" : (x <= tol * 2 ? "warn" : "bad"); }
+    var out = rows.map(function (r) {
+      var applied = N(r.applied, NaN);
+      var rawExp = P.scale(applied, inLo, inHi, outLo, outHi), exp = P.clamp(rawExp, outLo, outHi);
+      var sat = Math.abs(rawExp - exp) > 1e-9;
+      var pct = P.pctSpan(applied, inLo, inHi);
+      var af = (r.as_found == null || r.as_found === "") ? null : N(r.as_found, NaN);
+      var al = (r.as_left == null || r.as_left === "") ? null : N(r.as_left, NaN);
+      var afErr = af == null ? null : P.errSpan(af, exp, outLo, outHi);
+      var alErr = al == null ? null : P.errSpan(al, exp, outLo, outHi);
+      if (afErr != null && isFinite(afErr)) { haveAF = true; if (Math.abs(afErr) > Math.abs(maxAF)) maxAF = afErr; }
+      if (alErr != null && isFinite(alErr)) { haveAL = true; if (Math.abs(alErr) > Math.abs(maxAL)) maxAL = alErr; }
+      return {
+        applied: P.fmtTrim(applied, 4), pct: P.fmt(pct, 2), exp: P.fmtTrim(exp, 4), sat: sat,
+        af: af == null ? "—" : P.fmtTrim(af, 4), afErr: afErr == null ? "—" : P.fmt(afErr, 3),
+        al: al == null ? "—" : P.fmtTrim(al, 4), alErr: alErr == null ? "—" : P.fmt(alErr, 3)
+      };
+    });
+    var verdict;
+    if (!(tol > 0)) verdict = "Set a tolerance";
+    else if (haveAL) verdict = Math.abs(maxAL) <= tol ? "PASS, left in tolerance" : "FAIL, out of tolerance";
+    else if (haveAF) verdict = Math.abs(maxAF) <= tol ? "Found in tolerance" : "Found out, needs adjust";
+    else verdict = "Enter readings";
+    var setup = inLo + " to " + inHi + (inU ? " " + inU : "") + " -> " + outLo + " to " + outHi + (outU ? " " + outU : "") +
+      ", +/-" + tol + "% span, " + rows.length + " points";
+    return {
+      ok: true, setup: setup, rows: out, in_unit: inU, out_unit: outU,
+      max_found: haveAF ? P.fmt(maxAF, 3) : "—", max_left: haveAL ? P.fmt(maxAL, 3) : "—", verdict: verdict
+    };
+  }
+  function render(r) {
+    var heads = ["Applied", "%", "Expected", "As-Found", "Found err", "As-Left", "Left err"];
+    var rows = r.rows.map(function (x) {
+      return [x.applied, x.pct, x.exp + (x.sat ? " (sat)" : ""), x.af, x.afErr + "%", x.al, x.alErr + "%"];
+    });
+    return {
+      label: "Verdict", value: r.verdict,
+      tables: [
+        { caption: r.setup, headings: heads, rows: rows },
+        { caption: "Max error (percent of span)", rows: [["As-Found max", r.max_found + " %"], ["As-Left max", r.max_left + " %"]] }
+      ]
+    };
+  }
+  PGWizard.mount({
+    root: ".pgw",
+    greeting: "Hi, I'll build the calibration worksheet with you. First the loop: the input range you apply, the output range you measure, the tolerance in percent of span, and how many points (3, 5, or 11). Then I'll walk the points for the As-Found readings, and the As-Left if you adjusted. For example: \"0 to 100 inH2O in, 4 to 20 mA out, half a percent tolerance, 5 points.\"",
+    system: SYSTEM, tools: TOOLS, run: run, render: render
+  });
 })();
 </script>
 <footer class="fv-footer"><div class="fv-wrap fv-footer__top"><div class="fv-footer__brand"><a class="fv-brand" href="/"><span class="fv-brand__mark fv-brand__mark--plain" style="background-image:url(/images/Logo.png)"></span><span class="fv-brand__name">Bridges <span>Industrial</span></span></a><p>Hands-on field instrumentation and analytical measurement, technical training, PragOptics hardware and software, and the Idea Lab. Engineered for clarity, accountability, and scale.</p><p>On site across the Texas Gulf Coast from League City, including Houston, Texas City, Pasadena, Baytown, Clear Lake, and Galveston. Remote and advisory work anywhere in the US.</p></div><div class="fv-fcol"><h3>What we do</h3><a href="/instrument-support/">Instrument Technical Support</a><a href="/industrial">Industrial Automation &amp; Training</a><a href="/education/">Field Pocket Guide</a><a href="/partnerships">Partnerships</a><a href="/integration">PragOptics</a><a href="/idea-lab/">Idea Lab</a></div><div class="fv-fcol"><h3>Connect</h3><a href="/break-in/" style="color:var(--accent)">Submit Break-In</a><span style="color:var(--muted);font-size:.82rem;display:block;margin:2px 0 6px">Instrument not working? Ask a specialist, free.</span><a href="mailto:support@bridgesindust.com">support@bridgesindust.com</a><a href="tel:+18324250421">+1 (832) 425-0421</a></div></div><div class="fv-wrap fv-footer__bottom"><span>&copy; <span id="fv-year">2026</span> Bridges Industrial LLC. All rights reserved.</span><a href="/integration/terms/" style="color:var(--muted)">Terms &amp; Privacy</a></div></footer>

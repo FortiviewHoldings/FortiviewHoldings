@@ -25,13 +25,25 @@
 </head>
 <body>
 <main class="pg-main">
-  <div class="pg-wrap--wide pg-wrap">
+  <div class="pg-wrap--wide pg-wrap pgw pgw--chat">
 
     <header class="pg-head">
       <a class="pg-back" href="/education/">Field Pocket Guide</a>
       <h1 class="fv-h2">RTD Tables</h1>
       <p class="fv-lead">Platinum RTDs to IEC 60751, the 0.00385 curve. Resistance against temperature by the Callendar-Van Dusen equation, so the table is generated, not looked up and rounded. Convert a single reading either way, or build a table at any interval.</p>
     </header>
+
+    <div class="pgw-modes" role="tablist" aria-label="Tool mode">
+      <button id="pgwModeChat" class="pgw-mode is-active" type="button" role="tab" aria-selected="true"><span class="pgw-mode__ic">&#8620;</span> AI wizard</button>
+      <button id="pgwModeForm" class="pgw-mode" type="button" role="tab" aria-selected="false"><span class="pgw-mode__ic">&#8862;</span> Manual form</button>
+    </div>
+    <section class="pgw-card" aria-label="Guided wizard">
+      <h2 class="pg-tool__title"><span class="pg-dot"></span> Guided setup</h2>
+      <p class="pg-tool__sub">Tell me the sensor, the direction, and your reading. The wizard runs the exact same IEC 60751 math as the form, and it can build a resistance table over any range.</p>
+      <div id="pgwLog" class="pgw-log" aria-live="polite"></div>
+      <form id="pgwForm" class="pgw-bar"><textarea id="pgwInput" class="pgw-input" rows="1" placeholder="Describe the sensor and reading, or answer the wizard&hellip;" aria-label="Message the wizard"></textarea><button id="pgwSend" class="pgw-send" type="submit">Send</button></form>
+      <p class="pgw-note">The wizard only asks questions and runs the calculator. Every number comes from the deterministic engine, not the AI.</p>
+    </section>
 
     <section class="pg-tool">
       <h2 class="pg-tool__title"><span class="pg-dot"></span> Sensor</h2>
@@ -132,6 +144,79 @@
   });
   document.addEventListener("input", function () { compute(); table(); });
   if (document.readyState !== "loading") refresh(); else document.addEventListener("DOMContentLoaded", refresh);
+})();
+</script>
+<script src="/education/assets/wizard.js"></script>
+<script>
+(function () {
+  var P = window.PG, N = function (v, d) { var n = parseFloat(v); return isFinite(n) ? n : d; };
+  var SYSTEM =
+    "You are the RTD wizard for Bridges Industrial, for platinum RTDs per IEC 60751 (alpha 0.00385). Help a field tech by talking, one thing at a time. " +
+    "Collect: the sensor (Pt100, Pt500, or Pt1000; the number is the ice-point resistance R0), the direction (a temperature converted to resistance, or a measured resistance converted to temperature), and the value. " +
+    "Translate plain speech into fields (e.g. 'Pt100 at 100 degrees C' gives sensor=100, direction=t2r, value=100; '138.5 ohms on a Pt100' gives sensor=100, direction=r2t, value=138.5). " +
+    "When you have the sensor, direction, and value, CALL rtd_convert. For a full resistance table over a range, CALL rtd_table. Never do the arithmetic yourself: the tool returns the exact numbers and a card appears in the chat. The valid range is -200 to 850 C. Report the returned numbers plainly. Plain text only, no Markdown.";
+  var TOOLS = [
+    {
+      name: "rtd_convert",
+      description: "Convert a single platinum-RTD reading either direction with the deterministic IEC 60751 engine. Returns the converted value plus the standard anchor points for the sensor.",
+      parameters: {
+        type: "object",
+        properties: {
+          sensor: { type: "number", description: "ice-point resistance R0: 100 (Pt100), 500 (Pt500), or 1000 (Pt1000); default 100" },
+          direction: { type: "string", enum: ["t2r", "r2t"], description: "t2r = temperature to resistance; r2t = resistance to temperature" },
+          value: { type: "number", description: "the reading to convert (degrees C for t2r, ohms for r2t)" }
+        },
+        required: ["value"]
+      }
+    },
+    {
+      name: "rtd_table",
+      description: "Generate a two-column temperature-to-resistance reference table with the deterministic IEC 60751 engine.",
+      parameters: {
+        type: "object",
+        properties: {
+          sensor: { type: "number", description: "R0: 100, 500, or 1000; default 100" },
+          from: { type: "number", description: "start temperature, C" },
+          to: { type: "number", description: "end temperature, C" },
+          step: { type: "number", description: "step, C" }
+        },
+        required: ["from", "to", "step"]
+      }
+    }
+  ];
+  function run(name, a) {
+    var R0 = N(a.sensor, 100); if (R0 !== 100 && R0 !== 500 && R0 !== 1000) R0 = 100;
+    if (name === "rtd_table") {
+      var from = N(a.from, NaN), to = N(a.to, NaN), step = N(a.step, NaN);
+      if (!P.ok(from, to, step) || step <= 0) return { error: "Give me a from, a to, and a positive step." };
+      from = Math.max(from, -200); to = Math.min(to, 850);
+      var rows = [], n = 0;
+      for (var t = from; t <= to + 1e-9 && n < 400; t += step, n++) rows.push({ t: P.fmtTrim(t, 2), r: P.fmt(P.RTD.res(t, R0), 3) });
+      return { ok: true, kind: "table", sensor: R0, rows: rows };
+    }
+    var dir = a.direction === "r2t" ? "r2t" : "t2r", val = N(a.value, NaN);
+    if (!isFinite(val)) return { error: "Tell me the value to convert." };
+    var res, unit, note = "";
+    if (dir === "t2r") { if (val < -200 || val > 850) note = "Outside the -200 to 850 C validity range."; res = P.RTD.res(val, R0); unit = "ohms"; }
+    else { res = P.RTD.temp(val, R0); unit = "degrees C"; if (isFinite(res) && (res < -200 || res > 850)) note = "Result is outside the -200 to 850 C validity range."; }
+    if (!P.ok(res)) return { error: "That reading has no valid RTD solution." };
+    var anchors = [0, 100, -100, 850].map(function (t) { return { t: t, r: P.fmt(P.RTD.res(t, R0), 3) }; });
+    return { ok: true, kind: "convert", sensor: R0, direction: dir, value: P.fmt(res, dir === "t2r" ? 3 : 2), unit: unit, note: note, anchors: anchors };
+  }
+  function render(r) {
+    if (r.kind === "table") {
+      return { label: "Pt" + r.sensor + " resistance table",
+        tables: [{ caption: "Temperature to resistance", headings: ["Degrees C", "Ohms (Pt" + r.sensor + ")"], rows: r.rows.map(function (x) { return [x.t, x.r]; }) }] };
+    }
+    var tables = [{ caption: "Anchor points (IEC 60751)", headings: ["Degrees C", "Ohms (Pt" + r.sensor + ")"], rows: r.anchors.map(function (x) { return [x.t, x.r]; }) }];
+    if (r.note) tables.unshift({ caption: "Note", rows: [["", r.note]] });
+    return { label: "Pt" + r.sensor + " result", value: r.value, unit: r.unit, tables: tables };
+  }
+  PGWizard.mount({
+    root: ".pgw",
+    greeting: "Hi, I'll work the RTD conversion with you. Tell me the sensor (Pt100, Pt500, or Pt1000), the direction, and your reading. For example: \"Pt100 at 100 degrees C\" or \"138.5 ohms on a Pt100.\" I can also build a resistance table over a range.",
+    system: SYSTEM, tools: TOOLS, run: run, render: render
+  });
 })();
 </script>
 <footer class="fv-footer"><div class="fv-wrap fv-footer__top"><div class="fv-footer__brand"><a class="fv-brand" href="/"><span class="fv-brand__mark fv-brand__mark--plain" style="background-image:url(/images/Logo.png)"></span><span class="fv-brand__name">Bridges <span>Industrial</span></span></a><p>Hands-on field instrumentation and analytical measurement, technical training, PragOptics hardware and software, and the Idea Lab. Engineered for clarity, accountability, and scale.</p><p>On site across the Texas Gulf Coast from League City, including Houston, Texas City, Pasadena, Baytown, Clear Lake, and Galveston. Remote and advisory work anywhere in the US.</p></div><div class="fv-fcol"><h3>What we do</h3><a href="/instrument-support/">Instrument Technical Support</a><a href="/industrial">Industrial Automation &amp; Training</a><a href="/education/">Field Pocket Guide</a><a href="/partnerships">Partnerships</a><a href="/integration">PragOptics</a><a href="/idea-lab/">Idea Lab</a></div><div class="fv-fcol"><h3>Connect</h3><a href="/break-in/" style="color:var(--accent)">Submit Break-In</a><span style="color:var(--muted);font-size:.82rem;display:block;margin:2px 0 6px">Instrument not working? Ask a specialist, free.</span><a href="mailto:support@bridgesindust.com">support@bridgesindust.com</a><a href="tel:+18324250421">+1 (832) 425-0421</a></div></div><div class="fv-wrap fv-footer__bottom"><span>&copy; <span id="fv-year">2026</span> Bridges Industrial LLC. All rights reserved.</span><a href="/integration/terms/" style="color:var(--muted)">Terms &amp; Privacy</a></div></footer>

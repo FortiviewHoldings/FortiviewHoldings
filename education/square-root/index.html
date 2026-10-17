@@ -25,13 +25,25 @@
 </head>
 <body>
 <main class="pg-main">
-  <div class="pg-wrap--wide pg-wrap">
+  <div class="pg-wrap--wide pg-wrap pgw pgw--chat">
 
     <header class="pg-head">
       <a class="pg-back" href="/education/">Field Pocket Guide</a>
       <h1 class="fv-h2">Square-Root Extraction</h1>
       <p class="fv-lead">Flow through a restriction follows the square root of differential pressure. A DP cell reads linearly in pressure, so flow needs the square root taken. Enter a signal and read the flow, or enter a flow and read the signal, both directions, with the differential-pressure and flow ranges side by side.</p>
     </header>
+
+    <div class="pgw-modes" role="tablist" aria-label="Tool mode">
+      <button id="pgwModeChat" class="pgw-mode is-active" type="button" role="tab" aria-selected="true"><span class="pgw-mode__ic">&#8620;</span> AI wizard</button>
+      <button id="pgwModeForm" class="pgw-mode" type="button" role="tab" aria-selected="false"><span class="pgw-mode__ic">&#8862;</span> Manual form</button>
+    </div>
+    <section class="pgw-card" aria-label="Guided wizard">
+      <h2 class="pg-tool__title"><span class="pg-dot"></span> Guided setup</h2>
+      <p class="pg-tool__sub">Describe the DP and flow ranges and your reading. The wizard runs the exact same math as the form and shows both the linear and extracted signals right here &mdash; and it will confirm whether a milliamp reading is the linear or the extracted signal.</p>
+      <div id="pgwLog" class="pgw-log" aria-live="polite"></div>
+      <form id="pgwForm" class="pgw-bar"><textarea id="pgwInput" class="pgw-input" rows="1" placeholder="Describe the ranges and your reading, or answer the wizard&hellip;" aria-label="Message the wizard"></textarea><button id="pgwSend" class="pgw-send" type="submit">Send</button></form>
+      <p class="pgw-note">The wizard only asks questions and runs the calculator. Every number comes from the deterministic engine, not the AI.</p>
+    </section>
 
     <section class="pg-tool">
       <h2 class="pg-tool__title"><span class="pg-dot"></span> Ranges</h2>
@@ -168,6 +180,73 @@
   document.addEventListener("input", compute);
   if (document.readyState !== "loading") compute(); else document.addEventListener("DOMContentLoaded", compute);
   $("#hint").textContent = "Enter the linear (un-extracted) DP transmitter mA.";
+})();
+</script>
+<script src="/education/assets/wizard.js"></script>
+<script>
+(function () {
+  var P = window.PG, N = function (v, d) { var n = parseFloat(v); return isFinite(n) ? n : d; };
+  var SYSTEM =
+    "You are the Square-Root Extraction wizard for Bridges Industrial. A DP flow transmitter measures differential pressure, and flow is proportional to the square root of DP. Help a field tech by talking, one thing at a time. " +
+    "Collect: the DP range (low, high, units), the flow range (low, high, units), the direction, and the value. The two directions are: a DP signal in milliamps you convert to flow (direction=sig), or a flow in engineering units you convert back to the DP signal (direction=flow). " +
+    "CRITICAL: when the user gives you a milliamp reading, CONFIRM whether it is the LINEAR (un-extracted) DP signal or the already square-root-EXTRACTED signal, because that is the whole ambiguity this tool resolves; the sig direction expects the linear DP milliamps. " +
+    "Translate plain speech into fields yourself. When you have the ranges and a value, CALL solve_sqrt. Never do the arithmetic yourself: the tool returns the exact numbers and a results card appears in the chat. Report the returned numbers plainly. Plain text only, no Markdown.";
+  var TOOLS = [{
+    name: "solve_sqrt",
+    description: "DP-flow square-root extraction with the deterministic engine, both directions. Returns percent DP, percent flow, DP and flow in engineering units, and BOTH the DP-linear and flow-extracted milliamp signals for the same condition.",
+    parameters: {
+      type: "object",
+      properties: {
+        value: { type: "number", description: "the reading to convert: a DP-linear mA when direction=sig, a flow in engineering units when direction=flow" },
+        direction: { type: "string", enum: ["sig", "flow"], description: "sig = DP-linear mA to flow; flow = flow in EU back to the DP signal" },
+        dp_low: { type: "number", description: "DP range low; default 0" },
+        dp_high: { type: "number", description: "DP range high; default 100" },
+        dp_unit: { type: "string", description: "DP units, e.g. inH2O" },
+        flow_low: { type: "number", description: "flow range low; default 0" },
+        flow_high: { type: "number", description: "flow range high; default 500" },
+        flow_unit: { type: "string", description: "flow units, e.g. GPM" }
+      },
+      required: ["value"]
+    }
+  }];
+  function run(name, a) {
+    var dpLo = N(a.dp_low, 0), dpHi = N(a.dp_high, 100), flLo = N(a.flow_low, 0), flHi = N(a.flow_high, 500);
+    var dpU = a.dp_unit || "inH2O", flU = a.flow_unit || "GPM", dir = a.direction === "flow" ? "flow" : "sig", val = N(a.value, NaN);
+    if (!isFinite(val)) return { error: "Tell me the value to convert." };
+    var pctDP, pctFL;
+    if (dir === "sig") { pctDP = P.maToPct(val); pctFL = P.sqrtExtract(pctDP); }
+    else { pctFL = P.pctSpan(val, flLo, flHi); pctDP = P.sqrtSquare(pctFL); }
+    if (!P.ok(pctDP, pctFL)) return { error: "Check the ranges and the value." };
+    var dpEU = P.fromPct(pctDP, dpLo, dpHi), flEU = P.fromPct(pctFL, flLo, flHi);
+    return {
+      ok: true, direction: dir, dp_unit: dpU, flow_unit: flU,
+      pct_dp: P.fmt(pctDP, 2), pct_flow: P.fmt(pctFL, 2),
+      dp_eu: P.fmt(dpEU, 3), flow_eu: P.fmt(flEU, 3),
+      ma_linear: P.fmt(P.pctToMa(pctDP), 3), ma_extracted: P.fmt(P.pctToMa(pctFL), 3)
+    };
+  }
+  function render(r) {
+    return {
+      label: "Flow", value: r.flow_eu, unit: r.flow_unit,
+      tables: [
+        { caption: "Results", rows: [
+          ["Percent DP", r.pct_dp + " %"],
+          ["Percent flow", r.pct_flow + " %"],
+          ["Differential pressure", r.dp_eu + " " + r.dp_unit],
+          ["Flow", r.flow_eu + " " + r.flow_unit]
+        ] },
+        { caption: "Both signals, same condition", rows: [
+          ["DP-linear signal", r.ma_linear + " mA"],
+          ["Flow-extracted signal", r.ma_extracted + " mA"]
+        ] }
+      ]
+    };
+  }
+  PGWizard.mount({
+    root: ".pgw",
+    greeting: "Hi, I'll work the square-root extraction with you. Tell me the DP range, the flow range, and your reading. For example: \"0 to 100 inches of water, 0 to 500 GPM, the linear DP signal reads 12 mA.\" I'll confirm whether a milliamp reading is the linear or the extracted signal.",
+    system: SYSTEM, tools: TOOLS, run: run, render: render
+  });
 })();
 </script>
 <footer class="fv-footer"><div class="fv-wrap fv-footer__top"><div class="fv-footer__brand"><a class="fv-brand" href="/"><span class="fv-brand__mark fv-brand__mark--plain" style="background-image:url(/images/Logo.png)"></span><span class="fv-brand__name">Bridges <span>Industrial</span></span></a><p>Hands-on field instrumentation and analytical measurement, technical training, PragOptics hardware and software, and the Idea Lab. Engineered for clarity, accountability, and scale.</p><p>On site across the Texas Gulf Coast from League City, including Houston, Texas City, Pasadena, Baytown, Clear Lake, and Galveston. Remote and advisory work anywhere in the US.</p></div><div class="fv-fcol"><h3>What we do</h3><a href="/instrument-support/">Instrument Technical Support</a><a href="/industrial">Industrial Automation &amp; Training</a><a href="/education/">Field Pocket Guide</a><a href="/partnerships">Partnerships</a><a href="/integration">PragOptics</a><a href="/idea-lab/">Idea Lab</a></div><div class="fv-fcol"><h3>Connect</h3><a href="/break-in/" style="color:var(--accent)">Submit Break-In</a><span style="color:var(--muted);font-size:.82rem;display:block;margin:2px 0 6px">Instrument not working? Ask a specialist, free.</span><a href="mailto:support@bridgesindust.com">support@bridgesindust.com</a><a href="tel:+18324250421">+1 (832) 425-0421</a></div></div><div class="fv-wrap fv-footer__bottom"><span>&copy; <span id="fv-year">2026</span> Bridges Industrial LLC. All rights reserved.</span><a href="/integration/terms/" style="color:var(--muted)">Terms &amp; Privacy</a></div></footer>

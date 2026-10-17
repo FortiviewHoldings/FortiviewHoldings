@@ -206,3 +206,54 @@ body.pg-pad-open .pg-main{padding-bottom:320px}
 @media(prefers-reduced-motion:no-preference){
   .pg-lib__grid a:hover{transform:translateY(-1px)}
 }
+
+/* ============================================================
+   Guided wizard (shared engine: wizard.js). Chat is the default
+   view; the manual form hides behind the segmented switch. The
+   card rides the same glass tokens as .pg-tool.
+   ============================================================ */
+/* view toggle: chat default, form behind the switch */
+.pgw.pgw--chat .pg-tool{display:none}
+.pgw:not(.pgw--chat) .pgw-card{display:none}
+
+/* segmented mode switch */
+.pgw-modes{display:inline-flex;gap:3px;padding:3px;background:var(--glass);border:1px solid var(--glass-border);border-radius:999px;margin:0 0 18px}
+.pgw-mode{display:inline-flex;align-items:center;gap:6px;border:0;background:transparent;color:var(--ink-2);font-family:var(--body);font-size:.8rem;font-weight:600;padding:7px 15px;border-radius:999px;cursor:pointer;min-height:36px}
+.pgw-mode:hover{color:var(--ink)}
+.pgw-mode.is-active{background:var(--accent);color:var(--accent-ink)}
+.pgw-mode__ic{font-family:var(--mono);font-size:.85rem}
+
+/* chat card */
+.pgw-card{background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  border:1px solid var(--glass-border);border-radius:var(--radius-lg);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07),var(--shadow);
+  padding:clamp(18px,3.4vw,28px);margin-bottom:22px}
+.pgw-log{max-height:min(620px,70vh);overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:2px 2px 12px}
+.pgw-msg{max-width:88%;padding:9px 13px;border-radius:14px;font-size:.86rem;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+.pgw-msg--you{align-self:flex-end;background:var(--accent);color:var(--accent-ink);border-bottom-right-radius:4px;font-weight:500}
+.pgw-msg--pulse{align-self:flex-start;background:var(--glass-2);border:1px solid var(--glass-border);color:var(--ink);border-bottom-left-radius:4px}
+.pgw-thinking{display:flex;gap:4px;align-items:center;padding:12px 13px}
+.pgw-thinking span{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:pgwpulse 1s infinite}
+.pgw-thinking span:nth-child(2){animation-delay:.15s}
+.pgw-thinking span:nth-child(3){animation-delay:.3s}
+@keyframes pgwpulse{0%,60%,100%{opacity:.3}30%{opacity:1}}
+
+.pgw-bar{display:flex;gap:8px;align-items:flex-end;margin-top:4px}
+.pgw-input{flex:1;min-width:0;resize:none;min-height:46px;max-height:120px;background:rgba(8,12,22,.6);border:1px solid var(--glass-border);color:var(--ink);border-radius:var(--radius);padding:11px 13px;font:inherit;font-size:.9rem;line-height:1.5}
+.pgw-input:focus{outline:3px solid var(--accent-soft);border-color:var(--accent)}
+.pgw-send{flex:0 0 auto;min-height:46px;font-family:var(--body);font-weight:700;font-size:.9rem;padding:0 18px;border:0;border-radius:var(--radius);background:var(--accent);color:var(--accent-ink);cursor:pointer}
+.pgw-send:hover{background:#3ee6d4}
+.pgw-send:disabled{opacity:.5;cursor:default}
+.pgw-note{font-size:.72rem;color:var(--muted);margin:10px 0 0}
+
+/* in-chat result card */
+.pgw-result{max-width:100%;width:100%;align-self:stretch;background:var(--glass-2);border:1px solid var(--glass-border);border-radius:14px;padding:13px 15px}
+.pgw-result__head{display:flex;flex-direction:column;gap:1px;margin-bottom:6px}
+.pgw-result__lbl{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.pgw-result__num{font-family:var(--mono);font-size:1.4rem;font-weight:600;color:var(--accent)}
+.pgw-tcap{font-family:var(--display);font-size:.78rem;font-weight:600;color:var(--ink);margin:10px 0 3px}
+.pgw-twrap{overflow-x:auto;max-width:100%}
+.pgw-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:.78rem}
+.pgw-table th{text-align:left;color:var(--muted);font-size:.6rem;text-transform:uppercase;letter-spacing:.04em;padding:4px 8px;border-bottom:1px solid var(--glass-border)}
+.pgw-table td{padding:5px 8px;border-bottom:1px solid var(--glass-border);color:var(--ink-2)}
+.pgw-table td.num{text-align:right;color:var(--ink);white-space:nowrap}

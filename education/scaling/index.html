@@ -25,13 +25,25 @@
 </head>
 <body>
 <main class="pg-main">
-  <div class="pg-wrap--wide pg-wrap">
+  <div class="pg-wrap--wide pg-wrap pgw pgw--chat">
 
     <header class="pg-head">
       <a class="pg-back" href="/education/">Field Pocket Guide</a>
       <h1 class="fv-h2">Signal Scaling</h1>
       <p class="fv-lead">The straight-line relationship every transmitter lives on. Enter either side and read the other, with percent of span between them. This is the ideal-output side of a calibration: what the loop should do as the input moves.</p>
     </header>
+
+    <div class="pgw-modes" role="tablist" aria-label="Tool mode">
+      <button id="pgwModeChat" class="pgw-mode is-active" type="button" role="tab" aria-selected="true"><span class="pgw-mode__ic">&#8620;</span> AI wizard</button>
+      <button id="pgwModeForm" class="pgw-mode" type="button" role="tab" aria-selected="false"><span class="pgw-mode__ic">&#8862;</span> Manual form</button>
+    </div>
+    <section class="pgw-card" aria-label="Guided wizard">
+      <h2 class="pg-tool__title"><span class="pg-dot"></span> Guided setup</h2>
+      <p class="pg-tool__sub">Describe the scaling in plain words &mdash; the input range, the output range, and the value. The wizard runs the exact same math as the form and shows the result with the five-point table right here.</p>
+      <div id="pgwLog" class="pgw-log" aria-live="polite"></div>
+      <form id="pgwForm" class="pgw-bar"><textarea id="pgwInput" class="pgw-input" rows="1" placeholder="Describe the range and value, or answer the wizard&hellip;" aria-label="Message the wizard"></textarea><button id="pgwSend" class="pgw-send" type="submit">Send</button></form>
+      <p class="pgw-note">The wizard only asks questions and runs the calculator. Every number comes from the deterministic engine, not the AI.</p>
+    </section>
 
     <section class="pg-tool">
       <h2 class="pg-tool__title"><span class="pg-dot"></span> Ranges</h2>
@@ -114,6 +126,73 @@
   });
   document.addEventListener("input", compute);
   if (document.readyState !== "loading") compute(); else document.addEventListener("DOMContentLoaded", compute);
+})();
+</script>
+<script src="/education/assets/wizard.js"></script>
+<script>
+(function () {
+  var P = window.PG, N = function (v, d) { var n = parseFloat(v); return isFinite(n) ? n : d; };
+  var SYSTEM =
+    "You are the Signal Scaling wizard for Bridges Industrial. You help a field tech set up a linear scaling by talking, not by filling a form. " +
+    "Linear scaling maps an input span to an output span; percent of span is shared by both sides. " +
+    "Collect, ONE thing at a time in plain words: the input range (low, high, units), the output range (low, high, units), the direction, and the single value to convert. " +
+    "Translate plain speech into fields yourself (e.g. '0 to 100 degrees C into 4 to 20 milliamps, reading 50' gives in_low=0, in_high=100, in_unit=C, out_low=4, out_high=20, out_unit=mA, value=50, direction=i2o). " +
+    "A 4-20 mA transmitter is just input and output ranges; if it is unclear which side the user's value is on, ask. " +
+    "When you have both ranges and a value, CALL scale_span. Never do the arithmetic yourself: the tool returns the exact value and percent of span, and the result with a five-point table appears in the chat automatically. Report the returned numbers plainly. " +
+    "Plain text only, no Markdown.";
+  var TOOLS = [{
+    name: "scale_span",
+    description: "Linear two-way signal scaling with the deterministic engine. Maps a value from one span to another and returns the scaled value, percent of span, and a five-point reference table.",
+    parameters: {
+      type: "object",
+      properties: {
+        value: { type: "number", description: "the single value to convert" },
+        in_low: { type: "number", description: "input range low (LRV); default 0" },
+        in_high: { type: "number", description: "input range high (URV); default 100" },
+        in_unit: { type: "string", description: "input units, e.g. C, psi, %" },
+        out_low: { type: "number", description: "output range low; default 4" },
+        out_high: { type: "number", description: "output range high; default 20" },
+        out_unit: { type: "string", description: "output units, e.g. mA" },
+        direction: { type: "string", enum: ["i2o", "o2i"], description: "i2o = the value is on the input side, solve the output; o2i = the value is on the output side, solve the input" }
+      },
+      required: ["value"]
+    }
+  }];
+  function run(name, a) {
+    var inLo = N(a.in_low, 0), inHi = N(a.in_high, 100), outLo = N(a.out_low, 4), outHi = N(a.out_high, 20);
+    var inU = a.in_unit || "", outU = a.out_unit || "", dir = a.direction === "o2i" ? "o2i" : "i2o", val = N(a.value, NaN);
+    if (!isFinite(val)) return { error: "Tell me the value to convert." };
+    var res, pct, resU;
+    if (dir === "i2o") { res = P.scale(val, inLo, inHi, outLo, outHi); pct = P.pctSpan(val, inLo, inHi); resU = outU; }
+    else { res = P.scale(val, outLo, outHi, inLo, inHi); pct = P.pctSpan(val, outLo, outHi); resU = inU; }
+    if (!P.ok(res)) return { error: "That range has no span (low equals high). Give a low and high that differ." };
+    var table = [0, 25, 50, 75, 100].map(function (p) {
+      return { percent: p + "%", input: P.fmtTrim(P.fromPct(p, inLo, inHi), 4), output: P.fmtTrim(P.fromPct(p, outLo, outHi), 4) };
+    });
+    return {
+      ok: true, direction: dir,
+      result_label: dir === "i2o" ? "Output value" : "Input value",
+      result_value: P.fmt(res, 4), result_unit: resU,
+      percent_of_span: P.fmt(pct, 2),
+      in_unit: inU, out_unit: outU, reference_table: table
+    };
+  }
+  function render(r) {
+    return {
+      label: r.result_label, value: r.result_value, unit: r.result_unit,
+      tables: [
+        { caption: "Result", rows: [["Percent of span", r.percent_of_span + " %"]] },
+        { caption: "Five-point reference",
+          headings: ["%", "Input" + (r.in_unit ? " (" + r.in_unit + ")" : ""), "Output" + (r.out_unit ? " (" + r.out_unit + ")" : "")],
+          rows: r.reference_table.map(function (x) { return [x.percent, x.input, x.output]; }) }
+      ]
+    };
+  }
+  PGWizard.mount({
+    root: ".pgw",
+    greeting: "Hi, I'll set up the scaling with you. Tell me the input range, the output range, and the value to convert. For example: \"0 to 100 degrees C into 4 to 20 milliamps, what's 50 degrees?\"",
+    system: SYSTEM, tools: TOOLS, run: run, render: render
+  });
 })();
 </script>
 <footer class="fv-footer"><div class="fv-wrap fv-footer__top"><div class="fv-footer__brand"><a class="fv-brand" href="/"><span class="fv-brand__mark fv-brand__mark--plain" style="background-image:url(/images/Logo.png)"></span><span class="fv-brand__name">Bridges <span>Industrial</span></span></a><p>Hands-on field instrumentation and analytical measurement, technical training, PragOptics hardware and software, and the Idea Lab. Engineered for clarity, accountability, and scale.</p><p>On site across the Texas Gulf Coast from League City, including Houston, Texas City, Pasadena, Baytown, Clear Lake, and Galveston. Remote and advisory work anywhere in the US.</p></div><div class="fv-fcol"><h3>What we do</h3><a href="/instrument-support/">Instrument Technical Support</a><a href="/industrial">Industrial Automation &amp; Training</a><a href="/education/">Field Pocket Guide</a><a href="/partnerships">Partnerships</a><a href="/integration">PragOptics</a><a href="/idea-lab/">Idea Lab</a></div><div class="fv-fcol"><h3>Connect</h3><a href="/break-in/" style="color:var(--accent)">Submit Break-In</a><span style="color:var(--muted);font-size:.82rem;display:block;margin:2px 0 6px">Instrument not working? Ask a specialist, free.</span><a href="mailto:support@bridgesindust.com">support@bridgesindust.com</a><a href="tel:+18324250421">+1 (832) 425-0421</a></div></div><div class="fv-wrap fv-footer__bottom"><span>&copy; <span id="fv-year">2026</span> Bridges Industrial LLC. All rights reserved.</span><a href="/integration/terms/" style="color:var(--muted)">Terms &amp; Privacy</a></div></footer>
