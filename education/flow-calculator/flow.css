@@ -235,6 +235,53 @@
 .fc .card-sub{font-size:11.5px;color:var(--muted);line-height:1.45;margin:0}
 .fc label .req-tag{margin-left:7px;vertical-align:middle}
 
+/* ---- provenance banner: demo placeholders vs the user's own data ---- */
+.fc .prov-banner{display:flex;align-items:flex-start;gap:10px;border-radius:var(--radius);padding:11px 14px;font-size:12.5px;line-height:1.5;border:1px solid}
+.fc .prov-banner .prov-ico{flex:0 0 auto;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:12px;font-family:var(--mono);margin-top:1px}
+.fc .prov-banner strong{font-weight:600}
+.fc .prov-banner--warn{background:rgba(242,178,76,.1);border-color:rgba(242,178,76,.35);color:#f3c983}
+.fc .prov-banner--warn .prov-ico{background:var(--amber);color:#2a1c04}
+.fc .prov-banner--warn strong{color:var(--amber)}
+.fc .prov-banner--ok{background:var(--accent-soft);border-color:rgba(47,212,194,.3);color:var(--ink-2)}
+.fc .prov-banner--ok .prov-ico{background:var(--accent);color:var(--accent-ink)}
+.fc .prov-banner--ok strong{color:var(--accent)}
+
+/* ---- guided chat wizard ---- */
+.fc .wiz .step{background:var(--cosmic);color:#fff}
+.fc .wiz-log{max-height:min(620px,72vh);overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:2px 2px 12px}
+.fc .wiz-msg{max-width:86%;padding:9px 13px;border-radius:14px;font-size:13px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+.fc .wiz-msg--you{align-self:flex-end;background:var(--accent);color:var(--accent-ink);border-bottom-right-radius:4px;font-weight:500}
+.fc .wiz-msg--pulse{align-self:flex-start;background:var(--glass-2);border:1px solid var(--glass-border);color:var(--ink);border-bottom-left-radius:4px}
+.fc .wiz-thinking{display:flex;gap:4px;align-items:center;padding:12px 13px}
+.fc .wiz-thinking span{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:wizpulse 1s infinite}
+.fc .wiz-thinking span:nth-child(2){animation-delay:.15s}
+.fc .wiz-thinking span:nth-child(3){animation-delay:.3s}
+@keyframes wizpulse{0%,60%,100%{opacity:.3}30%{opacity:1}}
+.fc .wiz-bar{display:flex;gap:8px;align-items:flex-end}
+.fc .wiz-input{flex:1;min-width:0;resize:none;min-height:40px;max-height:120px;background:rgba(255,255,255,.04);border:1px solid var(--glass-border);color:var(--ink);border-radius:var(--radius);padding:9px 12px;font:inherit;font-size:13px;line-height:1.5}
+.fc .wiz-input:focus{outline:3px solid var(--accent-soft);border-color:var(--accent)}
+.fc .wiz-send{flex:0 0 auto;min-height:40px}
+.fc .wiz-note{font-size:11px;color:var(--muted);margin:8px 0 0}
+.fc--chat .toolbar,.fc--chat .note-bar,.fc--chat .form-guide,.fc--chat .layout,.fc--chat #sourceDetails,.fc--chat #checksDetails,.fc--chat>footer{display:none}
+.fc:not(.fc--chat) .wiz{display:none}
+.fc .fc-modes{display:inline-flex;gap:3px;padding:3px;background:var(--glass);border:1px solid var(--glass-border);border-radius:999px;margin:0 0 16px}
+.fc .fc-mode{display:inline-flex;align-items:center;gap:6px;border:0;background:transparent;color:var(--ink-2);font-family:var(--body);font-size:12px;font-weight:600;padding:7px 15px;border-radius:999px;cursor:pointer;min-height:34px}
+.fc .fc-mode:hover{color:var(--ink)}
+.fc .fc-mode.is-active{background:var(--accent);color:var(--accent-ink)}
+.fc .fc-mode__ic{font-family:var(--mono);font-size:13px}
+.fc .wiz-top{display:flex;justify-content:flex-end;margin:-2px 0 8px}
+.fc .wiz-result{max-width:100%;width:100%;align-self:stretch;background:var(--glass);border:1px solid var(--glass-border);border-radius:14px;padding:13px 15px}
+.fc .wiz-result__head{display:flex;flex-direction:column;gap:1px;margin-bottom:8px}
+.fc .wiz-result__lbl{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.fc .wiz-result__num{font-family:var(--display);font-size:22px;font-weight:600;color:var(--accent)}
+.fc .wiz-graph{margin:2px 0 6px}
+.fc .wiz-graph svg{width:100%;height:auto;background:rgba(255,255,255,.02);border:1px solid var(--glass-border);border-radius:var(--radius)}
+.fc .wiz-tcap{font-family:var(--display);font-size:12px;font-weight:600;color:var(--ink);margin:10px 0 3px}
+.fc .wiz-table{width:100%;border-collapse:collapse;font-size:12px}
+.fc .wiz-table th{text-align:left;color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.03em;padding:4px 8px;border-bottom:1px solid var(--glass-border)}
+.fc .wiz-table td{padding:5px 8px;border-bottom:1px solid var(--glass-border);color:var(--ink-2)}
+.fc .wiz-table td.num{text-align:right;font-family:var(--mono);color:var(--ink);white-space:nowrap}
+
 /* ---- print document (built on beforeprint; hidden on screen) ----
    Both reports render from a dedicated #printSheet, not from the live form.
    Spec sheet = head + specs + graph + curve data. Full report adds the

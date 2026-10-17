@@ -6,7 +6,7 @@ import { runAllFlowChecks } from './checks.js';
 const F=FlowCalc,$=id=>document.getElementById(id),form=$('calcForm');
 const n=id=>$(id).value.trim()===''?NaN:Number($(id).value),v=id=>$(id).value,put=(id,x)=>{$(id).value=Number.isFinite(x)?String(x):x??'';},txt=(id,t)=>{$(id).textContent=t;};
 const show=(id,on)=>{$(id).hidden=!on;};
-let last=null,config=null,previous={},pins=[],curveRows=[],plot=null,lastChecks=null,timer;
+let last=null,config=null,previous={},pins=[],curveRows=[],plot=null,lastChecks=null,touched=new Set(),timer;
 function fmt(x,d=7){if(x==null||!Number.isFinite(x))return '—';if(x===0)return '0';return Math.abs(x)<.0001||Math.abs(x)>=1e9?x.toExponential(Math.min(d-1,7)):new Intl.NumberFormat('en-US',{maximumSignificantDigits:d}).format(x);}
 function controls(){return [...form.querySelectorAll('input[id],select[id]')];}
 function snapshot(){return Object.fromEntries(controls().map(e=>[e.id,e.value]));}
@@ -109,6 +109,7 @@ function conversions(r){$('conversionRows').replaceChildren();for(const kind of 
 //      points; Full report adds conversions, state, equations and sources.
 function specRows(r,c){
  const du=$('dpUnit').selectedOptions[0].textContent,dU=v('dUnit'),rows=[],add=(k,x,wide)=>rows.push({k,x,wide});
+ const dk=demoKeys();add('Data basis',dk.length?('DEMONSTRATION — '+dk.length+' placeholder input'+(dk.length>1?'s':'')+', not verified: '+dk.join(', ')):'User-entered values',true);
  add('Fluid',c.fluid==='gas'?'Gas · single phase':'Liquid');
  if(c.fluid==='gas'){add('Line pressure',fmt(r.state.P/1000,7)+' kPa abs');add('Flowing temperature',fmt(r.state.T-273.15,6)+' °C · '+fmt(F.temperatureFromK(r.state.T,'F'),6)+' °F');}
  add('Flowing density',fmt(r.state.rho,7)+' kg/m³');
@@ -152,6 +153,11 @@ function buildPrintSheet(){
  const warn=psSection('Assumptions & applicability','ps-full warnings');warn.append($('warningContent').cloneNode(true));host.append(warn);
  const sg=$('sourceDetails').querySelector('.source-grid');if(sg){const src=psSection('Standards & sources','ps-full');src.append(sg.cloneNode(true));host.append(src);}
 }
+// ---- Provenance: which physical inputs are still demonstration placeholders
+//      (visible, editable, and untouched by the user) vs their own data.
+const PROV_KEYS={dp:'ΔP',D:'pipe bore D',beta:'beta ratio β',feature:'bore / throat size',Cd:'discharge coefficient C',probeK:'flow coefficient K',profileFactor:'velocity factor',lineP:'line pressure',lineT:'flowing temperature',rhoGas:'gas density',molarMass:'molar mass',lineZ:'compressibility Z',refP:'reference pressure',refT:'reference temperature',Q:'flow rate',velocity:'mean velocity',frequency:'pulse frequency',signal:'signal value',calQ:'calibration flow',calDP:'calibration ΔP',calRho:'calibration density'};
+function demoKeys(){const out=[];for(const id in PROV_KEYS){const f=$(id);if(!f||f.closest('[hidden]')||f.readOnly||f.disabled)continue;if(touched.has(id))continue;if(f.value.trim()==='')continue;out.push(PROV_KEYS[id]);}return out;}
+function updateProvenance(){const el=$('provenanceBanner');if(!el)return;const demo=demoKeys();if(!demo.length){el.className='prov-banner prov-banner--ok';el.hidden=false;el.innerHTML='<i class="prov-ico">✓</i><span><strong>These are your inputs.</strong> No demonstration placeholders remain in the active fields.</span>';return;}el.className='prov-banner prov-banner--warn';el.hidden=false;el.innerHTML='<i class="prov-ico">!</i><span><strong>Demonstration data — '+demo.length+' key input'+(demo.length>1?'s':'')+' still example values.</strong> Replace before trusting the result: '+demo.join(', ')+'.</span>';}
 function update(draw=true){
  visibility();
  try{
@@ -180,7 +186,7 @@ function update(draw=true){
   for(const id of ['Q','dp','beta','probeK','Cd','velocity','frequency','signal','rhoGas','lineZ'])if($(id).readOnly)put(id,'');
   for(const id of ['csvButton','jsonButton','pinButton'])$(id).disabled=true;
  }
- if(draw)drawCurve();previous=snapshot();return last;
+ if(draw)drawCurve();previous=snapshot();updateProvenance();return last;
 }
 function driving(c,r){if(isDP(c.element))return {value:r.dp/F.PRESSURE[v('dpUnit')],label:'ΔP ['+$('dpUnit').selectedOptions[0].textContent+']'};if(c.element==='velocity')return {value:r.velocity,label:'Mean velocity [m/s]'};if(c.element==='pulse')return {value:r.frequency,label:'Frequency [Hz]'};if(c.element==='signal')return {value:r.signal,label:'Signal [configured units]'};return {value:F.actualToFlow(r.qa,v('qUnit'),r.state),label:'Input flow ['+F.UNITS[v('qUnit')].label+']'};}
 function fixedConfig(c,r){return {...c,solve:'flow',beta:r.beta??c.beta,K:r.K??c.K,Cd:r.Cd??c.Cd,dp:r.dp??c.dp,cdMode:c.solve==='coef'?'manual':c.cdMode,q:c.element==='converter'?c.q:r.values[c.qUnit],velocity:r.velocity??c.velocity,frequency:r.frequency??c.frequency,signal:r.signal??c.signal};}
@@ -262,9 +268,9 @@ function preserveUnit(id,old,value){if(old===value||old==null)return;const linea
 }
 function preset(id){const map={us60:[60,'F',14.7,'psi'],us1473:[60,'F',14.73,'psi'],iso15:[15,'C',101.325,'kPa'],metric20:[20,'C',101.325,'kPa'],normal0:[0,'C',101.325,'kPa']},p=map[id];if(!p)return;['refT','refTUnit','refP','refPUnit'].forEach((id,i)=>put(id,p[i]));if(id==='iso15')put('refBasis','dry');}
 form.addEventListener('submit',e=>e.preventDefault());
-form.addEventListener('input',e=>{if(e.target.tagName==='SELECT')return;if(['refP','refT'].includes(e.target.id))put('refPreset','custom');update();if(e.target.id==='maxDP'&&last){autoRange();drawCurve();}});
+form.addEventListener('input',e=>{if(e.target.tagName==='SELECT')return;touched.add(e.target.id);if(['refP','refT'].includes(e.target.id))put('refPreset','custom');update();if(e.target.id==='maxDP'&&last){autoRange();drawCurve();}});
 form.addEventListener('change',e=>{
- if(e.target.tagName!=='SELECT')return;const id=e.target.id,old=previous[id],chosen=v(id);
+ if(e.target.tagName!=='SELECT')return;const id=e.target.id,old=previous[id],chosen=v(id);touched.add(id);
  try{preserveUnit(id,old,chosen);}catch(err){put(id,old);toast('Unit change not applied: '+err.message);update();return;}
  if(id==='element')setupMode(true);
  if(id==='fluid'){
@@ -308,7 +314,7 @@ $('importFile').addEventListener('change',async e=>{const file=e.target.files[0]
  if(!F.MODES[data.ui.element]||!['gas','liquid'].includes(data.ui.fluid))throw Error('Unsupported mode or fluid.');
  put('element',data.ui.element);put('fluid',data.ui.fluid);setupMode(true);for(const id of ['qUnit','rangeUnit','converterUnit'])fillUnits(id);
  for(const el of controls()){const x=data.ui[el.id];if(typeof x!=='string'||x.length>600)throw Error('Missing or invalid field: '+el.id);if(el.tagName==='SELECT'&&![...el.options].some(o=>o.value===x))throw Error('Unsupported selection: '+el.id);if(el.type==='number'&&x!==''&&!Number.isFinite(Number(x)))throw Error('Invalid number: '+el.id);}
- restore(data.ui);pins=[];if(!update(false))throw Error($('errorText').textContent);
+ restore(data.ui);pins=[];touched=new Set(controls().map(el=>el.id));if(!update(false))throw Error($('errorText').textContent);
  if(data.chart&&[...$('curveType').options].some(o=>o.value===data.chart.type)){put('curveType',data.chart.type);for(const[id,key]of [['curveMin','min'],['curveMax','max']])if(Number.isFinite(Number(data.chart[key])))put(id,Number(data.chart[key]));$('actualOverlay').checked=data.chart.actualOverlay===true;}
  // Recalculate known comparison input objects; never trust stored result objects or evaluate text.
  if(Array.isArray(data.comparisons))for(const p of data.comparisons.slice(0,2)){if(p?.inputs?.element===config.element&&p.inputs.fluid===config.fluid&&typeof p.name==='string'&&p.name.length<250){try{const rr=F.solve(p.inputs);pins.push({c:p.inputs,r:rr,name:p.name});}catch(ignore){}}}
@@ -321,12 +327,26 @@ $('specSheetButton').addEventListener('click',()=>{if(update()){document.body.cl
 window.addEventListener('beforeprint',buildPrintSheet);
 window.addEventListener('afterprint',()=>{$('printSheet').replaceChildren();document.body.classList.remove('print-spec');});
 setupMode(true);const defaults=snapshot();
-function loadExample(name){put('element','venturi');put('fluid','gas');setupMode(true);for(const id of ['qUnit','rangeUnit','converterUnit'])fillUnits(id);restore(defaults);pins=[];put('curveType','response');
+function loadExample(name){put('element','venturi');put('fluid','gas');setupMode(true);for(const id of ['qUnit','rangeUnit','converterUnit'])fillUnits(id);restore(defaults);pins=[];touched=new Set();put('curveType','response');
  if(name==='water'){put('fluid','liquid');fillUnits('qUnit');fillUnits('rangeUnit');fillUnits('converterUnit');put('converterUnit','m3h');put('qUnit','gpm');put('rangeUnit','gpm');put('D',8.071);put('Cd',.995);put('coefficientSource','LIQUID DEMONSTRATION — entered density/viscosity, not an automatic water-property model.');}
  if(name==='converter'){put('element','converter');setupMode(true);put('Q',100);put('qUnit','acfm');}
  update(false);autoRange();drawCurve();previous=snapshot();}
 for(const b of document.querySelectorAll('[data-example]'))b.addEventListener('click',()=>loadExample(b.dataset.example));
-window.FlowCalcUI={getConfig:()=>config,getResult:()=>last,refresh:update,loadExample,runChecks,drawCurve,getCurve:()=>curveRows.map(({result,...r})=>r),getPins:()=>pins,autoRange,snapshot};
+// ---- Hooks for the AI wizard: apply plain inputs to the real form, run the
+//      deterministic engine, and hand back a compact result. The model only
+//      collects values and calls this; the physics stays exact.
+const STRUCT=['element','fluid','solveFor','cdMode','expMode','densityMode','geometryMode','areaMode','signalLaw','pulseUnit','pulseBasis','pBasis','refPreset','refBasis','taps'];
+function resultSummary(r){const c=config,g=(k)=>r.values&&r.values[k]!=null?r.values[k]:null;return{meter:F.MODES[c.element].name,fluid:c.fluid,result:$('resultValue').textContent+' '+$('resultUnit').textContent,result_label:$('resultLabel').textContent,acfm:c.fluid==='gas'?g('acfm'):null,scfm:g('scfm'),nm3h:g('nm3h'),gpm:c.fluid==='liquid'?g('gpm'):null,mass_kgph:g('kgph'),reynolds:r.Re??null,discharge_coeff_C:r.Cd??null,coefficient_K:r.K??null,expansion:r.epsilon??null,reference_basis:basis(r.state),unverified_demo_inputs:demoKeys()};}
+function applyInputs(obj){
+ if(obj&&typeof obj==='object'){
+  for(const id of STRUCT){if(id in obj){const e=$(id);if(e&&e.tagName==='SELECT'){e.value=String(obj[id]);e.dispatchEvent(new Event('change',{bubbles:true}));touched.add(id);}}}
+  for(const k in obj){if(STRUCT.includes(k))continue;const e=$(k);if(!e)continue;e.value=String(obj[k]);touched.add(k);}
+ }
+ const r=update();
+ return r?{ok:true,...resultSummary(r)}:{ok:false,error:($('errorText').textContent||'Those inputs did not produce a valid result — check the highlighted fields.')};
+}
+function printReport(kind){if(!update())return{ok:false,error:'No valid result to report yet.'};if(kind==='spec')document.body.classList.add('print-spec');window.print();return{ok:true,printed:kind==='spec'?'spec sheet':'full report'};}
+window.FlowCalcUI={getConfig:()=>config,getResult:()=>last,refresh:update,loadExample,runChecks,drawCurve,getCurve:()=>curveRows.map(({result,...r})=>r),getPins:()=>pins,autoRange,snapshot,applyInputs,printReport,demoKeys,fmt,getCurveHeadings:()=>[$('curveXHeading').textContent,$('curveYHeading').textContent]};
 loadExample('air');runChecks();
 if(/[?&](report|print)=spec\b/.test(location.search))document.body.classList.add('print-spec');
 })();

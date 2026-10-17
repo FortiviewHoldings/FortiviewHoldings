@@ -2,6 +2,8 @@
 // Gemini function-declaration, so the model computes with real math instead of
 // doing arithmetic in its head. Mirrors the site's own reference tools.
 
+import { solveFlow, FLOW_TOOL } from "../../education/flow-calculator/flow-solve.js";
+
 const round = (n, d = 4) => (Number.isFinite(n) ? Number(n.toFixed(d)) : n);
 
 // --- 4-20 mA linear scaling: give one of ma / percent / eu, get all ---
@@ -88,7 +90,7 @@ function rtd_resistance({ temp_c, type = "Pt100" }) {
   return { type: R0 === 1000 ? "Pt1000" : "Pt100", temp_c: t, resistance_ohms: round(r, 4) };
 }
 
-const RUN = { scale_4_20ma, dp_flow, calibration_error, transmitter_error, number_base, rtd_resistance };
+const RUN = { scale_4_20ma, dp_flow, calibration_error, transmitter_error, number_base, rtd_resistance, solve_flow: solveFlow };
 
 export function runTool(name, args) {
   const fn = RUN[name];
@@ -98,6 +100,7 @@ export function runTool(name, args) {
 
 // Gemini function declarations.
 export const TOOL_DECLARATIONS = [
+  FLOW_TOOL,
   {
     name: "scale_4_20ma",
     description: "Linear 4-20 mA scaling. Given one of ma, percent, or eu (engineering units) with the eu_low/eu_high range, return all three.",
