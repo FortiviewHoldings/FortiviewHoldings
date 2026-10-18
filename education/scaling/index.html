@@ -134,6 +134,7 @@
   var P = window.PG, N = function (v, d) { var n = parseFloat(v); return isFinite(n) ? n : d; };
   var SYSTEM =
     "You are the Signal Scaling wizard for Bridges Industrial. You help a field tech set up a linear scaling by talking, not by filling a form. Linear scaling maps an input span to an output span; percent of span is shared by both sides. " +
+    "CRITICAL: linear scaling only applies when the two sides are genuinely proportional. A differential pressure mapped to a flow rate is NOT linear, because flow is proportional to the SQUARE ROOT of differential pressure (head-type DP flow). If the input is in differential-pressure units (inches of water, inH2O, mmH2O, a DP cell) and the output is a flow rate (SCFH, SCFM, ACFM, GPM, m3/h and the like), or the reverse, do NOT scale it linearly. Explain that this is a square-root relationship and send the user to the Square-Root Extraction tool at /education/square-root/, which handles DP-to-flow correctly. Only use scale_span for genuinely linear relationships, such as a 4-20 mA signal, a 3-15 psi signal, a temperature span, or an already-linearized flow signal. " +
     "Capture every required value before you compute: the input range (low and high), the output range (low and high), the direction, and the single value to convert, plus the units for each side. Collect them in plain words, one at a time. " +
     "You may SUGGEST a common value, for example a 4 to 20 mA output, but get the user's confirmation; never assume one silently, and do NOT call scale_span until every required value is captured. If the tool replies that inputs are missing, ask the user for exactly those. " +
     "Translate plain speech into fields yourself (e.g. '0 to 100 degrees C into 4 to 20 milliamps, reading 50' gives in_low=0, in_high=100, in_unit=C, out_low=4, out_high=20, out_unit=mA, value=50, direction=i2o). If it is unclear which side the user's value is on, ask. " +
@@ -162,6 +163,10 @@
     if (req.length) return { error: "Missing required inputs: " + req.join(", ") + ". Ask the user for these; do not compute until all are captured.", missing: req };
     var inLo = N(a.in_low), inHi = N(a.in_high), outLo = N(a.out_low), outHi = N(a.out_high);
     var inU = a.in_unit || "", outU = a.out_unit || "", dir = a.direction === "o2i" ? "o2i" : "i2o", val = N(a.value);
+    var dpUnit = /h2o|h₂o|water|w\.?c\b|inwc|mmh2o|wg\b/i, flowUnit = /scf|acf|gpm|gph|lpm|m3\/?h|m³|nm3|nm³|mscfd|bbl|ft3|l\/min|gal\/|flow/i;
+    if ((dpUnit.test(inU) && flowUnit.test(outU)) || (flowUnit.test(inU) && dpUnit.test(outU))) {
+      return { error: "That maps a differential pressure to a flow rate. Flow is proportional to the square root of differential pressure, so this is a head-type DP flow relationship and must NOT be scaled linearly. Tell the user this is a square-root relationship and send them to the Square-Root Extraction tool at /education/square-root/.", use_tool: "square-root" };
+    }
     if (!P.ok(val, inLo, inHi, outLo, outHi)) return { error: "The value and ranges must all be numbers." };
     var res, pct, resU;
     if (dir === "i2o") { res = P.scale(val, inLo, inHi, outLo, outHi); pct = P.pctSpan(val, inLo, inHi); resU = outU; }

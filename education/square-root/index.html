@@ -188,7 +188,7 @@
   var P = window.PG, N = function (v, d) { var n = parseFloat(v); return isFinite(n) ? n : d; };
   var SYSTEM =
     "You are the Square-Root Extraction wizard for Bridges Industrial. A DP flow transmitter measures differential pressure, and flow is proportional to the square root of DP. Help a field tech by talking, one thing at a time. " +
-    "Capture every required value before you compute: the DP range (low and high), the flow range (low and high), the direction, and the value, plus the units for each range. The two directions are: a DP signal in milliamps you convert to flow (direction=sig), or a flow in engineering units you convert back to the DP signal (direction=flow). " +
+    "Capture every required value before you compute: the DP range (low and high), the flow range (low and high), the direction, and the value, plus the units for each range. The three directions are: a DP signal in milliamps you convert to flow (direction=sig), a measured differential pressure VALUE in its units, for example 50 inches of water, you convert to flow (direction=dp), or a flow in engineering units you convert back to the DP signal (direction=flow). If the user gives a differential pressure reading in pressure units (inches of water, mmH2O), that is direction=dp. " +
     "CRITICAL: when the user gives you a milliamp reading, CONFIRM whether it is the LINEAR (un-extracted) DP signal or the already square-root-EXTRACTED signal, because that is the whole ambiguity this tool resolves; the sig direction expects the linear DP milliamps. " +
     "You may suggest a common value but get the user's confirmation; never assume one silently, and do NOT call solve_sqrt until every required value is captured. If the tool replies that inputs are missing, ask for exactly those. " +
     "Translate plain speech into fields yourself. When you have everything, CALL solve_sqrt; never do the arithmetic yourself. A results card appears in the chat. When the user asks for a report, spec sheet, or printout, CALL make_report. Report the returned numbers plainly. Plain text only, no Markdown.";
@@ -198,8 +198,8 @@
     parameters: {
       type: "object",
       properties: {
-        value: { type: "number", description: "the reading to convert: a DP-linear mA when direction=sig, a flow in engineering units when direction=flow" },
-        direction: { type: "string", enum: ["sig", "flow"], description: "sig = DP-linear mA to flow; flow = flow in EU back to the DP signal" },
+        value: { type: "number", description: "the reading to convert: a DP-linear mA when direction=sig, a differential pressure in DP units (e.g. inches of water) when direction=dp, a flow in engineering units when direction=flow" },
+        direction: { type: "string", enum: ["sig", "dp", "flow"], description: "sig = DP-linear mA signal to flow; dp = a measured differential pressure VALUE (in the DP units) to flow; flow = flow in EU back to the DP signal" },
         dp_low: { type: "number", description: "DP range low" },
         dp_high: { type: "number", description: "DP range high" },
         dp_unit: { type: "string", description: "DP units, e.g. inH2O" },
@@ -215,10 +215,11 @@
     ["value", "direction", "dp_low", "dp_high", "flow_low", "flow_high"].forEach(function (k) { if (a[k] == null || a[k] === "") req.push(k); });
     if (req.length) return { error: "Missing required inputs: " + req.join(", ") + ". Ask the user for these; do not compute until all are captured.", missing: req };
     var dpLo = N(a.dp_low), dpHi = N(a.dp_high), flLo = N(a.flow_low), flHi = N(a.flow_high);
-    var dpU = a.dp_unit || "inH2O", flU = a.flow_unit || "GPM", dir = a.direction === "flow" ? "flow" : "sig", val = N(a.value);
+    var dpU = a.dp_unit || "inH2O", flU = a.flow_unit || "GPM", dir = (a.direction === "flow" || a.direction === "dp") ? a.direction : "sig", val = N(a.value);
     if (!P.ok(val, dpLo, dpHi, flLo, flHi)) return { error: "The value and ranges must all be numbers." };
     var pctDP, pctFL;
     if (dir === "sig") { pctDP = P.maToPct(val); pctFL = P.sqrtExtract(pctDP); }
+    else if (dir === "dp") { pctDP = P.pctSpan(val, dpLo, dpHi); pctFL = P.sqrtExtract(pctDP); }
     else { pctFL = P.pctSpan(val, flLo, flHi); pctDP = P.sqrtSquare(pctFL); }
     if (!P.ok(pctDP, pctFL)) return { error: "Check the ranges and the value." };
     var dpEU = P.fromPct(pctDP, dpLo, dpHi), flEU = P.fromPct(pctFL, flLo, flHi);
@@ -265,8 +266,8 @@
         { title: "Setup", grid: [
           { k: "DP range", v: inp.dp_low + " to " + inp.dp_high + " " + r.dp_unit },
           { k: "Flow range", v: inp.flow_low + " to " + inp.flow_high + " " + r.flow_unit },
-          { k: "Direction", v: r.direction === "sig" ? "DP signal to flow" : "Flow to DP signal" },
-          { k: "Reading", v: String(inp.value) }
+          { k: "Direction", v: r.direction === "sig" ? "DP signal to flow" : (r.direction === "dp" ? "DP value to flow" : "Flow to DP signal") },
+          { k: "Reading", v: String(inp.value) + (r.direction === "dp" ? " " + r.dp_unit : "") }
         ] },
         { title: "Results", grid: resultGrid(r) },
         { note: "Flow is proportional to the square root of differential pressure; the DP-linear and flow-extracted signals are the same condition read two ways. Bridges Industrial Field Pocket Guide. Generated " + new Date().toLocaleString() + "." }

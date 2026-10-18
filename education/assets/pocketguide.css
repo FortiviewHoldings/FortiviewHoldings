@@ -266,8 +266,11 @@ body.pg-pad-open .pg-main{padding-bottom:320px}
   body.pgw-printing{background:#fff!important}
   body.pgw-printing::before,body.pgw-printing::after{display:none!important;content:none!important}
   body.pgw-printing>*{display:none!important}
-  body.pgw-printing>.pgw-print{display:block!important;color:#111;font-family:Inter,system-ui,sans-serif}
-  @page{margin:12mm}
+  /* @page margin AND content padding together: the page dialog can zero the
+     @page margin, so the padding guarantees a margin either way (same fix the
+     flow calculator's print uses). */
+  @page{margin:11mm}
+  body.pgw-printing>.pgw-print{display:block!important;box-sizing:border-box;width:100%;padding:7mm 8mm;color:#111;font-family:Inter,system-ui,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   body.pgw-printing .pgwps-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;border-bottom:2px solid #111;padding-bottom:8px;margin-bottom:12px}
   body.pgw-printing .pgwps-title{font-size:18px;font-weight:700}
   body.pgw-printing .pgwps-sub{font-size:11px;color:#555;margin-top:2px}
