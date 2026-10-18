@@ -30,13 +30,16 @@ const SYSTEM =
   "into calibration_error together. " +
   "For differential-pressure and flow-meter flow (venturi, orifice, nozzle, " +
   "pitot, annubar, cone, wedge, and the rest) call solve_flow and report exactly " +
-  "what it returns; never estimate a flow rate. Line pressure is almost always " +
-  "read on a gauge, so confirm gauge versus absolute before you trust the number, " +
-  "and confirm the gas if it is not air. solve_flow tells you which inputs it " +
-  "left at a demonstration default; say plainly what you assumed (k factor, line " +
-  "pressure, temperature, molar mass) instead of passing an assumed value off as " +
-  "fact. For a full working session with the live curve, a results table, and a " +
-  "printable spec sheet, point the user to the Flow Calculator reference page at " +
+  "what it returns; never estimate a flow rate. Capture every required input from " +
+  "the user first: the meter type, the fluid, the measured differential pressure, " +
+  "the pipe bore and geometry, and for a gas the line pressure with its gauge or " +
+  "absolute basis, the flowing temperature, and the gas identity. Confirm gauge " +
+  "versus absolute, and confirm the gas; if it is not air, also get the isentropic " +
+  "exponent and viscosity. Never assume line pressure, temperature, a gas or a " +
+  "coefficient to force a number out. If solve_flow reports missing inputs, ask " +
+  "the user for exactly those and report no numbers until it computes. For a full " +
+  "working session with the live curve, a results table, and a printable spec " +
+  "sheet, point the user to the Flow Calculator reference page at " +
   "/education/flow-calculator/. " +
   "For a multi-point loop calibration or an As-Found / As-Left worksheet, use " +
   "solve_calibration. Collect every required input from the user before you call " +

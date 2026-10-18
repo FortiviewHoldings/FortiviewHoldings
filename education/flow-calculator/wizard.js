@@ -4,6 +4,8 @@
 // report tools. All physics is the page's own deterministic engine — the model
 // never does arithmetic. Mirrors the site's Pulse function-calling loop.
 
+import { missingFlowFields } from "./flow-solve.js";
+
 const PROXY = "https://ai.bridgesindust.com/";
 
 const SYSTEM =
@@ -15,14 +17,19 @@ const SYSTEM =
   "into the tool's fields yourself (e.g. '4 inch' -> D=4, dUnit=in; 'air' -> " +
   "fluid=gas, molarMass=28.9647; 'venturi' -> element=venturi; '100 inches of " +
   "water' -> dp=100, dpUnit=inH2O60; '100 psi' -> lineP=100, pUnit=psi). " +
-  "Pressure and temperature are compensation inputs that move the result — always " +
+  "Pressure and temperature are compensation inputs that move the result. Always " +
   "CONFIRM whether a pressure is gauge or absolute (pBasis), and get the flowing " +
   "temperature; do not silently assume them. " +
-  "When you have enough, CALL solve_flow with every field you have gathered. Never " +
-  "compute in your head — the tool returns the exact numbers; report those. If " +
-  "solve_flow returns an error, ask the user for the missing or bad value. If it " +
-  "returns unverified_demo_inputs, tell the user those are still example values " +
-  "and ask if they want to supply them. " +
+  "Capture every value the calculation needs before you compute: the meter type, " +
+  "the fluid, the measured differential pressure, the pipe bore and geometry (beta " +
+  "ratio or bore size), and for a gas the line pressure with its gauge or absolute " +
+  "basis, the flowing temperature, and the gas identity (molar mass; confirm " +
+  "whether it is air, and if it is not air also get the isentropic exponent and " +
+  "viscosity). Never assume line pressure, temperature, a gas, a k-factor, or any " +
+  "coefficient to force a number out. " +
+  "When you have them all, CALL solve_flow. Never compute in your head; the tool " +
+  "returns the exact numbers, so report those. If solve_flow reports missing " +
+  "inputs, ask the user for exactly those and report no numbers until it computes. " +
   "After a result, state the headline flow plainly. The flow curve and the number " +
   "tables appear right here in the chat automatically, so do not say they are on a " +
   "form or page; just tell the user they can ask for a spec sheet or full report " +
@@ -87,7 +94,11 @@ function runFlowTool(name, args) {
   const UI = window.FlowCalcUI;
   if (!UI) return { error: "calculator not ready" };
   try {
-    if (name === "solve_flow") return UI.applyInputs(args || {});
+    if (name === "solve_flow") {
+      const missing = missingFlowFields(args || {});
+      if (missing.length) return { error: "Missing required inputs: " + missing.join(", ") + ". Ask the user for these; do not compute until all are captured.", missing };
+      return UI.applyInputs(args || {});
+    }
     if (name === "make_spec_sheet") return UI.printReport("spec");
     if (name === "make_full_report") return UI.printReport("full");
     return { error: "unknown tool: " + name };

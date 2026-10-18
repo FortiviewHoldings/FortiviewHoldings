@@ -133,35 +133,36 @@
 (function () {
   var P = window.PG, N = function (v, d) { var n = parseFloat(v); return isFinite(n) ? n : d; };
   var SYSTEM =
-    "You are the Signal Scaling wizard for Bridges Industrial. You help a field tech set up a linear scaling by talking, not by filling a form. " +
-    "Linear scaling maps an input span to an output span; percent of span is shared by both sides. " +
-    "Collect, ONE thing at a time in plain words: the input range (low, high, units), the output range (low, high, units), the direction, and the single value to convert. " +
-    "Translate plain speech into fields yourself (e.g. '0 to 100 degrees C into 4 to 20 milliamps, reading 50' gives in_low=0, in_high=100, in_unit=C, out_low=4, out_high=20, out_unit=mA, value=50, direction=i2o). " +
-    "A 4-20 mA transmitter is just input and output ranges; if it is unclear which side the user's value is on, ask. " +
-    "When you have both ranges and a value, CALL scale_span. Never do the arithmetic yourself: the tool returns the exact value and percent of span, and the result with a five-point table appears in the chat automatically. Report the returned numbers plainly. " +
-    "Plain text only, no Markdown.";
+    "You are the Signal Scaling wizard for Bridges Industrial. You help a field tech set up a linear scaling by talking, not by filling a form. Linear scaling maps an input span to an output span; percent of span is shared by both sides. " +
+    "Capture every required value before you compute: the input range (low and high), the output range (low and high), the direction, and the single value to convert, plus the units for each side. Collect them in plain words, one at a time. " +
+    "You may SUGGEST a common value, for example a 4 to 20 mA output, but get the user's confirmation; never assume one silently, and do NOT call scale_span until every required value is captured. If the tool replies that inputs are missing, ask the user for exactly those. " +
+    "Translate plain speech into fields yourself (e.g. '0 to 100 degrees C into 4 to 20 milliamps, reading 50' gives in_low=0, in_high=100, in_unit=C, out_low=4, out_high=20, out_unit=mA, value=50, direction=i2o). If it is unclear which side the user's value is on, ask. " +
+    "When you have everything, CALL scale_span; never do the arithmetic yourself. The result with a five-point table appears in the chat. When the user asks for a report, spec sheet, or printout, CALL make_report. Report the returned numbers plainly. Plain text only, no Markdown.";
   var TOOLS = [{
     name: "scale_span",
-    description: "Linear two-way signal scaling with the deterministic engine. Maps a value from one span to another and returns the scaled value, percent of span, and a five-point reference table.",
+    description: "Linear two-way signal scaling with the deterministic engine. Only call it once every required value has been captured. Returns the scaled value, percent of span, and a five-point reference table.",
     parameters: {
       type: "object",
       properties: {
         value: { type: "number", description: "the single value to convert" },
-        in_low: { type: "number", description: "input range low (LRV); default 0" },
-        in_high: { type: "number", description: "input range high (URV); default 100" },
+        in_low: { type: "number", description: "input range low (LRV)" },
+        in_high: { type: "number", description: "input range high (URV)" },
         in_unit: { type: "string", description: "input units, e.g. C, psi, %" },
-        out_low: { type: "number", description: "output range low; default 4" },
-        out_high: { type: "number", description: "output range high; default 20" },
+        out_low: { type: "number", description: "output range low" },
+        out_high: { type: "number", description: "output range high" },
         out_unit: { type: "string", description: "output units, e.g. mA" },
         direction: { type: "string", enum: ["i2o", "o2i"], description: "i2o = the value is on the input side, solve the output; o2i = the value is on the output side, solve the input" }
       },
-      required: ["value"]
+      required: ["value", "in_low", "in_high", "out_low", "out_high", "direction"]
     }
   }];
   function run(name, a) {
-    var inLo = N(a.in_low, 0), inHi = N(a.in_high, 100), outLo = N(a.out_low, 4), outHi = N(a.out_high, 20);
-    var inU = a.in_unit || "", outU = a.out_unit || "", dir = a.direction === "o2i" ? "o2i" : "i2o", val = N(a.value, NaN);
-    if (!isFinite(val)) return { error: "Tell me the value to convert." };
+    var req = [];
+    ["value", "in_low", "in_high", "out_low", "out_high", "direction"].forEach(function (k) { if (a[k] == null || a[k] === "") req.push(k); });
+    if (req.length) return { error: "Missing required inputs: " + req.join(", ") + ". Ask the user for these; do not compute until all are captured.", missing: req };
+    var inLo = N(a.in_low), inHi = N(a.in_high), outLo = N(a.out_low), outHi = N(a.out_high);
+    var inU = a.in_unit || "", outU = a.out_unit || "", dir = a.direction === "o2i" ? "o2i" : "i2o", val = N(a.value);
+    if (!P.ok(val, inLo, inHi, outLo, outHi)) return { error: "The value and ranges must all be numbers." };
     var res, pct, resU;
     if (dir === "i2o") { res = P.scale(val, inLo, inHi, outLo, outHi); pct = P.pctSpan(val, inLo, inHi); resU = outU; }
     else { res = P.scale(val, outLo, outHi, inLo, inHi); pct = P.pctSpan(val, outLo, outHi); resU = inU; }
@@ -177,21 +178,46 @@
       in_unit: inU, out_unit: outU, reference_table: table
     };
   }
+  function tableSpec(r) {
+    return {
+      headings: ["%", "Input" + (r.in_unit ? " (" + r.in_unit + ")" : ""), "Output" + (r.out_unit ? " (" + r.out_unit + ")" : "")],
+      rows: r.reference_table.map(function (x) { return [x.percent, x.input, x.output]; })
+    };
+  }
   function render(r) {
     return {
       label: r.result_label, value: r.result_value, unit: r.result_unit,
       tables: [
         { caption: "Result", rows: [["Percent of span", r.percent_of_span + " %"]] },
-        { caption: "Five-point reference",
-          headings: ["%", "Input" + (r.in_unit ? " (" + r.in_unit + ")" : ""), "Output" + (r.out_unit ? " (" + r.out_unit + ")" : "")],
-          rows: r.reference_table.map(function (x) { return [x.percent, x.input, x.output]; }) }
+        { caption: "Five-point reference", headings: tableSpec(r).headings, rows: tableSpec(r).rows }
+      ]
+    };
+  }
+  function report(r, inp) {
+    return {
+      title: "Signal Scaling",
+      subtitle: "Input " + inp.in_low + " to " + inp.in_high + " " + (r.in_unit || "") + ", Output " + inp.out_low + " to " + inp.out_high + " " + (r.out_unit || ""),
+      result: { label: r.result_label, value: r.result_value + " " + r.result_unit },
+      sections: [
+        { title: "Setup", grid: [
+          { k: "Input range", v: inp.in_low + " to " + inp.in_high + " " + (r.in_unit || "") },
+          { k: "Output range", v: inp.out_low + " to " + inp.out_high + " " + (r.out_unit || "") },
+          { k: "Direction", v: r.direction === "i2o" ? "Input to output" : "Output to input" },
+          { k: "Value in", v: String(inp.value) }
+        ] },
+        { title: "Result", grid: [
+          { k: r.result_label, v: r.result_value + " " + r.result_unit },
+          { k: "Percent of span", v: r.percent_of_span + " %" }
+        ] },
+        { title: "Five-point reference", table: tableSpec(r) },
+        { note: "Linear scaling. Bridges Industrial Field Pocket Guide. Generated " + new Date().toLocaleString() + "." }
       ]
     };
   }
   PGWizard.mount({
     root: ".pgw",
-    greeting: "Hi, I'll set up the scaling with you. Tell me the input range, the output range, and the value to convert. For example: \"0 to 100 degrees C into 4 to 20 milliamps, what's 50 degrees?\"",
-    system: SYSTEM, tools: TOOLS, run: run, render: render
+    greeting: "Hi, I'll set up the scaling with you. Tell me the input range, the output range, and the value to convert. When it is done you can ask me for a printable spec sheet. For example: \"0 to 100 degrees C into 4 to 20 milliamps, what's 50 degrees?\"",
+    system: SYSTEM, tools: TOOLS, run: run, render: render, report: report
   });
 })();
 </script>

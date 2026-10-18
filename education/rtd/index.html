@@ -152,21 +152,22 @@
   var P = window.PG, N = function (v, d) { var n = parseFloat(v); return isFinite(n) ? n : d; };
   var SYSTEM =
     "You are the RTD wizard for Bridges Industrial, for platinum RTDs per IEC 60751 (alpha 0.00385). Help a field tech by talking, one thing at a time. " +
-    "Collect: the sensor (Pt100, Pt500, or Pt1000; the number is the ice-point resistance R0), the direction (a temperature converted to resistance, or a measured resistance converted to temperature), and the value. " +
+    "Capture every required value before you compute: the sensor (Pt100, Pt500, or Pt1000; the number is the ice-point resistance R0), the direction (a temperature converted to resistance, or a measured resistance converted to temperature), and the value. For a reference table, capture the sensor and the from, to, and step. " +
+    "You may suggest a common choice such as Pt100, but get the user's confirmation; never assume the sensor silently, and do NOT call a tool until every required value is captured. If a tool replies that inputs are missing, ask for exactly those. " +
     "Translate plain speech into fields (e.g. 'Pt100 at 100 degrees C' gives sensor=100, direction=t2r, value=100; '138.5 ohms on a Pt100' gives sensor=100, direction=r2t, value=138.5). " +
-    "When you have the sensor, direction, and value, CALL rtd_convert. For a full resistance table over a range, CALL rtd_table. Never do the arithmetic yourself: the tool returns the exact numbers and a card appears in the chat. The valid range is -200 to 850 C. Report the returned numbers plainly. Plain text only, no Markdown.";
+    "When you have everything, CALL rtd_convert, or rtd_table for a range. Never do the arithmetic yourself. The valid range is -200 to 850 C. When the user asks for a report, spec sheet, or printout, CALL make_report. Report the returned numbers plainly. Plain text only, no Markdown.";
   var TOOLS = [
     {
       name: "rtd_convert",
-      description: "Convert a single platinum-RTD reading either direction with the deterministic IEC 60751 engine. Returns the converted value plus the standard anchor points for the sensor.",
+      description: "Convert a single platinum-RTD reading either direction with the deterministic IEC 60751 engine. Only call it once the sensor, direction and value are captured. Returns the converted value plus the standard anchor points.",
       parameters: {
         type: "object",
         properties: {
-          sensor: { type: "number", description: "ice-point resistance R0: 100 (Pt100), 500 (Pt500), or 1000 (Pt1000); default 100" },
+          sensor: { type: "number", description: "ice-point resistance R0: 100 (Pt100), 500 (Pt500), or 1000 (Pt1000)" },
           direction: { type: "string", enum: ["t2r", "r2t"], description: "t2r = temperature to resistance; r2t = resistance to temperature" },
           value: { type: "number", description: "the reading to convert (degrees C for t2r, ohms for r2t)" }
         },
-        required: ["value"]
+        required: ["sensor", "direction", "value"]
       }
     },
     {
@@ -175,33 +176,40 @@
       parameters: {
         type: "object",
         properties: {
-          sensor: { type: "number", description: "R0: 100, 500, or 1000; default 100" },
+          sensor: { type: "number", description: "R0: 100, 500, or 1000" },
           from: { type: "number", description: "start temperature, C" },
           to: { type: "number", description: "end temperature, C" },
           step: { type: "number", description: "step, C" }
         },
-        required: ["from", "to", "step"]
+        required: ["sensor", "from", "to", "step"]
       }
     }
   ];
   function run(name, a) {
-    var R0 = N(a.sensor, 100); if (R0 !== 100 && R0 !== 500 && R0 !== 1000) R0 = 100;
     if (name === "rtd_table") {
-      var from = N(a.from, NaN), to = N(a.to, NaN), step = N(a.step, NaN);
+      var reqt = [];
+      ["sensor", "from", "to", "step"].forEach(function (k) { if (a[k] == null || a[k] === "") reqt.push(k); });
+      if (reqt.length) return { error: "Missing required inputs: " + reqt.join(", ") + ". Ask the user; do not compute until all are captured.", missing: reqt };
+      var R0t = N(a.sensor); if (R0t !== 100 && R0t !== 500 && R0t !== 1000) return { error: "Sensor must be Pt100, Pt500, or Pt1000." };
+      var from = N(a.from), to = N(a.to), step = N(a.step);
       if (!P.ok(from, to, step) || step <= 0) return { error: "Give me a from, a to, and a positive step." };
       from = Math.max(from, -200); to = Math.min(to, 850);
       var rows = [], n = 0;
-      for (var t = from; t <= to + 1e-9 && n < 400; t += step, n++) rows.push({ t: P.fmtTrim(t, 2), r: P.fmt(P.RTD.res(t, R0), 3) });
-      return { ok: true, kind: "table", sensor: R0, rows: rows };
+      for (var t = from; t <= to + 1e-9 && n < 400; t += step, n++) rows.push({ t: P.fmtTrim(t, 2), r: P.fmt(P.RTD.res(t, R0t), 3) });
+      return { ok: true, kind: "table", sensor: R0t, from: from, to: to, step: step, rows: rows };
     }
-    var dir = a.direction === "r2t" ? "r2t" : "t2r", val = N(a.value, NaN);
-    if (!isFinite(val)) return { error: "Tell me the value to convert." };
+    var req = [];
+    ["sensor", "direction", "value"].forEach(function (k) { if (a[k] == null || a[k] === "") req.push(k); });
+    if (req.length) return { error: "Missing required inputs: " + req.join(", ") + ". Ask the user; do not compute until all are captured.", missing: req };
+    var R0 = N(a.sensor); if (R0 !== 100 && R0 !== 500 && R0 !== 1000) return { error: "Sensor must be Pt100, Pt500, or Pt1000." };
+    var dir = a.direction === "r2t" ? "r2t" : "t2r", val = N(a.value);
+    if (!isFinite(val)) return { error: "The reading must be a number." };
     var res, unit, note = "";
     if (dir === "t2r") { if (val < -200 || val > 850) note = "Outside the -200 to 850 C validity range."; res = P.RTD.res(val, R0); unit = "ohms"; }
     else { res = P.RTD.temp(val, R0); unit = "degrees C"; if (isFinite(res) && (res < -200 || res > 850)) note = "Result is outside the -200 to 850 C validity range."; }
     if (!P.ok(res)) return { error: "That reading has no valid RTD solution." };
     var anchors = [0, 100, -100, 850].map(function (t) { return { t: t, r: P.fmt(P.RTD.res(t, R0), 3) }; });
-    return { ok: true, kind: "convert", sensor: R0, direction: dir, value: P.fmt(res, dir === "t2r" ? 3 : 2), unit: unit, note: note, anchors: anchors };
+    return { ok: true, kind: "convert", sensor: R0, direction: dir, input: val, value: P.fmt(res, dir === "t2r" ? 3 : 2), unit: unit, note: note, anchors: anchors };
   }
   function render(r) {
     if (r.kind === "table") {
@@ -212,10 +220,38 @@
     if (r.note) tables.unshift({ caption: "Note", rows: [["", r.note]] });
     return { label: "Pt" + r.sensor + " result", value: r.value, unit: r.unit, tables: tables };
   }
+  function stamp() { return "Callendar-Van Dusen, valid -200 to 850 C. Bridges Industrial Field Pocket Guide. Generated " + new Date().toLocaleString() + "."; }
+  function report(r, inp) {
+    if (r.kind === "table") {
+      return {
+        title: "RTD Resistance Table, Pt" + r.sensor,
+        subtitle: "IEC 60751, alpha 0.00385, " + r.from + " to " + r.to + " C, step " + r.step,
+        sections: [
+          { title: "Temperature to resistance", table: { headings: ["Degrees C", "Ohms (Pt" + r.sensor + ")"], rows: r.rows.map(function (x) { return [x.t, x.r]; }) } },
+          { note: stamp() }
+        ]
+      };
+    }
+    return {
+      title: "RTD, Pt" + r.sensor,
+      subtitle: "IEC 60751, alpha 0.00385",
+      result: { label: r.direction === "t2r" ? "Resistance" : "Temperature", value: r.value + " " + r.unit },
+      sections: [
+        { title: "Conversion", grid: [
+          { k: "Sensor", v: "Pt" + r.sensor },
+          { k: "Direction", v: r.direction === "t2r" ? "Temperature to resistance" : "Resistance to temperature" },
+          { k: "Input", v: inp.value + (r.direction === "t2r" ? " degrees C" : " ohms") },
+          { k: "Result", v: r.value + " " + r.unit }
+        ] },
+        { title: "Anchor points (IEC 60751)", table: { headings: ["Degrees C", "Ohms (Pt" + r.sensor + ")"], rows: r.anchors.map(function (x) { return [x.t, x.r]; }) } },
+        { note: (r.note ? r.note + " " : "") + stamp() }
+      ]
+    };
+  }
   PGWizard.mount({
     root: ".pgw",
-    greeting: "Hi, I'll work the RTD conversion with you. Tell me the sensor (Pt100, Pt500, or Pt1000), the direction, and your reading. For example: \"Pt100 at 100 degrees C\" or \"138.5 ohms on a Pt100.\" I can also build a resistance table over a range.",
-    system: SYSTEM, tools: TOOLS, run: run, render: render
+    greeting: "Hi, I'll work the RTD conversion with you. Tell me the sensor (Pt100, Pt500, or Pt1000), the direction, and your reading. When it is done you can ask me for a printable report. For example: \"Pt100 at 100 degrees C\" or \"138.5 ohms on a Pt100.\" I can also build a resistance table over a range.",
+    system: SYSTEM, tools: TOOLS, run: run, render: render, report: report
   });
 })();
 </script>

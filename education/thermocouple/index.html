@@ -222,30 +222,34 @@
   var P = window.PG, N = function (v, d) { var n = parseFloat(v); return isFinite(n) ? n : d; };
   var SYSTEM =
     "You are the Thermocouple wizard for Bridges Industrial, for ITS-90 thermocouples (types J, K, T, E, N, R, S, B). Help a field tech by talking, one thing at a time. " +
-    "Collect: the type letter, the direction (a hot-junction temperature converted to meter millivolts, or a measured millivolt reading converted to temperature), the value, and the cold-junction / reference temperature. " +
-    "CRITICAL: always CONFIRM the cold-junction reference temperature, because 0 C (an ice bath) versus the terminal-block ambient moves the answer; do not assume it. " +
+    "Capture every required value before you compute: the type letter, the direction (a hot-junction temperature converted to meter millivolts, or a measured millivolt reading converted to temperature), the value, and the cold-junction / reference temperature. " +
+    "CRITICAL: always ASK FOR and CONFIRM the cold-junction reference temperature, because 0 C (an ice bath) versus the terminal-block ambient moves the answer; never assume it, and do NOT call tc_convert until you have it along with the type, direction and value. If the tool replies that inputs are missing, ask for exactly those. " +
     "Translate plain speech into fields (e.g. 'type K hot junction 300 C, cold junction 25' gives type=K, direction=c2mv, value=300, ref_c=25; 'type K meter reads 12.2 millivolts, ambient 25' gives direction=mv2c, value=12.2, ref_c=25). " +
-    "When you have the type, direction, value, and reference, CALL tc_convert. Never do the arithmetic yourself: the tool returns the exact numbers and a card appears in the chat. Report the returned numbers plainly. Plain text only, no Markdown.";
+    "When you have everything, CALL tc_convert; never do the arithmetic yourself. When the user asks for a report, spec sheet, or printout, CALL make_report. Report the returned numbers plainly. Plain text only, no Markdown.";
   var TOOLS = [{
     name: "tc_convert",
-    description: "Convert a thermocouple reading either direction with the deterministic ITS-90 engine and cold-junction compensation. Returns the meter millivolts (or hot-junction temperature) plus E(hot), E(reference), and the type range.",
+    description: "Convert a thermocouple reading either direction with the deterministic ITS-90 engine and cold-junction compensation. Only call it once the type, direction, value and reference junction are captured. Returns the meter millivolts (or hot-junction temperature) plus E(hot), E(reference), and the type range.",
     parameters: {
       type: "object",
       properties: {
         type: { type: "string", enum: ["J", "K", "T", "E", "N", "R", "S", "B"], description: "thermocouple letter type" },
         direction: { type: "string", enum: ["c2mv", "mv2c"], description: "c2mv = temperature to meter mV; mv2c = measured mV to temperature" },
         value: { type: "number", description: "hot-junction temperature in C (c2mv) or measured mV at the meter (mv2c)" },
-        ref_c: { type: "number", description: "cold-junction / reference temperature in C; confirm it, do not assume" }
+        ref_c: { type: "number", description: "cold-junction / reference temperature in C; ask for it, never assume" }
       },
-      required: ["type", "value"]
+      required: ["type", "direction", "value", "ref_c"]
     }
   }];
   function run(name, a) {
+    var req = [];
+    ["type", "direction", "value", "ref_c"].forEach(function (k) { if (a[k] == null || a[k] === "") req.push(k); });
+    if (req.length) return { error: "Missing required inputs: " + req.join(", ") + ". Ask the user; do not compute until all are captured, especially the cold-junction reference.", missing: req };
     var type = (a.type || "").toUpperCase(), dir = a.direction === "mv2c" ? "mv2c" : "c2mv";
-    var val = N(a.value, NaN), ref = N(a.ref_c, 0);
+    var val = N(a.value), ref = N(a.ref_c);
     var d = (P.TC_DATA || {})[type];
     if (!d) return { error: "Pick a thermocouple type: J, K, T, E, N, R, S, or B." };
-    if (!isFinite(val)) return { error: "Tell me the value to convert." };
+    if (!isFinite(val)) return { error: "The reading must be a number." };
+    if (!isFinite(ref)) return { error: "The cold-junction reference must be a number." };
     var eRef = P.TC.emf(type, ref);
     if (!isFinite(eRef)) return { error: "The reference temperature is outside the " + d.name + " range (" + d.range + ")." };
     if (dir === "c2mv") {
@@ -272,10 +276,32 @@
         ["Type range", r.range]
       ] }] };
   }
+  function report(r, inp) {
+    return {
+      title: "Thermocouple, " + r.type_name,
+      subtitle: "ITS-90, reference junction " + r.ref_c + " C",
+      result: { label: r.main_label, value: r.main_value + " " + r.main_unit },
+      sections: [
+        { title: "Conversion", grid: [
+          { k: "Type", v: r.type_name },
+          { k: "Direction", v: r.direction === "c2mv" ? "Temperature to millivolts" : "Millivolts to temperature" },
+          { k: "Input", v: inp.value + (r.direction === "c2mv" ? " degrees C" : " mV") },
+          { k: "Reference junction", v: r.ref_c + " C" }
+        ] },
+        { title: "Detail", grid: [
+          { k: "E(hot), ref 0 C", v: r.e_hot + " mV" },
+          { k: "E(reference)", v: r.e_ref + " mV" },
+          { k: "Meter = E(hot) - E(ref)", v: r.meter + " mV" },
+          { k: "Type range", v: r.range }
+        ] },
+        { note: "Cold-junction compensation: the meter reads E(hot) minus E(reference). NIST ITS-90 reference functions. Bridges Industrial Field Pocket Guide. Generated " + new Date().toLocaleString() + "." }
+      ]
+    };
+  }
   PGWizard.mount({
     root: ".pgw",
-    greeting: "Hi, I'll work the thermocouple conversion with you. Tell me the type, the direction, your reading, and the cold-junction reference. For example: \"type K, hot junction 300 C, cold junction 25.\" I'll confirm the reference, since 0 C versus ambient changes the answer.",
-    system: SYSTEM, tools: TOOLS, run: run, render: render
+    greeting: "Hi, I'll work the thermocouple conversion with you. Tell me the type, the direction, your reading, and the cold-junction reference. When it is done you can ask me for a printable report. For example: \"type K, hot junction 300 C, cold junction 25.\" I'll confirm the reference, since 0 C versus ambient changes the answer.",
+    system: SYSTEM, tools: TOOLS, run: run, render: render, report: report
   });
 })();
 </script>

@@ -188,31 +188,35 @@
   var P = window.PG, N = function (v, d) { var n = parseFloat(v); return isFinite(n) ? n : d; };
   var SYSTEM =
     "You are the Square-Root Extraction wizard for Bridges Industrial. A DP flow transmitter measures differential pressure, and flow is proportional to the square root of DP. Help a field tech by talking, one thing at a time. " +
-    "Collect: the DP range (low, high, units), the flow range (low, high, units), the direction, and the value. The two directions are: a DP signal in milliamps you convert to flow (direction=sig), or a flow in engineering units you convert back to the DP signal (direction=flow). " +
+    "Capture every required value before you compute: the DP range (low and high), the flow range (low and high), the direction, and the value, plus the units for each range. The two directions are: a DP signal in milliamps you convert to flow (direction=sig), or a flow in engineering units you convert back to the DP signal (direction=flow). " +
     "CRITICAL: when the user gives you a milliamp reading, CONFIRM whether it is the LINEAR (un-extracted) DP signal or the already square-root-EXTRACTED signal, because that is the whole ambiguity this tool resolves; the sig direction expects the linear DP milliamps. " +
-    "Translate plain speech into fields yourself. When you have the ranges and a value, CALL solve_sqrt. Never do the arithmetic yourself: the tool returns the exact numbers and a results card appears in the chat. Report the returned numbers plainly. Plain text only, no Markdown.";
+    "You may suggest a common value but get the user's confirmation; never assume one silently, and do NOT call solve_sqrt until every required value is captured. If the tool replies that inputs are missing, ask for exactly those. " +
+    "Translate plain speech into fields yourself. When you have everything, CALL solve_sqrt; never do the arithmetic yourself. A results card appears in the chat. When the user asks for a report, spec sheet, or printout, CALL make_report. Report the returned numbers plainly. Plain text only, no Markdown.";
   var TOOLS = [{
     name: "solve_sqrt",
-    description: "DP-flow square-root extraction with the deterministic engine, both directions. Returns percent DP, percent flow, DP and flow in engineering units, and BOTH the DP-linear and flow-extracted milliamp signals for the same condition.",
+    description: "DP-flow square-root extraction with the deterministic engine, both directions. Only call it once every required value has been captured. Returns percent DP, percent flow, DP and flow in engineering units, and BOTH the DP-linear and flow-extracted milliamp signals for the same condition.",
     parameters: {
       type: "object",
       properties: {
         value: { type: "number", description: "the reading to convert: a DP-linear mA when direction=sig, a flow in engineering units when direction=flow" },
         direction: { type: "string", enum: ["sig", "flow"], description: "sig = DP-linear mA to flow; flow = flow in EU back to the DP signal" },
-        dp_low: { type: "number", description: "DP range low; default 0" },
-        dp_high: { type: "number", description: "DP range high; default 100" },
+        dp_low: { type: "number", description: "DP range low" },
+        dp_high: { type: "number", description: "DP range high" },
         dp_unit: { type: "string", description: "DP units, e.g. inH2O" },
-        flow_low: { type: "number", description: "flow range low; default 0" },
-        flow_high: { type: "number", description: "flow range high; default 500" },
+        flow_low: { type: "number", description: "flow range low" },
+        flow_high: { type: "number", description: "flow range high" },
         flow_unit: { type: "string", description: "flow units, e.g. GPM" }
       },
-      required: ["value"]
+      required: ["value", "direction", "dp_low", "dp_high", "flow_low", "flow_high"]
     }
   }];
   function run(name, a) {
-    var dpLo = N(a.dp_low, 0), dpHi = N(a.dp_high, 100), flLo = N(a.flow_low, 0), flHi = N(a.flow_high, 500);
-    var dpU = a.dp_unit || "inH2O", flU = a.flow_unit || "GPM", dir = a.direction === "flow" ? "flow" : "sig", val = N(a.value, NaN);
-    if (!isFinite(val)) return { error: "Tell me the value to convert." };
+    var req = [];
+    ["value", "direction", "dp_low", "dp_high", "flow_low", "flow_high"].forEach(function (k) { if (a[k] == null || a[k] === "") req.push(k); });
+    if (req.length) return { error: "Missing required inputs: " + req.join(", ") + ". Ask the user for these; do not compute until all are captured.", missing: req };
+    var dpLo = N(a.dp_low), dpHi = N(a.dp_high), flLo = N(a.flow_low), flHi = N(a.flow_high);
+    var dpU = a.dp_unit || "inH2O", flU = a.flow_unit || "GPM", dir = a.direction === "flow" ? "flow" : "sig", val = N(a.value);
+    if (!P.ok(val, dpLo, dpHi, flLo, flHi)) return { error: "The value and ranges must all be numbers." };
     var pctDP, pctFL;
     if (dir === "sig") { pctDP = P.maToPct(val); pctFL = P.sqrtExtract(pctDP); }
     else { pctFL = P.pctSpan(val, flLo, flHi); pctDP = P.sqrtSquare(pctFL); }
@@ -224,6 +228,16 @@
       dp_eu: P.fmt(dpEU, 3), flow_eu: P.fmt(flEU, 3),
       ma_linear: P.fmt(P.pctToMa(pctDP), 3), ma_extracted: P.fmt(P.pctToMa(pctFL), 3)
     };
+  }
+  function resultGrid(r) {
+    return [
+      { k: "Percent DP", v: r.pct_dp + " %" },
+      { k: "Percent flow", v: r.pct_flow + " %" },
+      { k: "Differential pressure", v: r.dp_eu + " " + r.dp_unit },
+      { k: "Flow", v: r.flow_eu + " " + r.flow_unit },
+      { k: "DP-linear signal", v: r.ma_linear + " mA" },
+      { k: "Flow-extracted signal", v: r.ma_extracted + " mA" }
+    ];
   }
   function render(r) {
     return {
@@ -242,10 +256,27 @@
       ]
     };
   }
+  function report(r, inp) {
+    return {
+      title: "Square-Root Extraction",
+      subtitle: "DP " + inp.dp_low + " to " + inp.dp_high + " " + r.dp_unit + ", Flow " + inp.flow_low + " to " + inp.flow_high + " " + r.flow_unit,
+      result: { label: "Flow", value: r.flow_eu + " " + r.flow_unit },
+      sections: [
+        { title: "Setup", grid: [
+          { k: "DP range", v: inp.dp_low + " to " + inp.dp_high + " " + r.dp_unit },
+          { k: "Flow range", v: inp.flow_low + " to " + inp.flow_high + " " + r.flow_unit },
+          { k: "Direction", v: r.direction === "sig" ? "DP signal to flow" : "Flow to DP signal" },
+          { k: "Reading", v: String(inp.value) }
+        ] },
+        { title: "Results", grid: resultGrid(r) },
+        { note: "Flow is proportional to the square root of differential pressure; the DP-linear and flow-extracted signals are the same condition read two ways. Bridges Industrial Field Pocket Guide. Generated " + new Date().toLocaleString() + "." }
+      ]
+    };
+  }
   PGWizard.mount({
     root: ".pgw",
-    greeting: "Hi, I'll work the square-root extraction with you. Tell me the DP range, the flow range, and your reading. For example: \"0 to 100 inches of water, 0 to 500 GPM, the linear DP signal reads 12 mA.\" I'll confirm whether a milliamp reading is the linear or the extracted signal.",
-    system: SYSTEM, tools: TOOLS, run: run, render: render
+    greeting: "Hi, I'll work the square-root extraction with you. Tell me the DP range, the flow range, and your reading. When it is done you can ask me for a printable spec sheet. For example: \"0 to 100 inches of water, 0 to 500 GPM, the linear DP signal reads 12 mA.\" I'll confirm whether a milliamp reading is the linear or the extracted signal.",
+    system: SYSTEM, tools: TOOLS, run: run, render: render, report: report
   });
 })();
 </script>

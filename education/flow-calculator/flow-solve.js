@@ -27,7 +27,7 @@ const METERS = ["venturi","orifice","nozzle","long_nozzle","venturi_nozzle","thr
 // One tool definition, shared by the page wizard and the main-site Pulse.
 export const FLOW_TOOL = {
   name: "solve_flow",
-  description: "Compute differential-pressure / flow-meter flow with the deterministic ISO engine (never estimate it yourself). Provide the meter type, fluid, the measured value, geometry, and gas state as plain fields with their units. Returns the flow in several units plus key coefficients, and flags any input still left at a demonstration default.",
+  description: "Compute differential-pressure / flow-meter flow with the deterministic ISO engine (never estimate it yourself). Only call it once you have captured every required input from the user: the meter type, fluid, the measured differential pressure, the pipe bore and geometry, and the gas state (line pressure with gauge/absolute, flowing temperature, and the gas identity). It refuses to compute with assumed values and returns the list of inputs still missing. Returns the flow in several units plus key coefficients.",
   parameters: {
     type: "object",
     properties: {
@@ -54,6 +54,8 @@ export const FLOW_TOOL = {
       lineT: { type: "number", description: "flowing temperature value (gas)" },
       tUnit: { type: "string", enum: ["F","C","K","R"] },
       molarMass: { type: "number", description: "gas molar mass kg/kmol; air=28.9647, natural gas ~17-19" },
+      kappa: { type: "number", description: "gas isentropic exponent; air=1.4. Ask for it when the gas is not air." },
+      muGas: { type: "number", description: "gas dynamic viscosity in cP; air approx 0.0185. Ask for it when the gas is not air." },
       densityMode: { type: "string", enum: ["eos","manual"] },
       rhoGas: { type: "number", description: "entered gas density when densityMode=manual" },
       rhoLiquid: { type: "number", description: "liquid density kg/m3 (fluid=liquid)" },
@@ -73,6 +75,49 @@ export const FLOW_TOOL = {
 };
 
 const num = (x) => (x == null || x === "" ? NaN : Number(x));
+
+// Required inputs per meter type: what must be captured from the user before the
+// engine runs. No physically meaningful value is ever defaulted — a missing one
+// is reported so the wizard/Pulse asks for it instead of computing on a demo value.
+const AIR_M = 28.96546;
+const DP_ELEMENTS = ["venturi", "orifice", "nozzle", "long_nozzle", "venturi_nozzle", "throat_nozzle", "cone", "wedge", "custom_dp"];
+
+export function missingFlowFields(inp) {
+  inp = inp || {};
+  const miss = [];
+  const has = (k) => inp[k] != null && inp[k] !== "";
+  const need = (k, label) => { if (!has(k)) miss.push(label); };
+  const el = inp.element, fluid = inp.fluid;
+  if (!el) miss.push("meter type");
+  if (!fluid) miss.push("fluid (gas or liquid)");
+  if (!el || !fluid) return miss;
+  const gas = fluid === "gas";
+  const gasState = () => {
+    if (inp.densityMode === "manual") { need("rhoGas", "gas density"); return; }
+    need("lineP", "line pressure"); need("pBasis", "gauge or absolute"); need("lineT", "flowing temperature"); need("molarMass", "gas identity (molar mass)");
+    if (has("molarMass") && Math.abs(Number(inp.molarMass) - AIR_M) > 0.5) { need("kappa", "isentropic exponent"); need("muGas", "gas viscosity"); }
+  };
+  const density = () => { if (gas) gasState(); else need("rhoLiquid", "liquid density"); };
+  if (DP_ELEMENTS.indexOf(el) > -1) {
+    need("dp", "differential pressure"); need("D", "pipe bore D");
+    if (!has("beta") && !has("feature")) miss.push("beta ratio or bore size");
+    density();
+  } else if (el === "pitot" || el === "annubar") {
+    need("dp", "differential pressure"); need("D", "pipe bore D"); need("probeK", "flow coefficient K");
+    density();
+  } else if (el === "calibrated_dp") {
+    need("dp", "differential pressure"); need("calQ", "calibration flow"); need("calDP", "calibration differential"); need("calRho", "calibration density");
+    density();
+  } else if (el === "velocity") {
+    need("velocity", "mean velocity"); need("D", "pipe bore D");
+    density();
+  } else if (el === "pulse") {
+    need("frequency", "pulse frequency"); need("pulseK", "pulses per unit");
+  } else if (el === "signal") {
+    need("signal", "signal value");
+  }
+  return miss;
+}
 
 export function buildConfig(inp) {
   const c = { ...D, ...(inp || {}) };
@@ -104,12 +149,12 @@ export function buildConfig(inp) {
 }
 
 const r4 = (n) => (Number.isFinite(n) ? Number(n.toFixed(4)) : n);
-const GAS_KEYS = { dp: "ΔP", D: "pipe bore", beta: "beta ratio", lineP: "line pressure", lineT: "flowing temperature", molarMass: "gas molar mass", lineZ: "compressibility Z", refP: "reference pressure", refT: "reference temperature" };
 
 export function solveFlow(inp) {
   inp = inp || {};
   try {
-    if (!inp.element) return { error: "Specify the meter type (element), e.g. venturi, orifice, nozzle." };
+    const missing = missingFlowFields(inp);
+    if (missing.length) return { error: "Missing required inputs: " + missing.join(", ") + ". Ask the user for these; do not compute until all are captured.", missing };
     const cfg = buildConfig(inp), r = F.solve(cfg), v = r.values || {};
     const unit = inp.qUnit || D.qUnit;
     const out = { ok: true, meter: F.MODES[cfg.element].name, fluid: cfg.fluid, flow: r4(v[unit]), flow_unit: unit };
@@ -120,9 +165,6 @@ export function solveFlow(inp) {
     if (r.Cd != null) out.discharge_coeff_C = r4(r.Cd);
     if (r.K != null) out.coefficient_K = r4(r.K);
     if (r.epsilon != null) out.gas_expansion = r4(r.epsilon);
-    const keys = cfg.fluid === "gas" ? GAS_KEYS : { dp: "ΔP", D: "pipe bore", beta: "beta ratio" };
-    const dflt = Object.keys(keys).filter((k) => inp[k] == null || inp[k] === "").map((k) => keys[k]);
-    if (dflt.length) out.using_default_values_for = dflt;
     out.full_tool = "/education/flow-calculator/ (open for the live graph and a printable spec sheet)";
     return out;
   } catch (e) { return { error: e.message }; }
