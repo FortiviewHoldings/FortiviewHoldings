@@ -53,6 +53,17 @@ const SYSTEM =
   "More generally, never fill a measurement, range, pressure, temperature or " +
   "tolerance with an assumed value to get a number out; if a required input is " +
   "missing, ask for it. " +
+  "For a linear signal scaling (4-20 mA, 3-15 psi, a temperature span, an " +
+  "already-linearized flow signal) use solve_scaling, capturing both ranges, the " +
+  "direction and the value first. A differential pressure mapped to a flow rate " +
+  "is NOT linear, so for DP flow use solve_sqrt (square-root extraction), which " +
+  "also accepts a measured differential-pressure value directly. For a platinum " +
+  "RTD use solve_rtd (Pt100, Pt500 or Pt1000, either direction). For a " +
+  "thermocouple use thermocouple_convert (types J, K, T, E, N, R, S, B) and always " +
+  "ask for the cold-junction reference temperature, never assume it. For all of " +
+  "these, collect the required inputs before computing, and after a result you can " +
+  "point the user to the matching tool page under /education/ for the live graph, " +
+  "a full table, or a printable report. " +
   "(3) A specific plant problem you cannot resolve from concepts or the guides, " +
   "or anything that needs a human to look at the actual setup — point them to a " +
   "Break-In. Do not reach for Break-In on a question you can simply answer. " +

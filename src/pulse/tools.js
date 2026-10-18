@@ -3,40 +3,10 @@
 // doing arithmetic in its head. Mirrors the site's own reference tools.
 
 import { solveFlow, FLOW_TOOL } from "../../education/flow-calculator/flow-solve.js";
+import { solveScaling, SCALE_TOOL, solveSqrt, SQRT_TOOL, solveRtd, RTD_TOOL } from "../../education/assets/pg-solve.js";
+import { solveThermocouple, TC_TOOL } from "../../education/assets/tc-core.js";
 
 const round = (n, d = 4) => (Number.isFinite(n) ? Number(n.toFixed(d)) : n);
-
-// --- 4-20 mA linear scaling: give one of ma / percent / eu, get all ---
-function scale_4_20ma({ ma, percent, eu, eu_low = 0, eu_high = 100 }) {
-  const span = eu_high - eu_low;
-  let pct;
-  if (percent != null) pct = percent;
-  else if (ma != null) pct = ((ma - 4) / 16) * 100;
-  else if (eu != null) pct = span ? ((eu - eu_low) / span) * 100 : 0;
-  else return { error: "Provide one of ma, percent, or eu." };
-  return {
-    ma: round(4 + (pct / 100) * 16, 3),
-    percent: round(pct, 2),
-    eu: round(eu_low + (pct / 100) * span, 3),
-    range: `${eu_low}–${eu_high}`
-  };
-}
-
-// --- DP flow with square-root extraction ---
-function dp_flow({ ma, dp_percent, flow_percent, flow_max = 100 }) {
-  let dpPct;
-  if (dp_percent != null) dpPct = dp_percent;
-  else if (ma != null) dpPct = ((ma - 4) / 16) * 100;
-  else if (flow_percent != null) dpPct = (flow_percent * flow_percent) / 100;
-  else return { error: "Provide one of ma, dp_percent, or flow_percent." };
-  const flowPct = Math.sqrt(Math.max(0, dpPct) / 100) * 100;
-  return {
-    dp_percent: round(dpPct, 2),
-    flow_percent: round(flowPct, 2),
-    flow: round((flowPct / 100) * flow_max, 3),
-    ma: round(4 + (dpPct / 100) * 16, 3)
-  };
-}
 
 // --- calibration error as % of span, reading and reference in the SAME units ---
 function calibration_error({ reading, reference, span_low = 0, span_high = 100 }) {
@@ -77,17 +47,6 @@ function number_base({ value, from_base = 10, to_base = 16 }) {
     hex: n.toString(16).toUpperCase(),
     result: n.toString(to_base).toUpperCase()
   };
-}
-
-// --- RTD resistance, IEC 60751 (Pt100 / Pt1000) ---
-function rtd_resistance({ temp_c, type = "Pt100" }) {
-  const R0 = type.toLowerCase() === "pt1000" ? 1000 : 100;
-  const A = 3.9083e-3, B = -5.775e-7, C = -4.183e-12;
-  const t = temp_c;
-  const r = t >= 0
-    ? R0 * (1 + A * t + B * t * t)
-    : R0 * (1 + A * t + B * t * t + C * (t - 100) * t * t * t);
-  return { type: R0 === 1000 ? "Pt1000" : "Pt100", temp_c: t, resistance_ohms: round(r, 4) };
 }
 
 // --- multi-point calibration worksheet (As-Found / As-Left, percent of span) ---
@@ -133,7 +92,11 @@ function solve_calibration(a = {}) {
   };
 }
 
-const RUN = { scale_4_20ma, dp_flow, calibration_error, transmitter_error, number_base, rtd_resistance, solve_flow: solveFlow, solve_calibration };
+const RUN = {
+  solve_flow: solveFlow, solve_calibration,
+  solve_scaling: solveScaling, solve_sqrt: solveSqrt, solve_rtd: solveRtd, thermocouple_convert: solveThermocouple,
+  calibration_error, transmitter_error, number_base
+};
 
 export function runTool(name, args) {
   const fn = RUN[name];
@@ -144,6 +107,10 @@ export function runTool(name, args) {
 // Gemini function declarations.
 export const TOOL_DECLARATIONS = [
   FLOW_TOOL,
+  SCALE_TOOL,
+  SQRT_TOOL,
+  RTD_TOOL,
+  TC_TOOL,
   {
     name: "solve_calibration",
     description: "Grade a multi-point loop calibration (As-Found / As-Left) as error in percent of span, with a pass/fail verdict. ONLY call this once every required input has been collected from the user: the input range and units applied, the output range and units measured, the tolerance in percent of span, and the As-Found reading at each test point (plus As-Left if the device was adjusted). You may suggest a common value such as a 4-20 mA output but must confirm it; never assume one. If it replies that inputs are missing, ask the user for exactly those.",
@@ -172,33 +139,6 @@ export const TOOL_DECLARATIONS = [
         }
       },
       required: ["in_low", "in_high", "in_unit", "out_low", "out_high", "out_unit", "tol", "rows"]
-    }
-  },
-  {
-    name: "scale_4_20ma",
-    description: "Linear 4-20 mA scaling. Given one of ma, percent, or eu (engineering units) with the eu_low/eu_high range, return all three.",
-    parameters: {
-      type: "object",
-      properties: {
-        ma: { type: "number", description: "loop current, 4-20 mA" },
-        percent: { type: "number", description: "percent of span, 0-100" },
-        eu: { type: "number", description: "value in engineering units" },
-        eu_low: { type: "number", description: "engineering value at 4 mA" },
-        eu_high: { type: "number", description: "engineering value at 20 mA" }
-      }
-    }
-  },
-  {
-    name: "dp_flow",
-    description: "DP flow with square-root extraction. Given one of ma, dp_percent, or flow_percent (and flow_max), return DP %, flow %, flow, and mA.",
-    parameters: {
-      type: "object",
-      properties: {
-        ma: { type: "number" },
-        dp_percent: { type: "number", description: "differential pressure, percent of range" },
-        flow_percent: { type: "number" },
-        flow_max: { type: "number", description: "flow at 100%" }
-      }
     }
   },
   {
@@ -240,18 +180,6 @@ export const TOOL_DECLARATIONS = [
         to_base: { type: "integer" }
       },
       required: ["value"]
-    }
-  },
-  {
-    name: "rtd_resistance",
-    description: "RTD resistance at a temperature per IEC 60751. Give temp_c and type (Pt100 or Pt1000).",
-    parameters: {
-      type: "object",
-      properties: {
-        temp_c: { type: "number" },
-        type: { type: "string", description: "Pt100 or Pt1000" }
-      },
-      required: ["temp_c"]
     }
   }
 ];
