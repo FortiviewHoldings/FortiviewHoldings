@@ -198,7 +198,11 @@
   </div>
 </main>
 <script src="/education/assets/pocketguide.js"></script>
-<script>
+<script type="module">
+// The math comes from the one shared ES module; helpers and the numpad stay on
+// the global. Merged so every PG.* call below resolves to the single implementation.
+import * as PGM from "/education/assets/pg-math.js";
+const PG = Object.assign({}, window.PG, PGM);
 (function () {
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var wsBody = $("#wsBody");
@@ -333,9 +337,10 @@
 })();
 </script>
 <script src="/education/assets/wizard.js"></script>
-<script>
+<script type="module">
+import * as PGM from "/education/assets/pg-math.js";
 (function () {
-  var P = window.PG, N = function (v, d) { var n = parseFloat(v); return isFinite(n) ? n : d; };
+  var P = Object.assign({}, window.PG, PGM), N = function (v, d) { var n = parseFloat(v); return isFinite(n) ? n : d; };
   var SYSTEM =
     "You are the Calibration Worksheet wizard for Bridges Industrial. You help a field tech build a multi-point loop calibration by talking, one thing at a time. " +
     "Capture EVERY required value before you compute: the input range (low, high, and the units you apply), the output range (low, high, and the units you measure), the tolerance in percent of span, the number of test points (3, 5, or 11), and the As-Found reading at each point, plus the As-Left reading if the device was adjusted. " +

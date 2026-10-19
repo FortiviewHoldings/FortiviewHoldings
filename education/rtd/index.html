@@ -93,7 +93,11 @@
   </div>
 </main>
 <script src="/education/assets/pocketguide.js"></script>
-<script>
+<script type="module">
+// The math comes from the one shared ES module; helpers and the numpad stay on
+// the global. Merged so every PG.* call below resolves to the single implementation.
+import * as PGM from "/education/assets/pg-math.js";
+const PG = Object.assign({}, window.PG, PGM);
 (function () {
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var R0 = 100, mode = "t2r";
@@ -147,9 +151,10 @@
 })();
 </script>
 <script src="/education/assets/wizard.js"></script>
-<script>
+<script type="module">
+import * as PGM from "/education/assets/pg-math.js";
 (function () {
-  var P = window.PG, N = function (v, d) { var n = parseFloat(v); return isFinite(n) ? n : d; };
+  var P = Object.assign({}, window.PG, PGM), N = function (v, d) { var n = parseFloat(v); return isFinite(n) ? n : d; };
   var SYSTEM =
     "You are the RTD wizard for Bridges Industrial, for platinum RTDs per IEC 60751 (alpha 0.00385). Help a field tech by talking, one thing at a time. " +
     "Capture every required value before you compute: the sensor (Pt100, Pt500, or Pt1000; the number is the ice-point resistance R0), the direction (a temperature converted to resistance, or a measured resistance converted to temperature), and the value. For a reference table, capture the sensor and the from, to, and step. " +

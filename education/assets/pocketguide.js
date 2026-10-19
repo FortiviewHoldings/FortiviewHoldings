@@ -1,8 +1,10 @@
 /* ============================================================
    Field Pocket Guide — shared toolkit (classic JS, no build step)
-   Math is the product here, so it stays plain and auditable.
-   Conventions: signals 4-20 mA, % is percent OF SPAN (not reading),
-   temps in degrees C, RTD per IEC 60751, thermocouples per ITS-90.
+   Number helpers and the on-screen numpad. The math itself lives in
+   pg-math.js (scaling, error, square-root, RTD) and tc-core.js
+   (thermocouples), imported as ES modules by every tool page and by
+   the main-site Pulse, so there is exactly one implementation.
+   Conventions: signals 4-20 mA, % is percent OF SPAN (not reading).
    ============================================================ */
 (function () {
   "use strict";
@@ -20,103 +22,6 @@
     if (!isFinite(v)) return "—";
     if (dp == null) dp = 4;
     return String(parseFloat(v.toFixed(dp)));
-  };
-
-  /* ---------------- linear scaling ----------------
-     Map a value on an input span to an output span. This is the
-     spine of every transmitter: % of span is shared by both sides. */
-  PG.scale = function (x, inLo, inHi, outLo, outHi) {
-    if (inHi === inLo) return NaN;
-    return outLo + (x - inLo) * (outHi - outLo) / (inHi - inLo);
-  };
-  PG.pctSpan = function (x, lo, hi) { return hi === lo ? NaN : (x - lo) / (hi - lo) * 100; };
-  PG.fromPct = function (p, lo, hi) { return lo + (p / 100) * (hi - lo); };
-  /* hold a value inside a range, lo/hi given in either order (handles reverse-acting and bipolar) */
-  PG.clamp = function (v, a, b) { var lo = Math.min(a, b), hi = Math.max(a, b); return v < lo ? lo : v > hi ? hi : v; };
-
-  /* ---------------- calibration error (percent OF SPAN) ----------------
-     expected = ideal output for the applied input.
-     error% = (actual - expected) / output-span * 100.
-     The operator types magnitudes only; the sign of the error is
-     produced by the math, never keyed in. */
-  PG.expectedOut = function (input, inLo, inHi, outLo, outHi) {
-    return PG.scale(input, inLo, inHi, outLo, outHi);
-  };
-  PG.errSpan = function (actual, expected, outLo, outHi) {
-    var span = outHi - outLo;
-    if (span === 0) return NaN;
-    return (actual - expected) / span * 100;
-  };
-
-  /* ---------------- square-root extraction (DP flow) ----------------
-     A DP cell measures differential pressure; flow ~ sqrt(DP).
-     %DP is linear in the 4-20 mA of a DP signal; %Flow = sqrt(%DP). */
-  PG.maToPct = function (ma) { return (ma - 4) / 16 * 100; };
-  PG.pctToMa = function (p) { return 4 + (p / 100) * 16; };
-  PG.sqrtExtract = function (pctDP) { return pctDP <= 0 ? 0 : Math.sqrt(pctDP / 100) * 100; }; // %DP -> %Flow
-  PG.sqrtSquare = function (pctFlow) { var f = pctFlow / 100; return f * f * 100; };           // %Flow -> %DP
-
-  /* ---------------- RTD: Pt platinum, IEC 60751 / ITS-90, alpha 0.00385 ---------------- */
-  PG.RTD = {
-    A: 3.9083e-3, B: -5.775e-7, C: -4.183e-12,
-    res: function (t, R0) {                 // temperature C -> resistance ohms
-      R0 = R0 || 100;
-      var A = this.A, B = this.B, C = this.C;
-      if (t >= 0) return R0 * (1 + A * t + B * t * t);
-      return R0 * (1 + A * t + B * t * t + C * (t - 100) * t * t * t);
-    },
-    temp: function (R, R0) {                 // resistance ohms -> temperature C
-      R0 = R0 || 100;
-      var A = this.A, B = this.B;
-      if (R >= R0) {                         // t >= 0: closed-form quadratic root
-        var disc = A * A - 4 * B * (1 - R / R0);
-        if (disc < 0) return NaN;
-        return (-A + Math.sqrt(disc)) / (2 * B);
-      }
-      var t = (R / R0 - 1) / A;              // t < 0: Newton-Raphson from a linear seed
-      for (var i = 0; i < 60; i++) {
-        var f = this.res(t, R0) - R;
-        var d = (this.res(t + 1e-3, R0) - this.res(t - 1e-3, R0)) / 2e-3;
-        if (d === 0) break;
-        var step = f / d; t -= step;
-        if (Math.abs(step) < 1e-7) break;
-      }
-      return t;
-    }
-  };
-
-  /* ---------------- thermocouple: ITS-90, reference junction 0 C ----------------
-     Coefficients are injected (verified) as PG.TC_DATA[type] = {
-       tMin, tMax, subRanges:[{tMinC,tMaxC,coeffs:[c0..cn],expA0,expA1,expA2}], ... }
-     emf returns mV for a temperature; temp inverts emf by bisection over
-     the monotonic range. */
-  PG.TC = {
-    emf: function (type, t) {
-      var d = (PG.TC_DATA || {})[type]; if (!d) return NaN;
-      var r = null, i;
-      for (i = 0; i < d.subRanges.length; i++) {
-        var sr = d.subRanges[i];
-        if (t >= sr.tMinC && t <= sr.tMaxC) { r = sr; break; }
-      }
-      if (!r) return NaN;
-      var e = 0, p = 1;
-      for (i = 0; i < r.coeffs.length; i++) { e += r.coeffs[i] * p; p *= t; }
-      if (r.expA0 != null && isFinite(r.expA0)) {
-        e += r.expA0 * Math.exp(r.expA1 * (t - r.expA2) * (t - r.expA2));
-      }
-      return e;
-    },
-    temp: function (type, mv) {
-      var d = (PG.TC_DATA || {})[type]; if (!d) return NaN;
-      var lo = (d.invMin != null ? d.invMin : d.tMin), hi = d.tMax;
-      var elo = this.emf(type, lo), ehi = this.emf(type, hi);
-      if (mv < Math.min(elo, ehi) - 1e-9 || mv > Math.max(elo, ehi) + 1e-9) return NaN;
-      for (var i = 0; i < 90; i++) {
-        var mid = (lo + hi) / 2, em = this.emf(type, mid);
-        if (em < mv) lo = mid; else hi = mid;
-      }
-      return (lo + hi) / 2;
-    }
   };
 
   /* ---------------- on-screen numpad (no negative key) ----------------

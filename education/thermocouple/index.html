@@ -128,8 +128,11 @@
   </div>
 </main>
 <script src="/education/assets/pocketguide.js"></script>
-<script src="/education/assets/tc-data.js"></script>
-<script>
+<script type="module">
+// The ITS-90 data and reference functions come from the one shared ES module
+// (the same one Pulse uses); helpers and the numpad stay on the global.
+import { TC_DATA, TC } from "/education/assets/tc-core.js";
+const PG = Object.assign({}, window.PG, { TC_DATA, TC });
 (function () {
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var type = "K", mode = "c2mv";
@@ -217,9 +220,10 @@
 })();
 </script>
 <script src="/education/assets/wizard.js"></script>
-<script>
+<script type="module">
+import { TC_DATA, TC } from "/education/assets/tc-core.js";
 (function () {
-  var P = window.PG, N = function (v, d) { var n = parseFloat(v); return isFinite(n) ? n : d; };
+  var P = Object.assign({}, window.PG, { TC_DATA, TC }), N = function (v, d) { var n = parseFloat(v); return isFinite(n) ? n : d; };
   var SYSTEM =
     "You are the Thermocouple wizard for Bridges Industrial, for ITS-90 thermocouples (types J, K, T, E, N, R, S, B). Help a field tech by talking, one thing at a time. " +
     "Capture every required value before you compute: the type letter, the direction (a hot-junction temperature converted to meter millivolts, or a measured millivolt reading converted to temperature), the value, and the cold-junction / reference temperature. " +

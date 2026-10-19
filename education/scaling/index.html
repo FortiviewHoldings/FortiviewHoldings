@@ -89,7 +89,11 @@
   </div>
 </main>
 <script src="/education/assets/pocketguide.js"></script>
-<script>
+<script type="module">
+// The math comes from the one shared ES module; helpers and the numpad stay on
+// the global. Merged so every PG.* call below resolves to the single implementation.
+import * as PGM from "/education/assets/pg-math.js";
+const PG = Object.assign({}, window.PG, PGM);
 (function () {
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var dir = "i2o";
@@ -129,9 +133,10 @@
 })();
 </script>
 <script src="/education/assets/wizard.js"></script>
-<script>
+<script type="module">
+import * as PGM from "/education/assets/pg-math.js";
 (function () {
-  var P = window.PG, N = function (v, d) { var n = parseFloat(v); return isFinite(n) ? n : d; };
+  var P = Object.assign({}, window.PG, PGM), N = function (v, d) { var n = parseFloat(v); return isFinite(n) ? n : d; };
   var SYSTEM =
     "You are the Signal Scaling wizard for Bridges Industrial. You help a field tech set up a linear scaling by talking, not by filling a form. Linear scaling maps an input span to an output span; percent of span is shared by both sides. " +
     "CRITICAL: linear scaling only applies when the two sides are genuinely proportional. A differential pressure mapped to a flow rate is NOT linear, because flow is proportional to the SQUARE ROOT of differential pressure (head-type DP flow). If the input is in differential-pressure units (inches of water, inH2O, mmH2O, a DP cell) and the output is a flow rate (SCFH, SCFM, ACFM, GPM, m3/h and the like), or the reverse, do NOT scale it linearly. Explain that this is a square-root relationship and send the user to the Square-Root Extraction tool at /education/square-root/, which handles DP-to-flow correctly. Only use scale_span for genuinely linear relationships, such as a 4-20 mA signal, a 3-15 psi signal, a temperature span, or an already-linearized flow signal. " +

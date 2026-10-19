@@ -145,7 +145,11 @@
   </div>
 </main>
 <script src="/education/assets/pocketguide.js"></script>
-<script>
+<script type="module">
+// The math comes from the one shared ES module; helpers and the numpad stay on
+// the global. Merged so every PG.* call below resolves to the single implementation.
+import * as PGM from "/education/assets/pg-math.js";
+const PG = Object.assign({}, window.PG, PGM);
 (function () {
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var mode = "sig";
@@ -183,9 +187,10 @@
 })();
 </script>
 <script src="/education/assets/wizard.js"></script>
-<script>
+<script type="module">
+import * as PGM from "/education/assets/pg-math.js";
 (function () {
-  var P = window.PG, N = function (v, d) { var n = parseFloat(v); return isFinite(n) ? n : d; };
+  var P = Object.assign({}, window.PG, PGM), N = function (v, d) { var n = parseFloat(v); return isFinite(n) ? n : d; };
   var SYSTEM =
     "You are the Square-Root Extraction wizard for Bridges Industrial. A DP flow transmitter measures differential pressure, and flow is proportional to the square root of DP. Help a field tech by talking, one thing at a time. " +
     "Capture every required value before you compute: the DP range (low and high), the flow range (low and high), the direction, and the value, plus the units for each range. The three directions are: a DP signal in milliamps you convert to flow (direction=sig), a measured differential pressure VALUE in its units, for example 50 inches of water, you convert to flow (direction=dp), or a flow in engineering units you convert back to the DP signal (direction=flow). If the user gives a differential pressure reading in pressure units (inches of water, mmH2O), that is direction=dp. " +

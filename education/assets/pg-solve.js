@@ -1,35 +1,14 @@
-// Shared, DOM-less solvers for the pocket-guide calculators so the main-site
-// Pulse computes the same numbers the tool pages do. The pages run on the
-// window.PG global (pocketguide.js); this module mirrors that math as ESM the
-// React bundle can import. The primitives below are identical to PG's, and the
-// outputs are verified against the pages. Capture-before-compute lives here too:
-// every required field must be supplied or the solver reports what is missing.
+// DOM-less solvers for the pocket-guide calculators, used by the main-site
+// Pulse. The math itself is imported from pg-math.js, the same module every
+// tool page's form and wizard use, so there is exactly one implementation.
+// Capture-before-compute lives here too: every required field must be supplied
+// or the solver reports what is missing instead of assuming a value.
+import { scale, pctSpan, fromPct, clamp, errSpan, maToPct, pctToMa, sqrtExtract, sqrtSquare, RTD } from "./pg-math.js";
 
 const num = (x) => (x == null || x === "" ? NaN : Number(x));
 const r = (n, d = 4) => (Number.isFinite(n) ? Number(n.toFixed(d)) : n);
 const ok = (...xs) => xs.every(Number.isFinite);
 const missing = (a, keys) => keys.filter((k) => a[k] == null || a[k] === "");
-
-// --- primitives, identical to window.PG ---
-const scale = (x, iLo, iHi, oLo, oHi) => (iHi === iLo ? NaN : oLo + (x - iLo) * (oHi - oLo) / (iHi - iLo));
-const pctSpan = (x, lo, hi) => (hi === lo ? NaN : (x - lo) / (hi - lo) * 100);
-const fromPct = (p, lo, hi) => lo + (p / 100) * (hi - lo);
-const maToPct = (ma) => (ma - 4) / 16 * 100;
-const pctToMa = (p) => 4 + (p / 100) * 16;
-const sqrtExtract = (pDP) => (pDP <= 0 ? 0 : Math.sqrt(pDP / 100) * 100);
-const sqrtSquare = (pF) => { const f = pF / 100; return f * f * 100; };
-
-const RTD = {
-  A: 3.9083e-3, B: -5.775e-7, C: -4.183e-12,
-  res(t, R0) { R0 = R0 || 100; const { A, B, C } = this; return t >= 0 ? R0 * (1 + A * t + B * t * t) : R0 * (1 + A * t + B * t * t + C * (t - 100) * t * t * t); },
-  temp(R, R0) {
-    R0 = R0 || 100; const A = this.A, B = this.B;
-    if (R >= R0) { const disc = A * A - 4 * B * (1 - R / R0); return disc < 0 ? NaN : (-A + Math.sqrt(disc)) / (2 * B); }
-    let t = (R / R0 - 1) / A;
-    for (let i = 0; i < 60; i++) { const f = this.res(t, R0) - R, d = (this.res(t + 1e-3, R0) - this.res(t - 1e-3, R0)) / 2e-3; if (d === 0) break; const step = f / d; t -= step; if (Math.abs(step) < 1e-7) break; }
-    return t;
-  }
-};
 
 const miss = (m) => ({ error: "Missing required inputs: " + m.join(", ") + ". Ask the user for these; do not compute until all are captured.", missing: m });
 
@@ -141,4 +120,74 @@ export function solveRtd(a = {}) {
   const out = { ok: true, sensor: R0, direction: dir, value: r(res, dir === "t2r" ? 3 : 2), unit, full_tool: "/education/rtd/ (open for a printable report or a full table)" };
   if (note) out.note = note;
   return out;
+}
+
+// ---------- CALIBRATION WORKSHEET (As-Found / As-Left, percent of span) ----------
+// expected = the applied input scaled onto the output span, clamped to the output
+// limits (a real signal saturates); error = (measured - expected) / span * 100.
+export const CAL_TOOL = {
+  name: "solve_calibration",
+  description: "Grade a multi-point loop calibration (As-Found / As-Left) as error in percent of span, with a pass/fail verdict. ONLY call this once every required input has been collected from the user: the input range and units applied, the output range and units measured, the tolerance in percent of span, and the As-Found reading at each test point (plus As-Left if the device was adjusted). You may suggest a common value such as a 4-20 mA output but must confirm it; never assume one. If it replies that inputs are missing, ask the user for exactly those.",
+  parameters: {
+    type: "object",
+    properties: {
+      in_low: { type: "number", description: "input range low (LRV) applied" },
+      in_high: { type: "number", description: "input range high (URV) applied" },
+      in_unit: { type: "string", description: "input units, e.g. inH2O, psi, degC" },
+      out_low: { type: "number", description: "output range low measured" },
+      out_high: { type: "number", description: "output range high measured" },
+      out_unit: { type: "string", description: "output units, e.g. mA" },
+      tol: { type: "number", description: "tolerance, percent of span" },
+      rows: {
+        type: "array",
+        description: "one entry per test point, in order",
+        items: {
+          type: "object",
+          properties: {
+            applied: { type: "number", description: "input actually applied at this point" },
+            as_found: { type: "number", description: "output reading before adjustment" },
+            as_left: { type: "number", description: "output reading after adjustment; omit if no adjustment was made" }
+          },
+          required: ["applied", "as_found"]
+        }
+      }
+    },
+    required: ["in_low", "in_high", "in_unit", "out_low", "out_high", "out_unit", "tol", "rows"]
+  }
+};
+export function solveCalibration(a = {}) {
+  const { in_low, in_high, in_unit, out_low, out_high, out_unit, tol, rows } = a;
+  const m = missing(a, ["in_low", "in_high", "in_unit", "out_low", "out_high", "out_unit", "tol"]);
+  if (!Array.isArray(rows) || !rows.length) m.push("rows");
+  if (m.length) return miss(m);
+  const iLo = num(in_low), iHi = num(in_high), oLo = num(out_low), oHi = num(out_high), t = num(tol), span = oHi - oLo;
+  if (!ok(iLo, iHi, oLo, oHi, t)) return { error: "Ranges and tolerance must be numbers." };
+  if (iHi === iLo || span === 0) return { error: "Input and output ranges must each have a nonzero span." };
+  let maxAF = 0, maxAL = 0, haveAF = false, haveAL = false;
+  const out = rows.map((row) => {
+    const applied = num(row.applied), rawExp = scale(applied, iLo, iHi, oLo, oHi), exp = clamp(rawExp, oLo, oHi);
+    const af = (row.as_found == null || row.as_found === "") ? null : num(row.as_found);
+    const al = (row.as_left == null || row.as_left === "") ? null : num(row.as_left);
+    const afErr = af == null ? null : errSpan(af, exp, oLo, oHi);
+    const alErr = al == null ? null : errSpan(al, exp, oLo, oHi);
+    if (afErr != null && ok(afErr)) { haveAF = true; if (Math.abs(afErr) > Math.abs(maxAF)) maxAF = afErr; }
+    if (alErr != null && ok(alErr)) { haveAL = true; if (Math.abs(alErr) > Math.abs(maxAL)) maxAL = alErr; }
+    return {
+      applied: r(applied), percent: r(pctSpan(applied, iLo, iHi), 2),
+      expected: r(exp), saturated: Math.abs(rawExp - exp) > 1e-9,
+      as_found: af == null ? null : r(af), found_err_pct_span: afErr == null ? null : r(afErr, 3),
+      as_left: al == null ? null : r(al), left_err_pct_span: alErr == null ? null : r(alErr, 3)
+    };
+  });
+  let verdict;
+  if (!(t > 0)) verdict = "Set a tolerance";
+  else if (haveAL) verdict = Math.abs(maxAL) <= t ? "PASS, left in tolerance" : "FAIL, out of tolerance";
+  else if (haveAF) verdict = Math.abs(maxAF) <= t ? "Found in tolerance" : "Found out of tolerance, needs adjustment";
+  else verdict = "Enter readings";
+  return {
+    ok: true,
+    setup: `${iLo} to ${iHi} ${in_unit} -> ${oLo} to ${oHi} ${out_unit}, +/-${t}% span, ${rows.length} points`,
+    rows: out, as_found_max_pct_span: haveAF ? r(maxAF, 3) : null, as_left_max_pct_span: haveAL ? r(maxAL, 3) : null,
+    verdict, full_tool: "/education/calibration/ (open to print the worksheet report)"
+  };
 }
