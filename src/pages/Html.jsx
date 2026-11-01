@@ -12,6 +12,9 @@ export default function Html({ html, className, as: Tag = "div" }) {
     if (!href || !href.startsWith("/") || href.startsWith("//")) return;
     if (/\.\w+($|[?#])/.test(href)) return; // real files (.md, images) pass through
     if (a.hasAttribute("target")) return;
+    // The Idea Lab is a separate static sub-site served outside the React app, not a React route.
+    // Intercepting its links 404s (the router has no /idea-lab route), so let them do a full load.
+    if (/^\/idea-lab(\/|$)/.test(new URL(href, window.location.origin).pathname)) return;
     e.preventDefault();
     const url = new URL(href, window.location.origin);
     const path = url.pathname.replace(/\/index\.html$/, "").replace(/(.)\/$/, "$1");
