@@ -65,3 +65,18 @@ export function subjectOf(config, values, isShown) {
 export function mailto(subject, body) {
   return "mailto:" + TO + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
 }
+
+// The fields a form sends to its platform module: every shown field with a value, sanitized exactly as the
+// email body is (single-line values stripped of CR/LF, everything length-capped), plus the composed subject
+// and, when the visitor ticked it, text_ok. Keys are the form's own field names (letters, digits, _ only).
+export function fieldsOf(config, values, isShown, { subject = "", textOk = false } = {}) {
+  const out = {};
+  for (const f of active(config, isShown)) {
+    if (!/^[a-zA-Z_][a-zA-Z0-9_]{0,40}$/.test(f.name)) continue;
+    const v = f.block ? multiLine(values[f.name], f.maxlength || CAP) : oneLine(values[f.name], f.maxlength || 200);
+    if (v) out[f.name] = v;
+  }
+  if (subject) out.subject = oneLine(subject, 160);
+  if (textOk) out.text_ok = "yes";
+  return out;
+}

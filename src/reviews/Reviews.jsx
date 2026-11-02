@@ -44,7 +44,7 @@ function Modal({ onClose }) {
     setToast({ text: "Submitting review…", ok: true });
     try {
       await submitReview({ name, rating, comment });
-      setToast({ text: "Review submitted. Thank you — please allow a moment for it to appear.", ok: true });
+      setToast({ text: "Review submitted. Thank you — it appears once it has been checked.", ok: true });
       setTimeout(onClose, 1600);
     } catch {
       setBusy(false);

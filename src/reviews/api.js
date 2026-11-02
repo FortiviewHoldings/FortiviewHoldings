@@ -1,53 +1,27 @@
-import { ISSUE_OMNITOK } from "./endpoint.js";
+import { submitForm, readItems } from "../platform/doors.js";
 
-// Review submit, two steps: mint a single-use token, then post the review to
-// the endpoint that token authorizes. Same flow the old homepage used; the
-// URL lives in endpoint.js so the platform API can replace it in one place.
-
-function sid() {
-  let s = sessionStorage.getItem("sid");
-  if (!s) {
-    s = crypto.randomUUID();
-    sessionStorage.setItem("sid", s);
-  }
-  return s;
-}
-
-async function getOmniTok(act) {
-  const res = await fetch(ISSUE_OMNITOK, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ act, sid: sid() })
-  });
-  if (!res.ok) throw new Error("token request failed");
-  const data = await res.json();
-  return { ...data, sid: sid() };
-}
+// Reviews live in the PragOptics environment's own reviews table (platform/config.js names the install).
+// A new review is submitted there and shows once it has been approved; the rail reads the approved rows.
+// The static reviews.json shipped with the site is only the fallback when the platform cannot be read.
 
 export async function submitReview({ name, rating, comment }) {
-  const { endpoint, authToken, OmniTok, sid: s } = await getOmniTok("createReview");
-  const res = await fetch(endpoint, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-auth-token": authToken,
-      "X-OmniTok": OmniTok,
-      "X-SID": s
-    },
-    body: JSON.stringify({
-      id: `r-${Date.now()}`,
-      name: name.trim(),
-      rating: Number(rating),
-      comment: comment.trim(),
-      created_at: new Date().toISOString()
-    })
-  });
-  if (!res.ok) throw new Error("review submit failed");
+  await submitForm("reviews", { name: String(name).trim(), rating: String(Number(rating)), comment: String(comment).trim() });
   return true;
 }
 
 export async function loadReviews() {
-  const res = await fetch("/reviews/reviews.json", { cache: "no-store" });
-  if (!res.ok) throw new Error("failed to load reviews");
-  return res.json();
+  try {
+    const items = await readItems("reviews", { limit: 50 });
+    return items.map((i) => ({
+      id: i.id,
+      name: (i.fields && i.fields.name) || "",
+      rating: (i.fields && i.fields.rating) || "5",
+      comment: (i.fields && i.fields.comment) || "",
+      created_at: i.at || ""
+    }));
+  } catch {
+    const res = await fetch("/reviews/reviews.json", { cache: "no-store" });
+    if (!res.ok) throw new Error("failed to load reviews");
+    return res.json();
+  }
 }

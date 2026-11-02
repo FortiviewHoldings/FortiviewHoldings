@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react";
-import { flatten, compose, subjectOf, mailto, looksLikeEmail, TO } from "./compose.js";
+import { useEffect, useMemo, useState } from "react";
+import { flatten, compose, subjectOf, fieldsOf, mailto, looksLikeEmail, TO } from "./compose.js";
+import { PLATFORM } from "../platform/config.js";
+import { submitForm, warm } from "../platform/doors.js";
 
-// The backend is not wired yet, so submit falls back to mailto. One constant
-// to point every form at the mailer later.
-const ENDPOINT = "";
+// A form posts into its own module in the PragOptics environment (platform/config.js names the install
+// per intake key; each lands in its own table). A form with no install there composes an email, as before.
 
 export function useIntake(config, initial = {}) {
   const fields = useMemo(() => flatten(config), [config]);
@@ -14,6 +15,10 @@ export function useIntake(config, initial = {}) {
   const [dump, setDump] = useState("");
   const [pot, setPot] = useState("");
   const [textOk, setTextOk] = useState(false);
+  const install = PLATFORM.installs[config.intake] || "";
+
+  // the platform's challenge is fetched and solved as the form appears, so a send never waits
+  useEffect(() => { if (install) warm(); }, [install]);
 
   const set = (name, value) => setValues((v) => ({ ...v, [name]: value }));
 
@@ -69,11 +74,19 @@ export function useIntake(config, initial = {}) {
     const text = "To: " + TO + "\nSubject: " + subject + "\n\n" + body;
     setDump("");
 
-    if (ENDPOINT) {
+    if (install) {
       setStatus({ text: "Sending…", tone: "ok" });
-      fetch(ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ source: config.intake, ...values }) })
-        .then((r) => { if (!r.ok) throw new Error("bad"); setStatus({ text: "Sent. A specialist replies by email, in the order requests are received.", tone: "ok" }); setValues({}); setCopy(false); })
-        .catch(() => { setCopy(true); setStatus({ text: "That did not go through. Use Copy the details instead, or email " + TO + " directly.", tone: "bad" }); });
+      submitForm(config.intake, fieldsOf(config, values, shown, { subject, textOk }), { hp: pot })
+        .then(() => {
+          setStatus({ text: "Sent. A specialist replies by email, in the order requests are received.", tone: "ok" });
+          setValues({}); setTextOk(false); setCopy(false);
+        })
+        .catch((err) => {
+          // the platform's own sentence when it gave one (a cap, a pause); otherwise a plain refusal. Nothing is lost:
+          // the message is still here to copy and send by email.
+          setCopy(true);
+          setStatus({ text: (err && err.platform && err.message ? err.message : "That did not go through.") + " Use Copy the details instead, or email " + TO + " directly.", tone: "bad" });
+        });
       return;
     }
 
