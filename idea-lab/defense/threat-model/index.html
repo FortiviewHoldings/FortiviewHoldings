@@ -359,7 +359,7 @@
 
   var BASE = 20;           // a working but wide-open site
   var TOP = BASE;
-  RISKS.forEach(function (r) { TOP += r.points; });   // 20 + 100 = 120, capped at 100 below
+  RISKS.forEach(function (r) { TOP += r.points; });   // 20 + 100 = 120, scaled to 100 below
   var fixedCount = 0;
 
   /* ---------- ACT 1: the site notes (live, reflect fixes) ---------- */
@@ -388,9 +388,11 @@
 
   /* ---------- the score meter ---------- */
   function scoreNow() {
-    var s = BASE;
-    RISKS.forEach(function (r) { if (r.fixedNow) s += r.points; });
-    return Math.min(100, s);
+    /* the fixed points fill the 80 between the base and 100, so the
+       score reaches 100 only when all five risks are closed */
+    var got = 0;
+    RISKS.forEach(function (r) { if (r.fixedNow) got += r.points; });
+    return BASE + Math.round(got * (100 - BASE) / (TOP - BASE));
   }
   function renderScore() {
     var s = scoreNow();
@@ -400,11 +402,11 @@
     var hint = document.getElementById("scoreHint");
     num.textContent = s;
     fill.style.width = s + "%";
-    var band = s >= 90 ? "hi" : (s >= 55 ? "mid" : "lo");
+    var open = RISKS.length - fixedCount;   /* Hardened only with no risk left open */
+    var band = open === 0 ? "hi" : (s >= 55 ? "mid" : "lo");
     num.className = "score__num " + band;
     fill.className = band;
-    var open = RISKS.length - fixedCount;
-    if (s >= 90) {
+    if (open === 0) {
       grade.textContent = "Hardened";
       hint.textContent = "All five risks closed. This is a site a defender can stand behind.";
     } else if (s >= 55) {

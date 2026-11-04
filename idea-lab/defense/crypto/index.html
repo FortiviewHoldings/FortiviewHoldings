@@ -119,7 +119,7 @@
        cipher only has 25 keys, so just try them all until one reads like English.</p>
 
     <div class="outbox" id="puzzle" style="text-align:center;font-size:1.25em;margin-bottom:6px"></div>
-    <p class="center muted tiny">Tap a row when you can read it.</p>
+    <p class="center muted tiny" id="crackHint" aria-live="polite">Tap a row when you can read it.</p>
 
     <div class="tries" id="tries"></div>
 
@@ -147,7 +147,7 @@
       <p style="margin:0 0 4px"><b>Caesar cipher:</b> <span class="galaxy-num">25</span> · a few seconds by hand</p>
       <p style="margin:0"><b>Modern key (AES-256):</b> <span class="galaxy-num" id="bigKey"></span></p>
       <p class="muted tiny" style="margin:10px 0 0">That is more keys than there are atoms in the
-        whole visible universe.</p>
+        whole Milky Way galaxy.</p>
     </div>
 
     <div class="fact">
@@ -311,6 +311,7 @@
   document.getElementById("puzzle").textContent = puzzleText;
 
   var triesHost = document.getElementById("tries");
+  var crackHint = document.getElementById("crackHint");
   var picked = false;
   for (var s = 1; s <= 25; s++) {
     (function (by) {
@@ -322,6 +323,12 @@
       btn.addEventListener("click", function () {
         Array.prototype.forEach.call(triesHost.children, function (c) { c.classList.remove("is-pick"); });
         btn.classList.add("is-pick");
+        /* only the real key cracks it: any other row is still gibberish */
+        if (by !== SECRET_SHIFT) {
+          crackHint.textContent = "Shift back " + by + " is still gibberish. Try another row.";
+          return;
+        }
+        crackHint.textContent = "Shift back " + by + " reads like English. That is the key.";
         if (!picked) {
           picked = true;
           hasCracked = true;

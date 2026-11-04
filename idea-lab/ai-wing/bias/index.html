@@ -156,9 +156,9 @@
 
       <div class="fact" id="lesson1" style="margin-top:16px">
         <span aria-hidden="true">⚖️</span>
-        <span><b>Look at the gap.</b> It is great at cats and bad at dogs. It is not broken, and it is not
+        <span><b id="lesson1Head">Look at the gap.</b> <span id="lesson1Why">It is great at cats and bad at dogs. It is not broken, and it is not
         mean. It just saw mostly cats, so "cat" became its safe guess. Lopsided examples make a lopsided
-        sorter. People have a real name for this: <b>bias</b>.</span>
+        sorter.</span> People have a real name for this: <b>bias</b>.</span>
       </div>
     </div>
 
@@ -213,8 +213,8 @@
 
       <div class="fact hidden" id="lesson2" style="margin-top:16px">
         <span aria-hidden="true">✨</span>
-        <span><b>Same sorter. Same animals. Fairer examples.</b> The dog score jumped, and the gap
-        closed. You did not make it smarter. You made its examples fair, and the sorter followed.</span>
+        <span><b>Same sorter. Same animals. Fairer examples.</b> <span id="lesson2Gap">The dog score jumped, and the gap
+        closed.</span> You did not make it smarter. You made its examples fair, and the sorter followed.</span>
       </div>
     </div>
 
@@ -240,7 +240,7 @@
     <div class="fact">
       <span aria-hidden="true">⚖️</span>
       <span><b>This matters in the real world.</b> Real AI sorts job forms, photos, and voices. When its
-      examples leave a group out, it gets that group wrong, the same way your sorter missed dogs. People
+      examples leave a group out, it gets that group wrong, <span id="missedNote">the same way a sorter fed cats and only one dog calls every dog a cat</span>. People
       whose job is to build AI well spend a lot of time checking that the examples are fair.</span>
     </div>
 
@@ -426,10 +426,37 @@
     }
   });
 
+  /* the act 1 lesson says what this basket really did. This sorter lands on one of
+     three results: every new animal right, every one called "cat" (dogs missed), or
+     every one called "dog" (cats missed). The words follow the result and the basket,
+     and act 3 names the kind this sorter really missed */
+  var lesson1Head = document.getElementById("lesson1Head");
+  var lesson1Why = document.getElementById("lesson1Why");
+  var missedNote = document.getElementById("missedNote");
+  function gapWhy(kept, missed, nKept, nMissed) {
+    return "It is great at " + kept + "s and bad at " + missed + "s. It is not broken, and it is not mean. " +
+      (nMissed === 0
+        ? "It never saw a " + missed + ", so \"" + kept + "\" is the only answer it knows. Lopsided examples make a lopsided sorter."
+        : nKept > nMissed
+          ? "It just saw mostly " + kept + "s, so \"" + kept + "\" became its safe guess. Lopsided examples make a lopsided sorter."
+          : "It saw too few of each kind to tell them apart, so it fell back on \"" + kept + "\". Too few examples make a lopsided sorter too.");
+  }
+  function explainAct1(r, n) {
+    var missed = r.rightDog < r.rightCat ? "dog" : r.rightCat < r.rightDog ? "cat" : "";
+    lesson1Head.textContent = missed ? "Look at the gap." : "No gap this time.";
+    lesson1Why.textContent = missed === "dog" ? gapWhy("cat", "dog", n.cat, n.dog)
+      : missed === "cat" ? gapWhy("dog", "cat", n.dog, n.cat)
+      : "It got every new cat and dog right: your basket had enough of both kinds to learn each one. " +
+        "With only one dog in the basket, it would call every dog a cat. A lopsided basket makes a lopsided sorter.";
+    missedNote.textContent = missed ? "the same way your sorter missed " + missed + "s"
+      : "the same way a sorter fed cats and only one dog calls every dog a cat";
+  }
+
   var act1Result = null;
   document.getElementById("test1").addEventListener("click", function () {
     document.getElementById("result1").classList.remove("hidden");
     act1Result = runTest(t1.examples(), "bench1", "acc1", "pk1cat", "pk1dog");
+    explainAct1(act1Result, t1.counts());
     document.getElementById("a1Next").disabled = false;
     document.getElementById("a1Next").scrollIntoView({ behavior: "smooth", block: "center" });
   });
@@ -448,15 +475,15 @@
     }
   });
 
-  // seed act 2 so the kid starts from the SAME lopsided basket they made,
-  // then fixes it. We pre-load a lopsided start (5 cats, 1 dog) visually
-  // by simulating clicks, so balancing is the action they take here.
+  // seed act 2 with a lopsided start (5 cats, 1 dog), pre-loaded visually
+  // by simulating clicks, so balancing is the action they take here. It is
+  // the same start for everyone, not the basket the kid made in act 1.
   (function seedAct2() {
     var feedCat = document.getElementById("feed2cat"), feedDog = document.getElementById("feed2dog");
     var i;
     for (i = 0; i < 5; i++) feedCat.click();
     feedDog.click();
-    balanceMsg.textContent = "This is the lopsided basket from before: 5 cats, 1 dog. Add dogs to balance it.";
+    balanceMsg.textContent = "Here is a lopsided basket to fix: 5 cats, 1 dog. Add dogs to balance it.";
   })();
 
   document.getElementById("test2").addEventListener("click", function () {
@@ -467,8 +494,19 @@
     var counts = t2.counts();
     var balanced = Math.abs(counts.cat - counts.dog) <= 1 && counts.dog >= 3;
     var improvedDogs = act1Result ? (r.rightDog > act1Result.rightDog) : (r.rightDog >= 2);
+    var improvedCats = act1Result ? (r.rightCat > act1Result.rightCat) : false;
+    /* a balanced basket that sorts every test animal right has done the job, even when
+       the first basket was already fair and the dog score had no room to jump */
+    var allRight = r.pct === 100;
 
-    if (balanced && improvedDogs) {
+    if (balanced && (improvedDogs || allRight)) {
+      /* say which side the gap was on: a first basket heavy on dogs left the cats wrong,
+         and "stays closed" is only true when the first basket already sorted everything right */
+      document.getElementById("lesson2Gap").textContent = improvedDogs
+        ? "The dog score jumped, and the gap closed."
+        : improvedCats
+          ? "The cat score jumped, and the gap closed."
+          : "Every dog sorts right, and the gap stays closed.";
       document.getElementById("lesson2").classList.remove("hidden");
       IdeaLab.award("fair-mind", 50);
     } else if (!balanced) {

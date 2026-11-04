@@ -220,17 +220,22 @@
     var bits = pw.length * (Math.log(p) / Math.log(2));
     var log10sec = bits * Math.log10(2) - 9;             /* a billion guesses per second */
     var verdict, color, strong = false;
-    if (bits < 28)      { verdict = "Weak";        color = "var(--bad)"; }
+    /* Weak is anything cracked in under a second at that rate (under
+       about 30 bits), so Okay never sits next to "less than a second" */
+    if (log10sec < 0)   { verdict = "Weak";        color = "var(--bad)"; }
     else if (bits < 40) { verdict = "Okay";        color = "var(--warn)"; }
     else if (bits < 60) { verdict = "Strong";      color = "var(--good)"; strong = true; }
     else                { verdict = "Very strong"; color = "var(--plasma)"; strong = true; }
     var pct = Math.max(6, Math.min(100, Math.round(bits / 72 * 100)));
     var why = pw.length < 12 ? "Good start. Longer is stronger: try a few random words."
                              : "Long and unpredictable. This is the good stuff.";
-    /* one word plus a few digits is a pattern crackers try fast, even if the math looks okay */
-    if (/^[A-Za-z]{3,}[0-9!@#$%^&*]{0,4}$/.test(pw) && pw.length < 14) {
+    /* one word plus a few digits is a pattern crackers try fast, even if the math looks okay
+       (only when it looks okay: a result the math already calls Weak stays Weak) */
+    if (verdict !== "Weak" && /^[A-Za-z]{3,}[0-9!@#$%^&*]{0,4}$/.test(pw) && pw.length < 14) {
       verdict = "Okay"; color = "var(--warn)"; strong = false; pct = Math.min(pct, 52);
-      why = "A word plus a few numbers is a pattern guessers try fast. Add more random words.";
+      why = /[^A-Za-z]/.test(pw)
+        ? "A word plus a few numbers is a pattern guessers try fast. Add more random words."
+        : "A single word is a pattern guessers try fast. Add more random words.";
     }
     return { pct:pct, color:color, verdict:verdict, time:humanTime(log10sec), why:why, strong:strong };
   }

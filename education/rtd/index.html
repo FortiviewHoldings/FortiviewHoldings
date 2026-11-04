@@ -66,6 +66,7 @@
         <div class="pg-field"><label class="pg-field__label" id="valLabel" for="valIn">Temperature <span class="u">(°C)</span></label><div class="pg-inwrap"><input class="pg-num" id="valIn" value="100"><button class="pg-sign" type="button" data-sign="#valIn">±</button></div></div>
         <div class="pg-field"><label class="pg-field__label" id="resLabel">Resistance</label><div class="pg-out is-good" id="resV" style="min-height:48px;align-items:center"><span>—</span><span class="pg-out__u" id="resU">Ω</span></div></div>
       </div>
+      <p class="pg-tablenote" id="convNote" hidden></p>
     </section>
 
     <section class="pg-tool">
@@ -109,12 +110,21 @@ const PG = Object.assign({}, window.PG, PGM);
     anchors.forEach(function (a) { html += '<span class="pg-chip ok">' + a.t + "°C = " + PG.fmt(a.r, 2) + " Ω</span>"; });
     $("#selfTest").innerHTML = html;
   }
+  // a conversion outside IEC 60751 is refused, with the valid range in words, the same range the table clamps to
   function compute() {
-    var v = PG.num($("#valIn").value), res, u;
-    if (mode === "t2r") { res = PG.RTD.res(v, R0); $("#resLabel").textContent = "Resistance"; u = "Ω"; }
-    else { res = PG.RTD.temp(v, R0); $("#resLabel").textContent = "Temperature"; u = "°C"; }
+    var v = PG.num($("#valIn").value), res, u, note = "";
+    if (mode === "t2r") {
+      res = (v < TMIN || v > TMAX) ? NaN : PG.RTD.res(v, R0); $("#resLabel").textContent = "Resistance"; u = "Ω";
+      if (PG.ok(v) && !PG.ok(res)) note = "Enter a temperature within −200 to 850 °C (IEC 60751).";
+    } else {
+      res = PG.RTD.temp(v, R0); $("#resLabel").textContent = "Temperature"; u = "°C";
+      if (!(res >= TMIN - 0.005 && res <= TMAX + 0.005)) res = NaN; // held to the 0.01 °C shown
+      if (PG.ok(v) && !PG.ok(res)) note = "Enter a resistance within " + PG.fmt(PG.RTD.res(TMIN, R0), 2) + " to " + PG.fmt(PG.RTD.res(TMAX, R0), 2) + " Ω, −200 to 850 °C on a Pt" + R0 + " (IEC 60751).";
+    }
     $("#resV").querySelector("span").textContent = isFinite(res) ? PG.fmt(res, mode === "t2r" ? 3 : 2) : "—";
+    $("#resV").classList.toggle("is-good", isFinite(res));
     $("#resU").textContent = u;
+    $("#convNote").textContent = note; $("#convNote").hidden = !note;
   }
   function table() {
     var from = PG.num($("#tFrom").value), to = PG.num($("#tTo").value), step = PG.num($("#tStep").value);

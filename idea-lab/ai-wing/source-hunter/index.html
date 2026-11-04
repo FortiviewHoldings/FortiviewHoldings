@@ -243,10 +243,13 @@
       '<span class="res"></span>';
     card.querySelectorAll(".ebtn").forEach(function (btn) {
       btn.addEventListener("click", function () {
+        /* grade each card once: a graded card ignores any further click or key press */
+        if (card.classList.contains("graded")) return;
         var said = btn.dataset.v === "1";
         var right = said === ev.trust;
         card.classList.add("graded", right ? "correct" : "wrong");
         card.querySelector(".res").textContent = (right ? "Right. " : "Careful. ") + ev.r;
+        card.querySelectorAll(".ebtn").forEach(function (b) { b.disabled = true; });
         graded++;
         if (graded === evidence.length) {
           document.getElementById("a2Lesson").classList.remove("hidden");

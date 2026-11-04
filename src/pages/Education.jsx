@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { GUIDES } from "../data/guides.js";
+import { GUIDES, questionCount } from "../data/guides.js";
 import { TOOLS } from "../data/tools.js";
 import SearchBox from "../search/SearchBox.jsx";
 import Pulse from "../pulse/Pulse.jsx";
+import { useHead } from "../useHead.js";
 
 export default function Education() {
   const [mode, setMode] = useState("search");
-  useEffect(() => { document.title = "Field Pocket Guide | Bridges Industrial"; }, []);
+  useHead("/education");
 
   return (
     <div className="pg-main">
@@ -46,7 +47,7 @@ export default function Education() {
               <Link to={"/education/" + g.slug + "/"} key={g.slug}>
                 <span className="pg-lib__t">
                   <b>{g.title}</b>
-                  <span>{g.sections.length} questions</span>
+                  <span>{questionCount(g)} questions</span>
                 </span>
               </Link>
             ))}

@@ -30,7 +30,7 @@
     <header class="pg-head">
       <a class="pg-back" href="/education/">Field Pocket Guide</a>
       <h1 class="fv-h2">Calibration Error</h1>
-      <p class="fv-lead">Apply your standard, record the output. The worksheet returns error as <b>percent of span</b>, not percent of reading, with the sign handled for you. You only ever key in the magnitude you read.</p>
+      <p class="fv-lead">Apply your standard, record the output. The worksheet returns error as <b>percent of span</b>, not percent of reading, with the error's sign handled for you. You only ever key in the magnitude you read, and tap <span style="color:var(--amber)">±</span> for a reading below zero.</p>
     </header>
 
     <div class="pgw-modes" role="tablist" aria-label="Tool mode">
@@ -94,7 +94,7 @@
     <!-- WORKSHEET -->
     <section class="pg-tool">
       <h2 class="pg-tool__title"><span class="pg-dot"></span> Worksheet</h2>
-      <p class="pg-tool__sub">Enter the <b>applied input</b> you actually put in and the worksheet computes that row's <b>expected output</b>, then grades the <b>As-Found</b> (before adjustment) and <b>As-Left</b> (after) readings. The point buttons seed the set points; your <b>tolerance caps how far an applied input can stray</b> from its set point, so a reading can't be hidden by fudging the input. Stray past it and the value snaps back to the band edge.</p>
+      <p class="pg-tool__sub">Enter the <b>applied input</b> you actually put in and the worksheet computes that row's <b>expected output</b>, then grades the <b>As-Found</b> (before adjustment) and <b>As-Left</b> (after) readings. The point buttons seed the set points; your <b>tolerance caps how far an applied input can stray</b> from its set point, so a reading can't be hidden by fudging the input. Stray past it and the value snaps back to the band edge. A reading below zero takes the <span style="color:var(--amber)">±</span> beside it.</p>
 
       <div class="pg-table-wrap">
         <table class="pg-table pg-table--stack">
@@ -232,35 +232,58 @@ const PG = Object.assign({}, window.PG, PGM);
     }
   }
 
+  // seed each row's set point and applied input across the input range; the readings stay as keyed
+  function seed() {
+    var c = cfg(), ps = pointList(pts), good = PG.ok(c.inLo, c.inHi);
+    wsBody.querySelectorAll("tr").forEach(function (tr, i) {
+      var nom = good ? PG.fromPct(ps[i], c.inLo, c.inHi) : 0, el = tr.querySelector(".inIn");
+      tr.dataset.nom = nom;
+      el.value = good ? PG.fmtTrim(nom, 6) : "";
+      el.classList.toggle("is-neg", el.value.charAt(0) === "-");
+      el.classList.remove("pg-oob");
+    });
+  }
+
   function build() {
-    var c = cfg(), ps = pointList(pts), html = "";
-    ps.forEach(function (p) {
-      var nom = PG.ok(c.inLo, c.inHi) ? PG.fromPct(p, c.inLo, c.inHi) : 0;
-      var seed = PG.ok(c.inLo, c.inHi) ? PG.fmtTrim(nom, 6) : "";
+    var html = "";
+    pointList(pts).forEach(function () {
       html +=
-        '<tr data-nom="' + nom + '">' +
-          '<td data-label="Applied input"><input class="pg-num inIn" value="' + seed + '"></td>' +
+        '<tr>' +
+          '<td data-label="Applied input"><input class="pg-num inIn"></td>' +
           '<td class="pctCell" data-label="%">—</td>' +
           '<td class="expOut is-strong" data-label="Expected">—</td>' +
-          '<td data-label="As-Found"><input class="pg-num afIn" placeholder="—"></td>' +
+          '<td data-label="As-Found"><div class="pg-inwrap"><input class="pg-num afIn" placeholder="—"><button class="pg-sign" type="button" aria-label="As-Found sign">±</button></div></td>' +
           '<td class="afErr" data-label="Found err">—</td>' +
-          '<td data-label="As-Left"><input class="pg-num alIn" placeholder="—"></td>' +
+          '<td data-label="As-Left"><div class="pg-inwrap"><input class="pg-num alIn" placeholder="—"><button class="pg-sign" type="button" aria-label="As-Left sign">±</button></div></td>' +
           '<td class="alErr" data-label="Left err">—</td>' +
         '</tr>';
     });
     wsBody.innerHTML = html;
+    seed();
     wsBody.querySelectorAll(".inIn").forEach(function (el) {
-      if (el.value.charAt(0) === "-") el.classList.add("is-neg");
       el.addEventListener("blur", function () { clampApplied(el); });
     });
     PG.pad.init(wsBody);
     compute();
   }
 
-  function setErr(el, err, tol) {
+  // a reading is keyed as the magnitude on the meter; the ± beside it sets its sign, the same
+  // toggle the range fields use. The sign is the tech's, never inferred from the row.
+  wsBody.addEventListener("click", function (e) {
+    var b = e.target.closest(".pg-sign"); if (!b) return;
+    var el = b.parentNode.querySelector(".pg-num"), v = el.value || "";
+    if (v.charAt(0) === "-") v = v.slice(1); else if (v !== "" && parseFloat(v) !== 0) v = "-" + v;
+    PG.pad.set(el, v);
+  });
+  function signBtn(el) { el.parentNode.querySelector(".pg-sign").classList.toggle("is-neg", el.value.charAt(0) === "-"); }
+
+  // a signed error to dp places, rounded on the value as written
+  function pctDp(v, dp) { var r = PG.roundTo(v, dp); return (r >= 0 ? "+" : "") + PG.fmt(r, dp); }
+
+  function setErr(el, err, tol, dp) {
     el.classList.remove("err-ok", "err-warn", "err-bad");
     if (!PG.ok(err)) { el.textContent = "—"; return; }
-    el.textContent = (err >= 0 ? "+" : "") + PG.fmt(err, 3) + "%";
+    el.textContent = pctDp(err, dp) + "%";
     if (PG.ok(tol) && tol > 0) {
       var a = Math.abs(err);
       el.classList.add(a <= tol ? "err-ok" : a <= tol * 2 ? "err-warn" : "err-bad");
@@ -274,7 +297,7 @@ const PG = Object.assign({}, window.PG, PGM);
     $("#hAF").textContent = "As-Found" + (c.outU ? " (" + c.outU + ")" : "");
     $("#hAL").textContent = "As-Left" + (c.outU ? " (" + c.outU + ")" : "");
 
-    var maxAF = 0, maxAL = 0, hAF = false, hAL = false, bnd = band(c);
+    var maxAF = 0, maxAL = 0, hAF = false, hAL = false, bnd = band(c), dp = PG.errPlaces(c.tol);
     wsBody.querySelectorAll("tr").forEach(function (tr) {
       var inEl = tr.querySelector(".inIn");
       var applied = PG.num(inEl.value);
@@ -287,25 +310,29 @@ const PG = Object.assign({}, window.PG, PGM);
       var expCell = tr.querySelector(".expOut");
       expCell.textContent = PG.ok(exp) ? PG.fmtTrim(exp, 4) : "—";
       expCell.classList.toggle("is-sat", PG.ok(rawExp) && Math.abs(rawExp - exp) > 1e-9);
-      var af = PG.num(tr.querySelector(".afIn").value);
-      var al = PG.num(tr.querySelector(".alIn").value);
-      var afErr = PG.errSpan(af, exp, c.outLo, c.outHi);
-      var alErr = PG.errSpan(al, exp, c.outLo, c.outHi);
-      setErr(tr.querySelector(".afErr"), afErr, c.tol);
-      setErr(tr.querySelector(".alErr"), alErr, c.tol);
+      var afEl = tr.querySelector(".afIn"), alEl = tr.querySelector(".alIn");
+      signBtn(afEl); signBtn(alEl);
+      var af = PG.num(afEl.value);
+      var al = PG.num(alEl.value);
+      // each error is graded as it is shown, to the tolerance's own places and never fewer than 3,
+      // so a value shown at the tolerance is in it
+      var afErr = PG.roundTo(PG.errSpan(af, exp, c.outLo, c.outHi), dp);
+      var alErr = PG.roundTo(PG.errSpan(al, exp, c.outLo, c.outHi), dp);
+      setErr(tr.querySelector(".afErr"), afErr, c.tol, dp);
+      setErr(tr.querySelector(".alErr"), alErr, c.tol, dp);
       if (PG.ok(afErr)) { hAF = true; if (Math.abs(afErr) > Math.abs(maxAF)) maxAF = afErr; }
       if (PG.ok(alErr)) { hAL = true; if (Math.abs(alErr) > Math.abs(maxAL)) maxAL = alErr; }
     });
-    summary("#sumAF", maxAF, hAF, c.tol);
-    summary("#sumAL", maxAL, hAL, c.tol);
+    summary("#sumAF", maxAF, hAF, c.tol, dp);
+    summary("#sumAL", maxAL, hAL, c.tol, dp);
     verdict(c.tol, maxAL, hAL, maxAF, hAF);
   }
 
-  function summary(sel, v, have, tol) {
+  function summary(sel, v, have, tol, dp) {
     var el = $(sel); el.classList.remove("is-good", "is-bad", "is-warn");
     var num = el.querySelector("span");
     if (!have) { num.textContent = "—"; return; }
-    num.textContent = (v >= 0 ? "+" : "") + PG.fmt(v, 3);
+    num.textContent = pctDp(v, dp);
     if (PG.ok(tol) && tol > 0) {
       var a = Math.abs(v);
       el.classList.add(a <= tol ? "is-good" : a <= tol * 2 ? "is-warn" : "is-bad");
@@ -332,7 +359,11 @@ const PG = Object.assign({}, window.PG, PGM);
     build();
   });
 
-  document.addEventListener("input", compute);
+  // a change to the input range moves the set points, so re-seed them before grading
+  document.addEventListener("input", function (e) {
+    if (e.target && (e.target.id === "inLo" || e.target.id === "inHi")) seed();
+    compute();
+  });
   if (document.readyState !== "loading") build(); else document.addEventListener("DOMContentLoaded", build);
 })();
 </script>
@@ -389,7 +420,7 @@ import * as PGM from "/education/assets/pg-math.js";
     var rows = a.rows;
     if (!P.ok(inLo, inHi, outLo, outHi, tol)) return { error: "The ranges and tolerance must all be numbers." };
     if (inHi === inLo || outHi === outLo) return { error: "Check the input and output ranges; low and high must each differ." };
-    var maxAF = 0, maxAL = 0, haveAF = false, haveAL = false;
+    var maxAF = 0, maxAL = 0, haveAF = false, haveAL = false, dp = P.errPlaces(tol);
     function grade(err) { var x = Math.abs(err); return x <= tol ? "ok" : (x <= tol * 2 ? "warn" : "bad"); }
     var out = rows.map(function (r) {
       var applied = N(r.applied, NaN);
@@ -398,14 +429,15 @@ import * as PGM from "/education/assets/pg-math.js";
       var pct = P.pctSpan(applied, inLo, inHi);
       var af = (r.as_found == null || r.as_found === "") ? null : N(r.as_found, NaN);
       var al = (r.as_left == null || r.as_left === "") ? null : N(r.as_left, NaN);
-      var afErr = af == null ? null : P.errSpan(af, exp, outLo, outHi);
-      var alErr = al == null ? null : P.errSpan(al, exp, outLo, outHi);
+      // graded as shown, to the tolerance's own places and never fewer than 3, the same as the worksheet
+      var afErr = af == null ? null : P.roundTo(P.errSpan(af, exp, outLo, outHi), dp);
+      var alErr = al == null ? null : P.roundTo(P.errSpan(al, exp, outLo, outHi), dp);
       if (afErr != null && isFinite(afErr)) { haveAF = true; if (Math.abs(afErr) > Math.abs(maxAF)) maxAF = afErr; }
       if (alErr != null && isFinite(alErr)) { haveAL = true; if (Math.abs(alErr) > Math.abs(maxAL)) maxAL = alErr; }
       return {
         applied: P.fmtTrim(applied, 4), pct: P.fmt(pct, 2), exp: P.fmtTrim(exp, 4), sat: sat,
-        af: af == null ? "—" : P.fmtTrim(af, 4), afErr: afErr == null ? "—" : P.fmt(afErr, 3),
-        al: al == null ? "—" : P.fmtTrim(al, 4), alErr: alErr == null ? "—" : P.fmt(alErr, 3)
+        af: af == null ? "—" : P.fmtTrim(af, 4), afErr: afErr == null ? "—" : P.fmt(afErr, dp),
+        al: al == null ? "—" : P.fmtTrim(al, 4), alErr: alErr == null ? "—" : P.fmt(alErr, dp)
       };
     });
     var verdict;
@@ -417,7 +449,7 @@ import * as PGM from "/education/assets/pg-math.js";
       ", +/-" + tol + "% span, " + rows.length + " points";
     return {
       ok: true, setup: setup, rows: out, in_unit: inU, out_unit: outU,
-      max_found: haveAF ? P.fmt(maxAF, 3) : "—", max_left: haveAL ? P.fmt(maxAL, 3) : "—", verdict: verdict
+      max_found: haveAF ? P.fmt(maxAF, dp) : "—", max_left: haveAL ? P.fmt(maxAL, dp) : "—", verdict: verdict
     };
   }
   function worksheetRows(r) {

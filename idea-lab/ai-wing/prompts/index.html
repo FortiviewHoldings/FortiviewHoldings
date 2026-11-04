@@ -317,7 +317,7 @@
     var w = labelOf(WHOS, pick.who);
     promptBox.innerHTML =
       "Write " +
-      slot(l || "[a length]", !!l) + " about " +
+      slot(l ? l.toLowerCase() : "[a length]", !!l) + " about " +
       slot(t ? t.toLowerCase() : "[a topic]", !!t) + " for " +
       slot(w ? w.toLowerCase() : "[who it is for]", !!w) + ".";
 

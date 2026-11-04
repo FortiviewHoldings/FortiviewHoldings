@@ -248,10 +248,13 @@ img{max-width:100%}
 .wordchip{font:inherit;font-size:.85em;font-weight:700;color:var(--plasma);background:#0c142880;
   border:1px solid var(--border);border-radius:999px;padding:6px 12px;cursor:pointer}
 .wordchip:hover{color:#04060d;background:var(--plasma);border-color:transparent}
+/* the overlay scrolls when a card is taller than the screen (a phone held sideways), so
+   the source link and Got it stay reachable; margin:auto centers a card that fits and
+   starts a taller one at the top */
 .il-modal{position:fixed;inset:0;z-index:90;display:none;place-items:center;padding:18px;
-  background:#04060dcc;backdrop-filter:blur(5px)}
+  background:#04060dcc;backdrop-filter:blur(5px);overflow-y:auto;overscroll-behavior:contain}
 .il-modal.open{display:grid}
-.il-modal__card{max-width:540px;width:100%;border:1px solid var(--border);border-radius:var(--radius);
+.il-modal__card{max-width:540px;width:100%;margin:auto;border:1px solid var(--border);border-radius:var(--radius);
   background:#0c1428;padding:24px;box-shadow:0 30px 80px #000b}
 .il-modal__card h3{margin:.1em 0 .45em;font-size:1.35em}
 .il-modal__short{font-weight:700;color:var(--ink);margin:0 0 12px}
@@ -320,6 +323,19 @@ img{max-width:100%}
   .il-nav__links a{flex:0 0 auto;white-space:nowrap}
   .gate{grid-template-columns:1fr;text-align:center}
   .act__nav .btn{padding:12px 16px}
+}
+/* a phone held sideways: little height to spare. Keep the nav to one row: the wing
+   links become the same sideways-scrolling row as on a portrait phone, between the
+   brand and the rank, instead of wrapping onto extra rows. Touch screens only: a short
+   desktop window used with a mouse keeps the wrapped links, all in reach of the mouse.
+   The row's 5px padding (top and bottom taken back by the negative margins) and its
+   scroll padding keep a focused link's ring, 3px drawn 2px out, inside the row */
+@media (max-height:500px) and (pointer:coarse){
+  .il-nav__inner{flex-wrap:nowrap}
+  .il-nav__links{margin:-5px 0 -5px auto;padding:5px;scroll-padding-inline:5px;width:auto;flex:0 1 auto;min-width:0;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .il-nav__links::-webkit-scrollbar{display:none}
+  .il-nav__links a{flex:0 0 auto;white-space:nowrap}
+  .il-nav__rank{flex:0 0 auto;white-space:nowrap}
 }
 
 /* ---------- motion safety ---------- */

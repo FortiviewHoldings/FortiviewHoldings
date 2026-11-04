@@ -41,7 +41,7 @@ window.IDEA_LAB = {
         { key: "logic-gates", level: "spark", status: "live", href: "logic-gates/", badge: "first-light",
           icon: "\u{1FAA8}", name: "Grain of Sand to Logic Gate", tagline: "Cosmic web to atom, sand to a switch, switches to gates and code." },
         { key: "binary", level: "spark", status: "live", href: "binary/", badge: "binary-coder",
-          icon: "\u{1F522}", name: "Binary: count in 1s and 0s", tagline: "Flip switches to count, and spell your name in bits." },
+          icon: "\u{1F522}", name: "Binary: count in 1s and 0s", tagline: "Flip switches to count, and see the letter A in bits." },
         { key: "adder", level: "spark", status: "live", href: "adder/", badge: "adder-architect",
           icon: "➕", name: "The Adder", tagline: "Wire gates into a circuit that adds two real numbers." },
         { key: "memory", level: "spark", status: "live", href: "memory/", badge: "memory-keeper",

@@ -1,6 +1,6 @@
 // Per-route head data and the list of routes to prerender. One source for the
 // build-time prerender and any client-side title updates.
-import { GUIDES } from "./data/guides.js";
+import { GUIDES, questions } from "./data/guides.js";
 import home from "./data/home.json";
 import industrial from "./data/pages/industrial.json";
 import instrumentSupport from "./data/pages/instrument-support.json";
@@ -51,7 +51,7 @@ function leadAnswer(section) {
 }
 
 function guideFaqJsonld(g) {
-  const qa = (g.sections || [])
+  const qa = questions(g)
     .map((s) => ({ q: s.question, a: leadAnswer(s) }))
     .filter((x) => x.q && x.a);
   if (!qa.length) return null;

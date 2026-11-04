@@ -303,7 +303,7 @@
 
   var active = 0;     /* index of the case being investigated */
   var ran = {};       /* per-case set of checks run: ran[caseIndex] = {reverse:true,...} */
-  var decided = {};   /* per-case: did the kid already decide */
+  var decided = {};   /* per-case: the call the kid made on it ("trust" or "doubt") */
   var awarded = false;
 
   /* the picker buttons */
@@ -384,8 +384,8 @@
     var n = ranTotal();
     ranCountEl.textContent = n;
     var enough = n >= 2;
-    trustBtn.disabled = !enough || decided[active];
-    doubtBtn.disabled = !enough || decided[active];
+    trustBtn.disabled = !enough || !!decided[active];
+    doubtBtn.disabled = !enough || !!decided[active];
 
     /* Award once the kid has checked an image with at least two methods. */
     if (enough && !awarded) {
@@ -393,7 +393,9 @@
       IdeaLab.award("truth-tracer", 50);
     }
 
-    if (!decided[active]) {
+    if (decided[active]) {
+      showVerdict();
+    } else {
       vfb.textContent = enough
         ? "Two or more signals are in. Weigh them, then make the call."
         : "Run at least two checks. One signal is never enough to decide.";
@@ -401,15 +403,21 @@
     }
   }
 
-  function decide(choice) {
-    if (trustBtn.disabled && choice === "trust") return;
-    if (doubtBtn.disabled && choice === "doubt") return;
+  /* each image keeps its own verdict: show the call made on the image in view */
+  function showVerdict() {
     var c = CASES[active];
-    decided[active] = true;
+    var choice = decided[active];
     /* "mixed" verdicts are honestly resolved as doubt: when unsure, doubt */
     var right = (c.verdict === "trust") ? (choice === "trust") : (choice === "doubt");
     vfb.innerHTML = (right ? "✅ Good call. " : "🤔 Look again. ") + IdeaLab.esc(c.why);
     vfb.className = "vfb " + (right ? "ok" : "no");
+  }
+
+  function decide(choice) {
+    if (trustBtn.disabled && choice === "trust") return;
+    if (doubtBtn.disabled && choice === "doubt") return;
+    decided[active] = choice;
+    showVerdict();
     trustBtn.disabled = true;
     doubtBtn.disabled = true;
     a1Next.disabled = false;

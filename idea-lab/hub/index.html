@@ -85,22 +85,31 @@
   IdeaLab.nav(null, "..");
   IdeaLab.disclosure("il-disclose-mount");
 
-  /* rank line */
-  var r = IdeaLab.rank(), nx = IdeaLab.nextRank();
-  document.getElementById("rankLine").textContent = r.name + " · " + IdeaLab.xp() + " XP";
-  document.getElementById("nextLine").textContent = nx
-    ? (nx.min - IdeaLab.xp()) + " XP to " + nx.name
-    : "Top rank reached. You are a Quasar.";
-
-  /* badge shelf, every badge shown, locked ones dimmed */
+  /* the explorer log: rank line and badge shelf (every badge shown, locked
+     ones dimmed). Painted now, and again when another Idea Lab tab saves
+     progress, the same storage event shell.js listens for. shell.js
+     registered its listener first, so it has reloaded the progress by then */
   var shelf = document.getElementById("badgeShelf");
-  IdeaLab.data.badges.forEach(function (b) {
-    var got = IdeaLab.hasBadge(b.id);
-    var el = document.createElement("span");
-    el.className = "badge" + (got ? "" : " badge--locked");
-    el.title = b.note;
-    el.innerHTML = '<span class="b-ico">' + b.icon + "</span>" + IdeaLab.esc(b.name);
-    shelf.appendChild(el);
+  function paintLog() {
+    var r = IdeaLab.rank(), nx = IdeaLab.nextRank();
+    document.getElementById("rankLine").textContent = r.name + " · " + IdeaLab.xp() + " XP";
+    document.getElementById("nextLine").textContent = nx
+      ? (nx.min - IdeaLab.xp()) + " XP to " + nx.name
+      : "Top rank reached. You are a Quasar.";
+
+    shelf.innerHTML = "";
+    IdeaLab.data.badges.forEach(function (b) {
+      var got = IdeaLab.hasBadge(b.id);
+      var el = document.createElement("span");
+      el.className = "badge" + (got ? "" : " badge--locked");
+      el.title = b.note;
+      el.innerHTML = '<span class="b-ico">' + b.icon + "</span>" + IdeaLab.esc(b.name);
+      shelf.appendChild(el);
+    });
+  }
+  paintLog();
+  window.addEventListener("storage", function (e) {
+    if (e.key === "ideaLab.v1" || e.key === null) paintLog();
   });
 
   /* the star map, built from the manifest */

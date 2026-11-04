@@ -1,8 +1,8 @@
-import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useHead } from "../useHead.js";
 
 export default function NotFound() {
-  useEffect(() => { document.title = "Not found | Bridges Industrial"; }, []);
+  useHead(null, "Not found | Bridges Industrial");
 
   return (
     <section className="fv-section">

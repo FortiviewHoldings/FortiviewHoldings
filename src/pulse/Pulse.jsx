@@ -24,7 +24,7 @@ export default function Pulse({ compact = false }) {
   const punted = (t) => t.provider === "none" || /break[\s-]?in/i.test(t.text || "");
 
   function toBreakIn(question) {
-    navigate("/break-in", { state: { issue: question } });
+    navigate("/break-in/", { state: { issue: question } });
   }
 
   useEffect(() => { setNoEngine(!engineAvailable()); }, []);

@@ -11,3 +11,14 @@ const bySlug = new Map(GUIDES.map((g) => [g.slug, g]));
 export function guide(slug) {
   return bySlug.get(slug) ?? null;
 }
+
+// Every guide closes on "When this page runs out", which points onward and is not a question.
+const CLOSING = "when-this-page-runs-out";
+
+export function questions(g) {
+  return g.sections.filter((s) => s.id !== CLOSING);
+}
+
+export function questionCount(g) {
+  return questions(g).length;
+}

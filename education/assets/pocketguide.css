@@ -53,6 +53,9 @@
   background:var(--glass);border:1px solid var(--glass-border-2);border-radius:var(--radius);color:var(--ink-2);cursor:pointer}
 .pg-sign:hover{border-color:var(--accent);color:var(--accent)}
 .pg-sign.is-neg{color:var(--amber);border-color:var(--amber)}
+.pg-table td .pg-inwrap{flex:1;min-width:0}
+.pg-table td .pg-inwrap .pg-num{min-width:6em}
+.pg-table td .pg-sign{min-width:40px;margin-left:6px}
 
 /* readout values */
 .pg-out{display:flex;align-items:baseline;gap:.4em;font-family:var(--mono);color:var(--ink);
@@ -147,8 +150,10 @@ table.pg-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-
 body.pg-pad-open .pg-main{padding-bottom:320px}
 
 /* ---------- responsive ---------- */
-/* the wide calibration worksheet -> stacked cards through tablet width (its 7-col table needs ~830px) */
-@media (max-width:900px){
+/* the wide calibration worksheet -> stacked cards through tablet and small-laptop width (its 7-col table,
+   with a sign toggle beside each reading, needs ~906px, and ~953px when a 5- or 6-place tolerance shows
+   errors as long as +100.00000%) */
+@media (max-width:1100px){
   table.pg-table.pg-table--stack{min-width:0}
   .pg-table--stack thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
   .pg-table--stack tbody tr{display:block;border:1px solid var(--glass-border);border-radius:var(--radius);

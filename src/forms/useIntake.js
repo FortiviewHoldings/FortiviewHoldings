@@ -17,6 +17,14 @@ export function useIntake(config, initial = {}) {
   const [textOk, setTextOk] = useState(false);
   const install = PLATFORM.installs[config.intake] || "";
 
+  // initial can arrive after the first render (the contact page applies ?topic= once the page is live) or
+  // change with the address; apply it when it does.
+  const initialKey = JSON.stringify(initial || {});
+  useEffect(() => {
+    const next = JSON.parse(initialKey);
+    setValues((v) => (Object.keys(next).some((k) => v[k] !== next[k]) ? { ...v, ...next } : v));
+  }, [initialKey]);
+
   // the platform's challenge is fetched and solved as the form appears, so a send never waits
   useEffect(() => { if (install) warm(); }, [install]);
 

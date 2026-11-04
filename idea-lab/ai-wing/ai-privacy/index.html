@@ -160,6 +160,10 @@
       If the answer is no, keep it private. Homework, recipes, and riddles pass. Secrets do not.</span>
     </div>
 
+    <p class="center hidden" id="againRow" style="margin-top:16px">
+      <button class="btn btn--go" id="sortAgain" type="button">↺ Sort again</button>
+    </p>
+
     <div class="act__nav">
       <button class="btn btn--ghost" data-prev>← Back</button>
       <a class="btn btn--cosmic" href="../">Back to the AI Wing →</a>
@@ -226,10 +230,13 @@
   ];
 
   /* shuffle so it is not memorizable in order */
-  for (var s = ITEMS.length - 1; s > 0; s--) {
-    var j = Math.floor(Math.random() * (s + 1));
-    var tmp = ITEMS[s]; ITEMS[s] = ITEMS[j]; ITEMS[j] = tmp;
+  function shuffle() {
+    for (var s = ITEMS.length - 1; s > 0; s--) {
+      var j = Math.floor(Math.random() * (s + 1));
+      var tmp = ITEMS[s]; ITEMS[s] = ITEMS[j]; ITEMS[j] = tmp;
+    }
   }
+  shuffle();
 
   var idx = 0, right = 0, answered = false;
   var TOTAL = ITEMS.length;
@@ -288,6 +295,7 @@
     }
   });
 
+  var againRow = document.getElementById("againRow");
   function finish() {
     document.getElementById("scRight").textContent = right;
     document.getElementById("scTotal").textContent = TOTAL;
@@ -295,10 +303,22 @@
     if (right === TOTAL) {
       msg.textContent = "Perfect sort. You kept every secret where it belongs.";
       IdeaLab.award("secret-keeper", 50);
+      againRow.classList.add("hidden");
     } else {
       msg.textContent = "You sorted " + right + " of " + TOTAL + " right. Read the rule below, then sort again to nail it.";
+      againRow.classList.remove("hidden");
     }
   }
+
+  /* sort again: a fresh shuffle, a clean score, back to the bins */
+  document.getElementById("sortAgain").addEventListener("click", function () {
+    shuffle();
+    idx = 0; right = 0;
+    a1Next.disabled = true;
+    againRow.classList.add("hidden");
+    renderCard();
+    show(1);
+  });
 
   renderCard();
 })();

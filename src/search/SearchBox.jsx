@@ -59,7 +59,7 @@ export default function SearchBox() {
         <ol className="pg-search__results" ref={listRef}>
           {results.map((r, i) => (
             <li key={r.slug + r.sectionId} className={i === active ? "is-active" : undefined}>
-              <Link to={`/education/${r.slug}#${r.sectionId}`}>
+              <Link to={`/education/${r.slug}/#${r.sectionId}`}>
                 <span className="pg-search__q">{mark(r.question, query)}</span>
                 <span className="pg-search__guide">{r.guide}</span>
                 <span className="pg-search__snip">{mark(r.snippet, query)}</span>

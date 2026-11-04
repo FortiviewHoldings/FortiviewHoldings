@@ -396,6 +396,7 @@
       if (!solved[pIndex]) {
         solved[pIndex] = true;
         IdeaLab.addXP(15);
+        paintCount();
         maybeFinish();
       }
       puzzleNext.hidden = false;
@@ -423,10 +424,15 @@
     Array.prototype.forEach.call(gatePick.children, function (c) { c.classList.remove("is-sel"); });
     pTitle.textContent = "Puzzle " + (i + 1) + " of " + PUZZLES.length;
     goalTxt.innerHTML = PUZZLES[i].goalTxt;
-    Array.prototype.forEach.call(pcount.children, function (c, k) {
-      c.className = (k === i ? "is-now" : (solved[k] ? "is-done" : ""));
-    });
+    paintCount();
     render();
+  }
+
+  /* the counter: a solved puzzle reads done, the one still being worked on reads current */
+  function paintCount() {
+    Array.prototype.forEach.call(pcount.children, function (c, k) {
+      c.className = solved[k] ? "is-done" : (k === pIndex ? "is-now" : "");
+    });
   }
 
   puzzleNext.addEventListener("click", function () {

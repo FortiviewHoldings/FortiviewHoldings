@@ -3,7 +3,7 @@
 // tool page's form and wizard use, so there is exactly one implementation.
 // Capture-before-compute lives here too: every required field must be supplied
 // or the solver reports what is missing instead of assuming a value.
-import { scale, pctSpan, fromPct, clamp, errSpan, maToPct, pctToMa, sqrtExtract, sqrtSquare, RTD } from "./pg-math.js";
+import { scale, pctSpan, fromPct, clamp, errSpan, roundTo, errPlaces, maToPct, pctToMa, sqrtExtract, sqrtSquare, RTD } from "./pg-math.js";
 
 const num = (x) => (x == null || x === "" ? NaN : Number(x));
 const r = (n, d = 4) => (Number.isFinite(n) ? Number(n.toFixed(d)) : n);
@@ -164,19 +164,22 @@ export function solveCalibration(a = {}) {
   if (!ok(iLo, iHi, oLo, oHi, t)) return { error: "Ranges and tolerance must be numbers." };
   if (iHi === iLo || span === 0) return { error: "Input and output ranges must each have a nonzero span." };
   let maxAF = 0, maxAL = 0, haveAF = false, haveAL = false;
+  const dp = errPlaces(t);
   const out = rows.map((row) => {
     const applied = num(row.applied), rawExp = scale(applied, iLo, iHi, oLo, oHi), exp = clamp(rawExp, oLo, oHi);
     const af = (row.as_found == null || row.as_found === "") ? null : num(row.as_found);
     const al = (row.as_left == null || row.as_left === "") ? null : num(row.as_left);
-    const afErr = af == null ? null : errSpan(af, exp, oLo, oHi);
-    const alErr = al == null ? null : errSpan(al, exp, oLo, oHi);
+    // each error is graded as it is returned, to the tolerance's own places and never fewer than 3,
+    // so an error returned at the tolerance is in it
+    const afErr = af == null ? null : roundTo(errSpan(af, exp, oLo, oHi), dp);
+    const alErr = al == null ? null : roundTo(errSpan(al, exp, oLo, oHi), dp);
     if (afErr != null && ok(afErr)) { haveAF = true; if (Math.abs(afErr) > Math.abs(maxAF)) maxAF = afErr; }
     if (alErr != null && ok(alErr)) { haveAL = true; if (Math.abs(alErr) > Math.abs(maxAL)) maxAL = alErr; }
     return {
       applied: r(applied), percent: r(pctSpan(applied, iLo, iHi), 2),
       expected: r(exp), saturated: Math.abs(rawExp - exp) > 1e-9,
-      as_found: af == null ? null : r(af), found_err_pct_span: afErr == null ? null : r(afErr, 3),
-      as_left: al == null ? null : r(al), left_err_pct_span: alErr == null ? null : r(alErr, 3)
+      as_found: af == null ? null : r(af), found_err_pct_span: afErr,
+      as_left: al == null ? null : r(al), left_err_pct_span: alErr
     };
   });
   let verdict;
@@ -187,7 +190,7 @@ export function solveCalibration(a = {}) {
   return {
     ok: true,
     setup: `${iLo} to ${iHi} ${in_unit} -> ${oLo} to ${oHi} ${out_unit}, +/-${t}% span, ${rows.length} points`,
-    rows: out, as_found_max_pct_span: haveAF ? r(maxAF, 3) : null, as_left_max_pct_span: haveAL ? r(maxAL, 3) : null,
+    rows: out, as_found_max_pct_span: haveAF ? maxAF : null, as_left_max_pct_span: haveAL ? maxAL : null,
     verdict, full_tool: "/education/calibration/ (open to print the worksheet report)"
   };
 }

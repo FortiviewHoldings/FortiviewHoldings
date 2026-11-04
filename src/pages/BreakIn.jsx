@@ -1,11 +1,16 @@
 import { useLocation } from "react-router-dom";
 import FormPage from "./FormPage.jsx";
 import config from "../data/forms/break-in.json";
+import { useHead } from "../useHead.js";
+import { useLive } from "../useLive.js";
 
 export default function BreakIn() {
-  // Pulse can hand off the chat question to prefill the description.
+  useHead("/break-in");
+  // Pulse can hand off the chat question to prefill the description. It rides in history state, which the
+  // prerendered page does not have (a reload keeps it), so it is applied once the page is live, as on Contact.
   const { state } = useLocation();
-  const initial = state?.issue ? { issue: state.issue } : undefined;
+  const live = useLive();
+  const initial = live && state?.issue ? { issue: state.issue } : undefined;
 
   return (
     <FormPage

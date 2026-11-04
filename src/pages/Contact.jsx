@@ -1,6 +1,8 @@
 import { useSearchParams } from "react-router-dom";
 import FormPage from "./FormPage.jsx";
 import config from "../data/forms/contact.json";
+import { useHead } from "../useHead.js";
+import { useLive } from "../useLive.js";
 
 // ?topic= preselects the topic. The old site keyed off data-key on each option.
 function initialFromTopic(key) {
@@ -11,8 +13,12 @@ function initialFromTopic(key) {
 }
 
 export default function Contact() {
+  useHead("/contact");
   const [params] = useSearchParams();
-  const initial = initialFromTopic(params.get("topic"));
+  // The page is prerendered without a query string, so the render that hydrates it carries no topic either
+  // (a select's value is not patched in on hydration). The topic is applied once the page is live.
+  const live = useLive();
+  const initial = live ? initialFromTopic(params.get("topic")) : undefined;
 
   return (
     <FormPage

@@ -14,18 +14,38 @@
   /* ---- storage: localStorage for the longest local life, with a
      safe fallback so nothing breaks on file:// or private mode ---- */
   var mem = { xp: 0, badges: {} };
-  function load() {
+  var rankEl = null;   /* the nav's rank pill, once nav() has built it */
+  function clean(m) {
+    if (!m || typeof m !== "object") m = { xp: 0, badges: {} };
+    if (typeof m.xp !== "number") m.xp = 0;
+    if (!m.badges || typeof m.badges !== "object") m.badges = {};
+    return m;
+  }
+  /* the stored copy, or null when storage cannot be read */
+  function stored() {
     try {
       var raw = window.localStorage.getItem(KEY);
-      if (raw) mem = JSON.parse(raw);
-    } catch (e) { /* fall back to in-memory only */ }
-    if (!mem || typeof mem !== "object") mem = { xp: 0, badges: {} };
-    if (typeof mem.xp !== "number") mem.xp = 0;
-    if (!mem.badges) mem.badges = {};
+      return clean(raw ? JSON.parse(raw) : null);
+    } catch (e) { return null; }
   }
-  function save() {
+  function load() {
+    var s = stored();
+    if (s) mem = s;   /* else fall back to in-memory only */
+  }
+  /* another open Idea Lab tab may have saved since this page loaded:
+     fold the stored copy in (every badge either one earned, the larger
+     XP) so no tab ever writes its older copy over another tab's progress */
+  function merge() {
+    var s = stored(), id;
+    if (!s) return;
+    for (id in s.badges) if (s.badges[id]) mem.badges[id] = true;
+    if (s.xp > mem.xp) mem.xp = s.xp;
+  }
+  function write() {
     try { window.localStorage.setItem(KEY, JSON.stringify(mem)); } catch (e) { /* ignore */ }
+    paintRank();
   }
+  function save() { merge(); write(); }
   load();
 
   /* ---- rank from xp ---- */
@@ -50,6 +70,7 @@
   }
   function hasBadge(id) { return !!mem.badges[id]; }
   function award(id, xp) {
+    merge();   /* a badge another tab already earned is not fresh here */
     var fresh = !mem.badges[id];
     if (fresh) {
       mem.badges[id] = true;
@@ -59,8 +80,8 @@
     }
     return fresh;
   }
-  function addXP(n) { mem.xp += (n || 0); save(); }
-  function reset() { mem = { xp: 0, badges: {} }; save(); }
+  function addXP(n) { merge(); mem.xp += (n || 0); save(); }
+  function reset() { mem = { xp: 0, badges: {} }; write(); }
 
   /* ---- starfield: gentle, reduced-motion aware ---- */
   function starfield(canvasId) {
@@ -123,9 +144,12 @@
   /* ---- the global nav, built ONCE from the manifest ----
      base is the path back to /idea-lab/ from the current page
      (".", "..", etc.) so it works locally and on Pages alike ---- */
+  function rankText() {
+    return "Rank: <b>" + esc(rank().name) + "</b> · " + mem.xp + " XP";
+  }
+  function paintRank() { if (rankEl) rankEl.innerHTML = rankText(); }
   function nav(currentKey, base) {
     base = base || ".";
-    var r = rank();
     var links = DATA.wings.map(function (w) {
       var href = base + "/" + w.href;
       var cur = (w.key === currentKey) ? ' aria-current="page"' : "";
@@ -140,11 +164,10 @@
           '<img class="il-nav__logo" src="' + base + '/assets/logo.svg" alt="" width="28" height="28"> Idea Lab' +
         "</a>" +
         '<div class="il-nav__links">' + links + "</div>" +
-        '<div class="il-nav__rank" title="Earned in this browser only">' +
-          "Rank: <b>" + esc(r.name) + "</b> · " + mem.xp + " XP" +
-        "</div>" +
+        '<div class="il-nav__rank" title="Earned in this browser only">' + rankText() + "</div>" +
       "</div>";
     document.body.insertBefore(el, document.body.firstChild);
+    rankEl = el.querySelector(".il-nav__rank");
   }
 
   /* ---- render a wing's lab list from the manifest, so a wing
@@ -177,13 +200,29 @@
   /* ---- render a wing's progressive module ladder: grouped by
      level, completed modules marked (by their badge), and the first
      unfinished live module highlighted as "next up" ---- */
+  var tracks = [];
   function renderTrack(wingKey, selector) {
-    var wing = wingByKey(wingKey);
-    var host = document.querySelector(selector);
-    if (!wing || !host) return;
+    var t = { wingKey: wingKey, selector: selector, nodes: [] };
+    if (paintTrack(t)) tracks.push(t);
+  }
+  function paintTracks() { tracks.forEach(function (t) { paintTrack(t); }); }
+  /* (re)draw one ladder in place: build it fresh, put it where the
+     old one was, then take the old one out. The ladder shows only which
+     modules are done, so a save that leaves that set alone (an XP-only
+     save) leaves the ladder alone; and a module link that had keyboard
+     focus hands it to the same link in the new ladder */
+  function paintTrack(t) {
+    var wing = wingByKey(t.wingKey);
+    var host = document.querySelector(t.selector);
+    if (!wing || !host) return false;
     var mods = wing.modules || [];
     var live = mods.filter(function (m) { return m.status === "live"; });
     function isDone(m) { return m.badge && hasBadge(m.badge); }
+    var sig = live.filter(isDone).map(function (m) { return m.badge; }).join("|");
+    var first = t.nodes[0];
+    if (first && first.parentNode === host && t.sig === sig) return true;
+    var made = document.createDocumentFragment(), nodes = [];
+    function add(n) { nodes.push(n); made.appendChild(n); }
     var doneCount = live.filter(isDone).length;
     var nextUp = live.filter(function (m) { return !isDone(m); })[0];
     var nextKey = nextUp ? nextUp.key : null;
@@ -195,7 +234,7 @@
       '<div class="track-prog"><div><b>' + doneCount + " of " + live.length + "</b> modules complete" +
       (soon ? ' · <span class="muted">' + soon + " more charting</span>" : "") +
       '</div><div class="bar"><i style="width:' + (live.length ? Math.round(doneCount / live.length * 100) : 0) + '%"></i></div></div>';
-    host.appendChild(prog);
+    add(prog);
 
     var levels = wing.levels && wing.levels.length ? wing.levels : [{ key: null, name: "", sub: "" }];
     levels.forEach(function (lv) {
@@ -221,9 +260,41 @@
         list.appendChild(el);
       });
       sec.appendChild(list);
-      host.appendChild(sec);
+      add(sec);
+    });
+    var had = document.activeElement, hadHref = null;
+    if (had && had.getAttribute && t.nodes.some(function (n) { return n.contains(had); })) {
+      hadHref = had.getAttribute("href");
+    }
+    host.insertBefore(made, first && first.parentNode === host ? first : null);
+    t.nodes.forEach(function (n) { if (n.parentNode) n.parentNode.removeChild(n); });
+    t.nodes = nodes;
+    t.sig = sig;
+    if (hadHref !== null) refocus(nodes, hadHref);
+    return true;
+  }
+  /* give focus to the link in these nodes whose href matches */
+  function refocus(nodes, href) {
+    nodes.some(function (n) {
+      var links = n.querySelectorAll("a[href]");
+      for (var i = 0; i < links.length; i++) {
+        if (links[i].getAttribute("href") !== href) continue;
+        try { links[i].focus({ preventScroll: true }); } catch (e) { links[i].focus(); }
+        return true;
+      }
+      return false;
     });
   }
+
+  /* another open Idea Lab tab saved: take the stored progress (it
+     already holds this tab's, merged in on that save) and repaint the
+     rank pill and any module ladder on this page */
+  window.addEventListener("storage", function (e) {
+    if (e.key !== KEY && e.key !== null) return;
+    load();
+    paintRank();
+    paintTracks();
+  });
 
   /* ---- glossary: clickable [data-term] elements open a sourced
      definition card. Register once with a {slug: {term,short,deep,source}} map ---- */

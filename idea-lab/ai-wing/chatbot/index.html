@@ -34,11 +34,12 @@
   /* ---- ACT 1: rule builder ---- */
   .rulemaker{display:grid;gap:10px;border:1px solid var(--border);border-radius:14px;
     background:#0a1020;padding:16px;margin-top:6px}
-  .rulerow{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end}
+  .rulerow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:10px;align-items:end}
+  @media (max-width:640px){.rulerow{grid-template-columns:1fr}}
   .field{display:grid;gap:5px}
   .field label{font-size:.78em;color:var(--muted);font-weight:700}
   .field input{font:inherit;color:var(--ink);background:var(--glass);border:1px solid var(--border);
-    border-radius:10px;padding:11px 12px;min-height:46px}
+    border-radius:10px;padding:11px 12px;min-height:46px;width:100%;min-width:0}
   .field input:focus-visible{outline:3px solid var(--plasma);outline-offset:2px}
   .rulehint{font-size:.8em;color:var(--muted);min-height:1.2em}
   .rulelist{display:grid;gap:8px;margin-top:4px}

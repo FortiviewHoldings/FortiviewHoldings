@@ -1,7 +1,9 @@
 import FormPage from "./FormPage.jsx";
 import config from "../data/forms/partner.json";
+import { useHead } from "../useHead.js";
 
 export default function PartnerApply() {
+  useHead("/partnerships/apply");
   return (
     <FormPage
       eyebrow="Become a partner"

@@ -141,7 +141,7 @@
           <select id="opSel" aria-label="Comparison">
             <option value="gt">is greater than  (&gt;)</option>
             <option value="lt">is less than  (&lt;)</option>
-            <option value="eq">is equal to  (=)</option>
+            <option value="eq">is equal to  (==)</option>
           </select>
           <select id="targetSel" aria-label="Target number"></select>
           <span class="muted">?</span>
@@ -280,7 +280,7 @@
   fillMsgs(loseSel, LOSE_MSGS);
 
   /* the symbol we print for each operator */
-  var OP_SYMBOL = { gt: ">", lt: "<", eq: "=" };
+  var OP_SYMBOL = { gt: ">", lt: "<", eq: "==" };
 
   /* ---------- the decision, computed in plain JS ----------
      We read the chosen operator and switch on it. We NEVER turn

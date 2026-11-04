@@ -1462,22 +1462,32 @@ build(body){
   let inHigh=false, kind="npn";
   const svg=s("svg",{viewBox:"0 0 320 250"});bench.stage.append(svg);
   function on(){return kind==="npn"?inHigh:!inHigh;}
+  // NPN switches low-side under the pull-up R_C, so ON pulls Vout to 0 V; PNP switches high-side
+  // (emitter on +5 V, R_C pulling the collector down), so ON pulls Vout up to +5 V. Both invert.
+  function vOut(){return kind==="npn"?(on()?0:5):(on()?5:0);}
   function render(){
     svg.innerHTML="";
-    const ON=on(),vout=ON?0:5;
+    const ON=on(),vout=vOut(),npn=kind==="npn";
     const tx=172,ty=132;
     const colX=tx+14,colY=ty-30, emX=tx+14,emY=ty+30, baseX=tx-24,baseY=ty; // transistor terminals
-    // +5 rail -> R_C -> collector (aligned to the collector terminal)
+    const outY=npn?colY:emY; // Vout is the collector: the top terminal on the NPN, the bottom one on the PNP
     svg.append(s("text",{x:colX-8,y:24,class:"lbl b",fill:"var(--on)"},"+5V"));
+    if(npn){
+    // +5 rail -> R_C -> collector (aligned to the collector terminal)
     svg.append(s("path",{class:"wire"+(ON?" hot flow":""),d:`M${colX},30 L${colX},46`}));
     svg.append(resistorV(colX,46,colX,82));
     svg.append(s("text",{x:colX+10,y:66,class:"lbl"},"R_C"));
     svg.append(s("path",{class:"wire"+(ON?" hot flow":""),d:`M${colX},82 L${colX},${colY}`}));
+    }else{
+    // +5 rail -> emitter (the PNP's top terminal)
+    svg.append(s("path",{class:"wire"+(ON?" hot flow":""),d:`M${colX},30 L${colX},${colY}`}));
+    if(ON)svg.append(s("text",{x:colX+9,y:66,class:"lbl b",fill:"var(--on)"},"I"));
+    }
     // collector node + Vout tap
-    svg.append(s("circle",{cx:colX,cy:colY,r:4,class:"node"}));
-    svg.append(s("path",{class:"wire",d:`M${colX},${colY} L280,${colY}`}));
-    svg.append(s("text",{x:246,y:colY-9,class:"lbl b",fill:vout?"var(--on)":"var(--off)"},"Vout"));
-    svg.append(s("circle",{cx:284,cy:colY,r:5,fill:vout?"var(--on)":"var(--off)",stroke:"none"}));
+    svg.append(s("circle",{cx:colX,cy:outY,r:4,class:"node"}));
+    svg.append(s("path",{class:"wire",d:`M${colX},${outY} L280,${outY}`}));
+    svg.append(s("text",{x:246,y:outY-9,class:"lbl b",fill:vout?"var(--on)":"var(--off)"},"Vout"));
+    svg.append(s("circle",{cx:284,cy:outY,r:5,fill:vout?"var(--on)":"var(--off)",stroke:"none"}));
     // transistor symbol
     svg.append(transistorSVG(tx,ty,ON,kind));
     // base <- R_B <- input (aligned to the base terminal)
@@ -1487,10 +1497,19 @@ build(body){
     svg.append(s("path",{class:"wire"+(inHigh?" live":""),d:`M40,${baseY} L72,${baseY}`}));
     svg.append(s("circle",{cx:34,cy:baseY,r:4,class:"node"}));
     svg.append(s("text",{x:14,y:baseY+4,class:"lbl b",fill:inHigh?"var(--on)":"var(--muted)"},inHigh?"1":"0"));
+    if(npn){
     // emitter -> ground (aligned to the emitter terminal)
     svg.append(s("path",{class:"wire"+(ON?" hot flow":""),d:`M${emX},${emY} L${emX},206`}));
     svg.append(groundSVG(emX,212));
     if(ON)svg.append(s("text",{x:emX+9,y:192,class:"lbl b",fill:"var(--on)"},"I"));
+    }else{
+    // collector -> R_C -> ground (the PNP's bottom terminal)
+    svg.append(s("path",{class:"wire"+(ON?" hot flow":""),d:`M${emX},${emY} L${emX},170`}));
+    svg.append(resistorV(emX,170,emX,200));
+    svg.append(s("text",{x:emX+10,y:189,class:"lbl"},"R_C"));
+    svg.append(s("path",{class:"wire"+(ON?" hot flow":""),d:`M${emX},200 L${emX},206`}));
+    svg.append(groundSVG(emX,212));
+    }
   }
   const kindSeg=seg(["NPN","PNP"],0,i=>{kind=i?"pnp":"npn";render();upOut();});
   const inLever=leverSwitch(false,v=>{inHigh=v;render();upOut();});
@@ -1501,15 +1520,15 @@ build(body){
   );
   const ex=explain(bench);
   function upOut(){
-    const ON=on(),vout=ON?0:5;
+    const ON=on(),vout=vOut();
     bench.ro.roT.innerHTML=ON?'<span class="chip on">ON</span>':'<span class="chip off">OFF</span>';
     bench.ro.roCE.innerHTML=ON?"short":"open";
     bench.ro.roV.innerHTML=vout+" <small>V</small>";
     bench.ro.roV.style.color=vout?"var(--on)":"var(--off)";
     bench.ro.roInv.innerHTML=`${inHigh?1:0} → ${vout?1:0}`;
     ex.innerHTML=ON
-      ?`Base is driven so the transistor turns <b>ON</b>: collector-to-emitter is a <b>short</b>, dropping V<sub>out</sub> to <b>0&nbsp;V</b>. Note the input was ${inHigh?"HIGH":"LOW"} — the output is the opposite.`
-      :`Transistor is <b>OFF</b>: collector-to-emitter is <b>open</b>, so no current flows and R<sub>C</sub> pulls V<sub>out</sub> up to <b>+5&nbsp;V</b>. Input ${inHigh?"HIGH":"LOW"} → output ${vout?"HIGH":"LOW"}.`;
+      ?`Base is driven so the transistor turns <b>ON</b>: collector-to-emitter is a <b>short</b>, ${kind==="npn"?"dropping V<sub>out</sub> to <b>0&nbsp;V</b>":"pulling V<sub>out</sub> up to <b>+5&nbsp;V</b>"}. Note the input was ${inHigh?"HIGH":"LOW"} — the output is the opposite.`
+      :`Transistor is <b>OFF</b>: collector-to-emitter is <b>open</b>, so no current flows and R<sub>C</sub> pulls V<sub>out</sub> ${kind==="npn"?"up to <b>+5&nbsp;V</b>":"down to <b>0&nbsp;V</b>"}. Input ${inHigh?"HIGH":"LOW"} → output ${vout?"HIGH":"LOW"}.`;
     render();
   }
   render();upOut();
@@ -2058,11 +2077,11 @@ function transistorSVG(x,y,on,kind){
   // emitter arrow
   const npn=kind!=="pnp";
   if(npn)g.append(s("path",{d:`M${x+6},${y+21} l8,5 l-9,1 Z`,fill:col}));
-  else g.append(s("path",{d:`M${x-6},${y+13} l-8,-5 l9,-1 Z`,fill:col}));
+  else g.append(s("path",{d:`M${x-6},${y-13} l-8,5 l9,1 Z`,fill:col})); // PNP: emitter on top (high side), arrow pointing in
   g.append(s("line",{x1:x+14,y1:y-26,x2:x+14,y2:y-30,class:"ink"}));
   g.append(s("line",{x1:x+14,y1:y+26,x2:x+14,y2:y+30,class:"ink"}));
-  g.append(s("text",{x:x+20,y:y-24,class:"lbl"},"C"));
-  g.append(s("text",{x:x+20,y:y+30,class:"lbl"},"E"));
+  g.append(s("text",{x:x+20,y:y-24,class:"lbl"},npn?"C":"E"));
+  g.append(s("text",{x:x+20,y:y+30,class:"lbl"},npn?"E":"C"));
   g.append(s("text",{x:x-34,y:y-6,class:"lbl"},"B"));
   return g;
 }

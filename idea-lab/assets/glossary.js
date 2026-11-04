@@ -60,6 +60,18 @@ window.IDEA_LAB_GLOSSARY = {
     deep: "A bit (short for 'binary digit') has only two values, 0 or 1. Inside a chip a bit is a voltage being high or low, a switch on or off. Group bits and you represent bigger things: 8 bits make a byte, which can stand for a letter, a small number, or part of a color.",
     source: "https://en.wikipedia.org/wiki/Bit"
   },
+  pixel: {
+    term: "Pixel",
+    short: "One tiny dot of a picture. A screen shows an image by lighting up millions of them in a grid.",
+    deep: "Pixel is short for 'picture element'. A digital image is a grid of pixels, and the computer stores numbers for each one that say what color it is. On most screens each pixel is made of three tiny lights, red, green and blue, and mixing their strengths makes the colors you see. A Full HD screen is 1920 by 1080 pixels, which is just over two million dots.",
+    source: "https://en.wikipedia.org/wiki/Pixel"
+  },
+  register: {
+    term: "Register",
+    short: "A tiny, super fast storage box inside the processor that holds a number it is working on right now.",
+    deep: "A register is a small slot of memory built right into the CPU. The processor copies numbers into registers, does its math on them there, and copies results back out to main memory. Registers are the fastest storage in a computer, but a chip has only a small number of them, and each holds a fixed number of bits, often 64 on a modern chip. Instructions like ADD name the registers they work on.",
+    source: "https://en.wikipedia.org/wiki/Processor_register"
+  },
   piezoelectricity: {
     term: "Piezoelectricity",
     short: "Squeezing certain crystals like quartz makes a jolt of electricity, and electricity makes them squeeze back.",
@@ -115,6 +127,12 @@ window.IDEA_LAB_GLOSSARY = {
     short: "A one-way scramble that turns a password into a jumble that can't be un-scrambled.",
     deep: "A hash function turns a password into a fixed-length value that cannot be reversed, so a site stores the hash and compares hashes instead of keeping your real password. Good practice adds a unique random salt to each one and uses a deliberately slow function (bcrypt, scrypt, Argon2, PBKDF2) so attackers can't test guesses quickly.",
     source: "https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html"
+  },
+  encryption: {
+    term: "Encryption",
+    short: "Scrambling a message with a secret key so only someone with the right key can unscramble it and read it.",
+    deep: "Encryption turns readable data (plaintext) into scrambled data (ciphertext) using a key. Unlike hashing, it is meant to be undone: whoever holds the right key decrypts the message and reads it again, while anyone without the key sees only gibberish. HTTPS uses encryption (through a protocol called TLS) so snoops along the way cannot read the data passing between your browser and a website.",
+    source: "https://en.wikipedia.org/wiki/Encryption"
   },
   phishing: {
     term: "Phishing",

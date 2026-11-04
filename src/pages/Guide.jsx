@@ -1,11 +1,14 @@
 import { useEffect } from "react";
 import { useParams, useLocation, Link } from "react-router-dom";
 import { guide } from "../data/guides.js";
+import { useHead } from "../useHead.js";
 
 export default function Guide() {
   const { slug } = useParams();
   const { hash } = useLocation();
   const g = guide(slug);
+  // A bad slug has no page of its own: its head points at the guide index, not at the bad address.
+  useHead(g ? "/education/" + slug : "/education");
 
   // Scroll to the section a search result linked to, after layout settles.
   useEffect(() => {

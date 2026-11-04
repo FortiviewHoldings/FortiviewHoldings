@@ -17,7 +17,8 @@ export default function Html({ html, className, as: Tag = "div" }) {
     if (/^\/idea-lab(\/|$)/.test(new URL(href, window.location.origin).pathname)) return;
     e.preventDefault();
     const url = new URL(href, window.location.origin);
-    const path = url.pathname.replace(/\/index\.html$/, "").replace(/(.)\/$/, "$1");
+    // Keep the trailing slash: the prerendered addresses are /contact/, /break-in/ and so on.
+    const path = url.pathname.replace(/\/index\.html$/, "/").replace(/([^/])$/, "$1/");
     navigate(path + url.search + url.hash);
   }
 
