@@ -9,6 +9,11 @@
 // server, no key, no cost — used when the API has no key, is rate-limited, or
 // the visitor is offline.
 export const MODEL = {
+  // PULSE THROUGH PRAGOPTICS (2026-11-10): the platform's public ask door answers, with Pulse's prompt, guides and
+  // calculators living on the platform (src/model/providers/platform.js). env is the environment Pulse is installed
+  // on and install is that assistant's install id; with both set the Worker below is not in the path.
+  platform: { api: "https://api.pragoptics.com/api/v1", env: "", install: "", lane: "live" },
+
   // The safe path for a PUBLIC site: point this at your own backend endpoint,
   // which holds the key server-side and forwards to Gemini. The browser never
   // sees the key. Leave geminiKey empty when proxyUrl is set.

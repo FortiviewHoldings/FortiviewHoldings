@@ -2,11 +2,13 @@ import { buildIndex, search } from "../search/index.js";
 import { GUIDES } from "../data/guides.js";
 import { MODEL } from "./config.js";
 import { TOOL_DECLARATIONS, runTool } from "../pulse/tools.js";
+import { platformReady, platformAsk, warm as warmPlatform } from "./providers/platform.js";
 
 // Pulse's brain: retrieve the relevant guide sections, then answer with the
 // calculators available so it computes with real math. One worker round-trip
 // per tool call, capped so it always terminates.
 const index = buildIndex(GUIDES);
+warmPlatform();   // a challenge solved ahead, so the first question never waits
 
 const SYSTEM =
   "You are Pulse, the field-reference assistant for Bridges Industrial, an " +
@@ -135,9 +137,16 @@ async function callProxy(contents, prompt) {
   }
 }
 
-export async function pulseAnswer(question) {
+export async function pulseAnswer(question, history = []) {
   const hits = relevantSections(question);
   const sources = trimSources(hits);
+
+  // Pulse through PragOptics (2026-11-10): the platform holds the prompt, the guides and the calculators and answers
+  // on the environment's AI; the guide links beside the answer still come from this bundle's own index.
+  if (platformReady()) {
+    const r = await platformAsk(question, history);
+    return { text: toPlainText(r.answer), provider: "platform", sources };
+  }
   const context = hits.length
     ? hits.map((h, i) => `[${i + 1}] ${h.guide} — ${h.question}\n${h.snippet}`).join("\n\n")
     : "(no matching guide excerpts)";

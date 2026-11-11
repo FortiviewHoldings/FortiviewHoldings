@@ -49,7 +49,7 @@ export default function Pulse({ compact = false }) {
     setTurns((t) => [...t, { role: "you", text: q }]);
     setThinking(true);
     try {
-      const { text, provider, sources } = await pulseAnswer(q);
+      const { text, provider, sources } = await pulseAnswer(q, turns.filter((t) => !t.error && t.text).map((t) => ({ role: t.role === "you" ? "user" : "assistant", content: t.text })));
       setTurns((t) => [...t, { role: "pulse", text, provider, sources, question: q }]);
     } catch (err) {
       setTurns((t) => [...t, { role: "pulse", text: err.message, error: true }]);
