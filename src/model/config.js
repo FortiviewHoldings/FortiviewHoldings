@@ -17,7 +17,7 @@ export const MODEL = {
   // through POST /public/{env}/projects/{project}/call, with the project's credential read from the environment's Key
   // Vault and never in the page. project is the studio project of this site, cred the id of its Gemini credential there,
   // model the Gemini model name. With these three set the Worker below is not in the path either.
-  platform: { api: "https://api.pragoptics.com/api/v1", env: "", install: "", lane: "live", project: "", cred: "", model: "gemini-flash-lite-latest" },
+  platform: { api: "https://api.pragoptics.com/api/v1", env: "7a677248-2920-4aee-9bde-dab0782e0439", install: "", lane: "live", project: "site-sqo74ad", cred: "conn-ssa2ros-x-goog-api-key", model: "gemini-flash-lite-latest" },
 
   // The safe path for a PUBLIC site: point this at your own backend endpoint,
   // which holds the key server-side and forwards to Gemini. The browser never
