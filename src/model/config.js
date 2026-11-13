@@ -12,7 +12,12 @@ export const MODEL = {
   // PULSE THROUGH PRAGOPTICS (2026-11-10): the platform's public ask door answers, with Pulse's prompt, guides and
   // calculators living on the platform (src/model/providers/platform.js). env is the environment Pulse is installed
   // on and install is that assistant's install id; with both set the Worker below is not in the path.
-  platform: { api: "https://api.pragoptics.com/api/v1", env: "", install: "", lane: "live" },
+  // PULSE'S OWN CALL THROUGH THE PLATFORM (2026-11-13): with env, project and cred set, this bundle's own Gemini request
+  // (the prompt, the guide excerpts and the calculator loop stay here, as the Worker left them) is made BY the platform,
+  // through POST /public/{env}/projects/{project}/call, with the project's credential read from the environment's Key
+  // Vault and never in the page. project is the studio project of this site, cred the id of its Gemini credential there,
+  // model the Gemini model name. With these three set the Worker below is not in the path either.
+  platform: { api: "https://api.pragoptics.com/api/v1", env: "", install: "", lane: "live", project: "", cred: "", model: "gemini-flash-lite-latest" },
 
   // The safe path for a PUBLIC site: point this at your own backend endpoint,
   // which holds the key server-side and forwards to Gemini. The browser never

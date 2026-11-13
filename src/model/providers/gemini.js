@@ -1,4 +1,5 @@
 import { MODEL } from "../config.js";
+import { platformProxyReady, platformProxy } from "./platform.js";
 
 export function hasGemini() {
   return Boolean(MODEL.proxyUrl || MODEL.geminiKey);
@@ -9,6 +10,13 @@ export function hasGemini() {
 // Throws on no config or a non-2xx (including 429), which tells the router to
 // fall back.
 export async function geminiGenerate({ system, prompt }) {
+  // the platform makes the call with the project's vaulted key (2026-11-13, providers/platform.js)
+  if (platformProxyReady()) {
+    const r = await platformProxy({ system, prompt });
+    const text = String(r.text || "").trim();
+    if (!text) throw new Error("platform empty");
+    return text;
+  }
   if (MODEL.proxyUrl) {
     const res = await fetch(MODEL.proxyUrl, {
       method: "POST",

@@ -2,7 +2,7 @@ import { buildIndex, search } from "../search/index.js";
 import { GUIDES } from "../data/guides.js";
 import { MODEL } from "./config.js";
 import { TOOL_DECLARATIONS, runTool } from "../pulse/tools.js";
-import { platformReady, platformAsk, warm as warmPlatform } from "./providers/platform.js";
+import { platformReady, platformAsk, platformProxyReady, platformProxy, warm as warmPlatform } from "./providers/platform.js";
 
 // Pulse's brain: retrieve the relevant guide sections, then answer with the
 // calculators available so it computes with real math. One worker round-trip
@@ -123,6 +123,12 @@ async function callProxy(contents, prompt) {
   const body = JSON.stringify({ system: SYSTEM, prompt, contents, tools: TOOL_DECLARATIONS });
   // Flash-Lite intermittently returns 503/429 under load; ride through it.
   for (let attempt = 0; attempt < 3; attempt++) {
+    // Pulse's own call through the platform (2026-11-13): the same request the Worker took, made by the platform with the
+    // project's vaulted key; the ride-through stays the same.
+    if (platformProxyReady()) {
+      try { return await platformProxy({ system: SYSTEM, prompt, contents, tools: TOOL_DECLARATIONS }); }
+      catch (e) { if ((e.status === 503 || e.status === 429) && attempt < 2) { await new Promise((r) => setTimeout(r, 900 * (attempt + 1))); continue; } throw new Error("Pulse is busy right now — give it a second and try again."); }
+    }
     const res = await fetch(MODEL.proxyUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -151,7 +157,7 @@ export async function pulseAnswer(question, history = []) {
     ? hits.map((h, i) => `[${i + 1}] ${h.guide} — ${h.question}\n${h.snippet}`).join("\n\n")
     : "(no matching guide excerpts)";
 
-  if (!MODEL.proxyUrl) {
+  if (!MODEL.proxyUrl && !platformProxyReady()) {
     return {
       text: "Pulse needs its API key set to answer. Search still works.",
       provider: "none",

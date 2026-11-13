@@ -67,3 +67,52 @@ export async function platformAsk(question, history = []) {
   if (!res.ok) throw new Error(words(res.status, d));
   return { answer: String(d.answer || ""), sources: Array.isArray(d.sources) ? d.sources : [], actions: Array.isArray(d.actions) ? d.actions : [], remaining: Number(d.remaining || 0) };
 }
+
+// ---- Pulse's own Gemini call through the platform (2026-11-13): the Worker's job, done by the platform with the vaulted key ----
+export function platformProxyReady() { const p = P(); return Boolean(p.api && p.env && p.project && p.cred); }
+
+/** The Gemini request exactly as the Worker built it from { prompt, system, contents, tools }. */
+function geminiBody({ prompt, system, contents, tools }) {
+  const body = {
+    contents: Array.isArray(contents) ? contents : [{ role: "user", parts: [{ text: String(prompt || "") }] }],
+    generationConfig: { temperature: 0.2, maxOutputTokens: 800 }
+  };
+  if (system) body.systemInstruction = { parts: [{ text: String(system) }] };
+  if (Array.isArray(tools)) body.tools = [{ functionDeclarations: tools }];
+  return body;
+}
+
+/** The Worker's answer shape from Gemini's: { content, functionCall, text }, or a thrown error with .status. */
+function workerShape(data) {
+  const content = data?.candidates?.[0]?.content ?? null;
+  if (!content) throw Object.assign(new Error("Empty response from model"), { status: 502 });
+  const parts = content.parts || [];
+  const functionCall = parts.find((x) => x.functionCall)?.functionCall || null;
+  const text = parts.map((x) => x.text).filter(Boolean).join("");
+  return { content, functionCall, text };
+}
+
+/**
+ * One Gemini request through the platform's public project-call door. Takes what the Worker took ({ prompt, system,
+ * contents, tools }) and returns what the Worker returned ({ content, functionCall, text }); throws with .status on a
+ * refusal, so callers that rode through 429 and 503 on the Worker ride through them here.
+ */
+export async function platformProxy(workerBody) {
+  const p = P();
+  const pow = await challenge();
+  const model = String(p.model || "gemini-flash-lite-latest");
+  const body = JSON.stringify({
+    lane: p.lane || "live", pow, visitor: visitor(), credId: p.cred, method: "POST",
+    url: "https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(model) + ":generateContent",
+    headers: { "Content-Type": "application/json" },
+    body: geminiBody(workerBody || {})
+  });
+  // a plain POST (text/plain, no custom header) so no browser preflights it; the platform adds the site's origin to the answer
+  const res = await fetch(`${p.api}/public/${encodeURIComponent(p.env)}/projects/${encodeURIComponent(p.project)}/call?lane=${encodeURIComponent(p.lane || "live")}`, { method: "POST", headers: { "Content-Type": "text/plain;charset=UTF-8" }, body });
+  const d = await res.json().catch(() => ({}));
+  if (!res.ok) throw Object.assign(new Error(words(res.status, d)), { status: res.status, code: d?.code });
+  // the door answers { ok, status, headers, body }: status and body are Gemini's own
+  if (!d.ok || Number(d.status) >= 400) throw Object.assign(new Error(d?.body?.error?.message || "Gemini error"), { status: Number(d.status) || 502 });
+  return workerShape(d.body);
+}
+
