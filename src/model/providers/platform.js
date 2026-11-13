@@ -105,14 +105,17 @@ export async function platformProxy(workerBody) {
     lane: p.lane || "live", pow, visitor: visitor(), credId: p.cred, method: "POST",
     url: "https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(model) + ":generateContent",
     headers: { "Content-Type": "application/json" },
-    body: geminiBody(workerBody || {})
+    // the body goes as JSON text: the platform hands it to Gemini exactly as written (an object would reach it as "[object Object]")
+    body: JSON.stringify(geminiBody(workerBody || {}))
   });
   // a plain POST (text/plain, no custom header) so no browser preflights it; the platform adds the site's origin to the answer
   const res = await fetch(`${p.api}/public/${encodeURIComponent(p.env)}/projects/${encodeURIComponent(p.project)}/call?lane=${encodeURIComponent(p.lane || "live")}`, { method: "POST", headers: { "Content-Type": "text/plain;charset=UTF-8" }, body });
   const d = await res.json().catch(() => ({}));
   if (!res.ok) throw Object.assign(new Error(words(res.status, d)), { status: res.status, code: d?.code });
-  // the door answers { ok, status, headers, body }: status and body are Gemini's own
-  if (!d.ok || Number(d.status) >= 400) throw Object.assign(new Error(d?.body?.error?.message || "Gemini error"), { status: Number(d.status) || 502 });
-  return workerShape(d.body);
+  // the door answers { ok, status, headers, body }: status and body are Gemini's own, the body as the text Gemini sent
+  let up = d.body;
+  if (typeof up === "string") { try { up = JSON.parse(up); } catch { up = {}; } }
+  if (!d.ok || Number(d.status) >= 400) throw Object.assign(new Error(up?.error?.message || "Gemini error"), { status: Number(d.status) || 502 });
+  return workerShape(up);
 }
 
