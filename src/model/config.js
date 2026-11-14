@@ -17,7 +17,13 @@ export const MODEL = {
   // through POST /public/{env}/projects/{project}/call, with the project's credential read from the environment's Key
   // Vault and never in the page. project is the studio project of this site, cred the id of its Gemini credential there,
   // model the Gemini model name. With these three set the Worker below is not in the path either.
-  platform: { api: "https://api.pragoptics.com/api/v1", env: "7a677248-2920-4aee-9bde-dab0782e0439", install: "", lane: "live", project: "site-sqo74ad", cred: "conn-ssa2ros-x-goog-api-key", model: "gemini-flash-lite-latest" },
+  // PULSE IS THE PLATFORM'S ASSISTANT (Cameron, 2026-11-14: the assistant is not a web caller; it works in the environment
+  // it is built on, and it is not allowed to use its own call): install is Pulse's install on the bridgesindust environment
+  // (the Assistant module, installed 2026-11-13 as Pulse with Pulse's prompt). The platform answers with the environment's
+  // AI, the knowledge files, the instrumentation calculators and the forms the owner let it fill (Submit a Break-In, Work
+  // With Us, Become a Partner; the reviews are not a form it fills). project and cred stay blank so this bundle makes no
+  // Gemini call of its own; the Gemini project credential remains in the environment's vault, unused by this page.
+  platform: { api: "https://api.pragoptics.com/api/v1", env: "7a677248-2920-4aee-9bde-dab0782e0439", install: "084c9aba02dc115f", lane: "live", project: "", cred: "", model: "gemini-flash-lite-latest" },
 
   // The safe path for a PUBLIC site: point this at your own backend endpoint,
   // which holds the key server-side and forwards to Gemini. The browser never
