@@ -1,0 +1,277 @@
+{
+  "forms": [
+    {
+      "install": "6e1d99e5c54888d6",
+      "name": "Submit a Break-In",
+      "actions": [
+        {
+          "name": "send_message",
+          "label": "Submit a break-in",
+          "description": "A break-in: an instrument, measurement or control problem on the visitor's site that a Bridges Industrial specialist takes up by email, free. Use it when something is misbehaving now (a reading, a loop, a transmitter, a valve, a PLC) and the visitor wants help with it.",
+          "params": [
+            {
+              "key": "name",
+              "label": "Name",
+              "type": "text",
+              "required": true
+            },
+            {
+              "key": "company",
+              "label": "Company",
+              "type": "text",
+              "required": false
+            },
+            {
+              "key": "email",
+              "label": "Email",
+              "type": "email",
+              "required": true
+            },
+            {
+              "key": "phone",
+              "label": "Phone",
+              "type": "text",
+              "required": false
+            },
+            {
+              "key": "sector",
+              "label": "Sector",
+              "type": "text",
+              "required": true,
+              "options": [
+                "Oil & Gas — Upstream",
+                "Oil & Gas — Midstream",
+                "Oil & Gas — Downstream",
+                "Refining",
+                "Petrochemical & Chemical",
+                "Power Generation & Utilities",
+                "Water & Wastewater",
+                "Food & Beverage",
+                "Pharmaceutical & Life Sciences",
+                "Pulp & Paper",
+                "Metals & Mining",
+                "Manufacturing & Discrete",
+                "Marine & Offshore",
+                "Agriculture",
+                "Building & Facilities",
+                "Other"
+              ]
+            },
+            {
+              "key": "sectorOther",
+              "label": "Your sector (only when Sector is Other)",
+              "type": "text",
+              "required": false
+            },
+            {
+              "key": "measuring",
+              "label": "What is it measuring?",
+              "type": "text",
+              "required": true,
+              "options": [
+                "Level",
+                "Flow",
+                "Pressure",
+                "Temperature",
+                "Analytical (pH, conductivity, analyzer)",
+                "Weight or density",
+                "Control logic (PLC / DCS)",
+                "Not sure",
+                "Something else"
+              ]
+            },
+            {
+              "key": "product",
+              "label": "Product or medium",
+              "type": "text",
+              "required": true
+            },
+            {
+              "key": "when",
+              "label": "When does it happen?",
+              "type": "text",
+              "required": true,
+              "options": [
+                "All the time, since it started",
+                "Only on a certain shift or time of day",
+                "Only in certain weather or ambient conditions",
+                "Only at certain process conditions (low level, low flow, startup, high rate)",
+                "Only after a specific activity (a wash, a transfer, a batch change)",
+                "Since a specific change (new product, new device, recent work)",
+                "Intermittent, no pattern found yet",
+                "Not sure"
+              ]
+            },
+            {
+              "key": "around",
+              "label": "What happens around this equipment?",
+              "type": "text",
+              "required": false
+            },
+            {
+              "key": "issue",
+              "label": "The issue",
+              "type": "textarea",
+              "required": true
+            },
+            {
+              "key": "text_ok",
+              "label": "Text me instead: permission to reply by text to the phone given",
+              "type": "boolean",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "install": "ee7c0bfaf726bbec",
+      "name": "Work With Us",
+      "actions": [
+        {
+          "name": "send_message",
+          "label": "Send a website enquiry",
+          "description": "A website enquiry to work with Bridges Industrial: field instrumentation work, technical training, control logic (PLC or DCS), custom hardware or a print run, software or PragOptics, a referred project, or a problem with this website. Use it when the visitor wants services, a quote or a conversation, not a fix right now.",
+          "params": [
+            {
+              "key": "name",
+              "label": "Name",
+              "type": "text",
+              "required": true
+            },
+            {
+              "key": "company",
+              "label": "Company",
+              "type": "text",
+              "required": false
+            },
+            {
+              "key": "email",
+              "label": "Email",
+              "type": "email",
+              "required": true
+            },
+            {
+              "key": "phone",
+              "label": "Phone",
+              "type": "text",
+              "required": false
+            },
+            {
+              "key": "topic",
+              "label": "What is this about?",
+              "type": "text",
+              "required": true,
+              "options": [
+                "Work with us, general",
+                "Instrumentation and field work",
+                "Technical training",
+                "Control logic, PLC or DCS",
+                "Custom hardware or a print run",
+                "Software, APIs, or PragOptics",
+                "Refer a project",
+                "A problem with this website",
+                "Something else"
+              ]
+            },
+            {
+              "key": "topicOther",
+              "label": "Tell us what it is about (only when What is this about is Something else)",
+              "type": "text",
+              "required": false
+            },
+            {
+              "key": "message",
+              "label": "What do you need?",
+              "type": "textarea",
+              "required": true
+            },
+            {
+              "key": "text_ok",
+              "label": "Text me instead: permission to reply by text to the phone given",
+              "type": "boolean",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "install": "5f30a9de0d5d6099",
+      "name": "Become a Partner",
+      "actions": [
+        {
+          "name": "send_message",
+          "label": "Send a partner introduction",
+          "description": "A partner introduction from a vendor, supplier, distributor, manufacturer or rep, integrator, contractor, specialist trade, software company or referrer who wants to work alongside Bridges Industrial. Use it when the visitor offers something, not when they need help.",
+          "params": [
+            {
+              "key": "name",
+              "label": "Your name",
+              "type": "text",
+              "required": true
+            },
+            {
+              "key": "business",
+              "label": "Business name",
+              "type": "text",
+              "required": false
+            },
+            {
+              "key": "email",
+              "label": "Email",
+              "type": "email",
+              "required": true
+            },
+            {
+              "key": "phone",
+              "label": "Phone",
+              "type": "text",
+              "required": false
+            },
+            {
+              "key": "site",
+              "label": "Website",
+              "type": "text",
+              "required": false
+            },
+            {
+              "key": "area",
+              "label": "Where you work",
+              "type": "text",
+              "required": false
+            },
+            {
+              "key": "type",
+              "label": "What kind of partner are you?",
+              "type": "text",
+              "required": true,
+              "options": [
+                "Vendor or supplier",
+                "Distributor or procurement",
+                "Manufacturer or manufacturer’s rep",
+                "Integrator or contractor",
+                "Specialist trade or service",
+                "Software or technology",
+                "Referral or co-selling only",
+                "Other"
+              ]
+            },
+            {
+              "key": "offering",
+              "label": "What do you offer?",
+              "type": "textarea",
+              "required": true
+            },
+            {
+              "key": "text_ok",
+              "label": "Text me instead: permission to reply by text to the phone given",
+              "type": "boolean",
+              "required": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

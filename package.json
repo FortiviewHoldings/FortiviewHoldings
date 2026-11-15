@@ -5,10 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && vite build --ssr src/entry-server.jsx --outDir dist/server && node tools/prerender.mjs && node tools/stage-static.mjs && node tools/sitemap.mjs",
+    "build": "node tools/platform-forms.mjs --check && vite build && vite build --ssr src/entry-server.jsx --outDir dist/server && node tools/prerender.mjs && node tools/stage-static.mjs && node tools/sitemap.mjs",
     "build:spa": "vite build",
     "preview": "vite preview",
-    "extract": "node tools/extract-guides.mjs"
+    "extract": "node tools/extract-guides.mjs",
+    "forms": "node tools/platform-forms.mjs",
+    "forms:check": "node tools/platform-forms.mjs --check"
   },
   "dependencies": {
     "@mlc-ai/web-llm": "^0.2.84",
