@@ -1,32 +1,99 @@
 /* ============================================================
    Field Pocket Guide — shared guided-wizard engine (classic JS)
-   One chat brain for every tool. The AI (Pulse, via the gemini
-   proxy) only collects inputs in plain language and calls the
-   tool's deterministic function; it never does the arithmetic.
-   All math stays in PG — the wizard just talks and renders.
+   One chat brain for every tool. Pulse collects the inputs in
+   plain language; the math stays on the page (pg-math.js and
+   friends), the wizard just talks and renders.
    A tool mounts it with a thin config: PGWizard.mount({...}).
+
+   PULSE THROUGH PRAGOPTICS (2026-11-15). The chat box asks the
+   platform's public assistant door, the same door Ask Pulse on
+   /education uses: Pulse's prompt, the guides and the calculators
+   live there, and the key is the environment's own, vaulted on
+   the platform. The old proxy at ai.bridgesindust.com is gone.
+   The platform runs the calculator and answers in words; the
+   calculator's arguments come back with the answer, the page
+   runs the same calculation itself (cfg.run) and draws the result
+   card and the printable report exactly as before. The ids are
+   the same four as src/model/config.js. cfg.system and the tool
+   declarations stay on the page for reference only; the prompt
+   that rules is the one on Pulse's install.
    ============================================================ */
 (function () {
   "use strict";
   var PGWizard = (window.PGWizard = window.PGWizard || {});
-  var PROXY = "https://ai.bridgesindust.com/";
+  var PLATFORM = { api: "https://api.pragoptics.com/api/v1", env: "7a677248-2920-4aee-9bde-dab0782e0439", install: "084c9aba02dc115f", lane: "live" };
+  var MAX_TURNS = 10;   // the door reads the last ten turns of history
   var $ = function (id) { return document.getElementById(id); };
 
-  // One round-trip to the proxy. Flash-Lite hiccups with 503/429 under load; ride through it.
-  function callProxy(system, contents, tools) {
-    var body = JSON.stringify({ system: system, contents: contents, tools: tools });
-    return (function attempt(n) {
-      return fetch(PROXY, { method: "POST", headers: { "Content-Type": "application/json" }, body: body })
-        .then(function (res) {
-          if (res.ok) return res.json();
-          if ((res.status === 503 || res.status === 429) && n < 2) {
-            return new Promise(function (r) { setTimeout(r, 900 * (n + 1)); }).then(function () { return attempt(n + 1); });
-          }
+  // ---- the challenge: sha256(nonce + "." + counter) with `difficulty` leading zero bits, fetched ahead and solved once ----
+  function leadingZeroBits(str) {
+    return crypto.subtle.digest("SHA-256", new TextEncoder().encode(str)).then(function (buf) {
+      var dv = new DataView(buf), n = 0;
+      for (var i = 0; i < 8; i++) { var w = dv.getUint32(i * 4); if (w === 0) { n += 32; continue; } n += Math.clz32(w); break; }
+      return n;
+    });
+  }
+  function solve(nonce, difficulty) {
+    return (function step(c) {
+      if (c > 50000000) return Promise.resolve("");
+      return leadingZeroBits(nonce + "." + c).then(function (n) { return n >= difficulty ? String(c) : step(c + 1); });
+    })(0);
+  }
+  var pending = null;
+  function fetchChallenge() {
+    if (pending) return pending;
+    pending = fetch(PLATFORM.api + "/public/" + encodeURIComponent(PLATFORM.env) + "/challenge?lane=" + encodeURIComponent(PLATFORM.lane))
+      .then(function (r) { return r.json().then(function (d) { if (!r.ok) throw new Error((d && d.error) || ("The platform answered " + r.status)); return d; }); })
+      .then(function (d) {
+        return solve(d.nonce, d.difficulty).then(function (counter) {
+          return { nonce: d.nonce, counter: counter, readyAt: Date.now() + (d.minAgeMs || 2000), expiresAt: Date.parse(d.expiresAt) || (Date.now() + 15 * 60000) };
+        });
+      })
+      .catch(function (e) { pending = null; throw e; });
+    return pending;
+  }
+  /** A solved challenge, fetched ahead so a person never waits and never sends too soon; the next one warms while this one is used. */
+  function challenge() {
+    return fetchChallenge().then(function (c) {
+      if (Date.now() > c.expiresAt - 30000) { pending = null; return challenge(); }
+      var wait = Math.max(0, c.readyAt - Date.now());
+      return new Promise(function (r) { setTimeout(r, wait); }).then(function () {
+        pending = null; fetchChallenge().catch(function () {});
+        return { nonce: c.nonce, counter: c.counter };
+      });
+    });
+  }
+  function visitor() {
+    try {
+      var v = localStorage.getItem("po.visitor");
+      if (!v) { v = Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem("po.visitor", v); }
+      return v;
+    } catch (e) { return "anon"; }
+  }
+  // the door's refusals in Pulse's voice; the platform's own visitor sentences are kept when it has them
+  function words(status, d) {
+    var theirs = String((d && d.error) || "").trim(), code = String((d && d.code) || "");
+    if (["VISITOR_CAP", "MONTH_CAP", "SHARE_SPENT", "AI_NOT_CONNECTED", "AI_BALANCE_EMPTY", "AI_CALLS_EXHAUSTED"].indexOf(code) >= 0 && theirs) return theirs;
+    if (status === 429 || code === "AI_RATE_LIMITED") return "Pulse is busy right now. Give it a second and try again.";
+    if (status >= 500) return "Pulse is not available right now. The manual form on this page still works.";
+    return theirs || "Pulse could not answer that just now.";
+  }
+  /** One question to Pulse on the platform: { answer, actions } where a calculator action is { name, ok, args, result }. */
+  function askPlatform(question, history) {
+    return challenge().then(function (pow) {
+      var body = JSON.stringify({ lane: PLATFORM.lane, pow: pow, visitor: visitor(), question: String(question || "").slice(0, 2000), history: history });
+      var url = PLATFORM.api + "/public/" + encodeURIComponent(PLATFORM.env) + "/modules/" + encodeURIComponent(PLATFORM.install) + "/ask?lane=" + encodeURIComponent(PLATFORM.lane);
+      // a plain POST (text/plain, no custom header) so no browser preflights it; the platform adds the site's origin to the answer
+      return (function attempt(n) {
+        return fetch(url, { method: "POST", headers: { "Content-Type": "text/plain" }, body: body }).then(function (res) {
+          if (res.status === 503 && n < 1) return new Promise(function (r) { setTimeout(r, 900); }).then(function () { return attempt(n + 1); });
           return res.json().catch(function () { return {}; }).then(function (d) {
-            throw new Error(d.error || "The wizard is busy — give it a second and try again.");
+            if (!res.ok) { var e = new Error(words(res.status, d)); e.status = res.status; throw e; }
+            return { answer: String(d.answer || ""), actions: Array.isArray(d.actions) ? d.actions : [] };
           });
         });
-    })(0);
+      })(0);
+    });
   }
 
   function makeTable(headings, rows, cls) {
@@ -121,21 +188,13 @@
     return frag;
   }
 
-  // The report tool is offered to the model automatically whenever a tool supplies cfg.report.
-  var REPORT_TOOL = {
-    name: "make_report",
-    description: "Build a clean, printable report / spec sheet of the CURRENT result so the user can save it as a PDF. Only call this after a calculation has already been run and the user asks for a report, spec sheet, or printout.",
-    parameters: { type: "object", properties: {} }
-  };
-
   PGWizard.mount = function (cfg) {
     var root = typeof cfg.root === "string" ? document.querySelector(cfg.root) : cfg.root;
     var logEl = $("pgwLog"), form = $("pgwForm"), input = $("pgwInput"), send = $("pgwSend");
     if (!logEl || !form) return;
-    var convo = [], busy = false;
+    var convo = [], busy = false;   // the text turns so far: { role: "user" | "assistant", content }
     var lastResult = null, lastInputs = null;
     var canReport = !!cfg.report;
-    var toolsOut = canReport ? cfg.tools.concat([REPORT_TOOL]) : cfg.tools;
 
     // Resolve the body-level print target lazily (the config may mount before the
     // #pgwPrintSheet element is parsed); create it if the page did not supply one.
@@ -171,6 +230,14 @@
       card.className = "pgw-msg pgw-msg--pulse pgw-result";
       if (out.nodeType) card.appendChild(out);        // a DOM node from the tool
       else card.appendChild(cardFromSpec(out));        // a plain spec object
+      // the printable report is one press under the result (the model no longer carries a report tool)
+      if (canReport) {
+        var row = el("div", "pgw-result__act");
+        var btn = el("button", "pgw-send pgw-print", "Print report");
+        btn.type = "button";
+        btn.addEventListener("click", function () { var r = makeReport(); if (r && r.error) bubble("pulse", r.error); });
+        row.appendChild(btn); card.appendChild(row);
+      }
       var th = $("pgwThinking");
       if (th) logEl.insertBefore(card, th); else logEl.appendChild(card);
       logEl.scrollTop = logEl.scrollHeight;
@@ -191,7 +258,6 @@
     }
 
     function runTool(name, args) {
-      if (name === "make_report") return makeReport();
       try {
         var result = cfg.run(name, args || {});
         if (result && result.ok) { lastResult = result; lastInputs = args || {}; }
@@ -199,22 +265,32 @@
       } catch (e) { return { error: e.message }; }
     }
 
+    // The platform's calculator names map onto this page's own (cfg.platformTools, e.g. solve_scaling -> scale_span); a name the
+    // page declares itself passes through; anything else is not this page's business and draws nothing.
+    function localToolFor(name) {
+      if (cfg.platformTools && cfg.platformTools[name]) return cfg.platformTools[name];
+      return (cfg.tools || []).some(function (t) { return t.name === name; }) ? name : "";
+    }
+    // The history the door reads: a first turn that says which tool page this is (Pulse's own prompt rules the rest), Pulse's
+    // greeting, then the conversation so far, within the door's ten turns.
+    function historyFor() {
+      var note = { role: "user", content: "You are helping me on the Field Pocket Guide's " + (cfg.page || "tool") + " page on bridgesindust.com. Walk me through it: ask for whatever is missing, use the matching calculator, and report its numbers with their units." };
+      var hello = { role: "assistant", content: cfg.greeting || "Hi. Tell me the inputs and I will work it with you." };
+      return [note, hello].concat(convo.slice(-(MAX_TURNS - 2)));
+    }
     function ask(userText) {
-      convo.push({ role: "user", parts: [{ text: userText }] });
-      return (function step(n) {
-        if (n >= 6) return "That took too many steps — try rephrasing.";
-        return callProxy(cfg.system, convo, toolsOut).then(function (res) {
-          if (!res.content) return res.text || "I didn't catch that — try again.";
-          convo.push(res.content);
-          if (res.functionCall) {
-            var result = runTool(res.functionCall.name, res.functionCall.args);
-            if (result && result.ok && !result.printed) resultCard(result);
-            convo.push({ role: "user", parts: [{ functionResponse: { name: res.functionCall.name, response: { result: result } } }] });
-            return step(n + 1);
-          }
-          return res.text || "";
+      return askPlatform(userText, historyFor()).then(function (d) {
+        convo.push({ role: "user", content: userText });
+        convo.push({ role: "assistant", content: d.answer });
+        d.actions.forEach(function (a) {
+          if (!a || !a.ok || !a.args || typeof a.args !== "object") return;
+          var local = localToolFor(a.name);
+          if (!local) return;
+          var result = runTool(local, a.args);
+          if (result && result.ok) resultCard(result);
         });
-      })(0);
+        return d.answer || "I did not catch that. Try again.";
+      });
     }
 
     function submit() {
@@ -249,5 +325,6 @@
     });
 
     if (cfg.greeting) bubble("pulse", cfg.greeting);
+    try { fetchChallenge().catch(function () {}); } catch (e) { /* the first question fetches one */ }
   };
 })();

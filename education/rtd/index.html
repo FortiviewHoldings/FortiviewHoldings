@@ -265,7 +265,9 @@ import * as PGM from "/education/assets/pg-math.js";
   }
   PGWizard.mount({
     root: ".pgw",
-    greeting: "Hi, I'll work the RTD conversion with you. Tell me the sensor (Pt100, Pt500, or Pt1000), the direction, and your reading. When it is done you can ask me for a printable report. For example: \"Pt100 at 100 degrees C\" or \"138.5 ohms on a Pt100.\" I can also build a resistance table over a range.",
+    page: "RTD Tables",   // Pulse through PragOptics (2026-11-15): the platform's calculator runs there; its arguments come back and this page's own run() draws the card
+    platformTools: { solve_rtd: "rtd_convert" },
+    greeting: "Hi, I'll work the RTD conversion with you. Tell me the sensor (Pt100, Pt500, or Pt1000), the direction, and your reading. When it is done, press Print report under the result to save a PDF. For example: \"Pt100 at 100 degrees C\" or \"138.5 ohms on a Pt100.\" I can also build a resistance table over a range.",
     system: SYSTEM, tools: TOOLS, run: run, render: render, report: report
   });
 })();

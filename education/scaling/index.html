@@ -226,7 +226,9 @@ import * as PGM from "/education/assets/pg-math.js";
   }
   PGWizard.mount({
     root: ".pgw",
-    greeting: "Hi, I'll set up the scaling with you. Tell me the input range, the output range, and the value to convert. When it is done you can ask me for a printable spec sheet. For example: \"0 to 100 degrees C into 4 to 20 milliamps, what's 50 degrees?\"",
+    page: "Signal Scaling",   // Pulse through PragOptics (2026-11-15): the platform's calculator runs there; its arguments come back and this page's own run() draws the card
+    platformTools: { solve_scaling: "scale_span" },
+    greeting: "Hi, I'll set up the scaling with you. Tell me the input range, the output range, and the value to convert. When it is done, press Print report under the result to save a PDF. For example: \"0 to 100 degrees C into 4 to 20 milliamps, what's 50 degrees?\"",
     system: SYSTEM, tools: TOOLS, run: run, render: render, report: report
   });
 })();

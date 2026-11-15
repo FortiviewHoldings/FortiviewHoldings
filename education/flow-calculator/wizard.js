@@ -6,7 +6,69 @@
 
 import { missingFlowFields } from "./flow-solve.js";
 
-const PROXY = "https://ai.bridgesindust.com/";
+// PULSE THROUGH PRAGOPTICS (2026-11-15): the chat box asks the platform's public assistant door, the same door Ask Pulse on
+// /education uses; Pulse's prompt, the guides and the calculators (solve_flow among them) live there, and the key is the
+// environment's own, vaulted on the platform. The old proxy at ai.bridgesindust.com is gone. The platform runs the calculator and
+// answers in words; its arguments come back with the answer and this page runs the same calculation itself (runFlowTool) and draws
+// the result card as before. The ids are the same four as src/model/config.js. SYSTEM and TOOLS stay for reference only.
+const PLATFORM = { api: "https://api.pragoptics.com/api/v1", env: "7a677248-2920-4aee-9bde-dab0782e0439", install: "084c9aba02dc115f", lane: "live" };
+const MAX_TURNS = 10;   // the door reads the last ten turns of history
+const PAGE = "Flow Calculator (differential-pressure and head-type flow)";
+
+async function leadingZeroBits(str) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+  const dv = new DataView(buf);
+  let n = 0;
+  for (let i = 0; i < 8; i++) { const w = dv.getUint32(i * 4); if (w === 0) { n += 32; continue; } n += Math.clz32(w); break; }
+  return n;
+}
+async function solve(nonce, difficulty) {
+  for (let c = 0; c < 50000000; c++) { if ((await leadingZeroBits(nonce + "." + c)) >= difficulty) return String(c); }
+  return "";
+}
+let pending = null;
+function fetchChallenge() {
+  if (pending) return pending;
+  pending = fetch(`${PLATFORM.api}/public/${encodeURIComponent(PLATFORM.env)}/challenge?lane=${encodeURIComponent(PLATFORM.lane)}`)
+    .then((r) => r.json().then((d) => { if (!r.ok) throw new Error(d?.error || `The platform answered ${r.status}`); return d; }))
+    .then(async (d) => ({ nonce: d.nonce, counter: await solve(d.nonce, d.difficulty), readyAt: Date.now() + (d.minAgeMs || 2000), expiresAt: Date.parse(d.expiresAt) || (Date.now() + 15 * 60000) }))
+    .catch((e) => { pending = null; throw e; });
+  return pending;
+}
+/** A solved challenge, fetched ahead so a person never waits and never sends too soon; the next one warms while this one is used. */
+async function challenge() {
+  const c = await fetchChallenge();
+  if (Date.now() > c.expiresAt - 30000) { pending = null; return challenge(); }
+  await new Promise((res) => setTimeout(res, Math.max(0, c.readyAt - Date.now())));
+  pending = null; fetchChallenge().catch(() => {});
+  return { nonce: c.nonce, counter: c.counter };
+}
+function visitor() {
+  try { let v = localStorage.getItem("po.visitor"); if (!v) { v = Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem("po.visitor", v); } return v; } catch { return "anon"; }
+}
+// the door's refusals in Pulse's voice; the platform's own visitor sentences are kept when it has them
+function words(status, d) {
+  const theirs = String(d?.error || "").trim(), code = String(d?.code || "");
+  if (["VISITOR_CAP", "MONTH_CAP", "SHARE_SPENT", "AI_NOT_CONNECTED", "AI_BALANCE_EMPTY", "AI_CALLS_EXHAUSTED"].includes(code) && theirs) return theirs;
+  if (status === 429 || code === "AI_RATE_LIMITED") return "Pulse is busy right now. Give it a second and try again.";
+  if (status >= 500) return "Pulse is not available right now. The manual form on this page still works.";
+  return theirs || "Pulse could not answer that just now.";
+}
+/** One question to Pulse on the platform: { answer, actions } where a calculator action is { name, ok, args, result }. */
+async function askPlatform(question, history) {
+  const pow = await challenge();
+  const body = JSON.stringify({ lane: PLATFORM.lane, pow, visitor: visitor(), question: String(question || "").slice(0, 2000), history });
+  const url = `${PLATFORM.api}/public/${encodeURIComponent(PLATFORM.env)}/modules/${encodeURIComponent(PLATFORM.install)}/ask?lane=${encodeURIComponent(PLATFORM.lane)}`;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    // a plain POST (text/plain, no custom header) so no browser preflights it; the platform adds the site's origin to the answer
+    const res = await fetch(url, { method: "POST", headers: { "Content-Type": "text/plain" }, body });
+    if (res.status === 503 && attempt < 1) { await new Promise((r) => setTimeout(r, 900)); continue; }
+    const d = await res.json().catch(() => ({}));
+    if (!res.ok) { const e = new Error(words(res.status, d)); e.status = res.status; throw e; }
+    return { answer: String(d.answer || ""), actions: Array.isArray(d.actions) ? d.actions : [] };
+  }
+  throw new Error("Pulse is busy right now. Give it a second and try again.");
+}
 
 const SYSTEM =
   "You are the Flow Calculator wizard for Bridges Industrial. You help a field " +
@@ -105,33 +167,24 @@ function runFlowTool(name, args) {
   } catch (e) { return { error: e.message }; }
 }
 
-async function callProxy(contents) {
-  const body = JSON.stringify({ system: SYSTEM, contents, tools: TOOLS });
-  for (let attempt = 0; attempt < 3; attempt++) {
-    const res = await fetch(PROXY, { method: "POST", headers: { "Content-Type": "application/json" }, body });
-    if (res.ok) return res.json();
-    if ((res.status === 503 || res.status === 429) && attempt < 2) { await new Promise(r => setTimeout(r, 900 * (attempt + 1))); continue; }
-    const d = await res.json().catch(() => ({}));
-    throw new Error(d.error || "The wizard is busy — give it a second and try again.");
-  }
+const convo = [];   // the text turns so far: { role: "user" | "assistant", content }
+const GREETING = "Hi, I'll set up the calculation with you. Tell me about your meter: the type, the fluid, and what you're reading. When it is done, press Spec sheet or Full report under the result to save a PDF. For example: \"4-inch venturi on air, reading 100 inches of water at 100 psig and 80 °F.\"";
+// The history the door reads: a first turn that says which tool page this is (Pulse's own prompt rules the rest), Pulse's greeting,
+// then the conversation so far, within the door's ten turns.
+function historyFor() {
+  const note = { role: "user", content: `You are helping me on the Field Pocket Guide's ${PAGE} page on bridgesindust.com. Walk me through it: ask for whatever is missing, use the flow calculator, and report its numbers with their units.` };
+  return [note, { role: "assistant", content: GREETING }].concat(convo.slice(-(MAX_TURNS - 2)));
 }
-
-const convo = [];
 async function ask(userText) {
-  convo.push({ role: "user", parts: [{ text: userText }] });
-  for (let step = 0; step < 6; step++) {
-    const res = await callProxy(convo);
-    if (!res.content) return res.text || "I didn't catch that — try again.";
-    convo.push(res.content);
-    if (res.functionCall) {
-      const result = runFlowTool(res.functionCall.name, res.functionCall.args);
-      if (res.functionCall.name === "solve_flow" && result && result.ok) renderResultCard();
-      convo.push({ role: "user", parts: [{ functionResponse: { name: res.functionCall.name, response: { result } } }] });
-      continue;
-    }
-    return res.text || "";
+  const d = await askPlatform(userText, historyFor());
+  convo.push({ role: "user", content: userText });
+  convo.push({ role: "assistant", content: d.answer });
+  for (const a of d.actions) {
+    if (!a || !a.ok || a.name !== "solve_flow" || !a.args || typeof a.args !== "object") continue;
+    const result = runFlowTool("solve_flow", a.args);
+    if (result && result.ok) renderResultCard();
   }
-  return "That took too many steps — try rephrasing.";
+  return d.answer || "I did not catch that. Try again.";
 }
 
 // ---- UI ----
@@ -193,6 +246,14 @@ function renderResultCard() {
     const cap2 = document.createElement("div"); cap2.className = "wiz-tcap"; cap2.textContent = "Along the curve";
     card.append(cap2, makeTable(heads, pts.map((d) => [fnum(d.x), fnum(d.y)])));
   }
+  // the spec sheet and the full report are one press each under the result (the model no longer carries the print tools)
+  const act = document.createElement("div"); act.className = "wiz-result__act";
+  for (const [kind, label] of [["spec", "Spec sheet"], ["full", "Full report"]]) {
+    const b = document.createElement("button"); b.type = "button"; b.className = "wiz-send wiz-print"; b.textContent = label;
+    b.addEventListener("click", () => { const out = UI.printReport(kind); if (out && out.error) bubble("pulse", out.error); });
+    act.append(b);
+  }
+  card.append(act);
   const th = $("wizThinking");
   if (th) log().insertBefore(card, th); else log().append(card);
   log().scrollTop = log().scrollHeight;
@@ -234,6 +295,7 @@ function init() {
   const inp = $("wizInput");
   inp.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
   inp.addEventListener("input", () => { inp.style.height = "auto"; inp.style.height = Math.min(inp.scrollHeight, 120) + "px"; });
-  bubble("pulse", "Hi — I'll set up the calculation with you. Tell me about your meter: the type, the fluid, and what you're reading. For example: \"4-inch venturi on air, reading 100 inches of water at 100 psig and 80 °F.\"");
+  bubble("pulse", GREETING);
+  fetchChallenge().catch(() => {});   // the first question's proof of work, solved ahead
 }
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();

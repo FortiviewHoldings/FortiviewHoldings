@@ -281,7 +281,9 @@ import * as PGM from "/education/assets/pg-math.js";
   }
   PGWizard.mount({
     root: ".pgw",
-    greeting: "Hi, I'll work the square-root extraction with you. Tell me the DP range, the flow range, and your reading. When it is done you can ask me for a printable spec sheet. For example: \"0 to 100 inches of water, 0 to 500 GPM, the linear DP signal reads 12 mA.\" I'll confirm whether a milliamp reading is the linear or the extracted signal.",
+    page: "Square-Root Extraction",   // Pulse through PragOptics (2026-11-15): the platform's calculator runs there; its arguments come back and this page's own run() draws the card
+    platformTools: { solve_sqrt: "solve_sqrt" },
+    greeting: "Hi, I'll work the square-root extraction with you. Tell me the DP range, the flow range, and your reading. When it is done, press Print report under the result to save a PDF. For example: \"0 to 100 inches of water, 0 to 500 GPM, the linear DP signal reads 12 mA.\" I'll confirm whether a milliamp reading is the linear or the extracted signal.",
     system: SYSTEM, tools: TOOLS, run: run, render: render, report: report
   });
 })();

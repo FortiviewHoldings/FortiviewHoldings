@@ -492,7 +492,9 @@ import * as PGM from "/education/assets/pg-math.js";
   }
   PGWizard.mount({
     root: ".pgw",
-    greeting: "Hi, I'll build the calibration worksheet with you. First the loop: the input range you apply, the output range you measure, the tolerance in percent of span, and how many points (3, 5, or 11). Then I'll walk the points for the As-Found readings, and the As-Left if you adjusted. When it is done you can ask me for a printable report. For example: \"0 to 100 inH2O in, 4 to 20 mA out, half a percent tolerance, 5 points.\"",
+    page: "Calibration Worksheet",   // Pulse through PragOptics (2026-11-15): the platform's calculator runs there; its arguments come back and this page's own run() draws the card
+    platformTools: { solve_calibration: "solve_calibration" },
+    greeting: "Hi, I'll build the calibration worksheet with you. First the loop: the input range you apply, the output range you measure, the tolerance in percent of span, and how many points (3, 5, or 11). Then I'll walk the points for the As-Found readings, and the As-Left if you adjusted. When it is done, press Print report under the result to save a PDF. For example: \"0 to 100 inH2O in, 4 to 20 mA out, half a percent tolerance, 5 points.\"",
     system: SYSTEM, tools: TOOLS, run: run, render: render, report: report
   });
 })();

@@ -304,7 +304,9 @@ import { TC_DATA, TC } from "/education/assets/tc-core.js";
   }
   PGWizard.mount({
     root: ".pgw",
-    greeting: "Hi, I'll work the thermocouple conversion with you. Tell me the type, the direction, your reading, and the cold-junction reference. When it is done you can ask me for a printable report. For example: \"type K, hot junction 300 C, cold junction 25.\" I'll confirm the reference, since 0 C versus ambient changes the answer.",
+    page: "Thermocouple Tables",   // Pulse through PragOptics (2026-11-15): the platform's calculator runs there; its arguments come back and this page's own run() draws the card
+    platformTools: { thermocouple_convert: "tc_convert" },
+    greeting: "Hi, I'll work the thermocouple conversion with you. Tell me the type, the direction, your reading, and the cold-junction reference. When it is done, press Print report under the result to save a PDF. For example: \"type K, hot junction 300 C, cold junction 25.\" I'll confirm the reference, since 0 C versus ambient changes the answer.",
     system: SYSTEM, tools: TOOLS, run: run, render: render, report: report
   });
 })();
