@@ -233,7 +233,7 @@
       // the printable report is one press under the result (the model no longer carries a report tool)
       if (canReport) {
         var row = el("div", "pgw-result__act");
-        var btn = el("button", "pgw-send pgw-print", "Print report");
+        var btn = el("button", "pgw-send pgw-report-btn", "Print report");
         btn.type = "button";
         btn.addEventListener("click", function () { var r = makeReport(); if (r && r.error) bubble("pulse", r.error); });
         row.appendChild(btn); card.appendChild(row);

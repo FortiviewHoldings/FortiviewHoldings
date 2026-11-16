@@ -299,4 +299,4 @@ body.pg-pad-open .pg-main{padding-bottom:320px}
 }
 /* the Print report press under a result (2026-11-15) */
 .pgw-result__act{margin-top:10px;display:flex;justify-content:flex-end}
-.pgw-print{min-height:38px;font-size:.85rem;padding:0 14px}
+.pgw-report-btn{min-height:38px;font-size:.85rem;padding:0 14px}

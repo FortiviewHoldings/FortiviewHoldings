@@ -249,7 +249,7 @@ function renderResultCard() {
   // the spec sheet and the full report are one press each under the result (the model no longer carries the print tools)
   const act = document.createElement("div"); act.className = "wiz-result__act";
   for (const [kind, label] of [["spec", "Spec sheet"], ["full", "Full report"]]) {
-    const b = document.createElement("button"); b.type = "button"; b.className = "wiz-send wiz-print"; b.textContent = label;
+    const b = document.createElement("button"); b.type = "button"; b.className = "wiz-send wiz-report-btn"; b.textContent = label;
     b.addEventListener("click", () => { const out = UI.printReport(kind); if (out && out.error) bubble("pulse", out.error); });
     act.append(b);
   }
